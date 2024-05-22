@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  frontend:
+    container_name: eaf_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    env_file:
+      - ./frontend/.env
+  backend:
+    container_name: eaf_backend
+    restart: always
+    build:
+      context: ./backend/typescript
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    dns:
+      - 8.8.8.8
+    volumes:
+      - ./backend/typescript:/app
+    env_file:
+      - ./.env
