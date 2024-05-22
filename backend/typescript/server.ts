@@ -6,7 +6,7 @@ import * as firebaseAdmin from "firebase-admin";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 
-import { mongo, sequelize } from "./models";
+import { mongo } from "./models";
 import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
@@ -41,7 +41,7 @@ app.use(cookieParser());
 app.use(cors(CORS_OPTIONS));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(limiter);
+app.use(limiter);
 
 app.use("/auth", authRouter);
 app.use("/entities", entityRouter);

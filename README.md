@@ -1,7 +1,7 @@
 # Extend-A-Family
 
 ## Stack Choices
-**Frontend Language:** React
+**Frontend Language:** React<br>
 **Backend Language:** Node (Express)<br>
 **Backend API:** REST<br>
 **Database:** MongoDB<br>
@@ -11,61 +11,26 @@
 ## Table of Contents
 * 📝 [Documentation](#documentation)
 * ❗❗ [Reporting Issues](#reporting-issues)
-* 👨‍💻 [Getting Started: Users](#getting-started-users)
-* 👷 [Getting Started: Internal Tools Developers](#getting-started-internal-tools-developers)
-  * ✔️ [Prerequisites](#prerequisites)
-  * ⚙️ [Set up](#set-up)
+* ⚙️ [Set up](#set-up)
 * 🚀 [Creating a Release](#creating-a-release)
 * 🧰 [Useful Commands](#useful-commands)
   * ℹ️ [Get Names & Statuses of Running Containers](#get-names--statuses-of-running-containers)
   * ✨ [Linting & Formatting](#linting--formatting)
   * 🧪 [Running Tests](#running-tests)
-* ✍️ [Updating Documentation](#updating-documentation)
 * 🌳 [Version Control Guide](#version-control-guide)
   * 🌿 [Branching](#branching)
   * 🔒 [Commits](#commits)
 
-## Documentation
-
-https://uwblueprint.github.io/starter-code-v2
-
-
-## Reporting Issues
-
-You can open an issue in this GitHub repository, or message the #internal-tools-help channel in UW Blueprint’s Slack workspace.
-
-
-## Getting Started: Users
-
-Please follow the instructions in this [guide](https://uwblueprint.github.io/starter-code-v2/docs/getting-started) to generate and set up Starter Code. Starter Code must be preprocessed through the [`create-bp-app`](https://www.npmjs.com/package/@uwblueprint/create-bp-app) CLI tool before being used, so **please do not clone and run this repository directly**.
-
 ---
 
-## Getting Started: Internal Tools Developers
-
-### Prerequisites
-
-* Install Docker Desktop ([MacOS](https://docs.docker.com/docker-for-mac/install/) | [Windows (Home)](https://docs.docker.com/docker-for-windows/install-windows-home/) | [Windows (Pro, Enterprise, Education)](https://docs.docker.com/docker-for-windows/install/) | [Linux](https://docs.docker.com/engine/install/#server)) and ensure that it is running
-```bash
-# these commands should give error-free output
-docker info
-docker-compose --version
-```
-* Ask a member of the Internal Tools team to be added to our Firebase and MongoDB Atlas projects
-* Set up Vault client for secret management, see instructions [here](https://www.notion.so/uwblueprintexecs/Secret-Management-2d5b59ef0987415e93ec951ce05bf03e)
-
-
-### Set up
+## Set up
 
 1. Clone this repository and `cd` into the project folder
 ```bash
-git clone https://github.com/uwblueprint/starter-code-v2.git
-cd starter-code-v2
+git clone https://github.com/uwblueprint/extend-a-family.gitt
+cd extend-a-family
 ```
-2. Comment out one of the backend services in `docker-compose.yml`
-3. Follow through our [public docs](https://uwblueprint.github.io/starter-code-v2/docs/getting-started)
-4. In the root `.env` file, change the name of the MongoDB database according to the backend you're using: either `typescript-test` or `python-test`
-5. Run the application
+2. Run the application
 ```bash
 docker-compose up --build
 ```

@@ -1,8 +1,7 @@
 import { Router } from "express";
 import fs from "fs";
 import multer from "multer";
-// import EntityServiceMg from "../services/implementations/EntityServiceMg";
-import EntityServicePg from "../services/implementations/EntityServicePg";
+import EntityServiceMg from "../services/implementations/EntityServiceMg";
 import { isAuthorizedByRole } from "../middlewares/auth";
 import {
   EntityResponseDTO,
@@ -23,7 +22,7 @@ const defaultBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
 const fileStorageService: IFileStorageService = new FileStorageService(
   defaultBucket,
 );
-const entityService: IEntityService = new EntityServicePg(fileStorageService);
+const entityService: IEntityService = new EntityServiceMg(fileStorageService);
 
 /* Create entity */
 entityRouter.post(
