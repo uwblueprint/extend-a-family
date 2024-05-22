@@ -15,7 +15,7 @@
     "@types/react-dom": "^18.2.19",
     "@types/react-jsonschema-form": "^1.7.4",
     "@types/react-table": "^7.0.29",
-    "axios": "^0.21.1",
+    "axios": "^0.28.0",
     "bootstrap": "^4.6.0",
     "humps": "^2.0.1",
     "json-schema": "^0.3.0",
