@@ -29,3 +29,15 @@ services:
       - ./backend:/app
     env_file:
       - ./.env
+  database:
+    container_name: eaf_database
+    image: mongodb/mongodb-atlas-local
+    environment:
+      - MONGODB_INITDB_ROOT_USERNAME=user
+      - MONGODB_INITDB_ROOT_PASSWORD=pass
+    ports:
+      - 27018:27017
+    volumes:
+      - data:/data/db
+volumes:
+  data:
