@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   version: 1.0.0
-  title: UW Blueprint Starter Code TypeScript API
-  description: An API for the TypeScript Backend of Starter Code
+  title: UW Blueprint Extend-A-Family TypeScript API
+  description: An API for the TypeScript Backend of Extend-A-Family
 
 
 # Authentication 
