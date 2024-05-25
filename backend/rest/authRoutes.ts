@@ -3,7 +3,7 @@ import { CookieOptions, Router } from "express";
 import { isAuthorizedByEmail, isAuthorizedByUserId } from "../middlewares/auth";
 import {
   loginRequestValidator,
-  registerRequestValidator,
+  signupRequestValidator,
 } from "../middlewares/validators/authValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -44,8 +44,8 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
   }
 });
 
-/* Register a user, returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
-authRouter.post("/register", registerRequestValidator, async (req, res) => {
+/* Signup a user, returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
+authRouter.post("/signup", signupRequestValidator, async (req, res) => {
   try {
     await userService.createUser({
       firstName: req.body.firstName,

@@ -23,7 +23,7 @@ export const loginRequestValidator = async (
   return next();
 };
 
-export const registerRequestValidator = async (
+export const signupRequestValidator = async (
   req: Request,
   res: Response,
   next: NextFunction,

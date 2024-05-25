@@ -55,7 +55,7 @@ const logout = async (userId: string | undefined): Promise<boolean> => {
   }
 };
 
-const register = async (
+const signup = async (
   firstName: string,
   lastName: string,
   email: string,
@@ -63,7 +63,7 @@ const register = async (
 ): Promise<AuthenticatedUser> => {
   try {
     const { data } = await baseAPIClient.post(
-      "/auth/register",
+      "/auth/signup",
       { firstName, lastName, email, password },
       { withCredentials: true },
     );
@@ -114,7 +114,7 @@ export default {
   login,
   logout,
   loginWithGoogle,
-  register,
+  signup,
   resetPassword,
   refresh,
 };

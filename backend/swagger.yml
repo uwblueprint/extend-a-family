@@ -294,11 +294,11 @@ paths:
         '500':
           description: Invalid request
 
-  /auth/register:
+  /auth/signup:
     post:
       tags:
         - Auth
-      description: Register a new user
+      description: Signup a new user
       requestBody:
         required: true
         content:
