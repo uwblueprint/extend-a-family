@@ -1,5 +1,8 @@
 export type Role = "User" | "Admin";
 
+export const teamRoleValues = ["PM", "DESIGNER", "PL", "DEVELOPER"] as const;
+export type TeamRole = typeof teamRoleValues[number];
+
 export type Token = {
   accessToken: string;
   refreshToken: string;
