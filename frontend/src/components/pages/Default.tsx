@@ -48,6 +48,7 @@ const Default = (): React.ReactElement => {
         <Button text="Create Entity" path={Routes.CREATE_ENTITY_PAGE} />
         <Button text="Update Entity" path={Routes.UPDATE_ENTITY_PAGE} />
         <Button text="Display Entities" path={Routes.DISPLAY_ENTITY_PAGE} />
+        <Button text="Prototypes" path={Routes.PROTOTYPE_PAGE} />
         <Button text="Edit Team" path={Routes.EDIT_TEAM_PAGE} />
         <Button text="Hooks Demo" path={Routes.HOOKS_PAGE} />
       </div>

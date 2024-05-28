@@ -6,6 +6,7 @@ import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import CreatePage from "./components/pages/CreatePage";
+import PrototypePage from "./components/pages/PrototypePage";
 import Default from "./components/pages/Default";
 import DisplayPage from "./components/pages/DisplayPage";
 import NotFound from "./components/pages/NotFound";
@@ -83,6 +84,11 @@ const App = (): React.ReactElement => {
                 exact
                 path={Routes.DISPLAY_ENTITY_PAGE}
                 component={DisplayPage}
+              />
+              <PrivateRoute
+                exact
+                path={Routes.PROTOTYPE_PAGE}
+                component={PrototypePage}
               />
               <PrivateRoute
                 exact
