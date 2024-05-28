@@ -62,11 +62,13 @@ docker ps
 ### Linting & Formatting
 TypeScript backend and frontend:
 ```bash
-# linting & formatting warnings only
-docker exec -it scv2_ts_backend /bin/bash -c "yarn lint"
-
 # linting with fix & formatting
-docker exec -it scv2_ts_backend /bin/bash -c "yarn fix"
+docker exec -it eaf_backend /bin/bash -c "yarn fix"
+docker exec -it eaf_frontend /bin/bash -c "yarn fix"
+
+# linting warnings only
+docker exec -it eaf_backend /bin/bash -c "yarn lint"
+docker exec -it eaf_frontend /bin/bash -c "yarn lint"
 ```
 
 ### Running Tests
