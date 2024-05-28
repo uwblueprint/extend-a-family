@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ChakraProvider } from "@chakra-ui/react";
 import React from "react";
 import { createRoot } from "react-dom/client";
 
@@ -7,7 +9,9 @@ import reportWebVitals from "./reportWebVitals";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <ChakraProvider>
+      <App />
+    </ChakraProvider>
   </React.StrictMode>,
 );
 
