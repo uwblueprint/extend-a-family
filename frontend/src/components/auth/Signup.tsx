@@ -14,7 +14,7 @@ const Signup = (): React.ReactElement => {
   const [password, setPassword] = useState("");
 
   const onSignupClick = async () => {
-    const user: AuthenticatedUser = await authAPIClient.register(
+    const user: AuthenticatedUser = await authAPIClient.signup(
       firstName,
       lastName,
       email,

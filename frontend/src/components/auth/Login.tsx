@@ -29,7 +29,7 @@ const Login = (): React.ReactElement => {
     setAuthenticatedUser(user);
   };
 
-  const onSignUpClick = () => {
+  const onSignupClick = () => {
     history.push(SIGNUP_PAGE);
   };
 
@@ -94,7 +94,7 @@ const Login = (): React.ReactElement => {
         <button
           className="btn btn-primary"
           type="button"
-          onClick={onSignUpClick}
+          onClick={onSignupClick}
         >
           Sign Up
         </button>
