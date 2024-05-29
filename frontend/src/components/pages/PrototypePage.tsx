@@ -74,7 +74,7 @@ const AnalyticsView = ({
     const juicyLayout = map(moduleItems, function (item, i) {
       // Sexy triangle numbers
       let level = 0;
-      let total = 0;
+        let total = 0;
 
       while (total < i) {
         level++;
@@ -123,6 +123,7 @@ const AnalyticsView = ({
         breakpoints={breakpoints}
         cols={colSizes}
         verticalCompact={false}
+        draggableHandle=".drag-handle"
       >
         {generateDOM()}
       </ResponsiveGridLayout>
