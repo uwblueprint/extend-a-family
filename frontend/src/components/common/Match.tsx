@@ -1,6 +1,6 @@
 import React from "react";
 
-const TextBox: React.FC = () => {
+const Match: React.FC = () => {
   return (
     <div
       className={"drag-handle"}
@@ -13,9 +13,9 @@ const TextBox: React.FC = () => {
         textAlign: "center",
       }}
     >
-      <p> Text Box </p>
+      <p> Match Box </p>
     </div>
   );
 };
 
-export default TextBox;
+export default Match;
