@@ -1,4 +1,8 @@
+import { StringLiteral } from "typescript";
+
 export type Role = "User" | "Admin";
+export const teamRoleValues = ["PM", "DESIGNER", "PL", "DEVELOPER"] as const;
+export type TeamRole = typeof teamRoleValues[number];
 
 export type Token = {
   accessToken: string;
@@ -12,6 +16,15 @@ export type UserDTO = {
   email: string;
   role: Role;
 };
+
+export type TeamMemberDTO = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  teamRole: TeamRole;
+};
+
+export type CreateTeamMemberDTO = Omit<TeamMemberDTO, "id">;
 
 export type CreateUserDTO = Omit<UserDTO, "id"> & { password: string };
 
