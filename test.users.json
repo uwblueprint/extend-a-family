@@ -1,0 +1,90 @@
+[{
+  "_id": {
+    "$oid": "664fe8c63962470029da5243"
+  },
+  "firstName": "Carolyn",
+  "lastName": "Zhang",
+  "authId": "Mh6mDU2uprN6SsPeeR4X0hjygWp1",
+  "role": "User",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "664fed203962470029da5248"
+  },
+  "firstName": "Carolyn",
+  "lastName": "1",
+  "authId": "y07sbWfVEVdOwMwJjWwK89kzVvF2",
+  "role": "User",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "664ffa094b3552002867a187"
+  },
+  "firstName": "aathi",
+  "lastName": "rocks",
+  "authId": "QNhO3F2YSBQYxDNvF3pxfpDX4TI2",
+  "role": "User",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "664ffd0221ac2500349b68dd"
+  },
+  "firstName": "j",
+  "lastName": "h",
+  "authId": "rdOi8dqK45RANkyyndQlpuUV0bM2",
+  "role": "User",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66516a3992e2a9002a3d96c7"
+  },
+  "firstName": "Jimmy",
+  "lastName": "Liu",
+  "authId": "KBKw0J6LiGYw24znETzeeS9hnSF2",
+  "role": "User",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6651f75ae2a8780ab017d803"
+  },
+  "firstName": "Cherry",
+  "lastName": "Yang",
+  "authId": "8EukqnHS8dPLGJ3uCUv5xjn8jOO2",
+  "role": "User",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6652a88824be8e0029d7c950"
+  },
+  "firstName": "Jimmy",
+  "lastName": "Liu",
+  "authId": "1l7MwicAeUREDmEUahYr5nnV6ce2",
+  "role": "User",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "665658a4f99945e25d456971"
+  },
+  "firstName": "Maggie",
+  "lastName": "Chen",
+  "authId": "t5PkygeqePMwVOMT3KBg2LqZZrf1",
+  "role": "User",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6656746206c9691266bbe71b"
+  },
+  "firstName": "Harishan",
+  "lastName": "Ravindranathan",
+  "authId": "gfZqzxoMzsUgHpXUH3gKMXoCMC13",
+  "role": "User",
+  "__v": 0
+}]

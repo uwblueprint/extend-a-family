@@ -1,25 +1,19 @@
 import mongoose from "mongoose";
+import { getErrorMessage } from "../utilities/errorUtils";
 
 /* eslint-disable-next-line import/prefer-default-export */
 export const mongo = {
-  connect: (): void => {
-    mongoose.connect(
+  connect: async (): Promise<void> => {
+    try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      encodeURI(process.env.MG_DATABASE_URL!),
-      {
-        useUnifiedTopology: true,
-        useNewUrlParser: true,
-        useFindAndModify: false,
-      },
-      (error) => {
-        if (error) {
-          /* eslint-disable-next-line no-console */
-          console.error(`Error connecting to MongoDB: ${error.message}`);
-        } else {
-          /* eslint-disable-next-line no-console */
-          console.info("Successfully connected to MongoDB!");
-        }
-      },
-    );
+      await mongoose.connect(encodeURI(process.env.MG_DATABASE_URL!), {
+        dbName: process.env.MG_DATABASE_NAME,
+      });
+      /* eslint-disable-next-line no-console */
+      console.info("Successfully connected to MongoDB!");
+    } catch (error) {
+      /* eslint-disable-next-line no-console */
+      console.error(`Error connecting to MongoDB: ${getErrorMessage(error)}`);
+    }
   },
 };
