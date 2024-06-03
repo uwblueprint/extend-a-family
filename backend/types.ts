@@ -35,3 +35,14 @@ export type NodemailerConfig = {
 };
 
 export type SignupMethod = "PASSWORD" | "GOOGLE";
+
+export type TeamRole = "DEVELOPER" | "DESIGNER" | "PL" | "PM";
+
+export type TeamMemberDTO = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  teamRole: TeamRole;
+};
+
+export type CreateTeamMemberDTO = Omit<TeamMemberDTO, "id">;

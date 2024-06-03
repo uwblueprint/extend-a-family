@@ -1,51 +1,29 @@
 import { Router } from "express";
+import TeamMemberService from "../services/implementations/teamMemberService";
+import { getErrorMessage } from "../utilities/errorUtils";
+import { CreateTeamMemberDTO } from "../types";
+import { createTeamMemberDtoValidator } from "../middlewares/validators/teamMemberValidator";
 
-const userRouter: Router = Router();
-userRouter.use();
+const teamMemberRouter: Router = Router();
+const teamMemberService = new TeamMemberService();
 
-const teamMemberService: ITeamMemberService = new TeamMemberService();
+teamMemberRouter.get("/", async (req, res) => {
+  try {
+    const teamMembers = await teamMemberService.getTeamMembers();
+    res.status(200).json(teamMembers);
+  } catch (error: unknown) {
+    res.status(500).json({ error: getErrorMessage(error) });
+  }
+});
 
-userRouter.get("/", async (req, res) => {
-    
-    const contentType = req.headers["content-type"];
-  
-    if (userId && email) {
-      await sendResponseByMimeType(res, 400, contentType, [
-        {
-          error: "Cannot query by both userId and email.",
-        },
-      ]);
-      return;
-    }
-  
-    if (!userId && !email) {
-      try {
-        const users = await userService.getUsers();
-        await sendResponseByMimeType<UserDTO>(res, 200, contentType, users);
-      } catch (error: unknown) {
-        await sendResponseByMimeType(res, 500, contentType, [
-          {
-            error: getErrorMessage(error),
-          },
-        ]);
-      }
-      return;
-    }
-  
-  
-  
-    if (email) {
-      if (typeof email !== "string") {
-        res
-          .status(400)
-          .json({ error: "email query parameter must be a string." });
-      } else {
-        try {
-          const user = await userService.getUserByEmail(email);
-          res.status(200).json(user);
-        } catch (error: unknown) {
-          res.status(500).json({ error: getErrorMessage(error) });
-        }
-      }
-    }
-  });
+teamMemberRouter.post("/", createTeamMemberDtoValidator, async (req, res) => {
+  const data: CreateTeamMemberDTO = req.body;
+  try {
+    const newTeamMember = await teamMemberService.createTeamMember(data);
+    res.status(201).json(newTeamMember);
+  } catch (error: unknown) {
+    res.status(500).json({ error: getErrorMessage(error) });
+  }
+});
+
+export default teamMemberRouter;
