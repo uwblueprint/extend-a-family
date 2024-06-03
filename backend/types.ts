@@ -7,7 +7,7 @@ export type TeamMemberDTO = {
   firstName: string;
   lastName: string;
   teamRole: TeamRole;
-}
+};
 
 export type CreateTeamMemberDTO = Omit<TeamMemberDTO, "id">;
 
