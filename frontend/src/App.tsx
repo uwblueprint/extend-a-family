@@ -19,6 +19,7 @@ import SampleContext, {
 import sampleContextReducer from "./reducers/SampleContextReducer";
 import SampleContextDispatcherContext from "./contexts/SampleContextDispatcherContext";
 import EditTeamInfoPage from "./components/pages/EditTeamPage";
+import TeamMembersPage from "./components/pages/TeamMembersPage";
 import HooksDemo from "./components/pages/HooksDemo";
 
 import { AuthenticatedUser } from "./types/AuthTypes";
@@ -90,6 +91,11 @@ const App = (): React.ReactElement => {
                 component={EditTeamInfoPage}
               />
               <Route exact path="*" component={NotFound} />
+              <Route
+                exact
+                path={Routes.TEAM_MEMBERS}
+                component={TeamMembersPage}
+              />
             </Switch>
           </Router>
         </AuthContext.Provider>

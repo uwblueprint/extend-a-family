@@ -14,7 +14,7 @@ const TeamMemberSchema: Schema = new Schema({
     required: true,
   },
   lastName: {
-    type: Number,
+    type: String,
     required: true,
   },
   teamRole: {

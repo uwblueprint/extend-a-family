@@ -10,6 +10,7 @@ class TeamMemberService implements ITeamMemberService {
   async getTeamMembers(): Promise<TeamMemberDTO[]> {
     try {
       const teamMembers = await TeamMember.find({});
+      this.logger.info(`Retrieved ${teamMembers.length} team members`);
       return teamMembers.map((teamMember) => ({
         id: teamMember.id,
         teamRole: teamMember.teamRole,
