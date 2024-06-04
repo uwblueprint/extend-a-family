@@ -1,4 +1,5 @@
 export type Role = "User" | "Admin";
+export type TeamRole = "PM" | "DESIGNER" | "PL" | "DEVELOPER";
 
 export type Token = {
   accessToken: string;
@@ -13,7 +14,17 @@ export type UserDTO = {
   role: Role;
 };
 
+export type TeamMemberDTO = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  teamRole: TeamRole;
+};
+
+
 export type CreateUserDTO = Omit<UserDTO, "id"> & { password: string };
+
+export type CreateTeamMemberDTO = Omit<UserDTO, "id"> ;
 
 export type UpdateUserDTO = Omit<UserDTO, "id">;
 
