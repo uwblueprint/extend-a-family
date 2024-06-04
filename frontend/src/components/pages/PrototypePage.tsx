@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Responsive, WidthProvider, Layouts, Layout } from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
-import 'react-resizable/css/styles.css';
 
-import BaseModule from '../common/BaseModule';
+import BaseModule from "../common/BaseModule";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const AnalyticsView = () => {
-  const [moduleItems, setModuleItems] = useState(["text_box"]);
+  const moduleItems = ["text_box", "text_box", "text_box", "text_box"];
   const [layout, setLayout] = useState<Layout[]>([]);
   const [layoutBreakpoints, setLayoutBreakpoints] = useState<Layouts>();
 
@@ -52,7 +50,7 @@ const AnalyticsView = () => {
   const generateDOM = () => {
     const safeLayout = layout.length > 0 ? layout : defaultLayout().lg;
 
-    return safeLayout.map((item, index) => (
+    return safeLayout.map((item) => (
       <div
         key={item.i}
         className="grid-item"
@@ -61,20 +59,6 @@ const AnalyticsView = () => {
         <BaseModule name={item.i} layout={item} />
       </div>
     ));
-  };
-
-  const addItem = () => {
-    const newItem = `text_box`;
-    const newModuleItems = [...moduleItems, newItem];
-    setModuleItems(newModuleItems);
-    setLayout(defaultLayout().lg);
-  };
-
-  const addItem2 = () => {
-    const newItem = `match`;
-    const newModuleItems = [...moduleItems, newItem];
-    setModuleItems(newModuleItems);
-    setLayout(defaultLayout().lg);
   };
 
   return (
@@ -99,19 +83,15 @@ const AnalyticsView = () => {
           margin={[10, 10]}
           containerPadding={[10, 10]}
           compactType="vertical"
-          preventCollision={false}
-          useCSSTransforms={true}
           transformScale={1}
           verticalCompact={false}
           width={1200}
-          rowHeight={5}
+          rowHeight={500}
           maxRows={140}
         >
           {generateDOM()}
         </ResponsiveGridLayout>
       </div>
-      <button onClick={addItem}>Add Text Box</button>
-      <button onClick={addItem2}>Add Match Box</button>
     </>
   );
 };
