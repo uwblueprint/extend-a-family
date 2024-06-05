@@ -9,7 +9,7 @@ def signup_user(backend_url, body, access_token_field):
     assert response.status_code == 200
     data = response.json()
     assert "role" in data
-    assert data["role"] == "User"
+    assert data["role"] == "Facilitator"
     assert "id" in data
     assert access_token_field in data
     expected = {k: v for k, v in body.items() if k != "password"}
