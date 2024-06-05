@@ -26,7 +26,7 @@ const UserSchema: Schema = new Schema({
   role: {
     type: String,
     required: true,
-    enum: ["Administrator", "Facilitator", "Learner", "Admin"],
+    enum: ["Administrator", "Facilitator", "Learner"],
   },
 });
 

@@ -10,7 +10,7 @@ const testUsers = [
     firstName: "Peter",
     lastName: "Pan",
     authId: "123",
-    role: "Admin",
+    role: "Administrator",
   },
   {
     firstName: "Wendy",

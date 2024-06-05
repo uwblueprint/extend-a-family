@@ -17,9 +17,7 @@ const upload = multer({ dest: "uploads/" });
 
 const entityRouter: Router = Router();
 entityRouter.use(
-  isAuthorizedByRole(
-    new Set(["Administrator", "Facilitator", "Learner", "Admin"]),
-  ),
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
 );
 
 const defaultBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
