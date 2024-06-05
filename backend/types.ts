@@ -1,4 +1,4 @@
-export type Role = "User" | "Admin";
+export type Role = "Administrator" | "Facilitator" | "Learner" | "Admin";
 
 export type Token = {
   accessToken: string;

@@ -25,7 +25,7 @@ def signup_user(backend_url, body, access_token_field):
     assert "signup" in response.json()["data"]
     data = response.json()["data"]["signup"]
     assert "role" in data
-    assert data["role"] == "User"
+    assert data["role"] == "Facilitator"
     assert "id" in data
     assert access_token_field in data
     expected = {k: v for k, v in body.items() if k != "password"}

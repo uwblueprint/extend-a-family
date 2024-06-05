@@ -16,7 +16,7 @@ const testUsers = [
     firstName: "Wendy",
     lastName: "Darling",
     authId: "321",
-    role: "User",
+    role: "Facilitator",
   },
 ];
 
