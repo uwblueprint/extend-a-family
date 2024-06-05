@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
+import TeamMembersPage from "./pages/TeamMembersPage";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import CreatePage from "./components/pages/CreatePage";
 import Default from "./components/pages/Default";
@@ -65,6 +66,7 @@ const App = (): React.ReactElement => {
         >
           <Router>
             <Switch>
+              <Route exact path={Routes.TEAM_MEMBERS} component={TeamMembersPage} />
               <Route exact path={Routes.LOGIN_PAGE} component={Login} />
               <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
               <Route exact path={Routes.HOOKS_PAGE} component={HooksDemo} />
