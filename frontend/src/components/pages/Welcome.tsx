@@ -1,18 +1,41 @@
 import React from "react";
-import CreateForm from "../crud/CreateForm";
-import MainPageButton from "../common/MainPageButton";
+import { useHistory } from "react-router-dom";
 
-const CreatePage = (): React.ReactElement => {
+const Welcome = (): React.ReactElement => {
+  const history = useHistory();
+
+  const handleButtonClick = (button: string) => {
+    history.push(`/login?role=${button}`);
+  };
+
   return (
     <div style={{ textAlign: "center", width: "25%", margin: "0px auto" }}>
       <h1>Welcome</h1>
       <div className="button-container">
-          <button onClick={() => handleButtonClick('Button 1')}>Button 1</button>
-          <button onClick={() => handleButtonClick('Button 2')}>Button 2</button>
-          <button onClick={() => handleButtonClick('Button 3')}>Button 3</button>
-        </div>
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => handleButtonClick("administrator")}
+        >
+          Administrator
+        </button>
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => handleButtonClick("facilitator")}
+        >
+          Facilitator
+        </button>
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => handleButtonClick("learner")}
+        >
+          Learner
+        </button>
+      </div>
     </div>
   );
 };
 
-export default CreatePage;
+export default Welcome;
