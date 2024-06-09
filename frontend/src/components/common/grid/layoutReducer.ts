@@ -45,8 +45,8 @@ const layoutReducer = (
       return [
         ...state,
         {
-          x: maxX + 1,
-          y: maxY + 1,
+          x: 1,
+          y: 1,
           h: action.h ? action.h : 1,
           w: action.w ? action.w : 1,
           content: action.content

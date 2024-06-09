@@ -42,6 +42,7 @@ const createDragStartEvent = (
     };
   };
   element.dispatchEvent(event);
+  console.log("dispatched event");
 };
 
 const createDragStopEvent = (element: HTMLElement) => {
@@ -73,11 +74,14 @@ const GridElement: React.FC<GridElementProps> = ({
   useEffect(() => {
     const refCur = ref.current;
     if (refCur && temp && mouseEvent) {
+      console.log("drag start event");
       createDragStartEvent(refCur, mouseEvent);
     }
+
     return () => {
       if (refCur && temp && mouseEvent) {
-        createDragStopEvent(refCur);
+        console.log("error here");
+        // createDragStopEvent(refCur);
       }
     };
   }, [ref, temp, mouseEvent]);
