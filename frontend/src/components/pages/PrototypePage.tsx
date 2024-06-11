@@ -58,6 +58,7 @@ const Grid = () => {
           onLayoutChange={(layout) => dispatch({ type: "newLayout", layout })}
           cols={12}
           rowHeight={50}
+          maxRows={10}
           verticalCompact={false}
           width={600}
           preventCollision={true}
