@@ -4,8 +4,8 @@ import { useHistory } from "react-router-dom";
 const Welcome = (): React.ReactElement => {
   const history = useHistory();
 
-  const handleButtonClick = (button: string) => {
-    history.push(`/login?role=${button}`);
+  const handleButtonClick = (selectedRole: string) => {
+    history.push(`/login?role=${selectedRole}`);
   };
 
   return (
