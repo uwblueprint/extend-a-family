@@ -1,7 +1,7 @@
 import MgUser from "../../../models/user.mgmodel";
 import UserService from "../userService";
 
-import { UserDTO } from "../../../types";
+import { UserDTO } from "../../../types/userTypes";
 
 import db from "../../../testUtils/testDb";
 
