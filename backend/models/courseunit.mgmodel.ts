@@ -106,3 +106,4 @@ const CourseUnitSchema: Schema = new Schema({
 });
 
 export default mongoose.model<CourseUnit>("CourseUnit", CourseUnitSchema);
+
