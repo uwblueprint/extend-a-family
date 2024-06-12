@@ -1,10 +1,10 @@
 import {
   CreateUserDTO,
   Role,
-  SignupMethod,
   UpdateUserDTO,
   UserDTO,
-} from "../../types";
+} from "../../types/userTypes";
+import { SignupMethod } from "../../types/authTypes";
 
 interface IUserService {
   /**

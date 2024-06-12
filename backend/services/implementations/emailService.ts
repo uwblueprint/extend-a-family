@@ -1,6 +1,6 @@
 import nodemailer, { Transporter } from "nodemailer";
 import IEmailService from "../interfaces/emailService";
-import { NodemailerConfig } from "../../types";
+import { NodemailerConfig } from "../../types/authTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
