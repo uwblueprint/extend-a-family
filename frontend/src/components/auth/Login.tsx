@@ -9,6 +9,7 @@ import authAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
+import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 
 type GoogleResponse = GoogleLoginResponse | GoogleLoginResponseOffline;
 
@@ -31,15 +32,24 @@ const Login = (): React.ReactElement => {
   const searchParams = new URLSearchParams(location.search);
   const role = searchParams.get("role");
 
+  if (authenticatedUser) {
+    return <Redirect to={HOME_PAGE} />;
+  }
+
+  if (!role || !["administrator", "facilitator", "learner"].includes(role)) {
+    // need this changed when welcome page exists
+    return <Redirect to="/welcome" />;
+  }
+
   const onLogInClick = async () => {
     const user: AuthenticatedUser = await authAPIClient.login(email, password);
 
-    if (user && user.role.toLowerCase() !== role?.toLocaleLowerCase()) {
+    if (user && user.role.toLowerCase() !== role.toLocaleLowerCase()) {
       // change this later to not use an alert
       // eslint-disable-next-line no-alert
-      window.alert(`Bad login. Expected ${user.role}, got ${role}`);
-      return;
+      alert(`Bad login. Expected ${user.role}, got ${role}`);
     }
+    localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
     setAuthenticatedUser(user);
   };
 
@@ -53,15 +63,6 @@ const Login = (): React.ReactElement => {
     );
     setAuthenticatedUser(user);
   };
-
-  if (authenticatedUser) {
-    return <Redirect to={HOME_PAGE} />;
-  }
-
-  if (!role || !["administrator", "facilitator", "learner"].includes(role)) {
-    // need this changed when welcome page exists
-    return <Redirect to="/welcome" />;
-  }
 
   return (
     <div style={{ textAlign: "center" }}>
