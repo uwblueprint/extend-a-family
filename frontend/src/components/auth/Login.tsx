@@ -36,7 +36,8 @@ const Login = (): React.ReactElement => {
 
     if (user && user.role.toLowerCase() !== role?.toLocaleLowerCase()) {
       // change this later to not use an alert
-      alert(`Bad login. Expected ${user.role}, got ${role}`);
+      // eslint-disable-next-line no-alert
+      window.alert(`Bad login. Expected ${user.role}, got ${role}`);
       return;
     }
     setAuthenticatedUser(user);
@@ -57,68 +58,68 @@ const Login = (): React.ReactElement => {
     return <Redirect to={HOME_PAGE} />;
   }
 
-  if (!role || ["administrator", "facilitator", "learner"].includes(role)) {
+  if (!role || !["administrator", "facilitator", "learner"].includes(role)) {
     // need this changed when welcome page exists
     return <Redirect to="/welcome" />;
   }
 
   return (
     <div style={{ textAlign: "center" }}>
-      <h1>{role && capitalizeFirstLetter(role)} Login</h1>
-      {role !== "facilitator" && (
-        <form>
-          <div>
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="username@domain.com"
-            />
-          </div>
-          <div>
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="password"
-            />
-          </div>
-          <div>
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={onLogInClick}
-            >
-              Log In
-            </button>
-          </div>
-          <GoogleLogin
-            clientId={process.env.REACT_APP_OAUTH_CLIENT_ID || ""}
-            buttonText="Login with Google"
-            onSuccess={(response: GoogleResponse): void => {
-              if ("tokenId" in response) {
-                onGoogleLoginSuccess(response.tokenId);
-              } else {
-                // eslint-disable-next-line no-alert
-                window.alert(response);
-              }
-            }}
-            onFailure={(error: GoogleErrorResponse) =>
-              // eslint-disable-next-line no-alert
-              window.alert(JSON.stringify(error))
-            }
+      <h1>{capitalizeFirstLetter(role)} Login</h1>
+      <form>
+        <div>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="username@domain.com"
           />
-        </form>
+        </div>
+        <div>
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="password"
+          />
+        </div>
+        <div>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={onLogInClick}
+          >
+            Log In
+          </button>
+        </div>
+        <GoogleLogin
+          clientId={process.env.REACT_APP_OAUTH_CLIENT_ID || ""}
+          buttonText="Login with Google"
+          onSuccess={(response: GoogleResponse): void => {
+            if ("tokenId" in response) {
+              onGoogleLoginSuccess(response.tokenId);
+            } else {
+              // eslint-disable-next-line no-alert
+              window.alert(response);
+            }
+          }}
+          onFailure={(error: GoogleErrorResponse) =>
+            // eslint-disable-next-line no-alert
+            window.alert(JSON.stringify(error))
+          }
+        />
+      </form>
+      {role === "facilitator" && (
+        <div>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={onSignupClick}
+          >
+            Sign Up
+          </button>
+        </div>
       )}
-      <div>
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={onSignupClick}
-        >
-          Sign Up
-        </button>
-      </div>
     </div>
   );
 };
