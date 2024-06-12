@@ -4,9 +4,6 @@ WORKDIR /app
 
 COPY package.json yarn.lock ./
 RUN yarn install
-RUN npm install -g nodemon
-RUN npm install -g ts-node
-RUN npm install -g dotenv
 
 COPY . ./
 
