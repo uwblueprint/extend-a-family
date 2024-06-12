@@ -10,6 +10,9 @@ RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.
 RUN apt-get update && apt-get install -y libcurl3
 
 RUN yarn install
+RUN npm install -g nodemon
+RUN npm install -g ts-node
+RUN npm install -g dotenv
 
 COPY . ./
 
