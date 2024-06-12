@@ -10,6 +10,7 @@ import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
+import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
 type GoogleResponse = GoogleLoginResponse | GoogleLoginResponseOffline;
 
@@ -17,10 +18,6 @@ type GoogleErrorResponse = {
   error: string;
   details: string;
 };
-
-function capitalizeFirstLetter(string: string): string {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
 const Login = (): React.ReactElement => {
   const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
@@ -43,11 +40,17 @@ const Login = (): React.ReactElement => {
 
   const onLogInClick = async () => {
     const user: AuthenticatedUser = await authAPIClient.login(email, password);
-
-    if (user && user.role.toLowerCase() !== role.toLocaleLowerCase()) {
+    if (!user) {
+      // will need to change this for different errors
+      // eslint-disable-next-line no-alert
+      alert("Bad login, user not found");
+      return;
+    }
+    if (user.role.toLowerCase() !== role.toLowerCase()) {
       // change this later to not use an alert
       // eslint-disable-next-line no-alert
       alert(`Bad login. Expected ${user.role}, got ${role}`);
+      return;
     }
     localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
     setAuthenticatedUser(user);
