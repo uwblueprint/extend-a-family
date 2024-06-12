@@ -12,15 +12,18 @@ interface LayoutItem extends GridLayout.Layout {
   mouseEvent?: { clientX: number; clientY: number };
 }
 
-const initialItems: LayoutItem[] = [
-  { i: "0", x: 0, y: 0, w: 1, h: 2, content: "A" },
-  { i: "1", x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4, content: "B" },
-  { i: "2", x: 4, y: 0, w: 1, h: 2, content: "C" },
-];
-
 const Grid = () => {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [layout, dispatch] = useReducer(layoutReducer, initialItems);
+  const [layout, dispatch] = useReducer(layoutReducer, []);
+
+  const gridContainerStyle = {
+    backgroundColor: "lightgray",
+    width: "600px",
+    height: "600px",
+    backgroundImage:
+      "linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)",
+    backgroundSize: "50px 50px",
+  };
 
   return (
     <div
@@ -31,45 +34,68 @@ const Grid = () => {
         alignItems: "center",
       }}
     >
-      <DraggableSource targetRef={ref} dispatch={dispatch} key="1">
+      <DraggableSource
+        targetRef={ref}
+        dispatch={dispatch}
+        key="1"
+        componentType="TextBox"
+      >
         <div
           style={{
             width: "100px",
             height: "100px",
-            backgroundColor: "blue",
             border: "1px solid blue",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        ></div>
+        >
+          {" "}
+          Text Box
+        </div>
       </DraggableSource>
-      <DraggableSource targetRef={ref} dispatch={dispatch} key="2">
+      <DraggableSource
+        targetRef={ref}
+        dispatch={dispatch}
+        key="2"
+        componentType="Match"
+      >
         <div
           style={{
             width: "100px",
             height: "100px",
-            backgroundColor: "blue",
             border: "1px solid blue",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        ></div>
+        >
+          {" "}
+          Match
+        </div>
       </DraggableSource>
       <div ref={ref}>
         <GridLayout
           className="layout"
+          style={gridContainerStyle}
           layout={layout}
           onLayoutChange={(layout) => dispatch({ type: "newLayout", layout })}
           cols={12}
           rowHeight={50}
-          maxRows={10}
+          maxRows={12}
           verticalCompact={false}
           width={600}
           preventCollision={true}
+          containerPadding={[0, 0]}
+          margin={[0, 0]}
         >
           {layout.map((item) => (
             <div
               key={item.i}
               data-grid={item}
-              style={{ border: "1px solid red" }}
+              style={{ backgroundColor: "white" }}
             >
-              <GridElement {...item}>{item.content}</GridElement>
+              <GridElement {...item} componentType={item.content}>
+                {item.content}{" "}
+              </GridElement>
             </div>
           ))}
         </GridLayout>

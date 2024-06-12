@@ -22,6 +22,7 @@ interface DraggableSourceProps {
   dispatch: React.Dispatch<any>;
   onDrag?: DraggableEventHandler;
   onStop?: DraggableEventHandler;
+  componentType: string;
   children: ReactNode;
   [key: string]: any;
 }
@@ -31,6 +32,7 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
   dispatch,
   onDrag,
   onStop,
+  componentType,
   children,
   ...rest
 }) => {
@@ -65,7 +67,7 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
     if (target && !inserted) {
       const mouseEvent = getMouseEvent(e as MouseEvent | TouchEvent);
       if (mouseEvent) {
-        dispatch({ type: "addTemp", mouseEvent });
+        dispatch({ type: "addTemp", mouseEvent, content: componentType });
       }
       setInserted(true);
       return;

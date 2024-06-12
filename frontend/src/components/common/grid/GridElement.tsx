@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, ReactNode } from "react";
 import { pick } from "lodash";
+import BaseModule from "../BaseModule";
 
 interface MouseEventLike {
   clientX: number;
@@ -9,6 +10,7 @@ interface MouseEventLike {
 interface GridElementProps {
   temp?: boolean;
   children: ReactNode;
+  componentType?: string;
   mouseEvent?: MouseEventLike;
   style?: React.CSSProperties;
   className?: string;
@@ -57,6 +59,7 @@ const GridElement: React.FC<GridElementProps> = ({
   temp,
   children,
   mouseEvent,
+  componentType,
   ...rest
 }) => {
   const forwardProps = pick(rest, [
@@ -87,8 +90,9 @@ const GridElement: React.FC<GridElementProps> = ({
   }, [ref, temp, mouseEvent]);
 
   return (
-    <div ref={ref} {...forwardProps}>
-      {children}
+    <div ref={ref} {...forwardProps} style={{ height: "100%" }}>
+      {/* {children}  */}
+      <BaseModule name={componentType || ""} />
     </div>
   );
 };
