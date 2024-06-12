@@ -33,57 +33,54 @@ const ElementSkeletonSchema: Schema = new Schema({
 });
 
 type Page = {
-    id: string
-    title: string
-    type: "Lesson" | "Activity"
-    layout: [ElementSkeleton]
-  }
-  
-  const PageSchema: Schema = new Schema({
-    title: {
-      type: String,
-      required: true,
-    },
-    type: {
-      type: Number,
-      required: true,
-    },
-    layout: {
-      type: [ElementSkeletonSchema],
-      required: true,
-    },
+  id: string;
+  title: string;
+  type: "Lesson" | "Activity";
+  layout: [ElementSkeleton];
+};
+
+const PageSchema: Schema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: Number,
+    required: true,
+  },
+  layout: {
+    type: [ElementSkeletonSchema],
+    required: true,
+  },
 });
 
-
-//Module
 type Module = {
-    id: String;
-    title: String;
-    pages: [Page];
-}
+  id: string;
+  title: string;
+  pages: [Page];
+};
 
 const ModuleSchema: Schema = new Schema({
-    id: {
-      type: String,
-      required: true,
-    },
-    title: {
-      type: Number,
-      required: true,
-    },
-    pages: {
-      type: [PageSchema],
-      required: true,
-    },
-  });
+  id: {
+    type: String,
+    required: true,
+  },
+  title: {
+    type: Number,
+    required: true,
+  },
+  pages: {
+    type: [PageSchema],
+    required: true,
+  },
+});
 
-
-//Course Unit
+// Course Unit
 export interface CourseUnit extends Document {
-    id: String;
-    displayIndex: number;
-    title: String;
-    modules: [Module]
+  id: string;
+  displayIndex: number;
+  title: string;
+  modules: [Module];
 }
 
 const CourseUnitSchema: Schema = new Schema({
@@ -102,7 +99,7 @@ const CourseUnitSchema: Schema = new Schema({
   module: {
     type: [ModuleSchema],
     required: true,
-  }
+  },
 });
 
 export default mongoose.model<CourseUnit>("CourseUnit", CourseUnitSchema);
