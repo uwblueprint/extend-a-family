@@ -11,6 +11,8 @@ import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
 
+import Unit from "./models/courseunit.mgmodel";
+
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
   "https://uw-blueprint-starter-code.firebaseapp.com",
@@ -64,4 +66,24 @@ firebaseAdmin.initializeApp({
 app.listen({ port: process.env.PORT || 8080 }, () => {
   /* eslint-disable-next-line no-console */
   console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
+  async function test() {
+    const doc = new Unit({
+      displayIndex: 67,
+      title: "jeffery!",
+      modules: [
+        {
+          title: "string",
+          pages: [
+            {
+              title: "string",
+              type: "Lesson",
+              layout: [{ x: 5, y: 4, w: 3, h: 2, content: "hi" }],
+            },
+          ],
+        },
+      ],
+    });
+    await doc.save();
+  }
+  test();
 });
