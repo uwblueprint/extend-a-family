@@ -2,6 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useReducer, useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
+import Welcome from "./components/pages/Welcome";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import PrivateRoute from "./components/auth/PrivateRoute";
@@ -65,6 +66,7 @@ const App = (): React.ReactElement => {
         >
           <Router>
             <Switch>
+              <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
               <Route exact path={Routes.LOGIN_PAGE} component={Login} />
               <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
               <Route exact path={Routes.HOOKS_PAGE} component={HooksDemo} />
