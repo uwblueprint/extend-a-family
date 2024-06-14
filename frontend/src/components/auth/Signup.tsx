@@ -1,7 +1,9 @@
 import React, { useContext, useState } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, useLocation } from "react-router-dom";
 
 import authAPIClient from "../../APIClients/AuthAPIClient";
+// needs update when welcome page is available
+// import { HOME_PAGE , WELCOME_PAGE} from "../../constants/Routes";
 import { HOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
@@ -13,12 +15,23 @@ const Signup = (): React.ReactElement => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const location = useLocation();
+
+  // Extract query parameters from the URL
+  const params = new URLSearchParams(location.search);
+  const role = params.get("role");
+
+  if (role !== "facilitator") {
+    return <Redirect to="/welcome" />;
+  }
+
   const onSignupClick = async () => {
     const user: AuthenticatedUser = await authAPIClient.signup(
       firstName,
       lastName,
       email,
       password,
+      role.charAt(0).toUpperCase() + role.slice(1), // potential update in future
     );
     setAuthenticatedUser(user);
   };
@@ -29,7 +42,7 @@ const Signup = (): React.ReactElement => {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <h1>Signup</h1>
+      <h1>{role.charAt(0).toUpperCase() + role.slice(1)} Signup</h1>
       <form>
         <div>
           <input
