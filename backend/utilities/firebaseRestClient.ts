@@ -1,6 +1,6 @@
 import fetch, { Response } from "node-fetch";
 
-import { Token } from "../types";
+import { Token } from "../types/authTypes";
 import logger from "./logger";
 
 const Logger = logger(__filename);

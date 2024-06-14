@@ -61,15 +61,8 @@ docker ps
 
 ### Linting & Formatting
 TypeScript backend and frontend:
-```bash
-# linting with fix & formatting
-docker exec -it eaf_backend /bin/bash -c "yarn fix"
-docker exec -it eaf_frontend /bin/bash -c "yarn fix"
-
-# linting warnings only
-docker exec -it eaf_backend /bin/bash -c "yarn lint"
-docker exec -it eaf_frontend /bin/bash -c "yarn lint"
-```
+1. `cd` into the `backend/` directory. Run `yarn run fix`.
+2. `cd` into the `frontend/` directory. Run `yarn run fix`.
 
 ### Running Tests
 TypeScript backend and frontend:
