@@ -15,3 +15,5 @@ export const UPDATE_ENTITY_PAGE = "/entity/update";
 export const HOOKS_PAGE = "/hooks";
 
 export const WELCOME_PAGE = "/welcome";
+
+export const NOT_FOUND_PAGE = "/404-not-found";
