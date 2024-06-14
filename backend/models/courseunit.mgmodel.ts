@@ -48,7 +48,7 @@ const PageSchema: Schema = new Schema({
   type: {
     type: String,
     required: true,
-    enum: ["Lesson", "Activity"]
+    enum: ["Lesson", "Activity"],
   },
   layout: {
     type: [ElementSkeletonSchema],
@@ -105,4 +105,3 @@ const CourseUnitSchema: Schema = new Schema({
 });
 
 export default mongoose.model<CourseUnit>("CourseUnit", CourseUnitSchema);
-
