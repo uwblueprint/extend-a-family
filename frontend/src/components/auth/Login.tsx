@@ -26,7 +26,10 @@ const Login = (): React.ReactElement => {
 
   const onLogInClick = async () => {
     const user: AuthenticatedUser = await authAPIClient.login(email, password);
-    setAuthenticatedUser(user);
+    const isUserAuth = await authAPIClient.isUserAuth(email);
+    if (isUserAuth) {
+      setAuthenticatedUser(user);
+    }
   };
 
   const onSignupClick = () => {

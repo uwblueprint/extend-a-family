@@ -110,6 +110,23 @@ const refresh = async (): Promise<boolean> => {
   }
 };
 
+const isUserAuth = async (email: string): Promise<boolean> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(
+      `/auth/isUserVerified/${email}`,
+      {},
+      { headers: { Authorization: bearerToken } },
+    );
+    return data.isAuthorized;
+  } catch (error) {
+    return false;
+  }
+};
+
 export default {
   login,
   logout,
@@ -117,4 +134,5 @@ export default {
   signup,
   resetPassword,
   refresh,
+  isUserAuth,
 };

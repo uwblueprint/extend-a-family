@@ -1,6 +1,10 @@
 import { CookieOptions, Router } from "express";
 
-import { isAuthorizedByEmail, isAuthorizedByUserId } from "../middlewares/auth";
+import {
+  getAccessToken,
+  isAuthorizedByEmail,
+  isAuthorizedByUserId,
+} from "../middlewares/auth";
 import {
   loginRequestValidator,
   signupRequestValidator,
@@ -113,5 +117,18 @@ authRouter.post(
     }
   },
 );
+
+authRouter.post("/isUserVerified/:email", async (req, res) => {
+  try {
+    const token = getAccessToken(req);
+    const isAuthorized = await authService.isAuthorizedByEmail(
+      token as string,
+      req.params.email,
+    );
+    res.status(200).json({ isAuthorized });
+  } catch (error: unknown) {
+    res.status(500).json({ error: getErrorMessage(error) });
+  }
+});
 
 export default authRouter;

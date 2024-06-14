@@ -20,7 +20,10 @@ const Signup = (): React.ReactElement => {
       email,
       password,
     );
-    setAuthenticatedUser(user);
+    const isUserAuth = await authAPIClient.isUserAuth(email);
+    if (isUserAuth) {
+      setAuthenticatedUser(user);
+    }
   };
 
   if (authenticatedUser) {
