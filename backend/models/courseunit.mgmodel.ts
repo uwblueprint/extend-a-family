@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { PageType } from "../types/courseTypes";
 
-type ElementSkeleton = {
+export type ElementSkeleton = {
   id: string;
   x: number;
   y: number;
@@ -32,10 +33,10 @@ const ElementSkeletonSchema: Schema = new Schema({
   },
 });
 
-type Page = {
+export type Page = {
   id: string;
   title: string;
-  type: "Lesson" | "Activity";
+  type: PageType;
   layout: [ElementSkeleton];
 };
 
@@ -45,8 +46,9 @@ const PageSchema: Schema = new Schema({
     required: true,
   },
   type: {
-    type: Number,
+    type: String,
     required: true,
+    enum: ["Lesson", "Activity"]
   },
   layout: {
     type: [ElementSkeletonSchema],
@@ -54,7 +56,7 @@ const PageSchema: Schema = new Schema({
   },
 });
 
-type Module = {
+export type Module = {
   id: string;
   title: string;
   pages: [Page];
@@ -66,7 +68,7 @@ const ModuleSchema: Schema = new Schema({
     required: true,
   },
   title: {
-    type: Number,
+    type: String,
     required: true,
   },
   pages: {
