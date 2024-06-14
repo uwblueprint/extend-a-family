@@ -63,10 +63,6 @@ export type Module = {
 };
 
 const ModuleSchema: Schema = new Schema({
-  id: {
-    type: String,
-    required: true,
-  },
   title: {
     type: String,
     required: true,
@@ -86,10 +82,6 @@ export interface CourseUnit extends Document {
 }
 
 const CourseUnitSchema: Schema = new Schema({
-  id: {
-    type: String,
-    required: true,
-  },
   displayIndex: {
     type: Number,
     required: true,
