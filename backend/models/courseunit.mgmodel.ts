@@ -90,7 +90,7 @@ const CourseUnitSchema: Schema = new Schema({
     type: String,
     required: true,
   },
-  module: {
+  modules: {
     type: [ModuleSchema],
     required: true,
   },
