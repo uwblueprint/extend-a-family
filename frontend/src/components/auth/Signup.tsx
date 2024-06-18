@@ -2,11 +2,10 @@ import React, { useContext, useState } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 
 import authAPIClient from "../../APIClients/AuthAPIClient";
-// needs update when welcome page is available
-// import { HOME_PAGE , WELCOME_PAGE} from "../../constants/Routes";
-import { HOME_PAGE } from "../../constants/Routes";
+import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
+import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
 const Signup = (): React.ReactElement => {
   const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
@@ -22,7 +21,7 @@ const Signup = (): React.ReactElement => {
   const role = params.get("role");
 
   if (role !== "facilitator") {
-    return <Redirect to="/welcome" />;
+    return <Redirect to={WELCOME_PAGE} />;
   }
 
   const onSignupClick = async () => {
@@ -31,7 +30,7 @@ const Signup = (): React.ReactElement => {
       lastName,
       email,
       password,
-      role.charAt(0).toUpperCase() + role.slice(1), // potential update in future
+      capitalizeFirstLetter(role),
     );
     setAuthenticatedUser(user);
   };
@@ -42,7 +41,7 @@ const Signup = (): React.ReactElement => {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <h1>{role.charAt(0).toUpperCase() + role.slice(1)} Signup</h1>
+      <h1>{capitalizeFirstLetter(role)} Signup</h1>
       <form>
         <div>
           <input
