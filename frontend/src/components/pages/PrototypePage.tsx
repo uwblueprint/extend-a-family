@@ -91,7 +91,13 @@ const Grid = () => {
             <div
               key={item.i}
               data-grid={item}
-              style={{ backgroundColor: "white" }}
+              style={{
+                backgroundColor: "white",
+                transform: "translate(1px, 1px)",
+                marginTop: "1px",
+                borderLeft: "1px solid black",
+                borderBottom: "1px solid black",
+              }}
             >
               <GridElement {...item} componentType={item.content}>
                 {item.content}{" "}
