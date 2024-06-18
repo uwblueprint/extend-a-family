@@ -18,6 +18,9 @@ const Grid = () => {
 
   const gridContainerStyle = {
     backgroundColor: "lightgray",
+    borderLeft: "1px solid black",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
     width: "600px",
     height: "600px",
     backgroundImage:
@@ -93,10 +96,9 @@ const Grid = () => {
               data-grid={item}
               style={{
                 backgroundColor: "white",
-                transform: "translate(1px, 1px)",
-                marginTop: "1px",
+                borderTop: "1px solid black",
                 borderLeft: "1px solid black",
-                borderBottom: "1px solid black",
+                boxShadow: "1px 1px 0 0 black, 0 1px 0 0 black",
               }}
             >
               <GridElement {...item} componentType={item.content}>
