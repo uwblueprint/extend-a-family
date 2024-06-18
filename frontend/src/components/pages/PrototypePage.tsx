@@ -21,8 +21,8 @@ const Grid = () => {
     borderLeft: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
-    width: "600px",
-    height: "600px",
+    width: "601px",
+    height: "601px",
     backgroundImage:
       "linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)",
     backgroundSize: "50px 50px",
@@ -53,7 +53,7 @@ const Grid = () => {
           }}
         >
           {" "}
-          Text Box
+          Text Box - Drag Me !
         </div>
       </DraggableSource>
       <DraggableSource
@@ -72,7 +72,7 @@ const Grid = () => {
           }}
         >
           {" "}
-          Match
+          Match - Drag Me !
         </div>
       </DraggableSource>
       <div ref={ref}>
@@ -98,7 +98,7 @@ const Grid = () => {
                 backgroundColor: "white",
                 borderTop: "1px solid black",
                 borderLeft: "1px solid black",
-                boxShadow: "1px 1px 0 0 black, 0 1px 0 0 black",
+                boxShadow: "1px 1px 0 0 black, 0 1px 0 0 black", // box alignment
               }}
             >
               <GridElement {...item} componentType={item.content}>
