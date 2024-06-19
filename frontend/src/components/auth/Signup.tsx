@@ -27,10 +27,9 @@ const Signup = (): React.ReactElement => {
       // eslint-disable-next-line no-alert
       alert("Something went wrong with signup");
       return;
-    } else {
-      alert("Signup successful, verification link was sent to your email.");
     }
-
+  
+    alert("Signup successful, verification link was sent to your email.");
     const isUserAuth = await authAPIClient.isUserAuth(email);
     if (isUserAuth) {
       localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
