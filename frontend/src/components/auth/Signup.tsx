@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
+import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 
 const Signup = (): React.ReactElement => {
@@ -20,8 +21,19 @@ const Signup = (): React.ReactElement => {
       email,
       password,
     );
+    
+    if (!user) {
+      // will need to change this for different errors
+      // eslint-disable-next-line no-alert
+      alert("Something went wrong with signup");
+      return;
+    } else {
+      alert("Signup successful, verification link was sent to your email.");
+    }
+
     const isUserAuth = await authAPIClient.isUserAuth(email);
     if (isUserAuth) {
+      localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
       setAuthenticatedUser(user);
     }
   };
