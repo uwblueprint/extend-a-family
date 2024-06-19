@@ -77,13 +77,12 @@ const GridElement: React.FC<GridElementProps> = ({
   useEffect(() => {
     const refCur = ref.current;
     if (refCur && temp && mouseEvent) {
-      console.log("drag start event");
       createDragStartEvent(refCur, mouseEvent);
     }
 
     return () => {
       if (refCur && temp && mouseEvent) {
-        console.log("error here");
+        // TODO: Cannot initiate drag stop event because drag start event is not recognized
         // createDragStopEvent(refCur);
       }
     };
@@ -91,7 +90,6 @@ const GridElement: React.FC<GridElementProps> = ({
 
   return (
     <div ref={ref} {...forwardProps} style={{ height: "100%" }}>
-      {/* {children}  */}
       <BaseModule name={componentType || ""} />
     </div>
   );
