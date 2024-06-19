@@ -1,9 +1,11 @@
 import { CookieOptions, Router } from "express";
 
-import { isAuthorizedByEmail, isAuthorizedByUserId } from "../middlewares/auth";
+import { isAuthorizedByEmail, isAuthorizedByRole, isAuthorizedByUserId } from "../middlewares/auth";
+import * as firebaseAdmin from "firebase-admin";
 import {
   loginRequestValidator,
   signupRequestValidator,
+  inviteAdminRequestValidator,
 } from "../middlewares/validators/authValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -13,6 +15,8 @@ import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import { getErrorMessage } from "../utilities/errorUtils";
+
+import { generate } from "generate-password";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -30,7 +34,7 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
   try {
     const authDTO = req.body.idToken
       ? // OAuth
-        await authService.generateTokenOAuth(req.body.idToken)
+      await authService.generateTokenOAuth(req.body.idToken)
       : await authService.generateToken(req.body.email, req.body.password);
 
     const { refreshToken, ...rest } = authDTO;
@@ -112,6 +116,46 @@ authRouter.post(
       res.status(500).json({ error: getErrorMessage(error) });
     }
   },
+);
+
+authRouter.post(
+  "/inviteAdmin",
+  inviteAdminRequestValidator,
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    try {
+      const temporaryPassword = generate({
+        length: 20,
+        numbers: true
+      });
+      const invitedAdminUser = await userService.createUser({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        role: "Administrator",
+        password: temporaryPassword,
+      });
+      const emailVerificationLink = await firebaseAdmin
+        .auth()
+        .generateEmailVerificationLink(req.body.email);
+      await emailService.sendEmail(
+        req.body.email,
+        "Administrator Invitation: Smart Saving, Smart Spending",
+        `Hello,<br> <br>
+        You have been invited as an administrator to Smart Saving, Smart Spending.
+        <br> <br>
+        Please click the following link to verify your email and activate your account.
+        <strong> This link is only valid for 1 hour.</strong>
+        <br> <br>
+        <a href=${emailVerificationLink}> Verify email </a>
+        <br> <br>
+        To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`
+      );
+      res.status(200).json(invitedAdminUser);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  }
 );
 
 export default authRouter;
