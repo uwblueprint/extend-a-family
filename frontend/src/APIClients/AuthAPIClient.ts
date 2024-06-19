@@ -59,11 +59,12 @@ const signup = async (
   lastName: string,
   email: string,
   password: string,
+  role: string, // Added role parameter
 ): Promise<AuthenticatedUser> => {
   try {
     const { data } = await baseAPIClient.post(
       "/auth/signup",
-      { firstName, lastName, email, password },
+      { firstName, lastName, email, password, role }, // Added role to request body
       { withCredentials: true },
     );
     localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(data));
@@ -72,7 +73,6 @@ const signup = async (
     return null;
   }
 };
-
 const resetPassword = async (email: string | undefined): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,

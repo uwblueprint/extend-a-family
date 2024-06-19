@@ -51,7 +51,7 @@ authRouter.post("/signup", signupRequestValidator, async (req, res) => {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
-      role: "Facilitator",
+      role: req.body.role,
       password: req.body.password,
     });
 
