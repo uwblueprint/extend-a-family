@@ -15,11 +15,6 @@ module.exports = {
     react: {
       version: "detect",
     },
-    "import/resolver": {
-      node: {
-        extensions: [".ts", ".tsx", ".native.js"],
-      },
-    },
   },
   extends: [
     "airbnb-typescript",
@@ -29,7 +24,6 @@ module.exports = {
     "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:import/recommended",
   ],
   rules: {
     "prettier/prettier": ["warn", { endOfLine: "auto" }],
@@ -37,7 +31,6 @@ module.exports = {
     "react/no-array-index-key": "off",
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-static-element-interactions": "off",
-    "import/no-unresolved": [2, { devDependencies: true }],
   },
   ignorePatterns: ["build/*", ".eslintrc.js"],
 };
