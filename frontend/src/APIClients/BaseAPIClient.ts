@@ -4,16 +4,16 @@ import { jwtDecode } from "jwt-decode";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { setLocalStorageObjProperty } from "../utils/LocalStorageUtils";
 
-      import { DecodedJWT } from "../types/AuthTypes";
+import { DecodedJWT } from "../types/AuthTypes";
 
-    const baseAPIClient = axios.create({
+const baseAPIClient = axios.create({
   baseURL: process.env.REACT_APP_BACKEND_URL,
 });
 
 // Python API uses snake_case, frontend uses camelCase
 // convert request and response data to/from snake_case and camelCase through axios interceptors
 
-  baseAPIClient.interceptors.request.use(async (config: AxiosRequestConfig) => {
+baseAPIClient.interceptors.request.use(async (config: AxiosRequestConfig) => {
   const newConfig = { ...config };
 
   // if access token in header has expired, do a refresh
