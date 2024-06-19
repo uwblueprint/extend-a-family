@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Route, Redirect } from "react-router-dom";
 
 import AuthContext from "../../contexts/AuthContext";
-import { NOT_FOUND_PAGE, WELCOME_PAGE } from "../../constants/Routes";
+import { NOT_AUTHORIZED_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import { Role } from "../../types/AuthTypes";
 
 type PrivateRouteProps = {
@@ -24,7 +24,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     return allowedRoles.includes(authenticatedUser.role) ? (
       <Route path={path} exact={exact} component={component} />
     ) : (
-      <Redirect to={NOT_FOUND_PAGE} />
+      <Redirect to={NOT_AUTHORIZED_PAGE} />
     );
   }
   return <Redirect to={WELCOME_PAGE} />;

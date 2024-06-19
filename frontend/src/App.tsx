@@ -10,6 +10,7 @@ import CreatePage from "./components/pages/CreatePage";
 import Default from "./components/pages/Default";
 import DisplayPage from "./components/pages/DisplayPage";
 import NotFound from "./components/pages/NotFound";
+import NotAuthorized from "./components/pages/NotAuthorized";
 import UpdatePage from "./components/pages/UpdatePage";
 import AUTHENTICATED_USER_KEY from "./constants/AuthConstants";
 import AuthContext from "./contexts/AuthContext";
@@ -100,7 +101,11 @@ const App = (): React.ReactElement => {
                 component={EditTeamInfoPage}
                 allowedRoles={["Administrator", "Facilitator", "Learner"]}
               />
-              <Route exact path={Routes.NOT_FOUND_PAGE} component={NotFound} />
+              <Route
+                exact
+                path={Routes.NOT_AUTHORIZED_PAGE}
+                component={NotAuthorized}
+              />
               <Route exact path="*" component={NotFound} />
             </Switch>
           </Router>

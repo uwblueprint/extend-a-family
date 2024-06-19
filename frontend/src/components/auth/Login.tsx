@@ -34,7 +34,6 @@ const Login = (): React.ReactElement => {
   }
 
   if (!role || !["administrator", "facilitator", "learner"].includes(role)) {
-    // need this changed when welcome page exists
     return <Redirect to={WELCOME_PAGE} />;
   }
 

@@ -16,4 +16,4 @@ export const HOOKS_PAGE = "/hooks";
 
 export const WELCOME_PAGE = "/welcome";
 
-export const NOT_FOUND_PAGE = "/404-not-found";
+export const NOT_AUTHORIZED_PAGE = "/not-authorized";
