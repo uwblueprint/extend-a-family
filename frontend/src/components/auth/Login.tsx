@@ -52,9 +52,10 @@ const Login = (): React.ReactElement => {
       alert(`Bad login. Expected ${user.role}, got ${role}`);
       return;
     }
-    localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
-    const isUserAuth = await authAPIClient.isUserAuth(email);
+  
+    const isUserAuth = await authAPIClient.isUserAuth(email, user.accessToken);
     if (isUserAuth) {
+      localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
       setAuthenticatedUser(user);
     }
   };

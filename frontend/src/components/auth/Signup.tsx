@@ -30,7 +30,7 @@ const Signup = (): React.ReactElement => {
     }
   
     alert("Signup successful, verification link was sent to your email.");
-    const isUserAuth = await authAPIClient.isUserAuth(email);
+    const isUserAuth = await authAPIClient.isUserAuth(email, user.accessToken);
     if (isUserAuth) {
       localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
       setAuthenticatedUser(user);
