@@ -17,3 +17,5 @@ export const HOOKS_PAGE = "/hooks";
 export const WELCOME_PAGE = "/welcome";
 
 export const NOT_AUTHORIZED_PAGE = "/not-authorized";
+
+export const MY_ACCOUNT_PAGE = "/account";

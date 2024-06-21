@@ -26,6 +26,7 @@ import HooksDemo from "./components/pages/HooksDemo";
 import { AuthenticatedUser } from "./types/AuthTypes";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import * as Routes from "./constants/Routes";
+import MyAccount from "./components/pages/MyAccount";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser = getLocalStorageObj<AuthenticatedUser>(
@@ -75,6 +76,12 @@ const App = (): React.ReactElement => {
                 exact
                 path={Routes.HOME_PAGE}
                 component={Default}
+                allowedRoles={["Administrator", "Facilitator", "Learner"]}
+              />
+              <PrivateRoute
+                exact
+                path={Routes.MY_ACCOUNT_PAGE}
+                component={MyAccount}
                 allowedRoles={["Administrator", "Facilitator", "Learner"]}
               />
               <PrivateRoute
