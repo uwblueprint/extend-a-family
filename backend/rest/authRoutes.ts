@@ -1,7 +1,12 @@
 import { CookieOptions, Router } from "express";
 
-import { isAuthorizedByEmail, isAuthorizedByRole, isAuthorizedByUserId } from "../middlewares/auth";
 import * as firebaseAdmin from "firebase-admin";
+import { generate } from "generate-password";
+import {
+  isAuthorizedByEmail,
+  isAuthorizedByRole,
+  isAuthorizedByUserId,
+} from "../middlewares/auth";
 import {
   loginRequestValidator,
   signupRequestValidator,
@@ -15,8 +20,6 @@ import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import { getErrorMessage } from "../utilities/errorUtils";
-
-import { generate } from "generate-password";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -34,7 +37,7 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
   try {
     const authDTO = req.body.idToken
       ? // OAuth
-      await authService.generateTokenOAuth(req.body.idToken)
+        await authService.generateTokenOAuth(req.body.idToken)
       : await authService.generateToken(req.body.email, req.body.password);
 
     const { refreshToken, ...rest } = authDTO;
@@ -126,7 +129,7 @@ authRouter.post(
     try {
       const temporaryPassword = generate({
         length: 20,
-        numbers: true
+        numbers: true,
       });
       const invitedAdminUser = await userService.createUser({
         firstName: req.body.firstName,
@@ -149,13 +152,13 @@ authRouter.post(
         <br> <br>
         <a href=${emailVerificationLink}> Verify email </a>
         <br> <br>
-        To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`
+        To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`,
       );
       res.status(200).json(invitedAdminUser);
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }
-  }
+  },
 );
 
 export default authRouter;
