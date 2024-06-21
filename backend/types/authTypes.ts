@@ -18,4 +18,4 @@ export type NodemailerConfig = {
   };
 };
 
-export type SignupMethod = "PASSWORD" | "GOOGLE";
+export type SignupMethod = "PASSWORD";
