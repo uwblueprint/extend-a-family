@@ -21,7 +21,7 @@ const Signup = (): React.ReactElement => {
   const role = params.get("role");
 
   if (role !== "facilitator") {
-    return <Redirect to={HOME_PAGE} />;
+    return <Redirect to={WELCOME_PAGE} />;
   }
 
   const onSignupClick = async () => {
@@ -36,7 +36,7 @@ const Signup = (): React.ReactElement => {
   };
 
   if (authenticatedUser) {
-    return <Redirect to={WELCOME_PAGE} />;
+    return <Redirect to={HOME_PAGE} />;
   }
 
   return (
