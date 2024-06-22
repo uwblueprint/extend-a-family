@@ -1,20 +1,16 @@
-import React, { useRef, useReducer } from "react";
+import React, { useRef, useReducer, useState } from "react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import DraggableSource from "../common/grid/DraggableSource";
 import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
-
-interface LayoutItem extends GridLayout.Layout {
-  content: string;
-  temp?: boolean;
-  mouseEvent?: { clientX: number; clientY: number };
-}
+import { act } from "react-test-renderer";
 
 const Grid = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [layout, dispatch] = useReducer(layoutReducer, []);
+  const [activeComponent, setActiveComponent] = useState("");
 
   const gridContainerStyle = {
     backgroundColor: "lightgray",
@@ -84,7 +80,7 @@ const Grid = () => {
           cols={12}
           rowHeight={50}
           maxRows={12}
-          verticalCompact={false}
+          compactType={null}
           width={600}
           preventCollision={true}
           containerPadding={[0, 0]}
@@ -96,12 +92,27 @@ const Grid = () => {
               data-grid={item}
               style={{
                 backgroundColor: "white",
-                borderTop: "1px solid black",
-                borderLeft: "1px solid black",
-                boxShadow: "1px 1px 0 0 black, 0 1px 0 0 black", // box alignment
+                borderTop:
+                  item.i == activeComponent
+                    ? "1px solid blue"
+                    : "1 px solid black",
+                borderLeft:
+                  item.i == activeComponent
+                    ? "1px solid blue"
+                    : "1 px solid black",
+                boxShadow:
+                  item.i == activeComponent
+                    ? "1px 1px 0 0 black, 0 1px 0 0 blue"
+                    : "1px 1px 0 0 black, 0 1px 0 0 black", // box alignment
               }}
             >
-              <GridElement {...item} componentType={item.content}>
+              <GridElement
+                {...item}
+                componentType={item.content}
+                index={item.i}
+                component={activeComponent}
+                setComponent={setActiveComponent}
+              >
                 {item.content}{" "}
               </GridElement>
             </div>

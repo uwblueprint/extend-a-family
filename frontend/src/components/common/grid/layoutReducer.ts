@@ -14,6 +14,7 @@ interface LayoutItem {
   temp?: boolean;
   mouseEvent?: MouseEventLike;
   i: string;
+  resizeHandles?: any[];
 }
 
 interface LayoutAction {
@@ -23,6 +24,7 @@ interface LayoutAction {
   content?: string;
   mouseEvent?: MouseEventLike;
   layout?: LayoutItem[];
+  resizeHandles?: string[];
 }
 
 const layoutReducer = (
@@ -55,6 +57,7 @@ const layoutReducer = (
           temp: true,
           mouseEvent: action.mouseEvent,
           i: "" + state.length,
+          resizeHandles: ["sw", "nw", "se", "ne"],
         },
       ];
     case "clearTemp":

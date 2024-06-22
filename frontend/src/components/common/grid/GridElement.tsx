@@ -11,8 +11,10 @@ interface GridElementProps {
   temp?: boolean;
   children: ReactNode;
   componentType?: string;
+  index: string;
   mouseEvent?: MouseEventLike;
   style?: React.CSSProperties;
+  setComponent: (index: string) => void;
   className?: string;
   onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
   onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
@@ -58,8 +60,10 @@ const createDragStopEvent = (element: HTMLElement) => {
 const GridElement: React.FC<GridElementProps> = ({
   temp,
   children,
+  index,
   mouseEvent,
   componentType,
+  setComponent,
   ...rest
 }) => {
   const forwardProps = pick(rest, [
@@ -72,6 +76,12 @@ const GridElement: React.FC<GridElementProps> = ({
   ]);
 
   const ref = useRef<HTMLDivElement>(null);
+  const handleMouseDown = (event: any) => {
+    if (ref.current && ref.current.contains(event.target)) {
+      console.log(index);
+      setComponent(index);
+    }
+  };
 
   // Fake the drag start event if it's a new element with property temp
   useEffect(() => {
@@ -89,7 +99,12 @@ const GridElement: React.FC<GridElementProps> = ({
   }, [ref, temp, mouseEvent]);
 
   return (
-    <div ref={ref} {...forwardProps} style={{ height: "100%" }}>
+    <div
+      ref={ref}
+      onMouseDown={handleMouseDown}
+      {...forwardProps}
+      style={{ height: "100%" }}
+    >
       <BaseModule name={componentType || ""} />
     </div>
   );
