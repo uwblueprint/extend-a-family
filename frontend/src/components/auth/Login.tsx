@@ -6,7 +6,7 @@ import {
   GoogleLoginResponseOffline,
 } from "react-google-login";
 import authAPIClient from "../../APIClients/AuthAPIClient";
-import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
+import { HOME_PAGE, SIGNUP_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
@@ -34,8 +34,7 @@ const Login = (): React.ReactElement => {
   }
 
   if (!role || !["administrator", "facilitator", "learner"].includes(role)) {
-    // need this changed when welcome page exists
-    return <Redirect to="/welcome" />;
+    return <Redirect to={WELCOME_PAGE} />;
   }
 
   const onLogInClick = async () => {
