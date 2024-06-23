@@ -10,12 +10,12 @@ interface MouseEventLike {
 interface GridElementProps {
   temp?: boolean;
   children: ReactNode;
-  componentType?: string;
   index: string;
+  componentType?: string;
   mouseEvent?: MouseEventLike;
   style?: React.CSSProperties;
-  setComponent: (index: string) => void;
   className?: string;
+  setActiveComponent: (index: string) => void;
   onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
   onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
   onTouchEnd?: React.TouchEventHandler<HTMLDivElement>;
@@ -46,7 +46,6 @@ const createDragStartEvent = (
     };
   };
   element.dispatchEvent(event);
-  console.log("dispatched event");
 };
 
 const createDragStopEvent = (element: HTMLElement) => {
@@ -61,9 +60,9 @@ const GridElement: React.FC<GridElementProps> = ({
   temp,
   children,
   index,
+  setActiveComponent,
   mouseEvent,
   componentType,
-  setComponent,
   ...rest
 }) => {
   const forwardProps = pick(rest, [
@@ -76,12 +75,6 @@ const GridElement: React.FC<GridElementProps> = ({
   ]);
 
   const ref = useRef<HTMLDivElement>(null);
-  const handleMouseDown = (event: any) => {
-    if (ref.current && ref.current.contains(event.target)) {
-      console.log(index);
-      setComponent(index);
-    }
-  };
 
   // Fake the drag start event if it's a new element with property temp
   useEffect(() => {
@@ -101,7 +94,7 @@ const GridElement: React.FC<GridElementProps> = ({
   return (
     <div
       ref={ref}
-      onMouseDown={handleMouseDown}
+      onMouseDown={() => setActiveComponent(index)}
       {...forwardProps}
       style={{ height: "100%" }}
     >

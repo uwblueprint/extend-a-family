@@ -6,15 +6,15 @@ import DraggableSource from "../common/grid/DraggableSource";
 import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
 import { act } from "react-test-renderer";
+import { set } from "lodash";
 
 const Grid = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [layout, dispatch] = useReducer(layoutReducer, []);
-  const [activeComponent, setActiveComponent] = useState("");
+  const [activeComponent, setActiveComponent] = useState("0");
 
   const gridContainerStyle = {
     backgroundColor: "lightgray",
-    borderLeft: "1px solid black",
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
     width: "601px",
@@ -33,45 +33,58 @@ const Grid = () => {
         alignItems: "center",
       }}
     >
-      <DraggableSource
-        targetRef={ref}
-        dispatch={dispatch}
-        key="1"
-        componentType="TextBox"
-      >
-        <div
-          style={{
-            width: "100px",
-            height: "100px",
-            border: "1px solid blue",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+      <div style={{ display: "flex" }}>
+        <DraggableSource
+          targetRef={ref}
+          dispatch={dispatch}
+          key="1"
+          componentType="TextBox"
         >
-          {" "}
-          Text Box - Drag Me !
-        </div>
-      </DraggableSource>
-      <DraggableSource
-        targetRef={ref}
-        dispatch={dispatch}
-        key="2"
-        componentType="Match"
-      >
-        <div
-          style={{
-            width: "100px",
-            height: "100px",
-            border: "1px solid blue",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          <div
+            style={{
+              width: "70px",
+              height: "30px",
+              border: "1px solid blue",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {" "}
+            Text Box
+          </div>
+        </DraggableSource>
+        <div style={{ width: "20px" }}></div>
+        <DraggableSource
+          targetRef={ref}
+          dispatch={dispatch}
+          key="2"
+          componentType="Match"
         >
-          {" "}
-          Match - Drag Me !
-        </div>
-      </DraggableSource>
-      <div ref={ref}>
+          <div
+            style={{
+              width: "70px",
+              height: "30px",
+              border: "1px solid blue",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {" "}
+            Match
+          </div>
+        </DraggableSource>
+      </div>
+      <div style={{ height: "50px" }}></div>
+      <div
+        ref={ref}
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignContent: "center",
+          alignItems: "center",
+        }}
+      >
         <GridLayout
           className="layout"
           style={gridContainerStyle}
@@ -94,15 +107,15 @@ const Grid = () => {
                 backgroundColor: "white",
                 borderTop:
                   item.i == activeComponent
-                    ? "1px solid blue"
-                    : "1 px solid black",
+                    ? "2px solid blue"
+                    : "1px solid black",
                 borderLeft:
                   item.i == activeComponent
-                    ? "1px solid blue"
-                    : "1 px solid black",
+                    ? "2px solid blue"
+                    : "1px solid black",
                 boxShadow:
                   item.i == activeComponent
-                    ? "1px 1px 0 0 black, 0 1px 0 0 blue"
+                    ? "2px 2px 0 0 blue, 0 2px 0 0 blue"
                     : "1px 1px 0 0 black, 0 1px 0 0 black", // box alignment
               }}
             >
@@ -110,8 +123,7 @@ const Grid = () => {
                 {...item}
                 componentType={item.content}
                 index={item.i}
-                component={activeComponent}
-                setComponent={setActiveComponent}
+                setActiveComponent={setActiveComponent}
               >
                 {item.content}{" "}
               </GridElement>
