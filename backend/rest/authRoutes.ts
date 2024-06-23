@@ -1,6 +1,5 @@
 import { CookieOptions, Router } from "express";
 
-import * as firebaseAdmin from "firebase-admin";
 import { generate } from "generate-password";
 import {
   isAuthorizedByEmail,
@@ -138,22 +137,7 @@ authRouter.post(
         role: "Administrator",
         password: temporaryPassword,
       });
-      const emailVerificationLink = await firebaseAdmin
-        .auth()
-        .generateEmailVerificationLink(req.body.email);
-      await emailService.sendEmail(
-        req.body.email,
-        "Administrator Invitation: Smart Saving, Smart Spending",
-        `Hello,<br> <br>
-        You have been invited as an administrator to Smart Saving, Smart Spending.
-        <br> <br>
-        Please click the following link to verify your email and activate your account.
-        <strong> This link is only valid for 1 hour.</strong>
-        <br> <br>
-        <a href=${emailVerificationLink}> Verify email </a>
-        <br> <br>
-        To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`,
-      );
+      await authService.sendAdminInvite(req.body.email, temporaryPassword);
       res.status(200).json(invitedAdminUser);
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
