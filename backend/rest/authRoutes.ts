@@ -121,11 +121,16 @@ authRouter.post(
 authRouter.post("/isUserVerified/:email", async (req, res) => {
   try {
     const token = getAccessToken(req);
-    const isAuthorized = await authService.isAuthorizedByEmail(
-      token as string,
+    if (!token) {
+      res
+        .status(401)
+        .json({ error: "You are not authorized to make this request." });
+    }
+    const isVerified = await authService.isAuthorizedByEmail(
+      token!,
       req.params.email,
     );
-    res.status(200).json({ isAuthorized });
+    res.status(200).json({ isVerified });
   } catch (error: unknown) {
     res.status(500).json({ error: getErrorMessage(error) });
   }

@@ -40,7 +40,8 @@ const Login = (): React.ReactElement => {
 
   const onLogInClick = async () => {
     const user: AuthenticatedUser = await authAPIClient.login(email, password);
-    if (!user) {
+    const isUserAuth = user?.accessToken ? await authAPIClient.isUserAuth(email, user.accessToken) : null;
+    if (!user || !isUserAuth) {
       // will need to change this for different errors
       // eslint-disable-next-line no-alert
       alert("Bad login, user not found");
@@ -52,12 +53,9 @@ const Login = (): React.ReactElement => {
       alert(`Bad login. Expected ${user.role}, got ${role}`);
       return;
     }
-  
-    const isUserAuth = await authAPIClient.isUserAuth(email, user.accessToken);
-    if (isUserAuth) {
-      localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
-      setAuthenticatedUser(user);
-    }
+
+    localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
+    setAuthenticatedUser(user);
   };
 
   const onSignupClick = () => {

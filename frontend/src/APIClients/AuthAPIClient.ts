@@ -108,7 +108,10 @@ const refresh = async (): Promise<boolean> => {
   }
 };
 
-const isUserAuth = async (email: string, accessToken: string): Promise<boolean> => {
+const isUserAuth = async (
+  email: string,
+  accessToken: string,
+): Promise<boolean> => {
   const bearerToken = `Bearer ${accessToken}`;
 
   try {

@@ -21,14 +21,14 @@ const Signup = (): React.ReactElement => {
       email,
       password,
     );
-    
+
     if (!user) {
       // will need to change this for different errors
       // eslint-disable-next-line no-alert
       alert("Something went wrong with signup");
       return;
     }
-  
+
     alert("Signup successful, verification link was sent to your email.");
     const isUserAuth = await authAPIClient.isUserAuth(email, user.accessToken);
     if (isUserAuth) {
