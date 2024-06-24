@@ -164,6 +164,38 @@ class AuthService implements IAuthService {
     }
   }
 
+  async sendAdminInvite(
+    email: string,
+    temporaryPassword: string,
+  ): Promise<void> {
+    if (!this.emailService) {
+      const errorMessage =
+        "Attempted to call sendAdminInvite but this instance of AuthService does not have an EmailService instance";
+      Logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    const emailVerificationLink = await firebaseAdmin
+      .auth()
+      .generateEmailVerificationLink(email);
+
+    const emailBody = `Hello,<br> <br>
+      You have been invited as an administrator to Smart Saving, Smart Spending.
+      <br> <br>
+      Please click the following link to verify your email and activate your account.
+      <strong>This link is only valid for 1 hour.</strong>
+      <br> <br>
+      <a href=${emailVerificationLink}>Verify email</a>
+      <br> <br>
+      To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`;
+
+    await this.emailService.sendEmail(
+      email,
+      "Administrator Invitation: Smart Saving, Smart Spending",
+      emailBody,
+    );
+  }
+
   async isAuthorizedByRole(
     accessToken: string,
     roles: Set<Role>,
