@@ -40,8 +40,8 @@ const Login = (): React.ReactElement => {
 
   const onLogInClick = async () => {
     const user: AuthenticatedUser = await authAPIClient.login(email, password);
-    const isUserAuth = user?.accessToken ? await authAPIClient.isUserAuth(email, user.accessToken) : null;
-    if (!user || !isUserAuth) {
+    const isUserVerified = user?.accessToken ? await authAPIClient.isUserVerified(email, user.accessToken) : null;
+    if (!user || !isUserVerified) {
       // will need to change this for different errors
       // eslint-disable-next-line no-alert
       alert("Bad login, user not found");

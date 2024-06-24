@@ -108,7 +108,7 @@ const refresh = async (): Promise<boolean> => {
   }
 };
 
-const isUserAuth = async (
+const isUserVerified = async (
   email: string,
   accessToken: string,
 ): Promise<boolean> => {
@@ -133,5 +133,5 @@ export default {
   signup,
   resetPassword,
   refresh,
-  isUserAuth,
+  isUserVerified,
 };
