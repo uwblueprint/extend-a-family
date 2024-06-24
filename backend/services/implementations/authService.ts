@@ -170,7 +170,7 @@ class AuthService implements IAuthService {
   ): Promise<void> {
     if (!this.emailService) {
       const errorMessage =
-        "Attempted to call sendEmailVerificationLink but this instance of AuthService does not have an EmailService instance";
+        "Attempted to call sendAdminInvite but this instance of AuthService does not have an EmailService instance";
       Logger.error(errorMessage);
       throw new Error(errorMessage);
     }
