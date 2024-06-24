@@ -47,11 +47,17 @@ export const getApiValidationError = (
   fieldName: string,
   type: Type,
   isArray = false,
-): string => {
-  return `The ${fieldName} is not a ${type}${isArray ? " Array" : ""}`;
+): { error: string } => {
+  return {
+    error: `The ${fieldName} is not a ${type}${isArray ? " Array" : ""}`,
+  };
 };
 
-export const getFileTypeValidationError = (mimetype: string): string => {
+export const getFileTypeValidationError = (
+  mimetype: string,
+): { error: string } => {
   const allowableContentTypesString = [...allowableContentTypes].join(", ");
-  return `The file type ${mimetype} is not one of ${allowableContentTypesString}`;
+  return {
+    error: `The file type ${mimetype} is not one of ${allowableContentTypesString}`,
+  };
 };
