@@ -66,6 +66,7 @@ class AuthService implements IAuthService {
           email: googleUser.email,
           role: "Facilitator",
           password: "",
+          status: "Active", // temporary default value
         },
         googleUser.localId,
         "GOOGLE",
