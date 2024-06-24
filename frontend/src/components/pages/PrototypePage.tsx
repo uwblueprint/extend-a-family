@@ -98,6 +98,7 @@ const Grid = () => {
           preventCollision={true}
           containerPadding={[0, 0]}
           margin={[0, 0]}
+          isDroppable={true}
         >
           {layout.map((item) => (
             <div

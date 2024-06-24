@@ -27,6 +27,21 @@ interface LayoutAction {
   resizeHandles?: string[];
 }
 
+const calculateGridPosition = (mouseEvent, gridTop, gridLeft, cellSize) => {
+  const xPos = mouseEvent.clientX - gridLeft;
+  const yPos = mouseEvent.clientY - gridTop;
+
+  const cellX = Math.floor(xPos / cellSize);
+  const cellY = Math.floor(yPos / cellSize);
+
+  return { cellX, cellY };
+};
+
+// Assuming the following values for the grid layout
+const gridTop = 100; // Top margin of the grid
+const gridLeft = (window.innerWidth - 601) / 2; // Centered grid's left margin
+const cellSize = 50; // Size of each cell
+
 const layoutReducer = (
   state: LayoutItem[],
   action: LayoutAction,
@@ -36,21 +51,22 @@ const layoutReducer = (
       if (state.findIndex((item) => item.temp) !== -1) {
         return state;
       }
-      const maxX = state.reduce(
-        (val, item) => (item.x + item.h > val ? item.x + item.h : val),
-        0,
+
+      const { cellX, cellY } = calculateGridPosition(
+        action.mouseEvent,
+        gridTop,
+        gridLeft,
+        cellSize,
       );
-      const maxY = state.reduce(
-        (val, item) => (item.y + item.w > val ? item.y + item.w : val),
-        0,
-      );
+
+      console.log("cellX", cellX, "cellY", cellY);
       return [
         ...state,
         {
-          x: 1,
-          y: 1,
-          h: action.h ? action.h : 1,
-          w: action.w ? action.w : 1,
+          x: Math.max(cellX, 0),
+          y: Math.max(cellY, 0),
+          h: 1,
+          w: 1,
           content: action.content
             ? action.content
             : String.fromCharCode(65 + state.length),
