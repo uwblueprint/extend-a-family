@@ -6,12 +6,14 @@ import DraggableSource from "../common/grid/DraggableSource";
 import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
 import { EyeIcon, PencilIcon } from "@heroicons/react/24/outline";
+import BaseModule from "../common/modules/BaseModule";
 
 const Grid = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [layout, dispatch] = useReducer(layoutReducer, []);
   const [activeComponent, setActiveComponent] = useState("0");
   const [editMode, setEditMode] = useState(true);
+  const [componentData, setComponentData] = useState(new Map<string, object>());
 
   const gridContainerStyle = {
     backgroundColor: "lightgray",
@@ -187,6 +189,9 @@ const Grid = () => {
                 index={item.i}
                 activeComponent={activeComponent}
                 setActiveComponent={setActiveComponent}
+                componentData={componentData}
+                data={componentData.get(item.i) || {}}
+                setData={setComponentData}
               >
                 {item.content}{" "}
               </GridElement>
@@ -205,6 +210,12 @@ const Grid = () => {
           <h6 style={{ position: "absolute", top: "5px", left: "5px" }}>
             Edit Panel
           </h6>
+          <BaseModule
+            name={"Edit" + layout[Number(activeComponent)]?.content || ""}
+            data={componentData || {}}
+            activeComponent={activeComponent}
+            setData={setComponentData}
+          />
         </div>
       </div>
     </div>

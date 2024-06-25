@@ -1,6 +1,11 @@
 import React from "react";
 
-const Match: React.FC = () => {
+interface EditMatchProps {
+  componentData: {};
+  setComponentData: (data: Map<string, object>) => void;
+}
+
+const Match: React.FC<EditMatchProps> = () => {
   return (
     <div
       className={"drag-handle"}

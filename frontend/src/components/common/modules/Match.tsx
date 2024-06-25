@@ -1,21 +1,21 @@
 import React from "react";
 
-interface TextBoxProps {
+interface MatchProps {
   verticalAlign: string;
   fontWeight: string;
   horizontalAlign: string;
   fontSize: string;
 }
 interface ComponentProps {
-  componentData: TextBoxProps;
+  componentData: MatchProps;
 }
 
-const TextBox: React.FC<ComponentProps> = ({ componentData }) => {
+const Match: React.FC<ComponentProps> = ({ componentData }) => {
   const {
     verticalAlign = "center",
     fontWeight = "normal",
     horizontalAlign = "center",
-    fontSize,
+    fontSize = "14px",
   } = componentData;
   return (
     <div
@@ -24,13 +24,15 @@ const TextBox: React.FC<ComponentProps> = ({ componentData }) => {
         width: "100%",
         height: "100%",
         alignContent: verticalAlign,
-        justifyContent: "flex-start",
+        justifyContent: horizontalAlign,
         textAlign: "center",
+        fontWeight: fontWeight,
+        fontSize: fontSize,
       }}
     >
-      <p style={{ fontWeight: fontWeight }}> Text Box </p>
+      <p> Match Box </p>
     </div>
   );
 };
 
-export default TextBox;
+export default Match;

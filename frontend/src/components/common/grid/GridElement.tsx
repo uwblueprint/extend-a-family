@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, ReactNode } from "react";
 import { pick } from "lodash";
-import BaseModule from "../BaseModule";
+import BaseModule from "../modules/BaseModule";
 
 interface MouseEventLike {
   clientX: number;
@@ -16,6 +16,8 @@ interface GridElementProps {
   style?: React.CSSProperties;
   className?: string;
   activeComponent: string;
+  data: {};
+  setData: (data: Map<string, object>) => void;
   setActiveComponent: (index: string) => void;
   onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
   onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
@@ -63,6 +65,8 @@ const GridElement: React.FC<GridElementProps> = ({
   index,
   activeComponent,
   setActiveComponent,
+  data,
+  setData,
   mouseEvent,
   componentType,
   ...rest
@@ -97,12 +101,17 @@ const GridElement: React.FC<GridElementProps> = ({
     <div
       ref={ref}
       onMouseDown={() =>
-        setActiveComponent(activeComponent === index ? "" : index)
+        setActiveComponent(activeComponent === index ? "10000" : index)
       }
       {...forwardProps}
       style={{ height: "100%" }}
     >
-      <BaseModule name={componentType || ""} />
+      <BaseModule
+        name={componentType || ""}
+        activeComponent={activeComponent}
+        data={data}
+        setData={setData}
+      />
     </div>
   );
 };
