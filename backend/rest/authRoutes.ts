@@ -1,13 +1,16 @@
 import { CookieOptions, Router } from "express";
 
+import { generate } from "generate-password";
 import {
   getAccessToken,
   isAuthorizedByEmail,
   isAuthorizedByUserId,
+  isAuthorizedByRole,
 } from "../middlewares/auth";
 import {
   loginRequestValidator,
   signupRequestValidator,
+  inviteAdminRequestValidator,
 } from "../middlewares/validators/authValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -55,7 +58,7 @@ authRouter.post("/signup", signupRequestValidator, async (req, res) => {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
-      role: "Facilitator",
+      role: req.body.role,
       password: req.body.password,
     });
 
@@ -135,5 +138,30 @@ authRouter.post("/isUserVerified/:email", async (req, res) => {
     res.status(500).json({ error: getErrorMessage(error) });
   }
 });
+
+authRouter.post(
+  "/inviteAdmin",
+  inviteAdminRequestValidator,
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    try {
+      const temporaryPassword = generate({
+        length: 20,
+        numbers: true,
+      });
+      const invitedAdminUser = await userService.createUser({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        role: "Administrator",
+        password: temporaryPassword,
+      });
+      await authService.sendAdminInvite(req.body.email, temporaryPassword);
+      res.status(200).json(invitedAdminUser);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
 
 export default authRouter;
