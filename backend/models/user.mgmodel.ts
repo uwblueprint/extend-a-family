@@ -10,6 +10,11 @@ export interface User extends Document {
   role: Role;
 }
 
+const baseOptions = {
+	  discriminatorKey: "type",
+  	collection: "user",
+};
+
 const UserSchema: Schema = new Schema({
   firstName: {
     type: String,
@@ -28,6 +33,24 @@ const UserSchema: Schema = new Schema({
     required: true,
     enum: ["Administrator", "Facilitator", "Learner"],
   },
+
+},
+  baseOptions
+  
+);
+
+const User = mongoose.model<User>("User", UserSchema);
+
+const FacilitatorSchema = new Schema({
+  learners: { type: [String], default: [] }
 });
 
-export default mongoose.model<User>("User", UserSchema);
+const LearnerSchema = new Schema({
+  facilitator: { type: String, required: true }
+});
+
+const Facilitator = User.discriminator("Facilitator", FacilitatorSchema);
+const Learner = User.discriminator("Learner", LearnerSchema);
+
+export { User, Facilitator, Learner };
+export default User;
