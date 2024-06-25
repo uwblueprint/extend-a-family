@@ -15,6 +15,7 @@ interface GridElementProps {
   mouseEvent?: MouseEventLike;
   style?: React.CSSProperties;
   className?: string;
+  activeComponent: string;
   setActiveComponent: (index: string) => void;
   onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
   onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
@@ -60,6 +61,7 @@ const GridElement: React.FC<GridElementProps> = ({
   temp,
   children,
   index,
+  activeComponent,
   setActiveComponent,
   mouseEvent,
   componentType,
@@ -94,7 +96,9 @@ const GridElement: React.FC<GridElementProps> = ({
   return (
     <div
       ref={ref}
-      onMouseDown={() => setActiveComponent(index)}
+      onMouseDown={() =>
+        setActiveComponent(activeComponent === index ? "" : index)
+      }
       {...forwardProps}
       style={{ height: "100%" }}
     >

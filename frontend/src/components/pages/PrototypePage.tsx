@@ -5,13 +5,13 @@ import "react-resizable/css/styles.css";
 import DraggableSource from "../common/grid/DraggableSource";
 import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
-import { act } from "react-test-renderer";
-import { set } from "lodash";
+import { EyeIcon, PencilIcon } from "@heroicons/react/24/outline";
 
 const Grid = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [layout, dispatch] = useReducer(layoutReducer, []);
   const [activeComponent, setActiveComponent] = useState("0");
+  const [editMode, setEditMode] = useState(true);
 
   const gridContainerStyle = {
     backgroundColor: "lightgray",
@@ -29,11 +29,30 @@ const Grid = () => {
       style={{
         width: "full",
         height: "full",
+        display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
       }}
     >
-      <div style={{ display: "flex" }}>
+      <div
+        style={{
+          width: "601px",
+          alignContent: "center",
+          justifyContent: "center",
+          alignItems: "center",
+          display: "flex",
+          height: "110px",
+          border: "1px solid black",
+          marginTop: "10px",
+          marginBottom: "10px",
+          position: "relative",
+        }}
+      >
+        <div style={{ position: "absolute", left: "5px", top: "5px" }}>
+          <h6>Draggable Components</h6>
+        </div>
+        <br></br>
         <DraggableSource
           targetRef={ref}
           dispatch={dispatch}
@@ -44,8 +63,9 @@ const Grid = () => {
             style={{
               width: "70px",
               height: "30px",
-              border: "1px solid blue",
+              border: "1px solid black",
               alignItems: "center",
+              textAlign: "center",
               justifyContent: "center",
             }}
           >
@@ -64,7 +84,8 @@ const Grid = () => {
             style={{
               width: "70px",
               height: "30px",
-              border: "1px solid blue",
+              border: "1px solid black",
+              textAlign: "center",
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -74,7 +95,7 @@ const Grid = () => {
           </div>
         </DraggableSource>
       </div>
-      <div style={{ height: "50px" }}></div>
+
       <div
         ref={ref}
         style={{
@@ -85,9 +106,43 @@ const Grid = () => {
           alignItems: "center",
         }}
       >
+        <div
+          style={{ height: "601px", width: "220px", position: "relative" }}
+          onClick={() => {
+            setEditMode(!editMode);
+          }}
+        >
+          {editMode ? (
+            <EyeIcon
+              style={{
+                position: "absolute",
+                top: "5px",
+                left: "5px",
+                width: "40px",
+                height: "40px",
+                cursor: "pointer",
+              }}
+            />
+          ) : (
+            <PencilIcon
+              style={{
+                position: "absolute",
+                top: "5px",
+                left: "5px",
+                width: "35px",
+                height: "35px",
+                cursor: "pointer",
+              }}
+            />
+          )}
+        </div>
         <GridLayout
           className="layout"
-          style={gridContainerStyle}
+          style={
+            editMode
+              ? gridContainerStyle
+              : { width: "601px", height: "601px", border: "1px solid black" }
+          }
           layout={layout}
           onLayoutChange={(layout) => dispatch({ type: "newLayout", layout })}
           cols={12}
@@ -99,31 +154,38 @@ const Grid = () => {
           containerPadding={[0, 0]}
           margin={[0, 0]}
           isDroppable={true}
+          isDraggable={editMode}
+          isResizable={editMode}
         >
           {layout.map((item) => (
             <div
               key={item.i}
               data-grid={item}
-              style={{
-                backgroundColor: "white",
-                borderTop:
-                  item.i == activeComponent
-                    ? "2px solid blue"
-                    : "1px solid black",
-                borderLeft:
-                  item.i == activeComponent
-                    ? "2px solid blue"
-                    : "1px solid black",
-                boxShadow:
-                  item.i == activeComponent
-                    ? "2px 2px 0 0 blue, 0 2px 0 0 blue"
-                    : "1px 1px 0 0 black, 0 1px 0 0 black", // box alignment
-              }}
+              style={
+                editMode
+                  ? {
+                      backgroundColor: "white",
+                      borderTop:
+                        item.i == activeComponent
+                          ? "1px solid blue"
+                          : "1px solid black",
+                      borderLeft:
+                        item.i == activeComponent
+                          ? "1px solid blue"
+                          : "1px solid black",
+                      boxShadow:
+                        item.i == activeComponent
+                          ? "1px 1px 0 0 blue, 0 1px 0 0 blue"
+                          : "1px 1px 0 0 black, 0 1px 0 0 black", // box alignment
+                    }
+                  : {}
+              }
             >
               <GridElement
                 {...item}
                 componentType={item.content}
                 index={item.i}
+                activeComponent={activeComponent}
                 setActiveComponent={setActiveComponent}
               >
                 {item.content}{" "}
@@ -131,6 +193,19 @@ const Grid = () => {
             </div>
           ))}
         </GridLayout>
+        <div
+          style={{
+            width: "210px",
+            height: "601px",
+            border: "1px solid black",
+            marginLeft: "10px",
+            position: "relative",
+          }}
+        >
+          <h6 style={{ position: "absolute", top: "5px", left: "5px" }}>
+            Edit Panel
+          </h6>
+        </div>
       </div>
     </div>
   );
