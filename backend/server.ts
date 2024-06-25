@@ -65,3 +65,40 @@ app.listen({ port: process.env.PORT || 8080 }, () => {
   /* eslint-disable-next-line no-console */
   console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
 });
+
+
+import mongoose from 'mongoose';
+import User, { Facilitator, Learner } from './models/user.mgmodel';
+async function runTests() {
+  // Connect to MongoDB 
+  await mongo.connect();
+
+  try {
+    await User.deleteMany({});
+    
+    const facilitator = new Facilitator({
+      firstName: 'John',
+      lastName: 'Doe',
+      authId: '123',
+      role: 'Facilitator',
+      learners: ['learner1', 'learner2']
+    });
+    await facilitator.save();
+    console.log('Facilitator saved:', facilitator);
+
+    const learner = new Learner({
+      firstName: 'Jane',
+      lastName: 'Smith',
+      authId: '456',
+      role: 'Learner',
+      facilitator: '123'
+    });
+    await learner.save();
+    console.log('Learner saved:', learner);
+
+  } finally {
+    await mongoose.disconnect();
+  }
+}
+
+runTests().catch(error => console.error('Error running tests:', error));
