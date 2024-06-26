@@ -4,12 +4,11 @@ import { Redirect, useLocation } from "react-router-dom";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
-import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
 const Signup = (): React.ReactElement => {
-  const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
+  const { authenticatedUser } = useContext(AuthContext);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -41,6 +40,7 @@ const Signup = (): React.ReactElement => {
       return;
     }
 
+    // eslint-disable-next-line no-alert
     alert("Signup successful, verification link was sent to your email.");
   };
 
