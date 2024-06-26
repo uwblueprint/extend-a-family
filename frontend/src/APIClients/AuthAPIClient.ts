@@ -22,20 +22,6 @@ const login = async (
   }
 };
 
-const loginWithGoogle = async (idToken: string): Promise<AuthenticatedUser> => {
-  try {
-    const { data } = await baseAPIClient.post(
-      "/auth/login",
-      { idToken },
-      { withCredentials: true },
-    );
-    localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(data));
-    return data;
-  } catch (error) {
-    return null;
-  }
-};
-
 const logout = async (userId: string | undefined): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -129,7 +115,6 @@ const isUserVerified = async (
 export default {
   login,
   logout,
-  loginWithGoogle,
   signup,
   resetPassword,
   refresh,
