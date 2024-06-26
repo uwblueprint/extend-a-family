@@ -81,15 +81,22 @@ const CourseElementModel = mongoose.model<CourseElement>(
   CourseElementSchema,
 );
 
-CourseElementModel.discriminator("RichTextElement", RichTextElementSchema);
+export const RichTextElementModel = CourseElementModel.discriminator(
+  "RichTextElement",
+  RichTextElementSchema,
+);
 
-CourseElementModel.discriminator("ImageElement", ImageElementSchema);
+export const ImageElementModel = CourseElementModel.discriminator(
+  "ImageElement",
+  ImageElementSchema,
+);
 
-CourseElementModel.discriminator("TextInputElement", TextInputElementSchema);
+export const TextInputElementModel = CourseElementModel.discriminator(
+  "TextInputElement",
+  TextInputElementSchema,
+);
 
-CourseElementModel.discriminator(
+export const NumberInputElementModel = CourseElementModel.discriminator(
   "NumberInputElement",
   NumberInputElementSchema,
 );
-
-export default CourseElementModel;
