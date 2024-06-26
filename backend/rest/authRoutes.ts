@@ -2,9 +2,10 @@ import { CookieOptions, Router } from "express";
 
 import { generate } from "generate-password";
 import {
+  getAccessToken,
   isAuthorizedByEmail,
-  isAuthorizedByRole,
   isAuthorizedByUserId,
+  isAuthorizedByRole,
 } from "../middlewares/auth";
 import {
   loginRequestValidator,
@@ -119,6 +120,25 @@ authRouter.post(
     }
   },
 );
+
+authRouter.post("/isUserVerified/:email", async (req, res) => {
+  try {
+    const token = getAccessToken(req);
+    if (!token) {
+      res
+        .status(401)
+        .json({ error: "You are not authorized to make this request." });
+    } else {
+      const isVerified = await authService.isAuthorizedByEmail(
+        token,
+        req.params.email,
+      );
+      res.status(200).json({ isVerified });
+    }
+  } catch (error: unknown) {
+    res.status(500).json({ error: getErrorMessage(error) });
+  }
+});
 
 authRouter.post(
   "/inviteAdmin",
