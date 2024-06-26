@@ -5,6 +5,7 @@ interface TextBoxProps {
   fontWeight: string;
   horizontalAlign: string;
   fontSize: string;
+  content: string;
 }
 interface ComponentProps {
   componentData: TextBoxProps;
@@ -16,6 +17,7 @@ const TextBox: React.FC<ComponentProps> = ({ componentData }) => {
     fontWeight = "normal",
     horizontalAlign = "center",
     fontSize,
+    content = "Text Box",
   } = componentData;
   return (
     <div
@@ -28,7 +30,7 @@ const TextBox: React.FC<ComponentProps> = ({ componentData }) => {
         textAlign: "center",
       }}
     >
-      <p style={{ fontWeight: fontWeight }}> Text Box </p>
+      <p style={{ fontWeight: fontWeight }}> {content} </p>
     </div>
   );
 };

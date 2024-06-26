@@ -80,37 +80,12 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
         />
         <label htmlFor="flex-end-vertical">Bottom</label>
       </div>
-      <b>Horizontal Align:</b>
-      <div>
-        <input
-          type="radio"
-          id="flex-start-horizontal"
-          name="horizontal_align"
-          value="flex-start"
-          onChange={() => handleChange("justifyContent", "flex-start")}
-        />
-        <label htmlFor="flex-start-horizontal">Left</label>
-      </div>
-      <div>
-        <input
-          type="radio"
-          id="center-horizontal"
-          name="horizontal_align"
-          value="center"
-          onChange={() => handleChange("justifyContent", "center")}
-        />
-        <label htmlFor="center-horizontal">Center</label>
-      </div>
-      <div>
-        <input
-          type="radio"
-          id="flex-end-horizontal"
-          name="horizontal_align"
-          value="flex-end"
-          onChange={() => handleChange("justifyContent", "flex-end")}
-        />
-        <label htmlFor="flex-end-horizontal">Right</label>
-      </div>
+
+      <input
+        type="text"
+        placeholder="Text Box Content"
+        onChange={(e) => handleChange("content", e.target.value)}
+      />
     </div>
   );
 };
