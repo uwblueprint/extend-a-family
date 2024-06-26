@@ -169,3 +169,23 @@ export const NumberInputElementModel = CourseElementModel.discriminator(
   "NumberInputElement",
   NumberInputElementSchema,
 );
+
+export const CheckboxInputElementModel = CourseElementModel.discriminator(
+  "CheckboxInputElement",
+  CheckboxInputElementSchema,
+);
+
+export const MultipleChoiceElementModel = CourseElementModel.discriminator(
+  "MultipleChoiceElement",
+  MultipleChoiceElementSchema,
+);
+
+export const MatchingElementModel = CourseElementModel.discriminator(
+  "MatchingElement",
+  MatchingElementSchema,
+);
+
+export const TableElementModel = CourseElementModel.discriminator(
+  "TableElement",
+  TableElementSchema,
+);
