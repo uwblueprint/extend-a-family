@@ -1,9 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { ElementType } from "../types/courseTypes";
 
-export interface CourseElement extends Document {
+export type CourseElement = {
   type: ElementType;
-}
+};
 
 const CourseElementSchema: Schema = new Schema({
   type: {
@@ -80,6 +80,75 @@ const CourseElementModel = mongoose.model<CourseElement>(
   "CourseElement",
   CourseElementSchema,
 );
+
+export type CheckboxInputElement = {
+  correctAnswer: boolean;
+};
+
+const CheckboxInputElementSchema: Schema = new Schema({
+  correctAnswer: {
+    type: Boolean,
+    required: false,
+  },
+});
+
+export type MultipleChoiceElement = {
+  options: [CourseElement];
+  correctAnswer: number;
+};
+
+const MultipleChoiceElementSchema: Schema = new Schema({
+  options: {
+    type: [CourseElementSchema],
+    required: true,
+  },
+  correctAnswer: {
+    type: Number,
+    required: false,
+  },
+});
+
+export type MatchingElement = {
+  columns: number;
+  correctAnswer: [[CourseElement]];
+};
+
+const MatchingElementSchema: Schema = new Schema({
+  columns: {
+    type: Number,
+    required: true,
+  },
+  correctAnswer: {
+    type: [[CourseElementSchema]],
+    required: true,
+  },
+});
+
+export type TableElement = {
+  rows: number;
+  columns: number;
+  content: [[CourseElement]];
+  headerBackgroundColor: string;
+};
+
+const TableElementSchema: Schema = new Schema({
+  rows: {
+    type: Number,
+    required: true,
+  },
+  columns: {
+    type: Number,
+    required: true,
+  },
+  content: {
+    type: [[CourseElementSchema]],
+    required: true,
+  },
+  headerBackgroundColor: {
+    type: String,
+    required: false,
+  },
+});
 
 export const RichTextElementModel = CourseElementModel.discriminator(
   "RichTextElement",
