@@ -6,9 +6,9 @@ import {
   InteractiveElementType,
 } from "../types/courseTypes";
 
-export type CourseElement = {
+export interface CourseElement {
   type: ElementType;
-};
+}
 
 const CourseElementSchema: Schema = new Schema({
   type: {
