@@ -1,15 +1,21 @@
 export type PageType = "Lesson" | "Activity";
 
-export type DisplayElementType = "RichText" | "Image";
+export enum InteractiveElementType {
+  TextInput = "TextInput",
+  NumberInput = "NumberInput",
+  CheckboxInput = "CheckboxInput",
+  MultipleChoice = "MultipleChoice",
+  Matching = "Matching",
+}
 
-export type InteractiveElementType =
-  | "TextInput"
-  | "NumberInput "
-  | "CheckboxInput"
-  | "MultipleChoice"
-  | "Matching";
+export enum HybridElementType {
+  Table = "Table",
+}
 
-export type HybridElementType = "Table";
+export enum DisplayElementType {
+  RichText = "RichText",
+  Image = "Image",
+}
 
 export type ElementType =
   | DisplayElementType

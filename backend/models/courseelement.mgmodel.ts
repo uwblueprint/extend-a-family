@@ -1,5 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { ElementType } from "../types/courseTypes";
+import {
+  DisplayElementType,
+  ElementType,
+  InteractiveElementType,
+} from "../types/courseTypes";
 
 export type CourseElement = {
   type: ElementType;
@@ -9,10 +13,21 @@ const CourseElementSchema: Schema = new Schema({
   type: {
     type: String,
     required: true,
+    enum: [
+      "TextInput",
+      "NumberInput",
+      "CheckboxInput",
+      "MultipleChoice",
+      "Matching",
+      "Table",
+      "RichText",
+      "Image",
+    ],
   },
 });
 
 export interface RichTextElement extends CourseElement {
+  type: DisplayElementType.RichText;
   content: string;
   backgroundColor?: string;
 }
@@ -29,6 +44,7 @@ const RichTextElementSchema: Schema = new Schema({
 });
 
 export interface ImageElement extends CourseElement {
+  type: DisplayElementType.Image;
   src: string;
   alt: string;
 }
@@ -45,6 +61,7 @@ const ImageElementSchema: Schema = new Schema({
 });
 
 export interface TextInputElement extends CourseElement {
+  type: InteractiveElementType.TextInput;
   correctAnswer?: string;
 }
 
@@ -56,6 +73,7 @@ const TextInputElementSchema: Schema = new Schema({
 });
 
 export interface NumberInputElement extends CourseElement {
+  type: InteractiveElementType.NumberInput;
   correctAnswer?: number;
   prefixText?: string;
   suffixText?: string;
@@ -75,11 +93,6 @@ const NumberInputElementSchema: Schema = new Schema({
     required: false,
   },
 });
-
-const CourseElementModel = mongoose.model<CourseElement>(
-  "CourseElement",
-  CourseElementSchema,
-);
 
 export type CheckboxInputElement = {
   correctAnswer: boolean;
@@ -149,6 +162,11 @@ const TableElementSchema: Schema = new Schema({
     required: false,
   },
 });
+
+const CourseElementModel = mongoose.model<CourseElement>(
+  "CourseElement",
+  CourseElementSchema,
+);
 
 export const RichTextElementModel = CourseElementModel.discriminator(
   "RichTextElement",
