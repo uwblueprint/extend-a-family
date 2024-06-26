@@ -3,15 +3,12 @@ import { createRoot } from "react-dom/client";
 
 import "./index.css";
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { ChakraProvider } from "@chakra-ui/react";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <ChakraProvider>
-      <App />
-    </ChakraProvider>
+    <App />
   </React.StrictMode>,
 );
 
