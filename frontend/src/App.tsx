@@ -10,6 +10,7 @@ import CreatePage from "./components/pages/CreatePage";
 import Default from "./components/pages/Default";
 import DisplayPage from "./components/pages/DisplayPage";
 import NotFound from "./components/pages/NotFound";
+import NotAuthorized from "./components/pages/NotAuthorized";
 import UpdatePage from "./components/pages/UpdatePage";
 import AUTHENTICATED_USER_KEY from "./constants/AuthConstants";
 import AuthContext from "./contexts/AuthContext";
@@ -70,26 +71,40 @@ const App = (): React.ReactElement => {
               <Route exact path={Routes.LOGIN_PAGE} component={Login} />
               <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
               <Route exact path={Routes.HOOKS_PAGE} component={HooksDemo} />
-              <PrivateRoute exact path={Routes.HOME_PAGE} component={Default} />
+              <PrivateRoute
+                exact
+                path={Routes.HOME_PAGE}
+                component={Default}
+                allowedRoles={["Administrator", "Facilitator", "Learner"]}
+              />
               <PrivateRoute
                 exact
                 path={Routes.CREATE_ENTITY_PAGE}
                 component={CreatePage}
+                allowedRoles={["Administrator", "Facilitator", "Learner"]}
               />
               <PrivateRoute
                 exact
                 path={Routes.UPDATE_ENTITY_PAGE}
                 component={UpdatePage}
+                allowedRoles={["Administrator", "Facilitator", "Learner"]}
               />
               <PrivateRoute
                 exact
                 path={Routes.DISPLAY_ENTITY_PAGE}
                 component={DisplayPage}
+                allowedRoles={["Administrator", "Facilitator", "Learner"]}
               />
               <PrivateRoute
                 exact
                 path={Routes.EDIT_TEAM_PAGE}
                 component={EditTeamInfoPage}
+                allowedRoles={["Administrator", "Facilitator", "Learner"]}
+              />
+              <Route
+                exact
+                path={Routes.NOT_AUTHORIZED_PAGE}
+                component={NotAuthorized}
               />
               <Route exact path="*" component={NotFound} />
             </Switch>

@@ -1,9 +1,16 @@
 import { CookieOptions, Router } from "express";
 
-import { isAuthorizedByEmail, isAuthorizedByUserId } from "../middlewares/auth";
+import { generate } from "generate-password";
+import {
+  getAccessToken,
+  isAuthorizedByEmail,
+  isAuthorizedByUserId,
+  isAuthorizedByRole,
+} from "../middlewares/auth";
 import {
   loginRequestValidator,
   signupRequestValidator,
+  inviteAdminRequestValidator,
 } from "../middlewares/validators/authValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -108,6 +115,50 @@ authRouter.post(
     try {
       await authService.resetPassword(req.params.email);
       res.status(204).send();
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+authRouter.post("/isUserVerified/:email", async (req, res) => {
+  try {
+    const token = getAccessToken(req);
+    if (!token) {
+      res
+        .status(401)
+        .json({ error: "You are not authorized to make this request." });
+    } else {
+      const isVerified = await authService.isAuthorizedByEmail(
+        token,
+        req.params.email,
+      );
+      res.status(200).json({ isVerified });
+    }
+  } catch (error: unknown) {
+    res.status(500).json({ error: getErrorMessage(error) });
+  }
+});
+
+authRouter.post(
+  "/inviteAdmin",
+  inviteAdminRequestValidator,
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    try {
+      const temporaryPassword = generate({
+        length: 20,
+        numbers: true,
+      });
+      const invitedAdminUser = await userService.createUser({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        role: "Administrator",
+        password: temporaryPassword,
+      });
+      await authService.sendAdminInvite(req.body.email, temporaryPassword);
+      res.status(200).json(invitedAdminUser);
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }

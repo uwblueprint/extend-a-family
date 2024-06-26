@@ -67,7 +67,6 @@ const signup = async (
       { firstName, lastName, email, password, role }, // Added role to request body
       { withCredentials: true },
     );
-    localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(data));
     return data;
   } catch (error) {
     return null;
@@ -109,6 +108,24 @@ const refresh = async (): Promise<boolean> => {
   }
 };
 
+const isUserVerified = async (
+  email: string,
+  accessToken: string,
+): Promise<boolean> => {
+  const bearerToken = `Bearer ${accessToken}`;
+
+  try {
+    const { data } = await baseAPIClient.post(
+      `/auth/isUserVerified/${email}`,
+      {},
+      { headers: { Authorization: bearerToken } },
+    );
+    return data.isAuthorized;
+  } catch (error) {
+    return false;
+  }
+};
+
 export default {
   login,
   logout,
@@ -116,4 +133,5 @@ export default {
   signup,
   resetPassword,
   refresh,
+  isUserVerified,
 };
