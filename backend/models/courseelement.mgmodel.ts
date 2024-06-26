@@ -1,7 +1,8 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import {
   DisplayElementType,
   ElementType,
+  HybridElementType,
   InteractiveElementType,
 } from "../types/courseTypes";
 
@@ -94,9 +95,10 @@ const NumberInputElementSchema: Schema = new Schema({
   },
 });
 
-export type CheckboxInputElement = {
+export interface CheckboxInputElement extends CourseElement {
+  type: InteractiveElementType.CheckboxInput;
   correctAnswer: boolean;
-};
+}
 
 const CheckboxInputElementSchema: Schema = new Schema({
   correctAnswer: {
@@ -105,10 +107,11 @@ const CheckboxInputElementSchema: Schema = new Schema({
   },
 });
 
-export type MultipleChoiceElement = {
+export interface MultipleChoiceElement extends CourseElement {
+  type: InteractiveElementType.MultipleChoice;
   options: [CourseElement];
   correctAnswer: number;
-};
+}
 
 const MultipleChoiceElementSchema: Schema = new Schema({
   options: {
@@ -121,10 +124,11 @@ const MultipleChoiceElementSchema: Schema = new Schema({
   },
 });
 
-export type MatchingElement = {
+export interface MatchingElement extends CourseElement {
+  type: InteractiveElementType.Matching;
   columns: number;
   correctAnswer: [[CourseElement]];
-};
+}
 
 const MatchingElementSchema: Schema = new Schema({
   columns: {
@@ -137,12 +141,13 @@ const MatchingElementSchema: Schema = new Schema({
   },
 });
 
-export type TableElement = {
+export interface TableElement extends CourseElement {
+  type: HybridElementType.Table;
   rows: number;
   columns: number;
   content: [[CourseElement]];
   headerBackgroundColor: string;
-};
+}
 
 const TableElementSchema: Schema = new Schema({
   rows: {
