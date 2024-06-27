@@ -26,6 +26,7 @@ import HooksDemo from "./components/pages/HooksDemo";
 import { AuthenticatedUser } from "./types/AuthTypes";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import * as Routes from "./constants/Routes";
+import ManageUserPage from "./components/pages/ManageUserPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser = getLocalStorageObj<AuthenticatedUser>(
@@ -105,6 +106,12 @@ const App = (): React.ReactElement => {
                 exact
                 path={Routes.NOT_AUTHORIZED_PAGE}
                 component={NotAuthorized}
+              />
+              <PrivateRoute
+                exact
+                path={Routes.MANAGE_USERS_PAGE}
+                component={ManageUserPage}
+                allowedRoles={["Administrator"]}
               />
               <Route exact path="*" component={NotFound} />
             </Switch>
