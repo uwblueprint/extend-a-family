@@ -5,7 +5,6 @@ import MgUser, { User } from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
   Role,
-  Status,
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
