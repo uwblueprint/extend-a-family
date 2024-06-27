@@ -69,6 +69,7 @@ const Grid = () => {
               alignItems: "center",
               textAlign: "center",
               justifyContent: "center",
+              zIndex: 1000,
             }}
           >
             {" "}
@@ -106,6 +107,7 @@ const Grid = () => {
           justifyContent: "center",
           alignContent: "center",
           alignItems: "center",
+          zIndex: 1,
         }}
       >
         <div
