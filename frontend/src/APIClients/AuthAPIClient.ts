@@ -120,7 +120,7 @@ const isUserVerified = async (
       {},
       { headers: { Authorization: bearerToken } },
     );
-    return data.isAuthorized;
+    return data.isVerified;
   } catch (error) {
     return false;
   }
