@@ -60,7 +60,7 @@ authRouter.post("/signup", signupRequestValidator, async (req, res) => {
       email: req.body.email,
       role: req.body.role,
       password: req.body.password,
-      status: "Active", // temporary default value
+      status: "Active",
     });
 
     const authDTO = await authService.generateToken(
@@ -157,7 +157,7 @@ authRouter.post(
         email: req.body.email,
         role: "Administrator",
         password: temporaryPassword,
-        status: "Active", // temporary default value
+        status: "Invited",
       });
       await authService.sendAdminInvite(req.body.email, temporaryPassword);
       res.status(200).json(invitedAdminUser);
