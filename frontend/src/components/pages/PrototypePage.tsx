@@ -215,7 +215,7 @@ const Grid = () => {
             <h6>Edit Panel</h6>
             <button
               onClick={() => {
-                dispatch({ type: "deleteItem", index: activeComponent });
+                dispatch({ type: "deleteItem", i: activeComponent });
               }}
             >
               Delete

@@ -24,8 +24,8 @@ interface LayoutAction {
   content?: string;
   mouseEvent?: MouseEventLike;
   layout?: LayoutItem[];
+  i?: string;
   resizeHandles?: string[];
-  index?: string;
 }
 
 const calculateGridPosition = (
@@ -94,7 +94,7 @@ const layoutReducer = (
       const merged = merge(keyBy(state, "i"), keyBy(action.layout, "i"));
       return Object.values(merged) as LayoutItem[];
     case "deleteItem":
-      return state.filter((item) => item.i !== action.index);
+      return state.filter((item) => item.i !== action.i);
     default:
       return state;
   }
