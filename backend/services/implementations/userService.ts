@@ -47,7 +47,7 @@ class UserService implements IUserService {
       lastName: user.lastName,
       email: firebaseUser.email ?? "",
       role: user.role,
-      status: "Active", // temporary default value
+      status: user.status,
     };
   }
 
@@ -73,7 +73,7 @@ class UserService implements IUserService {
       lastName: user.lastName,
       email: firebaseUser.email ?? "",
       role: user.role,
-      status: "Active", // temporary default value
+      status: user.status,
     };
   }
 
@@ -137,7 +137,7 @@ class UserService implements IUserService {
             lastName: user.lastName,
             email: firebaseUser.email ?? "",
             role: user.role,
-            status: "Active" as Status, // temporary default value
+            status: user.status,
           };
         }),
       );
@@ -175,7 +175,7 @@ class UserService implements IUserService {
           lastName: user.lastName,
           authId: firebaseUser.uid,
           role: user.role,
-          status: "Active", // temporary default value
+          status: user.status,
         });
       } catch (mongoDbError) {
         // rollback user creation in Firebase
@@ -204,7 +204,7 @@ class UserService implements IUserService {
       lastName: newUser.lastName,
       email: firebaseUser.email ?? "",
       role: newUser.role,
-      status: "Active", // temporary default value
+      status: newUser.status,
     };
   }
 
@@ -263,7 +263,7 @@ class UserService implements IUserService {
       lastName: user.lastName,
       email: updatedFirebaseUser.email ?? "",
       role: user.role,
-      status: "Active", // temporary default value
+      status: user.status,
     };
   }
 
