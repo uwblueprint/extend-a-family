@@ -91,6 +91,13 @@ interface IUserService {
    * @throws Error if user deletion fails
    */
   deleteUserByEmail(email: string): Promise<void>;
+
+  /**
+   * Gets all user that belong to the role
+   * @param role the role that we want to get
+   * @returns an Array of UserDtos that all have the corresponding role
+   */
+  getUsersByRole(role: Role): Promise<Array<UserDTO>>;
 }
 
 export default IUserService;
