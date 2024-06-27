@@ -7,11 +7,12 @@ import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
 import { EyeIcon, PencilIcon } from "@heroicons/react/24/outline";
 import BaseModule from "../common/modules/BaseModule";
+import ConfirmationModal from "../common/modals/ConfirmationModal";
 
 const Grid = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [layout, dispatch] = useReducer(layoutReducer, []);
-  const [activeComponent, setActiveComponent] = useState("0");
+  const [activeComponent, setActiveComponent] = useState("10000");
   const [editMode, setEditMode] = useState(true);
   const [componentData, setComponentData] = useState(new Map<string, object>());
 
@@ -24,6 +25,17 @@ const Grid = () => {
     backgroundImage:
       "linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)",
     backgroundSize: "50px 50px",
+  };
+
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleConfirm = () => {
+    dispatch({ type: "deleteItem", i: activeComponent });
+    setModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setModalOpen(false);
   };
 
   return (
@@ -213,13 +225,16 @@ const Grid = () => {
         >
           <div style={{ position: "absolute", top: "5px", left: "5px" }}>
             <h6>Edit Panel</h6>
-            <button
-              onClick={() => {
-                dispatch({ type: "deleteItem", i: activeComponent });
-              }}
-            >
-              Delete
-            </button>
+            {activeComponent != "10000" && (
+              <button onClick={() => setModalOpen(true)}>Delete</button>
+            )}
+            <ConfirmationModal
+              title="Delete Component"
+              message="Are you sure you want to delete this component? This action is not reversible."
+              isOpen={isModalOpen}
+              onConfirm={handleConfirm}
+              onCancel={handleCancel}
+            />
           </div>
           <BaseModule
             name={"Edit" + layout[Number(activeComponent)]?.content || ""}
