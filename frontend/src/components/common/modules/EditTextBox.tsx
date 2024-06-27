@@ -23,11 +23,14 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
       style={{
         width: "100%",
         height: "100%",
-        justifyContent: "center",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
         alignContent: "center",
         textAlign: "center",
       }}
     >
+      <div style={{ height: "30px" }} />
       <b>Font Weight:</b>
       <div>
         <input

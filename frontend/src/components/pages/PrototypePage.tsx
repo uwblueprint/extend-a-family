@@ -69,6 +69,7 @@ const Grid = () => {
               alignItems: "center",
               textAlign: "center",
               justifyContent: "center",
+              backgroundColor: "white",
               zIndex: 1000,
             }}
           >
@@ -89,6 +90,7 @@ const Grid = () => {
               height: "30px",
               border: "1px solid black",
               textAlign: "center",
+              backgroundColor: "white",
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -195,7 +197,7 @@ const Grid = () => {
                 data={componentData.get(item.i) || {}}
                 setData={setComponentData}
               >
-                {item.content}{" "}
+                {item.content}
               </GridElement>
             </div>
           ))}
@@ -209,9 +211,16 @@ const Grid = () => {
             position: "relative",
           }}
         >
-          <h6 style={{ position: "absolute", top: "5px", left: "5px" }}>
-            Edit Panel
-          </h6>
+          <div style={{ position: "absolute", top: "5px", left: "5px" }}>
+            <h6>Edit Panel</h6>
+            <button
+              onClick={() => {
+                dispatch({ type: "deleteItem", index: activeComponent });
+              }}
+            >
+              Delete
+            </button>
+          </div>
           <BaseModule
             name={"Edit" + layout[Number(activeComponent)]?.content || ""}
             data={componentData || {}}

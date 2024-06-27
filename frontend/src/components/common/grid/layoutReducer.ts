@@ -25,9 +25,19 @@ interface LayoutAction {
   mouseEvent?: MouseEventLike;
   layout?: LayoutItem[];
   resizeHandles?: string[];
+  index?: string;
 }
 
-const calculateGridPosition = (mouseEvent, gridTop, gridLeft, cellSize) => {
+const calculateGridPosition = (
+  mouseEvent: MouseEventLike | undefined,
+  gridTop: number,
+  gridLeft: number,
+  cellSize: number,
+) => {
+  if (!mouseEvent) {
+    return { cellX: 0, cellY: 0 };
+  }
+
   const xPos = mouseEvent.clientX - gridLeft;
   const yPos = mouseEvent.clientY - gridTop;
 
@@ -37,9 +47,8 @@ const calculateGridPosition = (mouseEvent, gridTop, gridLeft, cellSize) => {
   return { cellX, cellY };
 };
 
-// Assuming the following values for the grid layout
 const gridTop = 100; // Top margin of the grid
-const gridLeft = (window.innerWidth - 601) / 2; // Centered grid's left margin
+const gridLeft = (window.innerWidth - 601) / 2; // Centered grid's left margin, where 601 is the width of the grid
 const cellSize = 50; // Size of each cell
 
 const layoutReducer = (
@@ -58,8 +67,6 @@ const layoutReducer = (
         gridLeft,
         cellSize,
       );
-
-      console.log("cellX", cellX, "cellY", cellY);
       return [
         ...state,
         {
@@ -72,7 +79,7 @@ const layoutReducer = (
             : String.fromCharCode(65 + state.length),
           temp: true,
           mouseEvent: action.mouseEvent,
-          i: "" + state.length,
+          i: "" + state.length, // Unique ID, but can cause future issues when deleting items
           resizeHandles: ["sw", "nw", "se", "ne"],
         },
       ];
@@ -86,6 +93,8 @@ const layoutReducer = (
       }
       const merged = merge(keyBy(state, "i"), keyBy(action.layout, "i"));
       return Object.values(merged) as LayoutItem[];
+    case "deleteItem":
+      return state.filter((item) => item.i !== action.index);
     default:
       return state;
   }

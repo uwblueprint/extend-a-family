@@ -74,7 +74,6 @@ const GridElement: React.FC<GridElementProps> = ({
   const forwardProps = pick(rest, [
     "style",
     "className",
-    "onMouseDown",
     "onMouseUp",
     "onTouchEnd",
     "onTouchStart",

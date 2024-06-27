@@ -26,11 +26,11 @@ const TextBox: React.FC<ComponentProps> = ({ componentData }) => {
         width: "100%",
         height: "100%",
         alignContent: verticalAlign,
-        justifyContent: "flex-start",
+        justifyContent: verticalAlign,
         textAlign: "center",
       }}
     >
-      <p style={{ fontWeight: fontWeight }}> {content} </p>
+      <p style={{ margin: "0px", fontWeight: fontWeight }}>{content}</p>
     </div>
   );
 };

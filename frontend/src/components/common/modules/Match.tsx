@@ -30,7 +30,7 @@ const Match: React.FC<ComponentProps> = ({ componentData }) => {
         fontSize: fontSize,
       }}
     >
-      <p> Match Box </p>
+      <p style={{ margin: "0px" }}> Match Box </p>
     </div>
   );
 };
