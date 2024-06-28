@@ -70,7 +70,6 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
         dispatch({ type: "addTemp", mouseEvent, content: componentType });
       }
       setInserted(true);
-      return;
     }
   };
 

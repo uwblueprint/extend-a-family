@@ -21,7 +21,7 @@ const TextBox: React.FC<ComponentProps> = ({ componentData }) => {
   } = componentData;
   return (
     <div
-      className={"drag-handle"}
+      className="drag-handle"
       style={{
         width: "100%",
         height: "100%",
@@ -30,7 +30,7 @@ const TextBox: React.FC<ComponentProps> = ({ componentData }) => {
         textAlign: "center",
       }}
     >
-      <p style={{ margin: "0px", fontWeight: fontWeight }}>{content}</p>
+      <p style={{ margin: "0px", fontWeight }}>{content}</p>
     </div>
   );
 };

@@ -2,10 +2,10 @@ import React, { useRef, useReducer, useState } from "react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
+import { EyeIcon, PencilIcon } from "@heroicons/react/24/outline";
 import DraggableSource from "../common/grid/DraggableSource";
 import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
-import { EyeIcon, PencilIcon } from "@heroicons/react/24/outline";
 import BaseModule from "../common/modules/BaseModule";
 import ConfirmationModal from "../common/modals/ConfirmationModal";
 
@@ -66,7 +66,7 @@ const Grid = () => {
         <div style={{ position: "absolute", left: "5px", top: "5px" }}>
           <h6>Draggable Components</h6>
         </div>
-        <br></br>
+        <br />
         <DraggableSource
           targetRef={ref}
           dispatch={dispatch}
@@ -89,7 +89,7 @@ const Grid = () => {
             Text Box
           </div>
         </DraggableSource>
-        <div style={{ width: "20px" }}></div>
+        <div style={{ width: "20px" }} />
         <DraggableSource
           targetRef={ref}
           dispatch={dispatch}
@@ -168,10 +168,10 @@ const Grid = () => {
           maxRows={12}
           compactType={null}
           width={600}
-          preventCollision={true}
+          preventCollision
           containerPadding={[0, 0]}
           margin={[0, 0]}
-          isDroppable={true}
+          isDroppable
           isDraggable={editMode}
           isResizable={editMode}
         >
@@ -237,7 +237,7 @@ const Grid = () => {
             />
           </div>
           <BaseModule
-            name={"Edit" + layout[Number(activeComponent)]?.content || ""}
+            name={`Edit${layout[Number(activeComponent)]?.content}` || ""}
             data={componentData || {}}
             activeComponent={activeComponent}
             setData={setComponentData}

@@ -79,7 +79,7 @@ const layoutReducer = (
             : String.fromCharCode(65 + state.length),
           temp: true,
           mouseEvent: action.mouseEvent,
-          i: "" + state.length, // Unique ID, but can cause future issues when deleting items
+          i: `${state.length}`, // Unique ID, but can cause future issues when deleting items
           resizeHandles: ["sw", "nw", "se", "ne"],
         },
       ];

@@ -19,7 +19,7 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
 
   return (
     <div
-      className={"drag-handle"}
+      className="drag-handle"
       style={{
         width: "100%",
         height: "100%",

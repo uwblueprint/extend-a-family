@@ -19,15 +19,15 @@ const Match: React.FC<ComponentProps> = ({ componentData }) => {
   } = componentData;
   return (
     <div
-      className={"drag-handle"}
+      className="drag-handle"
       style={{
         width: "100%",
         height: "100%",
         alignContent: verticalAlign,
         justifyContent: horizontalAlign,
         textAlign: "center",
-        fontWeight: fontWeight,
-        fontSize: fontSize,
+        fontWeight,
+        fontSize,
       }}
     >
       <p style={{ margin: "0px" }}> Match Box </p>
