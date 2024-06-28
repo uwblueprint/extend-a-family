@@ -97,7 +97,7 @@ const NumberInputElementSchema: Schema = new Schema({
 
 export interface CheckboxInputElement extends CourseElement {
   type: InteractiveElementType.CheckboxInput;
-  correctAnswer: boolean;
+  correctAnswer?: boolean;
 }
 
 const CheckboxInputElementSchema: Schema = new Schema({
@@ -110,7 +110,7 @@ const CheckboxInputElementSchema: Schema = new Schema({
 export interface MultipleChoiceElement extends CourseElement {
   type: InteractiveElementType.MultipleChoice;
   options: [CourseElement];
-  correctAnswer: number;
+  correctAnswer?: number;
 }
 
 const MultipleChoiceElementSchema: Schema = new Schema({
@@ -146,7 +146,7 @@ export interface TableElement extends CourseElement {
   rows: number;
   columns: number;
   content: [[CourseElement]];
-  headerBackgroundColor: string;
+  headerBackgroundColor?: string;
 }
 
 const TableElementSchema: Schema = new Schema({
