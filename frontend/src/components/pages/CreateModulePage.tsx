@@ -2,19 +2,21 @@ import React, { useRef, useReducer, useState } from "react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { EyeIcon, PencilIcon } from "@heroicons/react/24/outline";
 import DraggableSource from "../common/grid/DraggableSource";
 import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
 import BaseModule from "../common/modules/BaseModule";
 import ConfirmationModal from "../common/modals/ConfirmationModal";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
 
 const CreateModule = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [layout, dispatch] = useReducer(layoutReducer, []);
-  const [activeComponent, setActiveComponent] = useState("10000");
+  const [activeComponent, setActiveComponent] = useState("10000"); // Arbitrary number that will never be an index, allows us to call Number() without error
   const [editMode, setEditMode] = useState(true);
   const [componentData, setComponentData] = useState(new Map<string, object>());
+  const [isModalOpen, setModalOpen] = useState(false);
 
   const gridContainerStyle = {
     backgroundColor: "lightgray",
@@ -23,18 +25,16 @@ const CreateModule = () => {
     width: "601px",
     height: "601px",
     backgroundImage:
-      "linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)",
+      "linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)", // Grid lines
     backgroundSize: "50px 50px",
   };
 
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const handleConfirm = () => {
+  const handleDeleteConfirm = () => {
     dispatch({ type: "deleteItem", i: activeComponent });
     setModalOpen(false);
   };
 
-  const handleCancel = () => {
+  const handleDeleteCancel = () => {
     setModalOpen(false);
   };
 
@@ -131,7 +131,7 @@ const CreateModule = () => {
           }}
         >
           {editMode ? (
-            <EyeIcon
+            <VisibilityIcon
               style={{
                 position: "absolute",
                 top: "5px",
@@ -142,7 +142,7 @@ const CreateModule = () => {
               }}
             />
           ) : (
-            <PencilIcon
+            <ModeEditIcon
               style={{
                 position: "absolute",
                 top: "5px",
@@ -194,7 +194,7 @@ const CreateModule = () => {
                       boxShadow:
                         item.i == activeComponent
                           ? "1px 1px 0 0 blue, 0 1px 0 0 blue"
-                          : "1px 1px 0 0 black, 0 1px 0 0 black", // box alignment
+                          : "1px 1px 0 0 black, 0 1px 0 0 black", // Box alignment, 1px solid black border does not work
                     }
                   : {}
               }
@@ -232,8 +232,8 @@ const CreateModule = () => {
               title="Delete Component"
               message="Are you sure you want to delete this component? This action is not reversible."
               isOpen={isModalOpen}
-              onConfirm={handleConfirm}
-              onCancel={handleCancel}
+              onConfirm={handleDeleteConfirm}
+              onCancel={handleDeleteCancel}
             />
           </div>
           <BaseModule
