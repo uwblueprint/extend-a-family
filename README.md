@@ -9,10 +9,7 @@
 **File Storage:** Opt-in<br>
 
 ## Table of Contents
-* 📝 [Documentation](#documentation)
-* ❗❗ [Reporting Issues](#reporting-issues)
-* ⚙️ [Set up](#set-up)
-* 🚀 [Creating a Release](#creating-a-release)
+* ⚙️ [Setup](#setup)
 * 🧰 [Useful Commands](#useful-commands)
   * ℹ️ [Get Names & Statuses of Running Containers](#get-names--statuses-of-running-containers)
   * ✨ [Linting & Formatting](#linting--formatting)
@@ -20,36 +17,12 @@
 * 🌳 [Version Control Guide](#version-control-guide)
   * 🌿 [Branching](#branching)
   * 🔒 [Commits](#commits)
+* 🚀 [Creating a Release](#creating-a-release)
 
 ---
 
-## Set up
-
-1. Clone this repository and `cd` into the project folder
-```bash
-git clone https://github.com/uwblueprint/extend-a-family.gitt
-cd extend-a-family
-```
-2. Run the application
-```bash
-docker-compose up --build
-```
-
-The backend runs at http://localhost:8080 and the frontend runs at http://localhost:3000.
-
-
-## Creating a Release
-To update the release branch with commits from main:
-1. Create a new branch off the release branch
-2. Merge main into the new branch
-3. Open a PR from your new branch -> release branch
-4. Reviewers should be able to see just the changes from the new main commits
-5. Merge the PR, it should just show up as a single commit in the commit history of the release branch
-6. Tag the most recent `main` commit included in the release
-```bash
-git tag <semver> <short-hash-of-main-commit>
-git push origin --tags
-```
+## Setup
+Follow the steps here: [Setup Instructions](https://www.notion.so/uwblueprintexecs/Setup-Instructions-d6e0cdeb69cf4bbf93a33c7302370550)!
 
 
 ## Useful Commands
@@ -60,14 +33,17 @@ docker ps
 ```
 
 ### Linting & Formatting
-TypeScript backend and frontend:
+```bash
+docker exec -it eaf_backend /bin/bash -c "yarn run fix"
+docker exec -it eaf_frontend /bin/bash -c "yarn run fix"
+```
+OR
 1. `cd` into the `backend/` directory. Run `yarn run fix`.
 2. `cd` into the `frontend/` directory. Run `yarn run fix`.
 
 ### Running Tests
-TypeScript backend and frontend:
 ```bash
-docker exec -it scv2_ts_backend /bin/bash -c "yarn test"
+docker exec -it eaf_backend /bin/bash -c "yarn test"
 ```
 
 
@@ -113,3 +89,17 @@ git push -f
 ---
 
 1: From Git's own [guidelines](https://github.com/git/git/blob/311531c9de557d25ac087c1637818bd2aad6eb3a/Documentation/SubmittingPatches#L139-L145)
+
+
+## Creating a Release
+To update the release branch with commits from main:
+1. Create a new branch off the release branch
+2. Merge main into the new branch
+3. Open a PR from your new branch -> release branch
+4. Reviewers should be able to see just the changes from the new main commits
+5. Merge the PR, it should just show up as a single commit in the commit history of the release branch
+6. Tag the most recent `main` commit included in the release
+```bash
+git tag <semver> <short-hash-of-main-commit>
+git push origin --tags
+```
