@@ -9,7 +9,7 @@
     "lint": "eslint . --ext .ts,.js",
     "fix": "eslint . --ext .ts,.js --fix",
     "postinstall": "tsc",
-    "sync": "ts-node ./scripts/sync-databases.ts"
+    "sync-user-dbs": "ts-node ./scripts/sync-user-databases.ts"
   },
   "keywords": [],
   "author": "",

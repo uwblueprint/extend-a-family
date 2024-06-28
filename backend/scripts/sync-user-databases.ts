@@ -38,7 +38,7 @@ async function getAllFirebaseUsers(
   return users;
 }
 
-async function getUsersNotInFirebase(
+async function getUsersNotInMongoDB(
   allFirebaseUsers: firebaseAdmin.auth.UserRecord[],
   allMongoDBUsers: User[],
 ): Promise<string[]> {
@@ -51,7 +51,7 @@ async function getUsersNotInFirebase(
   return allFirebaseUserIds.filter((id) => !allMongoDBUserIds.has(id));
 }
 
-async function getUsersNotInMongoDB(
+async function getUsersNotInFirebase(
   allFirebaseUsers: firebaseAdmin.auth.UserRecord[],
   allMongoDBUsers: User[],
 ) {
@@ -91,7 +91,7 @@ async function main() {
     Logger.info(
       `Deleted ${removeMongoDBUsers.length} MongoDB users and ${removeFirebaseUsers.length} Firebase users`,
     );
-    return;
+    process.exit();
   } catch (error: unknown) {
     Logger.error(getErrorMessage(error));
     throw error;
