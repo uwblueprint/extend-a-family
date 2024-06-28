@@ -9,7 +9,7 @@ import layoutReducer from "../common/grid/layoutReducer";
 import BaseModule from "../common/modules/BaseModule";
 import ConfirmationModal from "../common/modals/ConfirmationModal";
 
-const Grid = () => {
+const CreateModule = () => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [layout, dispatch] = useReducer(layoutReducer, []);
   const [activeComponent, setActiveComponent] = useState("10000");
@@ -248,4 +248,4 @@ const Grid = () => {
   );
 };
 
-export default Grid;
+export default CreateModule;

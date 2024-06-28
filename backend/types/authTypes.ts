@@ -16,9 +16,6 @@ export type NodemailerConfig = {
     clientSecret: string;
     refreshToken: string;
   };
-  tls: {
-    rejectUnauthorized: boolean;
-  };
 };
 
 export type SignupMethod = "PASSWORD" | "GOOGLE";

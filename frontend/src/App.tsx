@@ -7,8 +7,8 @@ import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import CreatePage from "./components/pages/CreatePage";
-import PrototypePage from "./components/pages/PrototypePage";
 import Default from "./components/pages/Default";
+import CreateModulePage from "./components/pages/CreateModulePage";
 import DisplayPage from "./components/pages/DisplayPage";
 import NotFound from "./components/pages/NotFound";
 import NotAuthorized from "./components/pages/NotAuthorized";
@@ -105,9 +105,9 @@ const App = (): React.ReactElement => {
               />
               <PrivateRoute
                 exact
-                path={Routes.PROTOTYPE_PAGE}
-                component={PrototypePage}
-                allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                path={Routes.CREATE_MODULE_PAGE}
+                component={CreateModulePage}
+                allowedRoles={["Administrator", "Facilitator"]}
               />
               <PrivateRoute
                 exact
