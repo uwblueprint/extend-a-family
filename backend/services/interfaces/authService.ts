@@ -1,4 +1,5 @@
-import { AuthDTO, Role, Token } from "../../types";
+import { AuthDTO, Token } from "../../types/authTypes";
+import { Role } from "../../types/userTypes";
 
 interface IAuthService {
   /**
@@ -50,6 +51,14 @@ interface IAuthService {
    * @throws Error if unable to generate link or send email
    */
   sendEmailVerificationLink(email: string): Promise<void>;
+
+  /**
+   * Sends an email invitation to an invited administrator with the temporary password specified
+   * @param email email of new administrator invited
+   * @param temporaryPassword the new administrator's temporary password
+   * @throws Error if unable to generate link or send email
+   */
+  sendAdminInvite(email: string, temporaryPassword: string): Promise<void>;
 
   /**
    * Determine if the provided access token is valid and authorized for at least

@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import AuthService from "../services/implementations/authService";
 import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
-import { Role } from "../types";
+import { Role } from "../types/userTypes";
 
 const authService: IAuthService = new AuthService(new UserService());
 

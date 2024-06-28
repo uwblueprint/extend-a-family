@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-import { Role } from "../types";
+import { Role } from "../types/userTypes";
 
 export interface User extends Document {
   id: string;
@@ -26,7 +26,7 @@ const UserSchema: Schema = new Schema({
   role: {
     type: String,
     required: true,
-    enum: ["User", "Admin"],
+    enum: ["Administrator", "Facilitator", "Learner"],
   },
 });
 

@@ -4,10 +4,10 @@ import requests
 from test_user_gql import delete_user
 
 
-def register_user(backend_url, body, access_token_field):
+def signup_user(backend_url, body, access_token_field):
     query = """
-    mutation($user: RegisterUserDTO!) {
-        register(user: $user) {
+    mutation($user: SignupUserDTO!) {
+        signup(user: $user) {
             id
             firstName
             lastName
@@ -22,10 +22,10 @@ def register_user(backend_url, body, access_token_field):
         json={"query": query, "variables": {"user": body}},
     )
     assert "data" in response.json()
-    assert "register" in response.json()["data"]
-    data = response.json()["data"]["register"]
+    assert "signup" in response.json()["data"]
+    data = response.json()["data"]["signup"]
     assert "role" in data
-    assert data["role"] == "User"
+    assert data["role"] == "Facilitator"
     assert "id" in data
     assert access_token_field in data
     expected = {k: v for k, v in body.items() if k != "password"}
@@ -82,7 +82,7 @@ def test_auth_gql(backend_url, auth_header, auth_user, lang, api, new_user_email
     if lang != "ts":
         body = {inflection.underscore(k): v for k, v in body.items()}
         access_token_field = inflection.underscore(access_token_field)
-    user = register_user(backend_url, body, access_token_field)
+    user = signup_user(backend_url, body, access_token_field)
     delete_user(backend_url, auth_header, user["id"])
     # Call the following with the auth user since we cannot verify emails on new users in the script
     reset_password(backend_url, auth_header, auth_user["email"])

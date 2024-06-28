@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   version: 1.0.0
-  title: UW Blueprint Starter Code TypeScript API
-  description: An API for the TypeScript Backend of Starter Code
+  title: UW Blueprint Extend-A-Family TypeScript API
+  description: An API for the TypeScript Backend of Extend-A-Family
 
 
 # Authentication 
@@ -294,11 +294,11 @@ paths:
         '500':
           description: Invalid request
 
-  /auth/register:
+  /auth/signup:
     post:
       tags:
         - Auth
-      description: Register a new user
+      description: Signup a new user
       requestBody:
         required: true
         content:
@@ -481,7 +481,7 @@ paths:
                   type: string
                 role:
                   type: string
-                  enum: ["User", "Admin"]
+                  enum: ["Administrator", "Facilitator", "Learner"]
                 email:
                   type: string
       responses:
@@ -571,7 +571,7 @@ paths:
                   type: string
                 role:
                   type: string
-                  enum: ["User", "Admin"]
+                  enum: ["Administrator", "Facilitator", "Learner"]
                 email:
                   type: string
       responses:

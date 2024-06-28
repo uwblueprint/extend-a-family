@@ -3,7 +3,8 @@ import * as firebaseAdmin from "firebase-admin";
 import IAuthService from "../interfaces/authService";
 import IEmailService from "../interfaces/emailService";
 import IUserService from "../interfaces/userService";
-import { AuthDTO, Role, Token } from "../../types";
+import { AuthDTO, Token } from "../../types/authTypes";
+import { Role } from "../../types/userTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import FirebaseRestClient from "../../utilities/firebaseRestClient";
 import logger from "../../utilities/logger";
@@ -63,7 +64,7 @@ class AuthService implements IAuthService {
           firstName: googleUser.firstName,
           lastName: googleUser.lastName,
           email: googleUser.email,
-          role: "User",
+          role: "Facilitator",
           password: "",
         },
         googleUser.localId,
@@ -161,6 +162,38 @@ class AuthService implements IAuthService {
       );
       throw error;
     }
+  }
+
+  async sendAdminInvite(
+    email: string,
+    temporaryPassword: string,
+  ): Promise<void> {
+    if (!this.emailService) {
+      const errorMessage =
+        "Attempted to call sendAdminInvite but this instance of AuthService does not have an EmailService instance";
+      Logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    const emailVerificationLink = await firebaseAdmin
+      .auth()
+      .generateEmailVerificationLink(email);
+
+    const emailBody = `Hello,<br> <br>
+      You have been invited as an administrator to Smart Saving, Smart Spending.
+      <br> <br>
+      Please click the following link to verify your email and activate your account.
+      <strong>This link is only valid for 1 hour.</strong>
+      <br> <br>
+      <a href=${emailVerificationLink}>Verify email</a>
+      <br> <br>
+      To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`;
+
+    await this.emailService.sendEmail(
+      email,
+      "Administrator Invitation: Smart Saving, Smart Spending",
+      emailBody,
+    );
   }
 
   async isAuthorizedByRole(

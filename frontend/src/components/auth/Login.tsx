@@ -1,15 +1,16 @@
 import React, { useContext, useState } from "react";
-import { Redirect, useHistory } from "react-router-dom";
+import { Redirect, useHistory, useLocation } from "react-router-dom";
 import {
   GoogleLogin,
   GoogleLoginResponse,
   GoogleLoginResponseOffline,
 } from "react-google-login";
-
 import authAPIClient from "../../APIClients/AuthAPIClient";
-import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
+import { HOME_PAGE, SIGNUP_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
+import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
+import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
 type GoogleResponse = GoogleLoginResponse | GoogleLoginResponseOffline;
 
@@ -24,13 +25,42 @@ const Login = (): React.ReactElement => {
   const [password, setPassword] = useState("");
   const history = useHistory();
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const role = searchParams.get("role");
+
+  if (authenticatedUser) {
+    return <Redirect to={HOME_PAGE} />;
+  }
+
+  if (!role || !["administrator", "facilitator", "learner"].includes(role)) {
+    return <Redirect to={WELCOME_PAGE} />;
+  }
+
   const onLogInClick = async () => {
     const user: AuthenticatedUser = await authAPIClient.login(email, password);
+    const isUserVerified = user?.accessToken
+      ? await authAPIClient.isUserVerified(email, user.accessToken)
+      : null;
+    if (!user || !isUserVerified) {
+      // will need to change this for different errors
+      // eslint-disable-next-line no-alert
+      alert("Bad login, user not found");
+      return;
+    }
+    if (user.role.toLowerCase() !== role.toLowerCase()) {
+      // change this later to not use an alert
+      // eslint-disable-next-line no-alert
+      alert(`Bad login. Expected ${user.role}, got ${role}`);
+      return;
+    }
+
+    localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
     setAuthenticatedUser(user);
   };
 
-  const onSignUpClick = () => {
-    history.push(SIGNUP_PAGE);
+  const onSignupClick = () => {
+    history.push(`${SIGNUP_PAGE}?role=${role}`);
   };
 
   const onGoogleLoginSuccess = async (tokenId: string) => {
@@ -40,13 +70,9 @@ const Login = (): React.ReactElement => {
     setAuthenticatedUser(user);
   };
 
-  if (authenticatedUser) {
-    return <Redirect to={HOME_PAGE} />;
-  }
-
   return (
     <div style={{ textAlign: "center" }}>
-      <h1>Login</h1>
+      <h1>{capitalizeFirstLetter(role)} Login</h1>
       <form>
         <div>
           <input
@@ -90,15 +116,17 @@ const Login = (): React.ReactElement => {
           }
         />
       </form>
-      <div>
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={onSignUpClick}
-        >
-          Sign Up
-        </button>
-      </div>
+      {role === "facilitator" && (
+        <div>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={onSignupClick}
+          >
+            Sign Up
+          </button>
+        </div>
+      )}
     </div>
   );
 };

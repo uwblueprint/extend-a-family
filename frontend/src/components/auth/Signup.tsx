@@ -1,26 +1,47 @@
 import React, { useContext, useState } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, useLocation } from "react-router-dom";
 
 import authAPIClient from "../../APIClients/AuthAPIClient";
-import { HOME_PAGE } from "../../constants/Routes";
+import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
+import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
 const Signup = (): React.ReactElement => {
-  const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
+  const { authenticatedUser } = useContext(AuthContext);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const location = useLocation();
+
+  // Extract query parameters from the URL
+  const params = new URLSearchParams(location.search);
+  const role = params.get("role");
+
+  if (role !== "facilitator") {
+    return <Redirect to={WELCOME_PAGE} />;
+  }
+
   const onSignupClick = async () => {
-    const user: AuthenticatedUser = await authAPIClient.register(
+    const user: AuthenticatedUser = await authAPIClient.signup(
       firstName,
       lastName,
       email,
       password,
+      capitalizeFirstLetter(role),
     );
-    setAuthenticatedUser(user);
+
+    if (!user) {
+      // will need to change this for different errors
+      // eslint-disable-next-line no-alert
+      alert("Something went wrong with signup");
+      return;
+    }
+
+    // eslint-disable-next-line no-alert
+    alert("Signup successful, verification link was sent to your email.");
   };
 
   if (authenticatedUser) {
@@ -29,7 +50,7 @@ const Signup = (): React.ReactElement => {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <h1>Signup</h1>
+      <h1>{capitalizeFirstLetter(role)} Signup</h1>
       <form>
         <div>
           <input
