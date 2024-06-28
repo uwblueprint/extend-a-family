@@ -107,6 +107,7 @@ const App = (): React.ReactElement => {
                 exact
                 path={Routes.PROTOTYPE_PAGE}
                 component={PrototypePage}
+                allowedRoles={["Administrator", "Facilitator", "Learner"]}
               />
               <PrivateRoute
                 exact
