@@ -41,43 +41,42 @@ const UserSchema: Schema = new Schema(
 );
 =======
 const baseOptions = {
-	  discriminatorKey: "type",
-  	collection: "user",
+  discriminatorKey: "type",
+  collection: "user",
 };
 
-const UserSchema: Schema = new Schema({
-  firstName: {
-    type: String,
-    required: true,
+const UserSchema: Schema = new Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    authId: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      required: true,
+      enum: ["Administrator", "Facilitator", "Learner"],
+    },
   },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  authId: {
-    type: String,
-    required: true,
-  },
-  role: {
-    type: String,
-    required: true,
-    enum: ["Administrator", "Facilitator", "Learner"],
-  },
-
-},
-  baseOptions
-  
+  baseOptions,
 );
 
 const User = mongoose.model<User>("User", UserSchema);
 
 const FacilitatorSchema = new Schema({
-  learners: { type: [String], default: [] }
+  learners: { type: [String], default: [] },
 });
 >>>>>>> 17d46aa (added discriminator for learner and facilitator)
 
 const LearnerSchema = new Schema({
-  facilitator: { type: String, required: true }
+  facilitator: { type: String, required: true },
 });
 
 const Facilitator = User.discriminator("Facilitator", FacilitatorSchema);

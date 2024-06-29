@@ -6,10 +6,13 @@ import * as firebaseAdmin from "firebase-admin";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 
+import mongoose from "mongoose";
 import { mongo } from "./models";
 import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
+
+import User, { Facilitator, Learner } from "./models/user.mgmodel";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -65,40 +68,35 @@ app.listen({ port: process.env.PORT || 8080 }, () => {
   /* eslint-disable-next-line no-console */
   console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
 });
-
-
-import mongoose from 'mongoose';
-import User, { Facilitator, Learner } from './models/user.mgmodel';
 async function runTests() {
-  // Connect to MongoDB 
+  // Connect to MongoDB
   await mongo.connect();
 
   try {
     await User.deleteMany({});
-    
+
     const facilitator = new Facilitator({
-      firstName: 'John',
-      lastName: 'Doe',
-      authId: '123',
-      role: 'Facilitator',
-      learners: ['learner1', 'learner2']
+      firstName: "John",
+      lastName: "Doe",
+      authId: "123",
+      role: "Facilitator",
+      learners: ["learner1", "learner2"],
     });
     await facilitator.save();
-    console.log('Facilitator saved:', facilitator);
+    console.log("Facilitator saved:", facilitator);
 
     const learner = new Learner({
-      firstName: 'Jane',
-      lastName: 'Smith',
-      authId: '456',
-      role: 'Learner',
-      facilitator: '123'
+      firstName: "Jane",
+      lastName: "Smith",
+      authId: "456",
+      role: "Learner",
+      facilitator: "123",
     });
     await learner.save();
-    console.log('Learner saved:', learner);
-
+    console.log("Learner saved:", learner);
   } finally {
     await mongoose.disconnect();
   }
 }
 
-runTests().catch(error => console.error('Error running tests:', error));
+runTests().catch((error) => console.error("Error running tests:", error));
