@@ -68,6 +68,8 @@ app.listen({ port: process.env.PORT || 8080 }, () => {
   /* eslint-disable-next-line no-console */
   console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
 });
+
+// Testing function for new user relations (to be deleted)
 async function runTests() {
   // Connect to MongoDB
   await mongo.connect();
@@ -83,7 +85,6 @@ async function runTests() {
       learners: ["learner1", "learner2"],
     });
     await facilitator.save();
-    console.log("Facilitator saved:", facilitator);
 
     const learner = new Learner({
       firstName: "Jane",
@@ -93,10 +94,12 @@ async function runTests() {
       facilitator: "123",
     });
     await learner.save();
-    console.log("Learner saved:", learner);
   } finally {
     await mongoose.disconnect();
   }
 }
 
-runTests().catch((error) => console.error("Error running tests:", error));
+app.listen({ port: process.env.PORT || 8080 }, () => {
+  /* eslint-disable-next-line no-console */
+  runTests().catch((error) => console.error("Error running tests:", error));
+});
