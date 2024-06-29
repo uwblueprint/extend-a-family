@@ -1,5 +1,4 @@
-import React, { useRef, useEffect, ReactNode } from "react";
-import { pick } from "lodash";
+import React, { useRef, useEffect } from "react";
 import BaseModule from "../modules/BaseModule";
 
 interface MouseEventLike {
@@ -9,21 +8,13 @@ interface MouseEventLike {
 
 interface GridElementProps {
   temp?: boolean;
-  children: ReactNode;
   index: string;
   componentType?: string;
   mouseEvent?: MouseEventLike;
-  style?: React.CSSProperties;
-  className?: string;
   activeComponent: string;
-  data: {};
+  data: Map<string, object>;
   setData: (data: Map<string, object>) => void;
   setActiveComponent: (index: string) => void;
-  onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
-  onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
-  onTouchEnd?: React.TouchEventHandler<HTMLDivElement>;
-  onTouchStart?: React.TouchEventHandler<HTMLDivElement>;
-  [key: string]: any;
 }
 
 const createDragStartEvent = (
@@ -39,29 +30,37 @@ const createDragStartEvent = (
 
   // Fake getBoundingClientRect for one call
   // This way, we can influence where the drag action is started
-  const original = element.getBoundingClientRect;
-  element.getBoundingClientRect = () => {
-    element.getBoundingClientRect = original;
-    return {
-      ...original(),
-      left: mouseEvent.clientX,
-      top: mouseEvent.clientY,
-    };
-  };
+  const originalGetBoundingClientRect =
+    element.getBoundingClientRect.bind(element);
+  const modifiedGetBoundingClientRect = () => ({
+    ...originalGetBoundingClientRect(),
+    left: mouseEvent.clientX,
+    top: mouseEvent.clientY,
+  });
+
+  Object.defineProperty(element, "getBoundingClientRect", {
+    value: modifiedGetBoundingClientRect,
+    configurable: true,
+  });
+
   element.dispatchEvent(event);
+
+  // Restore original getBoundingClientRect
+  Object.defineProperty(element, "getBoundingClientRect", {
+    value: originalGetBoundingClientRect,
+  });
 };
 
-const createDragStopEvent = (element: HTMLElement) => {
-  const event = new MouseEvent("mouseup", {
-    bubbles: true,
-    cancelable: true,
-  });
-  element.dispatchEvent(event);
-};
+// const createDragStopEvent = (element: HTMLElement) => {
+//   const event = new MouseEvent("mouseup", {
+//     bubbles: true,
+//     cancelable: true,
+//   });
+//   element.dispatchEvent(event);
+// };
 
 const GridElement: React.FC<GridElementProps> = ({
   temp,
-  children,
   index,
   activeComponent,
   setActiveComponent,
@@ -69,16 +68,7 @@ const GridElement: React.FC<GridElementProps> = ({
   setData,
   mouseEvent,
   componentType,
-  ...rest
 }) => {
-  const forwardProps = pick(rest, [
-    "style",
-    "className",
-    "onMouseUp",
-    "onTouchEnd",
-    "onTouchStart",
-  ]);
-
   const ref = useRef<HTMLDivElement>(null);
 
   // Fake the drag start event if it's a new element with property temp
@@ -102,12 +92,12 @@ const GridElement: React.FC<GridElementProps> = ({
       onMouseDown={() =>
         setActiveComponent(activeComponent === index ? "10000" : index)
       }
-      {...forwardProps}
       style={{ height: "100%" }}
     >
       <BaseModule
         name={componentType || ""}
         activeComponent={activeComponent}
+        index={index}
         data={data}
         setData={setData}
       />

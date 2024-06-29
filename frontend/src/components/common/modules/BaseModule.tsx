@@ -7,7 +7,8 @@ import EditMatch from "./EditMatch";
 interface BasePrototypeProps {
   name: string;
   activeComponent: string;
-  data: any;
+  index?: string;
+  data: Map<string, object>;
   setData: (data: Map<string, object>) => void;
 }
 
@@ -16,10 +17,11 @@ const BaseModule: React.FC<BasePrototypeProps> = ({
   data,
   setData,
   activeComponent,
+  index = "",
 }) => {
   // Grid items
-  if (name === "TextBox") return <TextBox componentData={data} />;
-  if (name === "Match") return <Match componentData={data} />;
+  if (name === "TextBox") return <TextBox componentData={data.get(index)} />;
+  if (name === "Match") return <Match componentData={data.get(index)} />;
 
   // Corresponding edit panel
   if (name === "EditTextBox")

@@ -5,6 +5,7 @@ interface MouseEventLike {
   clientY: number;
 }
 
+type ResizeHandle = "sw" | "nw" | "se" | "ne" | "n" | "s" | "w" | "e";
 interface LayoutItem {
   x: number;
   y: number;
@@ -14,7 +15,7 @@ interface LayoutItem {
   temp?: boolean;
   mouseEvent?: MouseEventLike;
   i: string;
-  resizeHandles?: any[];
+  resizeHandles?: ResizeHandle[];
 }
 
 interface LayoutAction {
@@ -56,7 +57,7 @@ const layoutReducer = (
   action: LayoutAction,
 ): LayoutItem[] => {
   switch (action.type) {
-    case "addTemp":
+    case "addTemp": {
       if (state.findIndex((item) => item.temp) !== -1) {
         return state;
       }
@@ -83,16 +84,18 @@ const layoutReducer = (
           resizeHandles: ["sw", "nw", "se", "ne"],
         },
       ];
+    }
     case "clearTemp":
       return state.filter((item) => !item.temp);
     case "finaliseTemporaryItem":
       return state.map((item) => ({ ...item, temp: false }));
-    case "newLayout":
+    case "newLayout": {
       if (state.findIndex((item) => item.temp) !== -1) {
         return state;
       }
       const merged = merge(keyBy(state, "i"), keyBy(action.layout, "i"));
       return Object.values(merged) as LayoutItem[];
+    }
     case "deleteItem":
       return state.filter((item) => item.i !== action.i);
     default:

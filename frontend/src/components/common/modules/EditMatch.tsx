@@ -1,7 +1,7 @@
 import React from "react";
 
 interface EditMatchProps {
-  componentData: {};
+  componentData: Map<string, object>;
   setComponentData: (data: Map<string, object>) => void;
 }
 

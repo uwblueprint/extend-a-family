@@ -1,24 +1,22 @@
 import React from "react";
 
 interface TextBoxProps {
-  verticalAlign: string;
-  fontWeight: string;
-  horizontalAlign: string;
-  fontSize: string;
-  content: string;
+  verticalAlign?: string;
+  fontWeight?: string;
+  horizontalAlign?: string;
+  fontSize?: string;
+  content?: string;
 }
 interface ComponentProps {
-  componentData: TextBoxProps;
+  componentData?: TextBoxProps;
 }
 
 const TextBox: React.FC<ComponentProps> = ({ componentData }) => {
   const {
     verticalAlign = "center",
     fontWeight = "normal",
-    horizontalAlign = "center",
-    fontSize,
     content = "Text Box",
-  } = componentData;
+  } = componentData || {};
   return (
     <div
       className="drag-handle"

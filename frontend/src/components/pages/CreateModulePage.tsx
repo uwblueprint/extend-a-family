@@ -2,13 +2,13 @@ import React, { useRef, useReducer, useState } from "react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DraggableSource from "../common/grid/DraggableSource";
 import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
 import BaseModule from "../common/modules/BaseModule";
 import ConfirmationModal from "../common/modals/ConfirmationModal";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
 
 const CreateModule = () => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -162,7 +162,9 @@ const CreateModule = () => {
               : { width: "601px", height: "601px", border: "1px solid black" }
           }
           layout={layout}
-          onLayoutChange={(layout) => dispatch({ type: "newLayout", layout })}
+          onLayoutChange={(newLayout) =>
+            dispatch({ type: "newLayout", layout: newLayout })
+          }
           cols={12}
           rowHeight={50}
           maxRows={12}
@@ -184,15 +186,15 @@ const CreateModule = () => {
                   ? {
                       backgroundColor: "white",
                       borderTop:
-                        item.i == activeComponent
+                        item.i === activeComponent
                           ? "1px solid blue"
                           : "1px solid black",
                       borderLeft:
-                        item.i == activeComponent
+                        item.i === activeComponent
                           ? "1px solid blue"
                           : "1px solid black",
                       boxShadow:
-                        item.i == activeComponent
+                        item.i === activeComponent
                           ? "1px 1px 0 0 blue, 0 1px 0 0 blue"
                           : "1px 1px 0 0 black, 0 1px 0 0 black", // Box alignment, 1px solid black border does not work
                     }
@@ -200,17 +202,13 @@ const CreateModule = () => {
               }
             >
               <GridElement
-                {...item}
                 componentType={item.content}
                 index={item.i}
                 activeComponent={activeComponent}
                 setActiveComponent={setActiveComponent}
-                componentData={componentData}
-                data={componentData.get(item.i) || {}}
+                data={componentData}
                 setData={setComponentData}
-              >
-                {item.content}
-              </GridElement>
+              />
             </div>
           ))}
         </GridLayout>
@@ -225,8 +223,10 @@ const CreateModule = () => {
         >
           <div style={{ position: "absolute", top: "5px", left: "5px" }}>
             <h6>Edit Panel</h6>
-            {activeComponent != "10000" && (
-              <button onClick={() => setModalOpen(true)}>Delete</button>
+            {activeComponent !== "10000" && (
+              <button type="button" onClick={() => setModalOpen(true)}>
+                Delete
+              </button>
             )}
             <ConfirmationModal
               title="Delete Component"
@@ -238,7 +238,7 @@ const CreateModule = () => {
           </div>
           <BaseModule
             name={`Edit${layout[Number(activeComponent)]?.content}` || ""}
-            data={componentData || {}}
+            data={componentData}
             activeComponent={activeComponent}
             setData={setComponentData}
           />

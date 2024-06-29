@@ -1,8 +1,5 @@
-import React, { useState, ReactNode, useRef } from "react";
-import Draggable, {
-  DraggableEventHandler,
-  DraggableData,
-} from "react-draggable";
+import React, { useState, ReactNode } from "react";
+import Draggable, { DraggableEventHandler } from "react-draggable";
 
 const elementIsInChain = (
   elementToTraverse: HTMLElement | null,
@@ -17,14 +14,19 @@ const elementIsInChain = (
   return false;
 };
 
+interface DispatchAction {
+  type: string;
+  mouseEvent?: { clientX: number; clientY: number };
+  content?: string;
+}
+
 interface DraggableSourceProps {
   targetRef: React.RefObject<HTMLElement>;
-  dispatch: React.Dispatch<any>;
+  dispatch: React.Dispatch<DispatchAction>;
   onDrag?: DraggableEventHandler;
   onStop?: DraggableEventHandler;
   componentType: string;
   children: ReactNode;
-  [key: string]: any;
 }
 
 const DraggableSource: React.FC<DraggableSourceProps> = ({
@@ -34,7 +36,6 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
   onStop,
   componentType,
   children,
-  ...rest
 }) => {
   const [inserted, setInserted] = useState(false);
 
@@ -88,7 +89,6 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
       <Draggable
         onDrag={onDragOverwrite}
         onStop={onStopOverwrite}
-        {...rest}
         position={{ x: 0, y: 0 }}
       >
         {children}

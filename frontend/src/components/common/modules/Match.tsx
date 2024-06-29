@@ -1,13 +1,13 @@
 import React from "react";
 
 interface MatchProps {
-  verticalAlign: string;
-  fontWeight: string;
-  horizontalAlign: string;
-  fontSize: string;
+  verticalAlign?: string;
+  fontWeight?: string;
+  horizontalAlign?: string;
+  fontSize?: string;
 }
 interface ComponentProps {
-  componentData: MatchProps;
+  componentData?: MatchProps;
 }
 
 const Match: React.FC<ComponentProps> = ({ componentData }) => {
@@ -16,7 +16,7 @@ const Match: React.FC<ComponentProps> = ({ componentData }) => {
     fontWeight = "normal",
     horizontalAlign = "center",
     fontSize = "14px",
-  } = componentData;
+  } = componentData || {};
   return (
     <div
       className="drag-handle"

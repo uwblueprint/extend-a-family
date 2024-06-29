@@ -13,7 +13,9 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
 }) => {
   const handleChange = (field: string, value: string) => {
     const updatedData = new Map(componentData);
-    updatedData.set(index, { ...updatedData.get(index), [field]: value });
+    const currentData = updatedData.get(index) || {};
+    const newData = { ...currentData, [field]: value };
+    updatedData.set(index, newData);
     setComponentData(updatedData);
   };
 
@@ -33,55 +35,65 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
       <div style={{ height: "30px" }} />
       <b>Font Weight:</b>
       <div>
-        <input
-          type="radio"
-          id="bold"
-          name="font_weight"
-          value="bold"
-          onChange={() => handleChange("fontWeight", "bold")}
-        />
-        <label htmlFor="bold">Bold</label>
+        <label htmlFor="bold">
+          <input
+            type="radio"
+            id="bold"
+            name="font_weight_bold"
+            value="bold"
+            onChange={() => handleChange("fontWeight", "bold")}
+          />
+          Bold
+        </label>
       </div>
       <div>
-        <input
-          type="radio"
-          id="normal"
-          name="font_weight"
-          value="normal"
-          onChange={() => handleChange("fontWeight", "normal")}
-        />
-        <label htmlFor="normal">Normal</label>
+        <label htmlFor="normal">
+          <input
+            type="radio"
+            id="normal"
+            name="font_weight_normal"
+            value="bold"
+            onChange={() => handleChange("fontWeight", "normal")}
+          />
+          Bold
+        </label>
       </div>
       <b>Vertical Align:</b>
       <div>
-        <input
-          type="radio"
-          id="flex-start-vertical"
-          name="vertical_align"
-          value="flex-start"
-          onChange={() => handleChange("verticalAlign", "flex-start")}
-        />
-        <label htmlFor="flex-start-vertical">Top</label>
+        <label htmlFor="flex-start-vertical">
+          <input
+            type="radio"
+            id="flex-start-vertical"
+            name="vertical_align"
+            value="flex-start"
+            onChange={() => handleChange("verticalAlign", "flex-start")}
+          />
+          Top
+        </label>
       </div>
       <div>
-        <input
-          type="radio"
-          id="center-vertical"
-          name="vertical_align"
-          value="center"
-          onChange={() => handleChange("verticalAlign", "center")}
-        />
-        <label htmlFor="center-vertical">Center</label>
+        <label htmlFor="center-vertical">
+          <input
+            type="radio"
+            id="center-vertical"
+            name="vertical_align"
+            value="center"
+            onChange={() => handleChange("verticalAlign", "center")}
+          />
+          Center
+        </label>
       </div>
       <div>
-        <input
-          type="radio"
-          id="flex-end-vertical"
-          name="vertical_align"
-          value="flex-end"
-          onChange={() => handleChange("verticalAlign", "flex-end")}
-        />
-        <label htmlFor="flex-end-vertical">Bottom</label>
+        <label htmlFor="flex-end-vertical">
+          <input
+            type="radio"
+            id="flex-end-vertical"
+            name="vertical_align"
+            value="flex-end"
+            onChange={() => handleChange("verticalAlign", "flex-end")}
+          />
+          Bottom
+        </label>
       </div>
 
       <input
