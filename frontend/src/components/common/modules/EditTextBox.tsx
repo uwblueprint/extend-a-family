@@ -39,7 +39,7 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
           <input
             type="radio"
             id="bold"
-            name="font_weight_bold"
+            name="font_weight"
             value="bold"
             onChange={() => handleChange("fontWeight", "bold")}
           />
@@ -51,11 +51,11 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
           <input
             type="radio"
             id="normal"
-            name="font_weight_normal"
+            name="font_weight"
             value="bold"
             onChange={() => handleChange("fontWeight", "normal")}
           />
-          Bold
+          Normal
         </label>
       </div>
       <b>Vertical Align:</b>

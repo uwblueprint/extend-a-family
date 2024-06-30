@@ -13,8 +13,16 @@ interface GridElementProps {
   mouseEvent?: MouseEventLike;
   activeComponent: string;
   data: Map<string, object>;
+  children?: React.ReactNode;
+
   setData: (data: Map<string, object>) => void;
   setActiveComponent: (index: string) => void;
+  style?: React.CSSProperties;
+  className?: string;
+  onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
+  onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
+  onTouchEnd?: React.TouchEventHandler<HTMLDivElement>;
+  onTouchStart?: React.TouchEventHandler<HTMLDivElement>;
 }
 
 const createDragStartEvent = (
@@ -51,14 +59,6 @@ const createDragStartEvent = (
   });
 };
 
-// const createDragStopEvent = (element: HTMLElement) => {
-//   const event = new MouseEvent("mouseup", {
-//     bubbles: true,
-//     cancelable: true,
-//   });
-//   element.dispatchEvent(event);
-// };
-
 const GridElement: React.FC<GridElementProps> = ({
   temp,
   index,
@@ -68,6 +68,13 @@ const GridElement: React.FC<GridElementProps> = ({
   setData,
   mouseEvent,
   componentType,
+  style,
+  className,
+  onMouseDown,
+  onMouseUp,
+  onTouchEnd,
+  onTouchStart,
+  children,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -89,10 +96,15 @@ const GridElement: React.FC<GridElementProps> = ({
   return (
     <div
       ref={ref}
-      onMouseDown={() =>
-        setActiveComponent(activeComponent === index ? "10000" : index)
-      }
-      style={{ height: "100%" }}
+      style={{ height: "100%", ...style }}
+      className={className}
+      onMouseDown={(e) => {
+        setActiveComponent(activeComponent === index ? "10000" : index);
+        if (onMouseDown) onMouseDown(e);
+      }}
+      onMouseUp={onMouseUp}
+      onTouchEnd={onTouchEnd}
+      onTouchStart={onTouchStart}
     >
       <BaseModule
         name={componentType || ""}
@@ -101,11 +113,11 @@ const GridElement: React.FC<GridElementProps> = ({
         data={data}
         setData={setData}
       />
+      {children}
     </div>
   );
 };
 
-// Set default props
 GridElement.defaultProps = {
   mouseEvent: { clientX: 0, clientY: 0 },
 };

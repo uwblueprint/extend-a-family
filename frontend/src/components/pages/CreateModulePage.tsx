@@ -31,7 +31,25 @@ const CreateModule = () => {
 
   const handleDeleteConfirm = () => {
     dispatch({ type: "deleteItem", i: activeComponent });
+
+    // We re-index items in layoutReducer, so we need to update mappings to component data
+    const updatedComponentData = new Map(componentData);
+    updatedComponentData.delete(activeComponent);
+
+    const newComponentData = new Map();
+    updatedComponentData.forEach((value, key) => {
+      const itemId = parseInt(key, 10);
+      const actionId = parseInt(activeComponent || "0", 10);
+      if (itemId > actionId) {
+        newComponentData.set(`${itemId - 1}`, value);
+      } else {
+        newComponentData.set(key, value);
+      }
+    });
+
+    setComponentData(newComponentData);
     setModalOpen(false);
+    setActiveComponent("10000"); // Reset active component after deletion
   };
 
   const handleDeleteCancel = () => {
@@ -208,6 +226,7 @@ const CreateModule = () => {
                 setActiveComponent={setActiveComponent}
                 data={componentData}
                 setData={setComponentData}
+                {...item}
               />
             </div>
           ))}

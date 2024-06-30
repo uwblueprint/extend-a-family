@@ -96,8 +96,19 @@ const layoutReducer = (
       const merged = merge(keyBy(state, "i"), keyBy(action.layout, "i"));
       return Object.values(merged) as LayoutItem[];
     }
-    case "deleteItem":
-      return state.filter((item) => item.i !== action.i);
+    case "deleteItem": {
+      const updatedState = state
+        .filter((item) => item.i !== action.i)
+        .map((item) => {
+          const itemId = parseInt(item.i, 10);
+          const actionId = parseInt(action.i || "0", 10);
+          if (itemId > actionId) {
+            return { ...item, i: `${itemId - 1}` };
+          }
+          return item;
+        });
+      return updatedState;
+    }
     default:
       return state;
   }
