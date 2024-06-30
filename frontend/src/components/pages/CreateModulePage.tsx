@@ -226,7 +226,14 @@ const CreateModule = () => {
                 setActiveComponent={setActiveComponent}
                 data={componentData}
                 setData={setComponentData}
-                {...item}
+                temp={item.temp}
+                mouseEvent={item.mouseEvent}
+                style={item.style}
+                className={item.className}
+                onMouseDown={item.onMouseDown}
+                onMouseUp={item.onMouseUp}
+                onTouchEnd={item.onTouchEnd}
+                onTouchStart={item.onTouchStart}
               />
             </div>
           ))}

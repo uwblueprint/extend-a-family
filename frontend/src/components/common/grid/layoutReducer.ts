@@ -16,6 +16,12 @@ interface LayoutItem {
   mouseEvent?: MouseEventLike;
   i: string;
   resizeHandles?: ResizeHandle[];
+  style?: React.CSSProperties;
+  className?: string;
+  onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
+  onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
+  onTouchEnd?: React.TouchEventHandler<HTMLDivElement>;
+  onTouchStart?: React.TouchEventHandler<HTMLDivElement>;
 }
 
 interface LayoutAction {

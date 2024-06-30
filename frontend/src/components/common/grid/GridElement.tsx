@@ -13,8 +13,6 @@ interface GridElementProps {
   mouseEvent?: MouseEventLike;
   activeComponent: string;
   data: Map<string, object>;
-  children?: React.ReactNode;
-
   setData: (data: Map<string, object>) => void;
   setActiveComponent: (index: string) => void;
   style?: React.CSSProperties;
@@ -74,7 +72,6 @@ const GridElement: React.FC<GridElementProps> = ({
   onMouseUp,
   onTouchEnd,
   onTouchStart,
-  children,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -113,7 +110,6 @@ const GridElement: React.FC<GridElementProps> = ({
         data={data}
         setData={setData}
       />
-      {children}
     </div>
   );
 };
