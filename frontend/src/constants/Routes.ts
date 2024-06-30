@@ -8,6 +8,8 @@ export const EDIT_TEAM_PAGE = "/edit-team";
 
 export const DISPLAY_ENTITY_PAGE = "/entity";
 
+export const CREATE_MODULE_PAGE = "/create-module";
+
 export const CREATE_ENTITY_PAGE = "/entity/create";
 
 export const UPDATE_ENTITY_PAGE = "/entity/update";
