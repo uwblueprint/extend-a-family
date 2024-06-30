@@ -194,7 +194,6 @@ const CreateModule = () => {
           isDroppable
           isDraggable={editMode}
           isResizable={editMode}
-          allowOverlap={true}
         >
           {layout.map((item) => (
             <div
