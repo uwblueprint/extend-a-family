@@ -1,11 +1,14 @@
 export type Role = "Administrator" | "Facilitator" | "Learner";
 
+export type Status = "Invited" | "Active";
+
 export type UserDTO = {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   role: Role;
+  status: Status;
 };
 
 export type CreateUserDTO = Omit<UserDTO, "id"> & { password: string };
