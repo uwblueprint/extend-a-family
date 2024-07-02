@@ -12,7 +12,7 @@ import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
 
-import User, { Facilitator, Learner } from "./models/user.mgmodel";
+import UserModel, { Facilitator, Learner } from "./models/user.mgmodel";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -75,7 +75,7 @@ async function runTests() {
   await mongo.connect();
 
   try {
-    await User.deleteMany({});
+    await UserModel.deleteMany({});
 
     const facilitator = new Facilitator({
       firstName: "John",
