@@ -51,5 +51,5 @@ const LearnerSchema = new Schema({
 const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
 const Learner = UserModel.discriminator("Learner", LearnerSchema);
 
-export {Facilitator, Learner };
+export { Facilitator, Learner };
 export default UserModel;
