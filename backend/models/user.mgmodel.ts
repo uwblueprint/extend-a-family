@@ -38,7 +38,7 @@ const UserSchema: Schema = new Schema(
   baseOptions,
 );
 
-const User = mongoose.model<User>("User", UserSchema);
+const UserModel = mongoose.model<User>("User", UserSchema);
 
 const FacilitatorSchema = new Schema({
   learners: { type: [String], default: [] },
@@ -48,8 +48,8 @@ const LearnerSchema = new Schema({
   facilitator: { type: String, required: true },
 });
 
-const Facilitator = User.discriminator("Facilitator", FacilitatorSchema);
-const Learner = User.discriminator("Learner", LearnerSchema);
+const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
+const Learner = UserModel.discriminator("Learner", LearnerSchema);
 
-export { User, Facilitator, Learner };
-export default User;
+export {Facilitator, Learner };
+export default UserModel;
