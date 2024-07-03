@@ -55,7 +55,10 @@ class CourseService implements ICourseService {
     };
   }
 
-  async updateCourse(id: string, course: UpdateCourseUnitDTO): Promise<CourseUnitDTO> {
+  async updateCourse(
+    id: string,
+    course: UpdateCourseUnitDTO,
+  ): Promise<CourseUnitDTO> {
     let oldCourse: CourseUnit | null;
     try {
       oldCourse = await MgCourseUnit.findByIdAndUpdate(
