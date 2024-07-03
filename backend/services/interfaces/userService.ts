@@ -4,7 +4,6 @@ import {
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
-import { SignupMethod } from "../../types/authTypes";
 
 interface IUserService {
   /**
