@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
 import authAPIClient from "../../APIClients/AuthAPIClient";
-import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
+import { HOME_PAGE, SIGNUP_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
@@ -22,13 +22,15 @@ const Login = (): React.ReactElement => {
   }
 
   if (!role || !["administrator", "facilitator", "learner"].includes(role)) {
-    // need this changed when welcome page exists
-    return <Redirect to="/welcome" />;
+    return <Redirect to={WELCOME_PAGE} />;
   }
 
   const onLogInClick = async () => {
     const user: AuthenticatedUser = await authAPIClient.login(email, password);
-    if (!user) {
+    const isUserVerified = user?.accessToken
+      ? await authAPIClient.isUserVerified(email, user.accessToken)
+      : null;
+    if (!user || !isUserVerified) {
       // will need to change this for different errors
       // eslint-disable-next-line no-alert
       alert("Bad login, user not found");
@@ -40,6 +42,7 @@ const Login = (): React.ReactElement => {
       alert(`Bad login. Expected ${user.role}, got ${role}`);
       return;
     }
+
     localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
     setAuthenticatedUser(user);
   };

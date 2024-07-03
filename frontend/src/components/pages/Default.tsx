@@ -50,6 +50,7 @@ const Default = (): React.ReactElement => {
         <Button text="Display Entities" path={Routes.DISPLAY_ENTITY_PAGE} />
         <Button text="Edit Team" path={Routes.EDIT_TEAM_PAGE} />
         <Button text="Hooks Demo" path={Routes.HOOKS_PAGE} />
+        <Button text="My Account" path={Routes.MY_ACCOUNT_PAGE} />
       </div>
 
       <div style={{ height: "2rem" }} />
