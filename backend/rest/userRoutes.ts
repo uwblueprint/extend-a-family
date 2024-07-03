@@ -12,9 +12,10 @@ import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
-import { UserDTO } from "../types/userTypes";
+import { UserDTO, isRole } from "../types/userTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
 import { sendResponseByMimeType } from "../utilities/responseUtil";
+import { capitalizeFirstLetter } from "../utilities/StringUtils";
 
 const userRouter: Router = Router();
 userRouter.use(isAuthorizedByRole(new Set(["Administrator"])));
@@ -161,6 +162,20 @@ userRouter.delete("/", async (req, res) => {
   res
     .status(400)
     .json({ error: "Must supply one of userId or email as query parameter." });
+});
+
+userRouter.get("/:role", async (req, res) => {
+  try {
+    const captializedRole = capitalizeFirstLetter(req.params.role);
+    if (isRole(captializedRole)) {
+      const users = await userService.getUsersByRole(captializedRole);
+      res.status(200).json(users);
+    } else {
+      res.status(400).json({ error: `Invalid role` });
+    }
+  } catch (error: unknown) {
+    res.status(500).json({ error: getErrorMessage(error) });
+  }
 });
 
 export default userRouter;
