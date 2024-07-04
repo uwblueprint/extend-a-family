@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { AuthenticatedUser } from "../types/AuthTypes";
 import baseAPIClient from "./BaseAPIClient";
@@ -18,6 +19,9 @@ const login = async (
     );
     return data;
   } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.error);
+    }
     return null;
   }
 };
