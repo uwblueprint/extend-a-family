@@ -369,6 +369,7 @@ class UserService implements IUserService {
             lastName: user.lastName,
             email: firebaseUser.email ?? "",
             role: user.role,
+            status: user.status,
           };
         }),
       );
