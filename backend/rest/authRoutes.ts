@@ -40,14 +40,22 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
         await authService.generateTokenOAuth(req.body.idToken)
       : await authService.generateToken(req.body.email, req.body.password);
 
-    const { refreshToken, ...rest } = authDTO;
+    const { accessToken, refreshToken, ...rest } = authDTO;
+    const isVerified = await authService.isAuthorizedByEmail(
+      accessToken,
+      req.body.email,
+    );
+
+    if (!isVerified) {
+      throw new Error("UNVERIFIED_EMAIL");
+    }
 
     res
       .cookie("refreshToken", refreshToken, cookieOptions)
       .status(200)
       .json(rest);
   } catch (error: unknown) {
-    res.status(500).json({ error: getErrorMessage(error) });
+    return error;
   }
 });
 
