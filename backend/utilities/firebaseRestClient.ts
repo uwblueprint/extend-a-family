@@ -86,15 +86,20 @@ const FirebaseRestClient = {
       | RequestError = await response.json();
 
     if (!response.ok) {
+      const firebaseErrorMessage = (responseJson as RequestError).error.message;
+
       const errorMessage = [
         "Failed to sign-in via Firebase REST API, status code =",
         `${response.status},`,
         "error message =",
-        (responseJson as RequestError).error.message,
+        firebaseErrorMessage,
       ];
       Logger.error(errorMessage.join(" "));
-
-      throw new Error("Failed to sign-in via Firebase REST API");
+      if (firebaseErrorMessage === "INVALID_LOGIN_CREDENTIALS") {
+        throw new Error("INCORRECT_PASSWORD");
+      } else {
+        throw new Error("Failed to sign-in via Firebase REST API");
+      }
     }
 
     return {
