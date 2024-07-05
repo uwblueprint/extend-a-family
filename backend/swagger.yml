@@ -262,7 +262,7 @@ paths:
     post:
       tags:
         - Auth
-      description: Login user. Supply either both email and password, or an Google OAuth idToken.
+      description: Login user. Supply an email and password.
       requestBody:
         required: true
         content:

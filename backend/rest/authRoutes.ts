@@ -35,10 +35,10 @@ const cookieOptions: CookieOptions = {
 /* Returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
 authRouter.post("/login", loginRequestValidator, async (req, res) => {
   try {
-    const authDTO = req.body.idToken
-      ? // OAuth
-        await authService.generateTokenOAuth(req.body.idToken)
-      : await authService.generateToken(req.body.email, req.body.password);
+    const authDTO = await authService.generateToken(
+      req.body.email,
+      req.body.password,
+    );
 
     const { refreshToken, ...rest } = authDTO;
 
@@ -60,6 +60,7 @@ authRouter.post("/signup", signupRequestValidator, async (req, res) => {
       email: req.body.email,
       role: req.body.role,
       password: req.body.password,
+      status: "Active",
     });
 
     const authDTO = await authService.generateToken(
@@ -156,6 +157,7 @@ authRouter.post(
         email: req.body.email,
         role: "Administrator",
         password: temporaryPassword,
+        status: "Invited",
       });
       await authService.sendAdminInvite(req.body.email, temporaryPassword);
       res.status(200).json(invitedAdminUser);

@@ -4,7 +4,6 @@ import {
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
-import { SignupMethod } from "../../types/authTypes";
 
 interface IUserService {
   /**
@@ -62,11 +61,7 @@ interface IUserService {
    * @returns a UserDTO with the created user's information
    * @throws Error if user creation fails
    */
-  createUser(
-    user: CreateUserDTO,
-    authId?: string,
-    signupMethod?: SignupMethod,
-  ): Promise<UserDTO>;
+  createUser(user: CreateUserDTO, authId?: string): Promise<UserDTO>;
 
   /**
    * Update a user.
@@ -91,6 +86,13 @@ interface IUserService {
    * @throws Error if user deletion fails
    */
   deleteUserByEmail(email: string): Promise<void>;
+
+  /**
+   * Gets all user that belong to the role
+   * @param role the role that we want to get
+   * @returns an Array of UserDtos that all have the corresponding role
+   */
+  getUsersByRole(role: Role): Promise<Array<UserDTO>>;
 }
 
 export default IUserService;
