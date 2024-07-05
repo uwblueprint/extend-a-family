@@ -1,4 +1,4 @@
-import React, { useRef, useReducer, useState } from "react";
+import React, { useRef, useReducer, useState, useEffect } from "react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -28,6 +28,10 @@ const CreateModule = () => {
       "linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)", // Grid lines
     backgroundSize: "50px 50px",
   };
+
+  useEffect(() => {
+    console.log("Active component updated:", activeComponent);
+  }, [activeComponent]);
 
   const handleDeleteConfirm = () => {
     dispatch({ type: "deleteItem", i: activeComponent });
