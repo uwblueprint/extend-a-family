@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface EditMatchProps {
   componentData: Map<string, object>;
   setComponentData: (data: Map<string, object>) => void;
 }
+
+const [value, setValue] = useState<number | null>(0);
 
 const Match: React.FC<EditMatchProps> = () => {
   return (
