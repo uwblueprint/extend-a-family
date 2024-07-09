@@ -26,9 +26,12 @@ const TextBox: React.FC<ComponentProps> = ({ componentData }) => {
         alignContent: verticalAlign,
         justifyContent: verticalAlign,
         textAlign: "center",
+        overflow: "hidden",
       }}
     >
-      <p style={{ margin: "0px", fontWeight }}>{content}</p>
+      <p style={{ margin: "0px", fontWeight, overflowWrap: "break-word" }}>
+        {content}
+      </p>
     </div>
   );
 };
