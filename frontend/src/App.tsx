@@ -107,7 +107,7 @@ const App = (): React.ReactElement => {
                 exact
                 path={Routes.CREATE_MODULE_PAGE}
                 component={CreateModulePage}
-                allowedRoles={["Administrator"]}
+                allowedRoles={["Administrator", "Facilitator"]}
               />
               <PrivateRoute
                 exact

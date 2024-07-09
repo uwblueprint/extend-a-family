@@ -7,7 +7,7 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DraggableSource from "../common/grid/DraggableSource";
 import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
-import BaseModule from "../common/modules/BaseModule";
+import BaseModule from "../course_authoring/BaseModule";
 import ConfirmationModal from "../common/modals/ConfirmationModal";
 
 const CreateModule = () => {
