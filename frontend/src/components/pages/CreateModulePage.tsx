@@ -221,7 +221,7 @@ const CreateModule = () => {
             >
               <GridElement
                 componentType={item.content}
-                index={item.i}
+                elementLayoutManifest={{ i: item.i, w: item.w, h: item.h }}
                 activeComponent={activeComponent}
                 setActiveComponent={setActiveComponent}
                 data={componentData}
@@ -234,6 +234,7 @@ const CreateModule = () => {
                 onMouseUp={item.onMouseUp}
                 onTouchEnd={item.onTouchEnd}
                 onTouchStart={item.onTouchStart}
+                layout={layout}
               />
             </div>
           ))}
@@ -247,13 +248,29 @@ const CreateModule = () => {
             position: "relative",
           }}
         >
-          <div style={{ position: "absolute", top: "5px", left: "5px" }}>
-            <h6>Edit Panel</h6>
-            {activeComponent !== "10000" && (
-              <button type="button" onClick={() => setModalOpen(true)}>
-                Delete
-              </button>
-            )}
+          <div
+            style={{
+              position: "absolute",
+              top: "5px",
+              left: "5px",
+              right: "5px",
+            }}
+          >
+            <div
+              style={{
+                width: "200px",
+                display: "flex",
+
+                justifyContent: "space-between",
+              }}
+            >
+              <h6>Edit Panel</h6>
+              {activeComponent !== "10000" && (
+                <button type="button" onClick={() => setModalOpen(true)}>
+                  Delete
+                </button>
+              )}
+            </div>
             <ConfirmationModal
               title="Delete Component"
               message="Are you sure you want to delete this component? This action is not reversible."

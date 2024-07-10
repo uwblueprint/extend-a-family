@@ -8,7 +8,7 @@ interface MouseEventLike {
 
 interface GridElementProps {
   temp?: boolean;
-  index: string;
+  elementLayoutManifest: { i: string; w: number; h: number };
   componentType?: string;
   mouseEvent?: MouseEventLike;
   activeComponent: string;
@@ -21,6 +21,7 @@ interface GridElementProps {
   onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
   onTouchEnd?: React.TouchEventHandler<HTMLDivElement>;
   onTouchStart?: React.TouchEventHandler<HTMLDivElement>;
+  layout?: any;
 }
 
 const createDragStartEvent = (
@@ -59,7 +60,7 @@ const createDragStartEvent = (
 
 const GridElement: React.FC<GridElementProps> = ({
   temp,
-  index,
+  elementLayoutManifest,
   activeComponent,
   setActiveComponent,
   data,
@@ -72,6 +73,7 @@ const GridElement: React.FC<GridElementProps> = ({
   onMouseUp,
   onTouchEnd,
   onTouchStart,
+  layout,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -96,7 +98,11 @@ const GridElement: React.FC<GridElementProps> = ({
       style={{ height: "100%", ...style }}
       className={className}
       onMouseDown={(e) => {
-        setActiveComponent(activeComponent === index ? "10000" : index);
+        setActiveComponent(
+          activeComponent === elementLayoutManifest.i
+            ? "10000"
+            : elementLayoutManifest.i,
+        );
         if (onMouseDown) onMouseDown(e);
       }}
       onMouseUp={onMouseUp}
@@ -106,7 +112,7 @@ const GridElement: React.FC<GridElementProps> = ({
       <BaseModule
         name={componentType || ""}
         activeComponent={activeComponent}
-        index={index}
+        elementLayoutManifest={elementLayoutManifest}
         data={data}
         setData={setData}
       />

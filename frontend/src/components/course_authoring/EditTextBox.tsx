@@ -64,7 +64,6 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
           <input
             type="radio"
             id="flex-start-vertical"
-            name="vertical_align"
             value="flex-start"
             onChange={() => handleChange("verticalAlign", "flex-start")}
           />
