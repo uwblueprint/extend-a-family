@@ -11,6 +11,11 @@ export interface User extends Document {
   status: Status;
 }
 
+const baseOptions = {
+  discriminatorKey: "type",
+  collection: "user",
+};
+
 const UserSchema: Schema = new Schema(
   {
     firstName: {
@@ -30,13 +35,22 @@ const UserSchema: Schema = new Schema(
       required: true,
       enum: ["Administrator", "Facilitator", "Learner"],
     },
-    status: {
-      type: String,
-      required: true,
-      enum: ["Invited", "Active"],
-    },
   },
-  { timestamps: true },
+  baseOptions,
 );
 
-export default mongoose.model<User>("User", UserSchema);
+const UserModel = mongoose.model<User>("User", UserSchema);
+
+const FacilitatorSchema = new Schema({
+  learners: { type: [String], default: [] },
+});
+
+const LearnerSchema = new Schema({
+  facilitator: { type: String, required: true },
+});
+
+const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
+const Learner = UserModel.discriminator("Learner", LearnerSchema);
+
+export { Facilitator, Learner };
+export default UserModel;
