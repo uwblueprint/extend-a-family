@@ -46,6 +46,7 @@ class UserService implements IUserService {
       lastName: user.lastName,
       email: firebaseUser.email ?? "",
       role: user.role,
+      status: user.status,
     };
   }
 
@@ -71,6 +72,7 @@ class UserService implements IUserService {
       lastName: user.lastName,
       email: firebaseUser.email ?? "",
       role: user.role,
+      status: user.status,
     };
   }
 
@@ -134,6 +136,7 @@ class UserService implements IUserService {
             lastName: user.lastName,
             email: firebaseUser.email ?? "",
             role: user.role,
+            status: user.status,
           };
         }),
       );
@@ -145,25 +148,15 @@ class UserService implements IUserService {
     return userDtos;
   }
 
-  async createUser(
-    user: CreateUserDTO,
-    authId?: string,
-    signupMethod = "PASSWORD",
-  ): Promise<UserDTO> {
+  async createUser(user: CreateUserDTO): Promise<UserDTO> {
     let newUser: User;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
 
     try {
-      if (signupMethod === "GOOGLE") {
-        /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-        firebaseUser = await firebaseAdmin.auth().getUser(authId!);
-      } else {
-        // signupMethod === PASSWORD
-        firebaseUser = await firebaseAdmin.auth().createUser({
-          email: user.email,
-          password: user.password,
-        });
-      }
+      firebaseUser = await firebaseAdmin.auth().createUser({
+        email: user.email,
+        password: user.password,
+      });
 
       try {
         newUser = await MgUser.create({
@@ -171,6 +164,7 @@ class UserService implements IUserService {
           lastName: user.lastName,
           authId: firebaseUser.uid,
           role: user.role,
+          status: user.status,
         });
       } catch (mongoDbError) {
         // rollback user creation in Firebase
@@ -199,6 +193,7 @@ class UserService implements IUserService {
       lastName: newUser.lastName,
       email: firebaseUser.email ?? "",
       role: newUser.role,
+      status: newUser.status,
     };
   }
 
@@ -257,6 +252,7 @@ class UserService implements IUserService {
       lastName: user.lastName,
       email: updatedFirebaseUser.email ?? "",
       role: user.role,
+      status: user.status,
     };
   }
 
@@ -363,6 +359,7 @@ class UserService implements IUserService {
             lastName: user.lastName,
             email: firebaseUser.email ?? "",
             role: user.role,
+            status: user.status,
           };
         }),
       );

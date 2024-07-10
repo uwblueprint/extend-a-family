@@ -18,4 +18,6 @@ export const WELCOME_PAGE = "/welcome";
 
 export const NOT_AUTHORIZED_PAGE = "/not-authorized";
 
+export const MY_ACCOUNT_PAGE = "/account";
+
 export const MANAGE_USERS_PAGE = "/manage-users";

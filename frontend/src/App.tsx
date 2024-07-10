@@ -12,6 +12,7 @@ import DisplayPage from "./components/pages/DisplayPage";
 import NotFound from "./components/pages/NotFound";
 import NotAuthorized from "./components/pages/NotAuthorized";
 import UpdatePage from "./components/pages/UpdatePage";
+import MyAccount from "./components/pages/MyAccount";
 import AUTHENTICATED_USER_KEY from "./constants/AuthConstants";
 import AuthContext from "./contexts/AuthContext";
 import { getLocalStorageObj } from "./utils/LocalStorageUtils";
@@ -76,6 +77,12 @@ const App = (): React.ReactElement => {
                 exact
                 path={Routes.HOME_PAGE}
                 component={Default}
+                allowedRoles={["Administrator", "Facilitator", "Learner"]}
+              />
+              <PrivateRoute
+                exact
+                path={Routes.MY_ACCOUNT_PAGE}
+                component={MyAccount}
                 allowedRoles={["Administrator", "Facilitator", "Learner"]}
               />
               <PrivateRoute

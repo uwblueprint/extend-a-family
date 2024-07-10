@@ -86,7 +86,7 @@ const ManageUser = (): React.ReactElement => {
                 )
               : users
             ).map((user) => (
-              <TableRow key={user.id}>
+              <TableRow key={user.id} style={{ height: 53 }}>
                 <TableCell component="th" scope="row">
                   {user.email}
                 </TableCell>
@@ -99,7 +99,7 @@ const ManageUser = (): React.ReactElement => {
               </TableRow>
             ))}
             {emptyRows > 0 && (
-              <TableRow style={{ height: 25 * emptyRows }}>
+              <TableRow style={{ height: 53 * emptyRows }}>
                 <TableCell colSpan={6} />
               </TableRow>
             )}

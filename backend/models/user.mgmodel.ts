@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-import { Role } from "../types/userTypes";
+import { Role, Status } from "../types/userTypes";
 
 export interface User extends Document {
   id: string;
@@ -8,26 +8,35 @@ export interface User extends Document {
   lastName: string;
   authId: string;
   role: Role;
+  status: Status;
 }
 
-const UserSchema: Schema = new Schema({
-  firstName: {
-    type: String,
-    required: true,
+const UserSchema: Schema = new Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    authId: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      required: true,
+      enum: ["Administrator", "Facilitator", "Learner"],
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: ["Invited", "Active"],
+    },
   },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  authId: {
-    type: String,
-    required: true,
-  },
-  role: {
-    type: String,
-    required: true,
-    enum: ["Administrator", "Facilitator", "Learner"],
-  },
-});
+  { timestamps: true },
+);
 
 export default mongoose.model<User>("User", UserSchema);
