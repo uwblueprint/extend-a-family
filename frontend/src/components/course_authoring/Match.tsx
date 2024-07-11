@@ -13,10 +13,20 @@ const LeftNode = ({ data }) => {
   return (
     <div
       style={{
-        padding: "10px",
-        border: "2px solid black",
-        borderRadius: "5px",
-        backgroundColor: "#f9f9f9",
+        padding: "20px",
+        border: "1px solid #007bff",
+        borderRadius: "10px",
+        backgroundColor: "#e9ecef",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-5px)";
+        e.currentTarget.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.2)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "";
+        e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
       }}
     >
       <div>{data.label}</div>
@@ -29,10 +39,20 @@ const RightNode = ({ data }) => {
   return (
     <div
       style={{
-        padding: "10px",
-        border: "2px solid black",
-        borderRadius: "5px",
-        backgroundColor: "#f9f9f9",
+        padding: "20px",
+        border: "1px solid #007bff",
+        borderRadius: "10px",
+        backgroundColor: "#e9ecef",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-5px)";
+        e.currentTarget.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.2)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "";
+        e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
       }}
     >
       <Handle type="target" position={Position.Left} />
@@ -83,7 +103,7 @@ const initialNodes = [
 
 const initialEdges = [];
 
-const nodeTypes = { leftNode: LeftNode, rightNode: RightNode};
+const nodeTypes = { leftNode: LeftNode, rightNode: RightNode };
 
 interface MatchProps {
   numRows?: number;
@@ -96,7 +116,6 @@ interface ComponentProps {
   h: number;
 }
 
-
 const Match: React.FC<ComponentProps> = ({ componentData, i, w, h }) => {
   const { numRows = 0, numCols = 0 } = componentData || {};
 
@@ -105,14 +124,13 @@ const Match: React.FC<ComponentProps> = ({ componentData, i, w, h }) => {
   const [selectedNode, setSelectedNode] = useState(null);
 
   const onNodeClick = (event, node) => {
-
     if (selectedNode && selectedNode.type !== node.type) {
       setEdges((eds) =>
         addEdge(
           {
             id: `${selectedNode.id}-${node.id}`,
-            source: selectedNode.type == 'leftNode' ? selectedNode.id : node.id,
-            target: selectedNode.type == 'leftNode' ? node.id : selectedNode.id,
+            source: selectedNode.type == "leftNode" ? selectedNode.id : node.id,
+            target: selectedNode.type == "leftNode" ? node.id : selectedNode.id,
             animated: true,
             style: { stroke: "blue" },
           },
