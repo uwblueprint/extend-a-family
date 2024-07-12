@@ -1,6 +1,8 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import RateLimit from "express-rate-limit";
 import * as firebaseAdmin from "firebase-admin";
 import swaggerUi from "swagger-ui-express";
@@ -37,6 +39,18 @@ const limiter = RateLimit({
 });
 
 const app = express();
+const server = createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: CORS_ALLOW_LIST,
+    methods: ["GET", "POST"],
+  },
+});
+io.on("connection", (socket) => {
+  console.log("connected to", socket.id);
+});
+
 app.use(cookieParser());
 app.use(cors(CORS_OPTIONS));
 app.use(express.json());
@@ -61,7 +75,7 @@ firebaseAdmin.initializeApp({
   }),
 });
 
-app.listen({ port: process.env.PORT || 8080 }, () => {
+server.listen({ port: process.env.PORT || 8080 }, () => {
   /* eslint-disable-next-line no-console */
   console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
 });
