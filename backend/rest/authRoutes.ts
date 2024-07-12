@@ -11,6 +11,7 @@ import {
   loginRequestValidator,
   signupRequestValidator,
   inviteAdminRequestValidator,
+  forgotPasswordRequestValidator,
 } from "../middlewares/validators/authValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -161,6 +162,26 @@ authRouter.post(
       });
       await authService.sendAdminInvite(req.body.email, temporaryPassword);
       res.status(200).json(invitedAdminUser);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+/* Reset password through a "Forgot Password" option */
+authRouter.post(
+  "/forgotPassword",
+  forgotPasswordRequestValidator,
+  async (req, res) => {
+    try {
+      try {
+        await userService.getUserByEmail(req.body.email);
+      } catch (error) {
+        return res.status(401).json({ error: "EMAIL_NOT_FOUND" });
+      }
+
+      await authService.resetPassword(req.body.email);
+      res.status(204).send();
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }
