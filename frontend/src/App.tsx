@@ -1,6 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useReducer, useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Socket, io } from "socket.io-client";
 
 import Welcome from "./components/pages/Welcome";
 import Login from "./components/auth/Login";
@@ -28,6 +29,8 @@ import { AuthenticatedUser } from "./types/AuthTypes";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import * as Routes from "./constants/Routes";
 import ManageUserPage from "./components/pages/ManageUserPage";
+import { SocketContext } from "./contexts/SocketContext";
+import HelpModalPage from "./components/pages/HelpModalPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser = getLocalStorageObj<AuthenticatedUser>(
@@ -45,6 +48,19 @@ const App = (): React.ReactElement => {
     DEFAULT_SAMPLE_CONTEXT,
   );
 
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  useEffect(() => {
+    const newSocket = io(
+        process.env.REACT_APP_BACKEND_URL as string,
+        // { query: { id } }
+    )
+    newSocket.on("connect", () => {
+      console.log("connected");
+    })
+    setSocket(newSocket);
+  }, []);
+
   const HOUR_MS = 3300000;
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -59,6 +75,7 @@ const App = (): React.ReactElement => {
     return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
   }, [currentUser]);
 
+
   return (
     <SampleContext.Provider value={sampleContext}>
       <SampleContextDispatcherContext.Provider
@@ -67,62 +84,70 @@ const App = (): React.ReactElement => {
         <AuthContext.Provider
           value={{ authenticatedUser, setAuthenticatedUser }}
         >
-          <Router>
-            <Switch>
-              <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
-              <Route exact path={Routes.LOGIN_PAGE} component={Login} />
-              <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
-              <Route exact path={Routes.HOOKS_PAGE} component={HooksDemo} />
-              <PrivateRoute
-                exact
-                path={Routes.HOME_PAGE}
-                component={Default}
-                allowedRoles={["Administrator", "Facilitator", "Learner"]}
-              />
-              <PrivateRoute
-                exact
-                path={Routes.MY_ACCOUNT_PAGE}
-                component={MyAccount}
-                allowedRoles={["Administrator", "Facilitator", "Learner"]}
-              />
-              <PrivateRoute
-                exact
-                path={Routes.CREATE_ENTITY_PAGE}
-                component={CreatePage}
-                allowedRoles={["Administrator", "Facilitator", "Learner"]}
-              />
-              <PrivateRoute
-                exact
-                path={Routes.UPDATE_ENTITY_PAGE}
-                component={UpdatePage}
-                allowedRoles={["Administrator", "Facilitator", "Learner"]}
-              />
-              <PrivateRoute
-                exact
-                path={Routes.DISPLAY_ENTITY_PAGE}
-                component={DisplayPage}
-                allowedRoles={["Administrator", "Facilitator", "Learner"]}
-              />
-              <PrivateRoute
-                exact
-                path={Routes.EDIT_TEAM_PAGE}
-                component={EditTeamInfoPage}
-                allowedRoles={["Administrator", "Facilitator", "Learner"]}
-              />
-              <Route
-                exact
-                path={Routes.NOT_AUTHORIZED_PAGE}
-                component={NotAuthorized}
-              />
-              <PrivateRoute
-                exact
-                path={Routes.MANAGE_USERS_PAGE}
-                component={ManageUserPage}
-                allowedRoles={["Administrator"]}
-              />
-              <Route exact path="*" component={NotFound} />
-            </Switch>
-          </Router>
+          <SocketContext.Provider value={socket}>
+            <Router>
+              <Switch>
+                <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
+                <Route exact path={Routes.LOGIN_PAGE} component={Login} />
+                <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
+                <Route exact path={Routes.HOOKS_PAGE} component={HooksDemo} />
+                <PrivateRoute
+                  exact
+                  path={Routes.HOME_PAGE}
+                  component={Default}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.MY_ACCOUNT_PAGE}
+                  component={MyAccount}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.CREATE_ENTITY_PAGE}
+                  component={CreatePage}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.UPDATE_ENTITY_PAGE}
+                  component={UpdatePage}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.DISPLAY_ENTITY_PAGE}
+                  component={DisplayPage}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.EDIT_TEAM_PAGE}
+                  component={EditTeamInfoPage}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <Route
+                  exact
+                  path={Routes.NOT_AUTHORIZED_PAGE}
+                  component={NotAuthorized}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.MANAGE_USERS_PAGE}
+                  component={ManageUserPage}
+                  allowedRoles={["Administrator"]}
+                />
+                <Route
+                  exact
+                  path={Routes.HELP_MODAL_PAGE}
+                  component={HelpModalPage}
+                  
+                />
+                <Route exact path="*" component={NotFound} />
+              </Switch>
+            </Router>
+          </SocketContext.Provider>
         </AuthContext.Provider>
       </SampleContextDispatcherContext.Provider>
     </SampleContext.Provider>

@@ -21,3 +21,7 @@ export const NOT_AUTHORIZED_PAGE = "/not-authorized";
 export const MY_ACCOUNT_PAGE = "/account";
 
 export const MANAGE_USERS_PAGE = "/manage-users";
+
+export const HELP_MODAL_PAGE = "/ask-for-help";
+
+export const REQUEST_HELP_PAGE = "/request-help";
