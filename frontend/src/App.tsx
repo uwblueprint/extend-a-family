@@ -8,6 +8,7 @@ import Signup from "./components/auth/Signup";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import CreatePage from "./components/pages/CreatePage";
 import Default from "./components/pages/Default";
+import CreateModulePage from "./components/pages/CreateModulePage";
 import DisplayPage from "./components/pages/DisplayPage";
 import NotFound from "./components/pages/NotFound";
 import NotAuthorized from "./components/pages/NotAuthorized";
@@ -102,6 +103,12 @@ const App = (): React.ReactElement => {
                 path={Routes.DISPLAY_ENTITY_PAGE}
                 component={DisplayPage}
                 allowedRoles={["Administrator", "Facilitator", "Learner"]}
+              />
+              <PrivateRoute
+                exact
+                path={Routes.CREATE_MODULE_PAGE}
+                component={CreateModulePage}
+                allowedRoles={["Administrator"]}
               />
               <PrivateRoute
                 exact
