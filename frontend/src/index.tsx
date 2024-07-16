@@ -3,12 +3,17 @@ import { createRoot } from "react-dom/client";
 
 import "./index.css";
 // eslint-disable-next-line import/no-extraneous-dependencies
+import { ThemeProvider } from "@mui/material/styles";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
+import getTheme from "./theme/theme";
+
 createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={getTheme(false)}>
+      <App />
+    </ThemeProvider>
   </React.StrictMode>,
 );
 
