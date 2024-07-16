@@ -177,7 +177,7 @@ authRouter.post(
       try {
         await userService.getUserByEmail(req.body.email);
       } catch (error) {
-        return res.status(401).json({ error: "EMAIL_NOT_FOUND" });
+        res.status(401).json({ error: "EMAIL_NOT_FOUND" });
       }
 
       await authService.resetPassword(req.body.email);
