@@ -11,6 +11,11 @@ export interface User extends Document {
   status: Status;
 }
 
+const baseOptions = {
+  discriminatorKey: "role",
+  timestamps: true,
+};
+
 const UserSchema: Schema = new Schema(
   {
     firstName: {
@@ -36,7 +41,27 @@ const UserSchema: Schema = new Schema(
       enum: ["Invited", "Active"],
     },
   },
-  { timestamps: true },
+  baseOptions,
 );
 
-export default mongoose.model<User>("User", UserSchema);
+const UserModel = mongoose.model<User>("User", UserSchema);
+
+const AdministratorSchema = new Schema({});
+
+const FacilitatorSchema = new Schema({
+  learners: { type: [String], default: [] },
+});
+
+const LearnerSchema = new Schema({
+  facilitator: { type: String, required: true },
+});
+
+const Administrator = UserModel.discriminator(
+  "Administrator",
+  AdministratorSchema,
+);
+const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
+const Learner = UserModel.discriminator("Learner", LearnerSchema);
+
+export { Administrator, Facilitator, Learner };
+export default UserModel;
