@@ -13,7 +13,7 @@ export interface User extends Document {
 
 const baseOptions = {
   discriminatorKey: "role",
-  timestamps: true ,
+  timestamps: true,
 };
 
 const UserSchema: Schema = new Schema(
@@ -56,9 +56,12 @@ const LearnerSchema = new Schema({
   facilitator: { type: String, required: true },
 });
 
-const Administrator = UserModel.discriminator("Administrator", AdministratorSchema);
+const Administrator = UserModel.discriminator(
+  "Administrator",
+  AdministratorSchema,
+);
 const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
 const Learner = UserModel.discriminator("Learner", LearnerSchema);
 
-export { Facilitator, Learner };
+export { Administrator, Facilitator, Learner };
 export default UserModel;
