@@ -51,15 +51,15 @@ const App = (): React.ReactElement => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket = io(
-        process.env.REACT_APP_BACKEND_URL as string,
-        // { query: { id } }
-    )
+    if(!currentUser) return;
+    const newSocket = io(process.env.REACT_APP_BACKEND_URL as string, {
+      query: { currentUser },
+    });
     newSocket.on("connect", () => {
       console.log("connected");
-    })
+    });
     setSocket(newSocket);
-  }, []);
+  }, [currentUser]);
 
   const HOUR_MS = 3300000;
   useEffect(() => {
@@ -74,7 +74,6 @@ const App = (): React.ReactElement => {
 
     return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
   }, [currentUser]);
-
 
   return (
     <SampleContext.Provider value={sampleContext}>
@@ -142,7 +141,6 @@ const App = (): React.ReactElement => {
                   exact
                   path={Routes.HELP_MODAL_PAGE}
                   component={HelpModalPage}
-                  
                 />
                 <Route exact path="*" component={NotFound} />
               </Switch>

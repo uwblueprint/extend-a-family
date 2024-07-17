@@ -1,11 +1,17 @@
 import React, { useState } from "react";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel } from "@mui/material";
-import { TextareaAutosize } from '@mui/base/TextareaAutosize';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
 
 const HelpModalPage = (): React.ReactElement => {
   const [open, setOpen] = useState(false);
-  
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -15,45 +21,24 @@ const HelpModalPage = (): React.ReactElement => {
   };
 
   const handleSubmit = () => {
-    console.log("submit")
+    console.log("submit");
     handleClose();
-  }
+  };
 
   return (
     <div style={{ textAlign: "center", width: "25%", margin: "0px auto" }}>
       Help Modal
-      <Button onClick={handleClickOpen}>
-        Help?
-      </Button>
-
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        maxWidth="md"
-        fullWidth
-      >
+      <Button onClick={handleClickOpen}>Help?</Button>
+      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle>Help with Content</DialogTitle>
         <DialogContent>
           <DialogContentText>
             What are you having trouble with?
           </DialogContentText>
-          <Box
-            noValidate
-            component="form"
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              m: 'auto',
-              width: 'fit-content',
-            }}
-          >
-            <FormControl sx={{ mt: 2, minWidth: 120 }}>
-              <InputLabel htmlFor="max-width">maxWidth</InputLabel>
-              <TextareaAutosize aria-label="minimum height" minRows={3} placeholder="Minimum 3 rows" />
-            </FormControl>
-          </Box>
+          <textarea aria-label="help message" />
         </DialogContent>
         <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleSubmit}>Send</Button>
         </DialogActions>
       </Dialog>
