@@ -85,32 +85,37 @@ const Welcome = (): React.ReactElement => {
   const AdminButton = styled.button({
     backgroundColor: "#FFDBCF",
     width: "50%",
+    textAlign: "left"
   }) 
 
   const FacilitatorButton = styled.button({
     backgroundColor: "#E0E0FF",
     width: "50%",
+    textAlign: "left"
   });
 
   return (
     <Container 
-      style={{display: "flex", flexDirection: "column", padding: "50px"}}>
+      style={{height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center",  alignItems: "center", textAlign: "left"}}>
       <Container
-        style={{ height: "60vh",width:"80vw", display: "flex", alignItems: "center", textAlign: "left"}}
+        style={{ height: "60%", display: "flex", alignItems: "center", textAlign: "left", padding: "0" }}
       >
-        <Box style={{height:"100%", width: "50%", flex: 1 }}>
+        <Box style={{height:"100%", flex: 1 }}>
           <ImageOverlay
             backgroundImage={background}
             iconImage={icon}
             title="Smart Saving, Smart Spending"
           />
         </Box>
-        <Box style={{ height:"100%", width: "50%", flex: 1 }}>
+        <Box style={{ height:"100%", flex: 1 }}>
           <Box
             style={{
               backgroundColor: "#F5FAFC",
               height: "100%",
               padding:"50px 20px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
             }}
           >
             <Typography variant="h4">Learner Login</Typography>
@@ -153,7 +158,7 @@ const Welcome = (): React.ReactElement => {
         </Box>
       </Container>
       <div
-        style={{ width: "100%", marginTop: "16px", display: "flex", gap: "10px" }}
+        style={{ width: "100%", marginTop: "16px", display: "flex", gap: "10px", }}
         className="button-container"
       >
         <AdminButton
