@@ -67,7 +67,7 @@ firebaseAdmin.initializeApp({
 app.listen({ port: process.env.PORT || 8080 }, () => {
   /* eslint-disable-next-line no-console */
   console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
-  runTests().catch((error) => console.error("Error running tests:", error));
+  // runTests().catch((error) => console.error("Error running tests:", error));
 
 });
 
