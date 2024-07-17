@@ -67,6 +67,8 @@ firebaseAdmin.initializeApp({
 app.listen({ port: process.env.PORT || 8080 }, () => {
   /* eslint-disable-next-line no-console */
   console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
+  runTests().catch((error) => console.error("Error running tests:", error));
+
 });
 
 // Testing function for new user relations (to be deleted)
@@ -98,8 +100,3 @@ async function runTests() {
     await mongoose.disconnect();
   }
 }
-
-app.listen({ port: process.env.PORT || 8080 }, () => {
-  /* eslint-disable-next-line no-console */
-  runTests().catch((error) => console.error("Error running tests:", error));
-});

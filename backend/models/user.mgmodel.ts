@@ -41,8 +41,7 @@ const UserSchema: Schema = new Schema(
 );
 =======
 const baseOptions = {
-  discriminatorKey: "type",
-  collection: "user",
+  discriminatorKey: "role",
 };
 
 const UserSchema: Schema = new Schema(
@@ -70,6 +69,8 @@ const UserSchema: Schema = new Schema(
 
 const UserModel = mongoose.model<User>("User", UserSchema);
 
+const AdministratorSchema = new Schema({});
+
 const FacilitatorSchema = new Schema({
   learners: { type: [String], default: [] },
 });
@@ -79,6 +80,7 @@ const LearnerSchema = new Schema({
   facilitator: { type: String, required: true },
 });
 
+const Administrator = UserModel.discriminator("Administrator", AdministratorSchema);
 const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
 const Learner = UserModel.discriminator("Learner", LearnerSchema);
 
