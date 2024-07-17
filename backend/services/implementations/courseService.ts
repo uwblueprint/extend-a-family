@@ -12,14 +12,13 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 const Logger = logger(__filename);
 
 class CourseService implements ICourseService {
-  async getCourses(): Promise<Array<CourseUnitDTO>> {
+  async getCourseUnits(): Promise<Array<CourseUnitDTO>> {
     try {
       const courses: Array<CourseUnit> = await MgCourseUnit.find();
       return courses.map((course) => ({
         id: course.id,
         displayIndex: course.displayIndex,
         title: course.title,
-        modules: course.modules,
       }));
     } catch (error) {
       Logger.error(
@@ -29,7 +28,7 @@ class CourseService implements ICourseService {
     }
   }
 
-  async createCourse(course: CreateCourseUnitDTO): Promise<CourseUnitDTO> {
+  async createCourseUnit(course: CreateCourseUnitDTO): Promise<CourseUnitDTO> {
     let newCourse: CourseUnit | null;
     try {
       const largestDisplayIndexCourse = await MgCourseUnit.findOne().sort({
@@ -51,18 +50,17 @@ class CourseService implements ICourseService {
       id: newCourse.id,
       displayIndex: newCourse.displayIndex,
       title: newCourse.title,
-      modules: newCourse.modules,
     };
   }
 
-  async updateCourse(
-    id: string,
+  async updateCourseUnit(
+    displayIndex: number,
     course: UpdateCourseUnitDTO,
   ): Promise<CourseUnitDTO> {
     let oldCourse: CourseUnit | null;
     try {
-      oldCourse = await MgCourseUnit.findByIdAndUpdate(
-        id,
+      oldCourse = await MgCourseUnit.findOneAndUpdate(
+        { displayIndex },
         {
           title: course.title,
         },
@@ -70,7 +68,9 @@ class CourseService implements ICourseService {
       );
 
       if (!oldCourse) {
-        throw new Error(`Course unit Id ${id} not found.`);
+        throw new Error(
+          `Course unit with display index ${displayIndex} not found.`,
+        );
       }
     } catch (error) {
       Logger.error(
@@ -79,30 +79,29 @@ class CourseService implements ICourseService {
       throw error;
     }
     return {
-      id,
+      id: oldCourse.id,
       title: course.title,
-      modules: oldCourse.modules,
       displayIndex: oldCourse.displayIndex,
     };
   }
 
-  async deleteCourse(id: string): Promise<string> {
+  async deleteCourseUnit(displayIndex: number): Promise<number> {
     try {
-      const deletedCourseUnit: CourseUnit | null = await MgCourseUnit.findByIdAndDelete(
-        id,
-      );
+      const deletedCourseUnit: CourseUnit | null =
+        await MgCourseUnit.findOneAndDelete({ displayIndex });
       if (!deletedCourseUnit) {
-        throw new Error(`Course unit id ${id} not found`);
+        throw new Error(
+          `Course unit with display index ${displayIndex} not found`,
+        );
       }
 
       // get the index and update the ones behind it
-      const { displayIndex } = deletedCourseUnit;
       await MgCourseUnit.updateMany(
         { displayIndex: { $gt: displayIndex } },
         { $inc: { displayIndex: -1 } },
       );
 
-      return id;
+      return displayIndex;
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete course unit. Reason = ${getErrorMessage(error)}`,

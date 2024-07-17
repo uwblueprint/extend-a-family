@@ -1,10 +1,7 @@
-import { Module } from "../models/courseunit.mgmodel";
-
 export type CourseUnitDTO = {
   id: string;
   displayIndex: number;
   title: string;
-  modules: [Module];
 };
 
 export type CreateCourseUnitDTO = Omit<

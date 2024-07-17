@@ -1,7 +1,5 @@
 import { Router } from "express";
 import CourseService from "../services/implementations/courseService";
-import { sendResponseByMimeType } from "../utilities/responseUtil";
-import { CourseUnitDTO } from "../types/courseTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
 import {
   createCourseUnitDtoValidator,
@@ -16,15 +14,9 @@ courseRouter.get(
   "/",
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
-    const contentType = req.headers["content-type"];
     try {
-      const courses = await courseService.getCourses();
-      await sendResponseByMimeType<CourseUnitDTO>(
-        res,
-        200,
-        contentType,
-        courses,
-      );
+      const courses = await courseService.getCourseUnits();
+      res.status(200).json(courses);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }
@@ -37,7 +29,7 @@ courseRouter.post(
   createCourseUnitDtoValidator,
   async (req, res) => {
     try {
-      const newCourse = await courseService.createCourse({
+      const newCourse = await courseService.createCourseUnit({
         title: req.body.title,
       });
       res.status(201).json(newCourse);
@@ -48,15 +40,18 @@ courseRouter.post(
 );
 
 courseRouter.put(
-  "/:id",
+  "/:displayIndex",
   isAuthorizedByRole(new Set(["Administrator"])),
   updateCourseUnitDtoValidator,
   async (req, res) => {
-    const { id } = req.params;
+    const { displayIndex } = req.params;
     try {
-      const course = await courseService.updateCourse(id, {
-        title: req.body.title,
-      });
+      const course = await courseService.updateCourseUnit(
+        parseInt(displayIndex, 10),
+        {
+          title: req.body.title,
+        },
+      );
       res.status(200).json(course);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
@@ -65,13 +60,15 @@ courseRouter.put(
 );
 
 courseRouter.delete(
-  "/:id",
+  "/:displayIndex",
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
-    const { id } = req.params;
+    const { displayIndex } = req.params;
     try {
-      const deletedId = await courseService.deleteCourse(id);
-      res.status(200).json({ id: deletedId });
+      const deletedDisplayIndex = await courseService.deleteCourseUnit(
+        parseInt(displayIndex, 10),
+      );
+      res.status(200).json({ displayIndex: deletedDisplayIndex });
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }
