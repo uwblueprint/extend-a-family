@@ -11,7 +11,11 @@ export interface User extends Document {
   status: Status;
 }
 
-<<<<<<< HEAD
+const baseOptions = {
+  discriminatorKey: "role",
+  timestamps: true ,
+};
+
 const UserSchema: Schema = new Schema(
   {
     firstName: {
@@ -37,33 +41,6 @@ const UserSchema: Schema = new Schema(
       enum: ["Invited", "Active"],
     },
   },
-  { timestamps: true },
-);
-=======
-const baseOptions = {
-  discriminatorKey: "role",
-};
-
-const UserSchema: Schema = new Schema(
-  {
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    authId: {
-      type: String,
-      required: true,
-    },
-    role: {
-      type: String,
-      required: true,
-      enum: ["Administrator", "Facilitator", "Learner"],
-    },
-  },
   baseOptions,
 );
 
@@ -74,7 +51,6 @@ const AdministratorSchema = new Schema({});
 const FacilitatorSchema = new Schema({
   learners: { type: [String], default: [] },
 });
->>>>>>> 17d46aa (added discriminator for learner and facilitator)
 
 const LearnerSchema = new Schema({
   facilitator: { type: String, required: true },
