@@ -16,7 +16,7 @@ const baseOptions = {
   collection: "user",
 };
 
-const UserSchema: Schema = new Schema(
+export const UserSchema: Schema = new Schema(
   {
     firstName: {
       type: String,

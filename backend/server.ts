@@ -12,6 +12,7 @@ import { mongo } from "./models";
 import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
+import registerNotificationHandlers from "./sockets/notification";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -47,8 +48,20 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+
 io.on("connection", (socket) => {
   console.log("connected to", socket.id);
+  const { userId } = socket.handshake.query;
+
+  // so we can use mongodb id as the key to emit to instead
+  if (!userId) return;
+  socket.join(userId);
+
+  registerNotificationHandlers(io, socket);
+
+  socket.on("disconnect", () => {
+    console.log("disconnected", userId);
+  });
 });
 
 app.use(cookieParser());
@@ -61,6 +74,8 @@ app.use("/auth", authRouter);
 app.use("/entities", entityRouter);
 app.use("/users", userRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.set("io", io);
 
 mongo.connect();
 
