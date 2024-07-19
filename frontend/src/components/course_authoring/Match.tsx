@@ -19,6 +19,8 @@ const Node = ({ data, handleType }) => {
         backgroundColor: "#e9ecef",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+        height: data.height,
+        width: data.width,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-5px)";
@@ -75,6 +77,44 @@ const initialNodes = [];
 
 const initialEdges = [];
 
+const temp_dimensions = {
+  "node-0-0": { width: 75, height: 75 },
+  "node-0-1": { width: 75, height: 75 },
+  "node-0-2": { width: 75, height: 75 },
+  "node-1-0": { width: 75, height: 75 },
+  "node-1-1": { width: 100, height: 75 },
+  "node-1-2": { width: 150, height: 75 },
+  "node-2-0": { width: 75, height: 75 },
+  "node-2-1": { width: 75, height: 75 },
+  "node-2-2": { width: 75, height: 75 },
+}
+
+const getXcoord = (
+  gridWidth: number,
+  col: number,
+  numCols: number,
+  boxWidth: number,
+) => {
+  if (col == 0) {
+    return 0;
+  }
+
+  if (numCols == 2) {
+    return gridWidth - boxWidth;
+  }
+
+  if (numCols == 3) {
+    const midpoint = gridWidth / 2;
+    if (col == 1) {
+      return midpoint - boxWidth / 2;
+    }
+    return gridWidth - boxWidth;
+  }
+
+  return 0; // this case should never happen as long as max 3 columns
+
+}
+
 interface MatchProps {
   numRows?: number;
   numCols?: number;
@@ -84,9 +124,16 @@ interface ComponentProps {
   i: string;
   w: number;
   h: number;
+  dimensions?: { [key: string]: { width: number; height: number } };
 }
 
-const Match: React.FC<ComponentProps> = ({ componentData, i, w, h }) => {
+const Match: React.FC<ComponentProps> = ({
+  componentData,
+  i,
+  w,
+  h,
+  dimensions = temp_dimensions,
+}) => {
   const { numRows = 0, numCols = 0 } = componentData || {};
 
   const [nodes, setNodes] = useState(initialNodes);
@@ -102,18 +149,42 @@ const Match: React.FC<ComponentProps> = ({ componentData, i, w, h }) => {
     const newNodes = [];
     for (let row = 0; row < insertRows; row++) {
       for (let col = 0; col < insertCols; col++) {
+        const nodeWidth = dimensions[`node-${row}-${col}`]?.width ?? 100;
+        const nodeHeight = dimensions[`node-${row}-${col}`]?.height ?? 100;
         newNodes.push({
           id: `node-${row}-${col}`,
           type: getNodeType(col, insertCols),
           position: {
-            x: 0 + (col % insertCols) * 200,
+            x: getXcoord(w, col, insertCols, nodeWidth),
             y: row * (h / insertRows),
           },
-          data: { label: `Node ${row}-${col}`, index: row * insertCols + col },
+          data: { 
+            label: `Node ${row}-${col}`, 
+            index: row * insertCols + col,
+            width: nodeWidth,
+            height: nodeHeight,
+        },
         });
       }
     }
     setNodes(newNodes);
+  };
+
+  const modifyNodes = (id: string, data: any) => {
+    setNodes((prevNodes) =>
+      prevNodes.map((node) => {
+        if (node.id === id) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              ...data,
+            },
+          };
+        }
+        return node;
+      }),
+    );
   };
 
   useEffect(() => {
