@@ -168,21 +168,32 @@ authRouter.post(
   },
 );
 
-/* Reset password through a "Forgot Password" option */
+// /* Reset password through a "Forgot Password" option */
 authRouter.post(
   "/forgotPassword",
   forgotPasswordRequestValidator,
   async (req, res) => {
     try {
-      try {
-        await userService.getUserByEmail(req.body.email);
-        await authService.resetPassword(req.body.email);
-        res.status(204).send();
-      } catch (error) {
-        res.status(401).json({ error: "EMAIL_NOT_FOUND" });
-      }
+      await userService.getUserByEmail(req.body.email);
+      await authService.resetPassword(req.body.email);
+      res.status(204).send();
     } catch (error: unknown) {
-      res.status(500).json({ error: getErrorMessage(error) });
+      if (
+        // Email address is not registered
+        error instanceof Error &&
+        error.message ===
+          "There is no user record corresponding to the provided identifier."
+      ) {
+        res.status(401).json({ error: "EMAIL_NOT_FOUND" });
+      } else if (
+        // Given string is not in a valid email format
+        error instanceof Error &&
+        error.message === "The email address is improperly formatted."
+      ) {
+        res.status(401).json({ error: "NOT_VALID_EMAIL_ADDRESS_FORMAT" });
+      } else {
+        res.status(500).json({ error: getErrorMessage(error) });
+      }
     }
   },
 );
