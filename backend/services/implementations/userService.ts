@@ -63,7 +63,7 @@ class UserService implements IUserService {
       }
     } catch (error: unknown) {
       Logger.error(`Failed to get user. Reason = ${getErrorMessage(error)}`);
-      throw error;
+      throw new Error("EMAIL_NOT_FOUND");
     }
 
     return {
