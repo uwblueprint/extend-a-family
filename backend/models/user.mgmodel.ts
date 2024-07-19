@@ -44,6 +44,18 @@ const UserSchema: Schema = new Schema(
   baseOptions,
 );
 
+/* eslint-disable no-param-reassign */
+UserSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc: Document, ret: Record<string, unknown>) => {
+    // eslint-disable-next-line no-underscore-dangle
+    delete ret._id;
+    delete ret.createdAt;
+    delete ret.updatedAt;
+  },
+});
+
 const UserModel = mongoose.model<User>("User", UserSchema);
 
 const AdministratorSchema = new Schema({});
