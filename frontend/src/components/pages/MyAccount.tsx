@@ -1,18 +1,13 @@
-import React, { useContext } from "react";
-import { Redirect } from "react-router-dom";
+import React from "react";
 import MainPageButton from "../common/MainPageButton";
-import AuthContext from "../../contexts/AuthContext";
 import {
   isAuthenticatedFacilitator,
   isAuthenticatedLearner,
 } from "../../types/AuthTypes";
-import { WELCOME_PAGE } from "../../constants/Routes";
+import { useUser } from "../../hooks/useUser";
 
 const MyAccount = (): React.ReactElement => {
-  const { authenticatedUser } = useContext(AuthContext);
-  if (!authenticatedUser) {
-    return <Redirect to={WELCOME_PAGE} />;
-  }
+  const authenticatedUser = useUser();
   return (
     <div style={{ textAlign: "center", width: "25%", margin: "0px auto" }}>
       <h1>My Account</h1>
