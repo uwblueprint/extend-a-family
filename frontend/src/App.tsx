@@ -31,12 +31,11 @@ import * as Routes from "./constants/Routes";
 import ManageUserPage from "./components/pages/ManageUserPage";
 
 const App = (): React.ReactElement => {
-  const currentUser: AuthenticatedUser = getLocalStorageObj<AuthenticatedUser>(
-    AUTHENTICATED_USER_KEY,
-  );
+  const currentUser: AuthenticatedUser | null =
+    getLocalStorageObj<AuthenticatedUser | null>(AUTHENTICATED_USER_KEY);
 
   const [authenticatedUser, setAuthenticatedUser] =
-    useState<AuthenticatedUser>(currentUser);
+    useState<AuthenticatedUser | null>(currentUser);
 
   // Some sort of global state. Context API replaces redux.
   // Split related states into different contexts as necessary.

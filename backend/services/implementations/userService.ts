@@ -41,12 +41,8 @@ class UserService implements IUserService {
     }
 
     return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      ...user.toJSON(),
       email: firebaseUser.email ?? "",
-      role: user.role,
-      status: user.status,
     };
   }
 
@@ -67,12 +63,8 @@ class UserService implements IUserService {
     }
 
     return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      ...user.toJSON(),
       email: firebaseUser.email ?? "",
-      role: user.role,
-      status: user.status,
     };
   }
 
@@ -131,12 +123,8 @@ class UserService implements IUserService {
           }
 
           return {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            ...user.toJSON(),
             email: firebaseUser.email ?? "",
-            role: user.role,
-            status: user.status,
           };
         }),
       );
@@ -188,12 +176,8 @@ class UserService implements IUserService {
     }
 
     return {
-      id: newUser.id,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
+      ...newUser.toJSON(),
       email: firebaseUser.email ?? "",
-      role: newUser.role,
-      status: newUser.status,
     };
   }
 
@@ -247,7 +231,7 @@ class UserService implements IUserService {
     }
 
     return {
-      id: userId,
+      ...oldUser.toJSON(),
       firstName: user.firstName,
       lastName: user.lastName,
       email: updatedFirebaseUser.email ?? "",
@@ -268,13 +252,9 @@ class UserService implements IUserService {
         await firebaseAdmin.auth().deleteUser(deletedUser.authId);
       } catch (error) {
         // rollback user deletion in MongoDB
+        const { id, ...rest } = deletedUser.toJSON();
         try {
-          await MgUser.create({
-            firstName: deletedUser.firstName,
-            lastName: deletedUser.lastName,
-            authId: deletedUser.authId,
-            role: deletedUser.role,
-          });
+          await MgUser.create(rest);
         } catch (mongoDbError: unknown) {
           const errorMessage = [
             "Failed to rollback MongoDB user deletion after Firebase user deletion failure. Reason =",
@@ -309,14 +289,10 @@ class UserService implements IUserService {
       try {
         await firebaseAdmin.auth().deleteUser(firebaseUser.uid);
       } catch (error) {
+        // rollback user deletion in MongoDB
+        const { id, ...rest } = deletedUser.toJSON();
         try {
-          // rollback user deletion in MongoDB
-          await MgUser.create({
-            firstName: deletedUser.firstName,
-            lastName: deletedUser.lastName,
-            authId: deletedUser.authId,
-            role: deletedUser.role,
-          });
+          await MgUser.create(rest);
         } catch (mongoDbError: unknown) {
           const errorMessage = [
             "Failed to rollback MongoDB user deletion after Firebase user deletion failure. Reason =",
@@ -354,12 +330,8 @@ class UserService implements IUserService {
           }
 
           return {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            ...user.toJSON(),
             email: firebaseUser.email ?? "",
-            role: user.role,
-            status: user.status,
           };
         }),
       );
