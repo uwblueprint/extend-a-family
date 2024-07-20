@@ -1,6 +1,6 @@
 export type Role = "Administrator" | "Facilitator" | "Learner";
 
-export type BaseAuthenticatedUser = {
+export type AuthenticatedUser = {
   id: string;
   firstName: string;
   lastName: string;
@@ -9,19 +9,13 @@ export type BaseAuthenticatedUser = {
   accessToken: string;
 };
 
-export type AuthenticatedAdministrator = BaseAuthenticatedUser;
-export type AuthenticatedFacilitator = BaseAuthenticatedUser & {
+export type AuthenticatedAdministrator = AuthenticatedUser;
+export type AuthenticatedFacilitator = AuthenticatedUser & {
   learners: string[];
 };
-export type AuthenticatedLearner = BaseAuthenticatedUser & {
+export type AuthenticatedLearner = AuthenticatedUser & {
   facilitator: string;
 };
-
-export type AuthenticatedUser =
-  | AuthenticatedAdministrator
-  | AuthenticatedFacilitator
-  | AuthenticatedLearner
-  | null;
 
 export type DecodedJWT =
   | string
@@ -31,17 +25,17 @@ export type DecodedJWT =
 export function isAuthenticatedAdministrator(
   user: AuthenticatedUser,
 ): user is AuthenticatedAdministrator {
-  return user?.role === "Administrator";
+  return user.role === "Administrator";
 }
 
 export function isAuthenticatedFacilitator(
   user: AuthenticatedUser,
 ): user is AuthenticatedFacilitator {
-  return user?.role === "Facilitator";
+  return user.role === "Facilitator";
 }
 
 export function isAuthenticatedLearner(
   user: AuthenticatedUser,
 ): user is AuthenticatedLearner {
-  return user?.role === "Learner";
+  return user.role === "Learner";
 }
