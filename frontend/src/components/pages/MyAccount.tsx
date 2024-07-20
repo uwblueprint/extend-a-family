@@ -1,6 +1,10 @@
 import React, { useContext } from "react";
 import MainPageButton from "../common/MainPageButton";
 import AuthContext from "../../contexts/AuthContext";
+import {
+  isAuthenticatedFacilitator,
+  isAuthenticatedLearner,
+} from "../../types/AuthTypes";
 
 const MyAccount = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
@@ -12,6 +16,12 @@ const MyAccount = (): React.ReactElement => {
       <div style={{ marginBottom: "1rem" }}>
         Email: {authenticatedUser?.email}
       </div>
+      {isAuthenticatedFacilitator(authenticatedUser) && (
+        <div>learners : {authenticatedUser.learners}</div>
+      )}
+      {isAuthenticatedLearner(authenticatedUser) && (
+        <div>Facilitator : {authenticatedUser.facilitator}</div>
+      )}
       <MainPageButton />
     </div>
   );
