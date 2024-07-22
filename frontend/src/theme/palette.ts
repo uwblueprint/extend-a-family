@@ -1,17 +1,23 @@
+type RGB = `rgb(${number}, ${number}, ${number})`;
+type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;
+type HEX = `#${string}`;
+
+export type Color = RGB | RGBA | HEX;
+
 export type Palette = {
-  0: string;
-  10: string;
-  20: string;
-  30: string;
-  40: string;
-  50: string;
-  60: string;
-  70: string;
-  80: string;
-  90: string;
-  95: string;
-  99: string;
-  100: string;
+  0: Color;
+  10: Color;
+  20: Color;
+  30: Color;
+  40: Color;
+  50: Color;
+  60: Color;
+  70: Color;
+  80: Color;
+  90: Color;
+  95: Color;
+  99: Color;
+  100: Color;
 };
 
 // Defined in Figma Design Document

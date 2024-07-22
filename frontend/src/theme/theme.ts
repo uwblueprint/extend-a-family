@@ -42,9 +42,6 @@ declare module "@mui/material/styles" {
   }
 
   interface Theme {
-    status: {
-      danger: string;
-    };
     palette: PaletteOptions;
     typography: TypographyOptions;
   }
