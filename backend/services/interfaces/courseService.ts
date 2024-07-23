@@ -16,7 +16,7 @@ interface ICourseService {
    * @param course the info (currently just title) about course we want to create
    * @throws Error if course was not successfully created
    */
-  createCourseUnit(course: CreateCourseUnitDTO): Promise<CourseUnitDTO>;
+  createCourseUnit(courseUnit: CreateCourseUnitDTO): Promise<CourseUnitDTO>;
 
   /**
    * Updates 1 specific course unit
@@ -26,7 +26,7 @@ interface ICourseService {
    */
   updateCourseUnit(
     displayIndex: number,
-    course: UpdateCourseUnitDTO,
+    courseUnit: UpdateCourseUnitDTO,
   ): Promise<CourseUnitDTO>;
 
   /**

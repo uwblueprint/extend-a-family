@@ -14,31 +14,27 @@ const Logger = logger(__filename);
 class CourseService implements ICourseService {
   async getCourseUnits(): Promise<Array<CourseUnitDTO>> {
     try {
-      const courses: Array<CourseUnit> = await MgCourseUnit.find();
-      return courses.map((course) => ({
-        id: course.id,
-        displayIndex: course.displayIndex,
-        title: course.title,
+      const courseUnits: Array<CourseUnit> = await MgCourseUnit.find();
+      return courseUnits.map((courseUnit) => ({
+        id: courseUnit.id,
+        displayIndex: courseUnit.displayIndex,
+        title: courseUnit.title,
       }));
     } catch (error) {
-      Logger.error(
-        `Failed to get courses, . Reason = ${getErrorMessage(error)}`,
-      );
+      Logger.error(`Failed to get courses. Reason = ${getErrorMessage(error)}`);
       throw error;
     }
   }
 
-  async createCourseUnit(course: CreateCourseUnitDTO): Promise<CourseUnitDTO> {
-    let newCourse: CourseUnit | null;
+  async createCourseUnit(
+    courseUnit: CreateCourseUnitDTO,
+  ): Promise<CourseUnitDTO> {
+    let newCourseUnit: CourseUnit | null;
     try {
-      const largestDisplayIndexCourse = await MgCourseUnit.findOne().sort({
-        displayIndex: -1,
-      });
-      newCourse = await MgCourseUnit.create({
-        ...course,
-        displayIndex: largestDisplayIndexCourse
-          ? largestDisplayIndexCourse.displayIndex + 1
-          : 0,
+      const numCourseUnits = await MgCourseUnit.countDocuments();
+      newCourseUnit = await MgCourseUnit.create({
+        ...courseUnit,
+        displayIndex: numCourseUnits + 1,
       });
     } catch (error) {
       Logger.error(
@@ -47,22 +43,22 @@ class CourseService implements ICourseService {
       throw error;
     }
     return {
-      id: newCourse.id,
-      displayIndex: newCourse.displayIndex,
-      title: newCourse.title,
+      id: newCourseUnit.id,
+      displayIndex: newCourseUnit.displayIndex,
+      title: newCourseUnit.title,
     };
   }
 
   async updateCourseUnit(
     displayIndex: number,
-    course: UpdateCourseUnitDTO,
+    courseUnit: UpdateCourseUnitDTO,
   ): Promise<CourseUnitDTO> {
     let oldCourse: CourseUnit | null;
     try {
       oldCourse = await MgCourseUnit.findOneAndUpdate(
         { displayIndex },
         {
-          title: course.title,
+          title: courseUnit.title,
         },
         { runValidators: true },
       );
@@ -80,7 +76,7 @@ class CourseService implements ICourseService {
     }
     return {
       id: oldCourse.id,
-      title: course.title,
+      title: courseUnit.title,
       displayIndex: oldCourse.displayIndex,
     };
   }

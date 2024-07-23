@@ -4,15 +4,9 @@ export type CourseUnitDTO = {
   title: string;
 };
 
-export type CreateCourseUnitDTO = Omit<
-  CourseUnitDTO,
-  "id" | "modules" | "displayIndex"
->;
+export type CreateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 
-export type UpdateCourseUnitDTO = Omit<
-  CourseUnitDTO,
-  "id" | "modules" | "displayIndex"
->;
+export type UpdateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 
 export enum InteractiveElementType {
   TextInput = "TextInput",
