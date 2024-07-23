@@ -61,3 +61,15 @@ export const inviteAdminRequestValidator = async (
 
   return next();
 };
+
+export const forgotPasswordRequestValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.email, "string")) {
+    return res.status(400).send(getApiValidationError("email", "string"));
+  }
+
+  return next();
+};

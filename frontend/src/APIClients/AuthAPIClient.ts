@@ -9,7 +9,7 @@ import {
 const login = async (
   email: string,
   password: string,
-): Promise<AuthenticatedUser> => {
+): Promise<AuthenticatedUser | null> => {
   try {
     const { data } = await baseAPIClient.post(
       "/auth/login",
@@ -46,7 +46,7 @@ const signup = async (
   email: string,
   password: string,
   role: string, // Added role parameter
-): Promise<AuthenticatedUser> => {
+): Promise<AuthenticatedUser | null> => {
   try {
     const { data } = await baseAPIClient.post(
       "/auth/signup",

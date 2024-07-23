@@ -8,7 +8,8 @@
     "dev": "nodemon -L",
     "lint": "eslint . --ext .ts,.js",
     "fix": "eslint . --ext .ts,.js --fix",
-    "postinstall": "tsc"
+    "postinstall": "tsc",
+    "sync-user-dbs": "ts-node ./scripts/sync-user-databases.ts"
   },
   "keywords": [],
   "author": "",
