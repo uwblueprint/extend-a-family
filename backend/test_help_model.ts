@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { mongo } from "./models";
-import UserModel, { Facilitator, Learner } from "./models/user.mgmodel";
+import { Facilitator, Learner } from "./models/user.mgmodel";
 import MgHelpRequest from "./models/helprequest.mgmodel";
 import MgCourseUnit from "./models/courseunit.mgmodel";
 
@@ -22,6 +22,7 @@ async function runTests() {
       authId: "123",
       role: "Facilitator",
       learners: ["learner1", "learner2"],
+      status: "Active",
     });
     await facilitator.save();
 
@@ -31,10 +32,11 @@ async function runTests() {
       authId: "456",
       role: "Learner",
       facilitator: "123",
+      status: "Active",
     });
     await learner.save();
 
-    const CourseUnit = await MgCourseUnit.create({
+    await MgCourseUnit.create({
       displayIndex: 1,
       title: "Fake title",
       modules: [
@@ -47,11 +49,11 @@ async function runTests() {
 
     await MgHelpRequest.create({
       message: "send help plz",
-      learner,
-      facilitator,
-      unit: CourseUnit.id,
-      module: CourseUnit.modules[0].id,
-      page: CourseUnit.modules[0].pages[0].id,
+      learner: learner.id,
+      facilitator: facilitator.id,
+      unit: 1, // now is this the displayIndex or is this the array index?
+      module: 0, // thse two are definitely the array index
+      page: 0,
     });
   } finally {
     await mongoose.disconnect();

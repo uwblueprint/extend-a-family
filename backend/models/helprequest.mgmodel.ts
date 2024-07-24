@@ -1,19 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
-import {
-  Facilitator,
-  FacilitatorSchema,
-  Learner,
-  LearnerSchema,
-} from "./user.mgmodel";
 
 export interface HelpRequest extends Document {
   id: string;
   message: string;
-  learner: typeof Learner;
-  facilitator: typeof Facilitator;
-  unit: string;
-  module: string;
-  page: string;
+  learner: string;
+  facilitator: string;
+  unit: number;
+  module: number;
+  page: number;
 }
 
 const HelpRequestSchema: Schema = new Schema(
@@ -23,23 +17,23 @@ const HelpRequestSchema: Schema = new Schema(
       required: true,
     },
     learner: {
-      type: LearnerSchema,
+      type: String,
       required: true,
     },
     facilitator: {
-      type: FacilitatorSchema,
+      type: String,
       required: true,
     },
     unit: {
-      type: String,
+      type: Number,
       required: true,
     },
     module: {
-      type: String,
+      type: Number,
       required: true,
     },
     page: {
-      type: String,
+      type: Number,
       required: true,
     },
   },
