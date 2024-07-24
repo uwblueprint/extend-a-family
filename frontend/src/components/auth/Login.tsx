@@ -8,6 +8,8 @@ import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { PresentableError } from "../../types/ErrorTypes";
 import { authErrors, defaultAuthError } from "../../errors/AuthErrors";
+import { isRole } from "../../types/UserTypes";
+
 
 const Login = (): React.ReactElement => {
   const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
@@ -19,13 +21,13 @@ const Login = (): React.ReactElement => {
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const role = searchParams.get("role");
+  const role = capitalizeFirstLetter(searchParams.get("role"));
 
   if (authenticatedUser) {
     return <Redirect to={HOME_PAGE} />;
   }
 
-  if (!role || !["administrator", "facilitator", "learner"].includes(role)) {
+  if (!role || !isRole(role)) {
     return <Redirect to={WELCOME_PAGE} />;
   }
 
@@ -36,35 +38,14 @@ const Login = (): React.ReactElement => {
       const user: AuthenticatedUser | null = await authAPIClient.login(
         email,
         password,
+        role,
       );
-      const isUserVerified = user?.accessToken
-        ? await authAPIClient.isUserVerified(email, user.accessToken)
-        : null;
-      if (!user || !isUserVerified) {
-        // will need to change this for different errors
-        // eslint-disable-next-line no-alert
-        alert("Bad login, user not found");
-        return;
-      }
-      if (user.role.toLowerCase() !== role.toLowerCase()) {
-        // change this later to not use an alert
-        // eslint-disable-next-line no-alert
-        alert(`Bad login. Expected ${user.role}, got ${role}`);
-        return;
-      }
 
       localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
       setAuthenticatedUser(user);
     } catch (e: unknown) {
-      if (e instanceof Error) {
-        const errorCode = e.message;
-        const errorContent = authErrors[errorCode] ?? defaultAuthError;
-        if (errorCode === "EMAIL_NOT_FOUND") {
-          setEmailError(errorContent);
-        } else {
-          setLoginError(errorContent);
-        }
-      }
+      // eslint-disable-next-line no-alert
+      alert("bad!");
     }
   };
 
@@ -116,7 +97,7 @@ const Login = (): React.ReactElement => {
           </button>
         </div>
       </form>
-      {role === "facilitator" && (
+      {role === "Facilitator" && (
         <div>
           <button
             className="btn btn-primary"

@@ -61,6 +61,13 @@ interface IAuthService {
   isAuthorizedByRole(accessToken: string, roles: Set<Role>): Promise<boolean>;
 
   /**
+   * Determine the corresponding Roles to the access key
+   * @param accessToken user's access token
+   * @returns Role if token valid and authorized, null otherwise
+   */
+  correctRole(accessToken: string): Promise<Role | null>;
+
+  /**
    * Determine if the provided access token is valid and issued to the requested user
    * @param accessToken user's access token
    * @param requestedUserId userId of requested user
