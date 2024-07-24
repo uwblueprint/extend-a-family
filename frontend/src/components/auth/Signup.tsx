@@ -25,7 +25,7 @@ const Signup = (): React.ReactElement => {
   }
 
   const onSignupClick = async () => {
-    const user: AuthenticatedUser = await authAPIClient.signup(
+    const user: AuthenticatedUser | null = await authAPIClient.signup(
       firstName,
       lastName,
       email,

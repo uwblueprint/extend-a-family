@@ -8,6 +8,7 @@ import Signup from "./components/auth/Signup";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import CreatePage from "./components/pages/CreatePage";
 import Default from "./components/pages/Default";
+import CreateModulePage from "./components/pages/CreateModulePage";
 import DisplayPage from "./components/pages/DisplayPage";
 import NotFound from "./components/pages/NotFound";
 import NotAuthorized from "./components/pages/NotAuthorized";
@@ -27,14 +28,14 @@ import HooksDemo from "./components/pages/HooksDemo";
 import { AuthenticatedUser } from "./types/AuthTypes";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import * as Routes from "./constants/Routes";
+import ManageUserPage from "./components/pages/ManageUserPage";
 
 const App = (): React.ReactElement => {
-  const currentUser: AuthenticatedUser = getLocalStorageObj<AuthenticatedUser>(
-    AUTHENTICATED_USER_KEY,
-  );
+  const currentUser: AuthenticatedUser | null =
+    getLocalStorageObj<AuthenticatedUser | null>(AUTHENTICATED_USER_KEY);
 
   const [authenticatedUser, setAuthenticatedUser] =
-    useState<AuthenticatedUser>(currentUser);
+    useState<AuthenticatedUser | null>(currentUser);
 
   // Some sort of global state. Context API replaces redux.
   // Split related states into different contexts as necessary.
@@ -104,6 +105,12 @@ const App = (): React.ReactElement => {
               />
               <PrivateRoute
                 exact
+                path={Routes.CREATE_MODULE_PAGE}
+                component={CreateModulePage}
+                allowedRoles={["Administrator"]}
+              />
+              <PrivateRoute
+                exact
                 path={Routes.EDIT_TEAM_PAGE}
                 component={EditTeamInfoPage}
                 allowedRoles={["Administrator", "Facilitator", "Learner"]}
@@ -112,6 +119,12 @@ const App = (): React.ReactElement => {
                 exact
                 path={Routes.NOT_AUTHORIZED_PAGE}
                 component={NotAuthorized}
+              />
+              <PrivateRoute
+                exact
+                path={Routes.MANAGE_USERS_PAGE}
+                component={ManageUserPage}
+                allowedRoles={["Administrator"]}
               />
               <Route exact path="*" component={NotFound} />
             </Switch>

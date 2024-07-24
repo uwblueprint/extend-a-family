@@ -17,5 +17,3 @@ export type NodemailerConfig = {
     refreshToken: string;
   };
 };
-
-export type SignupMethod = "PASSWORD" | "GOOGLE";

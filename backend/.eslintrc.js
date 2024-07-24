@@ -19,5 +19,5 @@ module.exports = {
     "prettier/prettier": ["error", { endOfLine: "auto" }],
     "import/prefer-default-export": "off",
   },
-  ignorePatterns: ["build/*"],
+  ignorePatterns: ["build/*", ".eslintrc.js"],
 };

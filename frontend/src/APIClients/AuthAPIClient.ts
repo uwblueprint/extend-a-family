@@ -10,7 +10,7 @@ import {
 const login = async (
   email: string,
   password: string,
-): Promise<AuthenticatedUser> => {
+): Promise<AuthenticatedUser | null> => {
   try {
     const { data } = await baseAPIClient.post(
       "/auth/login",
@@ -22,20 +22,6 @@ const login = async (
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.error);
     }
-    return null;
-  }
-};
-
-const loginWithGoogle = async (idToken: string): Promise<AuthenticatedUser> => {
-  try {
-    const { data } = await baseAPIClient.post(
-      "/auth/login",
-      { idToken },
-      { withCredentials: true },
-    );
-    localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(data));
-    return data;
-  } catch (error) {
     return null;
   }
 };
@@ -64,7 +50,7 @@ const signup = async (
   email: string,
   password: string,
   role: string, // Added role parameter
-): Promise<AuthenticatedUser> => {
+): Promise<AuthenticatedUser | null> => {
   try {
     const { data } = await baseAPIClient.post(
       "/auth/signup",
@@ -133,7 +119,6 @@ const isUserVerified = async (
 export default {
   login,
   logout,
-  loginWithGoogle,
   signup,
   resetPassword,
   refresh,

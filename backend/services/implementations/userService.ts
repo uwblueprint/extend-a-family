@@ -41,11 +41,8 @@ class UserService implements IUserService {
     }
 
     return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      ...user.toJSON(),
       email: firebaseUser.email ?? "",
-      role: user.role,
     };
   }
 
@@ -66,11 +63,8 @@ class UserService implements IUserService {
     }
 
     return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      ...user.toJSON(),
       email: firebaseUser.email ?? "",
-      role: user.role,
     };
   }
 
@@ -129,11 +123,8 @@ class UserService implements IUserService {
           }
 
           return {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            ...user.toJSON(),
             email: firebaseUser.email ?? "",
-            role: user.role,
           };
         }),
       );
@@ -145,25 +136,15 @@ class UserService implements IUserService {
     return userDtos;
   }
 
-  async createUser(
-    user: CreateUserDTO,
-    authId?: string,
-    signupMethod = "PASSWORD",
-  ): Promise<UserDTO> {
+  async createUser(user: CreateUserDTO): Promise<UserDTO> {
     let newUser: User;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
 
     try {
-      if (signupMethod === "GOOGLE") {
-        /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-        firebaseUser = await firebaseAdmin.auth().getUser(authId!);
-      } else {
-        // signupMethod === PASSWORD
-        firebaseUser = await firebaseAdmin.auth().createUser({
-          email: user.email,
-          password: user.password,
-        });
-      }
+      firebaseUser = await firebaseAdmin.auth().createUser({
+        email: user.email,
+        password: user.password,
+      });
 
       try {
         newUser = await MgUser.create({
@@ -171,6 +152,7 @@ class UserService implements IUserService {
           lastName: user.lastName,
           authId: firebaseUser.uid,
           role: user.role,
+          status: user.status,
         });
       } catch (mongoDbError) {
         // rollback user creation in Firebase
@@ -194,11 +176,8 @@ class UserService implements IUserService {
     }
 
     return {
-      id: newUser.id,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
+      ...newUser.toJSON(),
       email: firebaseUser.email ?? "",
-      role: newUser.role,
     };
   }
 
@@ -252,11 +231,12 @@ class UserService implements IUserService {
     }
 
     return {
-      id: userId,
+      ...oldUser.toJSON(),
       firstName: user.firstName,
       lastName: user.lastName,
       email: updatedFirebaseUser.email ?? "",
       role: user.role,
+      status: user.status,
     };
   }
 
@@ -272,13 +252,9 @@ class UserService implements IUserService {
         await firebaseAdmin.auth().deleteUser(deletedUser.authId);
       } catch (error) {
         // rollback user deletion in MongoDB
+        const { id, ...rest } = deletedUser.toJSON();
         try {
-          await MgUser.create({
-            firstName: deletedUser.firstName,
-            lastName: deletedUser.lastName,
-            authId: deletedUser.authId,
-            role: deletedUser.role,
-          });
+          await MgUser.create(rest);
         } catch (mongoDbError: unknown) {
           const errorMessage = [
             "Failed to rollback MongoDB user deletion after Firebase user deletion failure. Reason =",
@@ -313,14 +289,10 @@ class UserService implements IUserService {
       try {
         await firebaseAdmin.auth().deleteUser(firebaseUser.uid);
       } catch (error) {
+        // rollback user deletion in MongoDB
+        const { id, ...rest } = deletedUser.toJSON();
         try {
-          // rollback user deletion in MongoDB
-          await MgUser.create({
-            firstName: deletedUser.firstName,
-            lastName: deletedUser.lastName,
-            authId: deletedUser.authId,
-            role: deletedUser.role,
-          });
+          await MgUser.create(rest);
         } catch (mongoDbError: unknown) {
           const errorMessage = [
             "Failed to rollback MongoDB user deletion after Firebase user deletion failure. Reason =",
@@ -358,11 +330,8 @@ class UserService implements IUserService {
           }
 
           return {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            ...user.toJSON(),
             email: firebaseUser.email ?? "",
-            role: user.role,
           };
         }),
       );

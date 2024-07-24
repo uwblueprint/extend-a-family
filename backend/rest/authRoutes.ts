@@ -11,6 +11,7 @@ import {
   loginRequestValidator,
   signupRequestValidator,
   inviteAdminRequestValidator,
+  forgotPasswordRequestValidator,
 } from "../middlewares/validators/authValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -35,10 +36,10 @@ const cookieOptions: CookieOptions = {
 /* Returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
 authRouter.post("/login", loginRequestValidator, async (req, res) => {
   try {
-    const authDTO = req.body.idToken
-      ? // OAuth
-        await authService.generateTokenOAuth(req.body.idToken)
-      : await authService.generateToken(req.body.email, req.body.password);
+    const authDTO = await authService.generateToken(
+      req.body.email,
+      req.body.password,
+    );
 
     const { accessToken, refreshToken, ...rest } = authDTO;
     const isVerified = await authService.isAuthorizedByEmail(
@@ -68,6 +69,7 @@ authRouter.post("/signup", signupRequestValidator, async (req, res) => {
       email: req.body.email,
       role: req.body.role,
       password: req.body.password,
+      status: "Active",
     });
 
     const authDTO = await authService.generateToken(
@@ -164,9 +166,25 @@ authRouter.post(
         email: req.body.email,
         role: "Administrator",
         password: temporaryPassword,
+        status: "Invited",
       });
       await authService.sendAdminInvite(req.body.email, temporaryPassword);
       res.status(200).json(invitedAdminUser);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+// /* Reset password through a "Forgot Password" option */
+authRouter.post(
+  "/forgotPassword",
+  forgotPasswordRequestValidator,
+  async (req, res) => {
+    try {
+      await userService.getUserByEmail(req.body.email);
+      await authService.resetPassword(req.body.email);
+      res.status(204).send();
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }

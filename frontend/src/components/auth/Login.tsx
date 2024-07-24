@@ -1,10 +1,5 @@
 import React, { useContext, useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
-import {
-  GoogleLogin,
-  GoogleLoginResponse,
-  GoogleLoginResponseOffline,
-} from "react-google-login";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, SIGNUP_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
@@ -13,13 +8,6 @@ import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { PresentableError } from "../../types/ErrorTypes";
 import { authErrors, defaultAuthError } from "../../errors/AuthErrors";
-
-type GoogleResponse = GoogleLoginResponse | GoogleLoginResponseOffline;
-
-type GoogleErrorResponse = {
-  error: string;
-  details: string;
-};
 
 const Login = (): React.ReactElement => {
   const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
@@ -45,7 +33,7 @@ const Login = (): React.ReactElement => {
     try {
       setLoginError(undefined);
       setEmailError(undefined);
-      const user: AuthenticatedUser = await authAPIClient.login(
+      const user: AuthenticatedUser | null = await authAPIClient.login(
         email,
         password,
       );
@@ -82,13 +70,6 @@ const Login = (): React.ReactElement => {
 
   const onSignupClick = () => {
     history.push(`${SIGNUP_PAGE}?role=${role}`);
-  };
-
-  const onGoogleLoginSuccess = async (tokenId: string) => {
-    const user: AuthenticatedUser = await authAPIClient.loginWithGoogle(
-      tokenId,
-    );
-    setAuthenticatedUser(user);
   };
 
   return (
@@ -134,22 +115,6 @@ const Login = (): React.ReactElement => {
             Log In
           </button>
         </div>
-        <GoogleLogin
-          clientId={process.env.REACT_APP_OAUTH_CLIENT_ID || ""}
-          buttonText="Login with Google"
-          onSuccess={(response: GoogleResponse): void => {
-            if ("tokenId" in response) {
-              onGoogleLoginSuccess(response.tokenId);
-            } else {
-              // eslint-disable-next-line no-alert
-              window.alert(response);
-            }
-          }}
-          onFailure={(error: GoogleErrorResponse) =>
-            // eslint-disable-next-line no-alert
-            window.alert(JSON.stringify(error))
-          }
-        />
       </form>
       {role === "facilitator" && (
         <div>
