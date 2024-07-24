@@ -78,7 +78,7 @@ const App = (): React.ReactElement => {
                 exact
                 path={Routes.WELCOME_PAGE}
                 render={() => {
-                  return currentUser ? (
+                  return authenticatedUser ? (
                     <Redirect to={Routes.HOME_PAGE} />
                   ) : (
                     <Welcome />
