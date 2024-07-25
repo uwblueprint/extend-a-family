@@ -14,7 +14,7 @@ interface EditMatchProps {
   index: string;
 }
 
-const Match: React.FC<EditMatchProps> = ({
+const MatchPanel: React.FC<EditMatchProps> = ({
   componentData,
   setComponentData,
   index,
@@ -83,4 +83,4 @@ const Match: React.FC<EditMatchProps> = ({
   );
 };
 
-export default Match;
+export default MatchPanel;

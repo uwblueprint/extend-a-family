@@ -138,7 +138,7 @@ interface ComponentProps {
   h: number;
 }
 
-const Match: React.FC<ComponentProps> = ({
+const MatchComponent: React.FC<ComponentProps> = ({
   componentData,
   setComponentData,
   i,
@@ -300,4 +300,4 @@ const Match: React.FC<ComponentProps> = ({
   );
 };
 
-export default Match;
+export default MatchComponent;

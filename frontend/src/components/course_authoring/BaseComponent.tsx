@@ -1,8 +1,8 @@
 import React from "react";
-import Match from "./Match";
-import TextBox from "./TextBox";
-import EditTextBox from "./EditTextBox";
-import EditMatch from "./EditMatch";
+import MatchComponent from "./MatchComponent";
+import TextComponent from "./TextComponent";
+import TextPanel from "./TextPanel";
+import MatchPanel from "./MatchPanel";
 
 interface BasePrototypeProps {
   name: string;
@@ -12,7 +12,7 @@ interface BasePrototypeProps {
   setData: (data: Map<string, object>) => void;
 }
 
-const BaseModule: React.FC<BasePrototypeProps> = ({
+const BaseComponent: React.FC<BasePrototypeProps> = ({
   name,
   data,
   setData,
@@ -20,11 +20,13 @@ const BaseModule: React.FC<BasePrototypeProps> = ({
   elementLayoutManifest = { i: "", w: 0, h: 0 },
 }) => {
   switch (name) {
-    case "TextBox":
-      return <TextBox componentData={data.get(elementLayoutManifest.i)} />;
-    case "Match":
+    case "TextComponent":
       return (
-        <Match
+        <TextComponent componentData={data.get(elementLayoutManifest.i)} />
+      );
+    case "MatchComponent":
+      return (
+        <MatchComponent
           componentData={data}
           setComponentData={setData}
           i={elementLayoutManifest.i}
@@ -32,17 +34,17 @@ const BaseModule: React.FC<BasePrototypeProps> = ({
           h={elementLayoutManifest.h}
         />
       );
-    case "EditTextBox":
+    case "EditTextComponent":
       return (
-        <EditTextBox
+        <TextPanel
           componentData={data}
           setComponentData={setData}
           index={activeComponent}
         />
       );
-    case "EditMatch":
+    case "EditMatchComponent":
       return (
-        <EditMatch
+        <MatchPanel
           componentData={data}
           setComponentData={setData}
           index={activeComponent}
@@ -53,4 +55,4 @@ const BaseModule: React.FC<BasePrototypeProps> = ({
   }
 };
 
-export default BaseModule;
+export default BaseComponent;
