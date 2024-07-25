@@ -7,14 +7,14 @@ interface MouseEventLike {
 }
 
 interface GridElementProps {
-  isTemporary?: boolean;
-  layoutManifest: { i: string; w: number; h: number };
+  temp?: boolean;
+  elementLayoutManifest: { i: string; w: number; h: number };
   componentType?: string;
-  initialMouseEvent?: MouseEventLike;
-  activeComponentId: string;
+  mouseEvent?: MouseEventLike;
+  activeComponent: string;
   data: Map<string, object>;
-  updateData: (data: Map<string, object>) => void;
-  setActiveComponentId: (id: string) => void;
+  setData: (data: Map<string, object>) => void;
+  setActiveComponent: (index: string) => void;
   style?: React.CSSProperties;
   className?: string;
   onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
@@ -24,7 +24,7 @@ interface GridElementProps {
   layout?: any;
 }
 
-const triggerDragStartEvent = (
+const createDragStartEvent = (
   element: HTMLElement,
   mouseEvent: MouseEventLike,
 ) => {
@@ -35,6 +35,8 @@ const triggerDragStartEvent = (
     clientY: mouseEvent.clientY,
   });
 
+  // Fake getBoundingClientRect for one call
+  // This way, we can influence where the drag action is started
   const originalGetBoundingClientRect =
     element.getBoundingClientRect.bind(element);
   const modifiedGetBoundingClientRect = () => ({
@@ -50,19 +52,20 @@ const triggerDragStartEvent = (
 
   element.dispatchEvent(event);
 
+  // Restore original getBoundingClientRect
   Object.defineProperty(element, "getBoundingClientRect", {
     value: originalGetBoundingClientRect,
   });
 };
 
 const GridElement: React.FC<GridElementProps> = ({
-  isTemporary,
-  layoutManifest,
-  activeComponentId,
-  setActiveComponentId,
+  temp,
+  elementLayoutManifest,
+  activeComponent,
+  setActiveComponent,
   data,
-  updateData,
-  initialMouseEvent,
+  setData,
+  mouseEvent,
   componentType,
   style,
   className,
@@ -72,29 +75,33 @@ const GridElement: React.FC<GridElementProps> = ({
   onTouchStart,
   layout,
 }) => {
-  const elementRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
+  // Fake the drag start event if it's a new element with property temp
   useEffect(() => {
-    const currentElement = elementRef.current;
-    if (currentElement && isTemporary && initialMouseEvent) {
-      triggerDragStartEvent(currentElement, initialMouseEvent);
+    const refCur = ref.current;
+    if (refCur && temp && mouseEvent) {
+      createDragStartEvent(refCur, mouseEvent);
     }
 
     return () => {
-      if (currentElement && isTemporary && initialMouseEvent) {
-        // TODO: Handle drag stop event if needed
+      if (refCur && temp && mouseEvent) {
+        // TODO: Cannot initiate drag stop event because drag start event is not recognized
+        // createDragStopEvent(refCur);
       }
     };
-  }, [elementRef, isTemporary, initialMouseEvent]);
+  }, [ref, temp, mouseEvent]);
 
   return (
     <div
-      ref={elementRef}
+      ref={ref}
       style={{ height: "100%", ...style }}
       className={className}
       onMouseDown={(e) => {
-        setActiveComponentId(
-          activeComponentId === layoutManifest.i ? "10000" : layoutManifest.i,
+        setActiveComponent(
+          activeComponent === elementLayoutManifest.i
+            ? "10000"
+            : elementLayoutManifest.i,
         );
         if (onMouseDown) onMouseDown(e);
       }}
@@ -104,13 +111,17 @@ const GridElement: React.FC<GridElementProps> = ({
     >
       <BaseModule
         name={componentType || ""}
-        activeComponent={activeComponentId}
-        elementLayoutManifest={layoutManifest}
+        activeComponent={activeComponent}
+        elementLayoutManifest={elementLayoutManifest}
         data={data}
-        setData={updateData}
+        setData={setData}
       />
     </div>
   );
+};
+
+GridElement.defaultProps = {
+  mouseEvent: { clientX: 0, clientY: 0 },
 };
 
 export default GridElement;
