@@ -7,9 +7,11 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-
+import { useLearner } from "../../hooks/useUser";
 
 const HelpModalPage = (): React.ReactElement => {
+  const learner = useLearner();
+
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -20,8 +22,9 @@ const HelpModalPage = (): React.ReactElement => {
     setOpen(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("submit");
+    // learner.facilitator
     handleClose();
   };
 

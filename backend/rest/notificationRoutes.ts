@@ -11,7 +11,7 @@ const notificationService = new NotificationService();
 notificationRouter.get("/", async (req, res) => {
   const { user, start, limit } = req.query;
   if (!user) {
-    res.status(400).json({ error: "A user is required" });
+    res.status(400).json({ error: "An user is required" });
     return;
   }
 
