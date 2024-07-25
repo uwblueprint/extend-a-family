@@ -23,7 +23,7 @@ const Node = ({ data, handleType }) => {
         width: data.width,
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-5px)";
+        // e.currentTarget.style.transform = "translateY(-5px)";
         e.currentTarget.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.2)";
       }}
       onMouseLeave={(e) => {
@@ -77,6 +77,9 @@ const initialNodes = [];
 
 const initialEdges = [];
 
+const defaultWidth = 75;
+const defaultHeight = 75;
+
 const temp_dimensions = {
   "node-0-0": { width: 75, height: 75 },
   "node-0-1": { width: 75, height: 75 },
@@ -87,7 +90,7 @@ const temp_dimensions = {
   "node-2-0": { width: 75, height: 75 },
   "node-2-1": { width: 75, height: 75 },
   "node-2-2": { width: 75, height: 75 },
-}
+};
 
 const getXcoord = (
   gridWidth: number,
@@ -112,33 +115,54 @@ const getXcoord = (
   }
 
   return 0; // this case should never happen as long as max 3 columns
-
-}
+};
 
 interface MatchProps {
   numRows?: number;
   numCols?: number;
+  nodePositionToData?: Map<string, object>;
+  selectedNode?: { id: string; type: string };
+  lastSelectedNode?: { id: string; type: string };
 }
+
 interface ComponentProps {
-  componentData?: MatchProps;
+  componentData: Map<string, MatchProps>;
+  setComponentData: (data: Map<string, object>) => void;
   i: string;
   w: number;
   h: number;
-  dimensions?: { [key: string]: { width: number; height: number } };
 }
 
 const Match: React.FC<ComponentProps> = ({
   componentData,
+  setComponentData,
   i,
   w,
   h,
-  dimensions = temp_dimensions,
 }) => {
-  const { numRows = 0, numCols = 0 } = componentData || {};
+  const {
+    numRows = 0,
+    numCols = 0,
+    nodePositionToData = new Map<string, object>(),
+    selectedNode = null,
+    lastSelectedNode = null,
+  } = componentData.get(i) || {};
 
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
-  const [selectedNode, setSelectedNode] = useState(null);
+
+  const handleChange = (
+    field: string,
+    value: any,
+    currentComponentData = componentData,
+  ) => {
+    const updatedData = new Map<any, any>(currentComponentData);
+    const currentData = updatedData.get(i) || {};
+    const newData = { ...currentData, [field]: value };
+    updatedData.set(i, newData);
+    setComponentData(updatedData);
+    return updatedData;
+  };
 
   const insertNodes = (
     insertRows: number,
@@ -149,8 +173,10 @@ const Match: React.FC<ComponentProps> = ({
     const newNodes = [];
     for (let row = 0; row < insertRows; row++) {
       for (let col = 0; col < insertCols; col++) {
-        const nodeWidth = dimensions[`node-${row}-${col}`]?.width ?? 100;
-        const nodeHeight = dimensions[`node-${row}-${col}`]?.height ?? 100;
+        const nodeWidth =
+          nodePositionToData[`node-${row}-${col}`]?.width ?? defaultWidth;
+        const nodeHeight =
+          nodePositionToData[`node-${row}-${col}`]?.height ?? defaultHeight;
         newNodes.push({
           id: `node-${row}-${col}`,
           type: getNodeType(col, insertCols),
@@ -158,12 +184,12 @@ const Match: React.FC<ComponentProps> = ({
             x: getXcoord(w, col, insertCols, nodeWidth),
             y: row * (h / insertRows),
           },
-          data: { 
-            label: `Node ${row}-${col}`, 
+          data: {
+            label: `Node ${row}-${col}`,
             index: row * insertCols + col,
             width: nodeWidth,
             height: nodeHeight,
-        },
+          },
         });
       }
     }
@@ -192,6 +218,7 @@ const Match: React.FC<ComponentProps> = ({
   }, [numRows, numCols, w, h]);
 
   const onNodeClick = (event, node) => {
+    let updatedData = handleChange("lastSelectedNode", node);
     if (selectedNode && selectedNode.type !== node.type) {
       setEdges((eds) =>
         addEdge(
@@ -207,9 +234,9 @@ const Match: React.FC<ComponentProps> = ({
           eds,
         ),
       );
-      setSelectedNode(null);
+      handleChange("selectedNode", null, updatedData);
     } else {
-      setSelectedNode(node);
+      handleChange("selectedNode", node, updatedData);
     }
   };
 

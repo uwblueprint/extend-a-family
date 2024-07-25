@@ -19,37 +19,38 @@ const BaseModule: React.FC<BasePrototypeProps> = ({
   activeComponent,
   elementLayoutManifest = { i: "", w: 0, h: 0 },
 }) => {
-  // Grid items
-  if (name === "TextBox")
-    return <TextBox componentData={data.get(elementLayoutManifest.i)} />;
-  if (name === "Match")
-    return (
-      <Match
-        componentData={data.get(elementLayoutManifest.i)}
-        i={elementLayoutManifest.i}
-        w={elementLayoutManifest.w}
-        h={elementLayoutManifest.h}
-      />
-    );
-
-  // Corresponding edit panel
-  if (name === "EditTextBox")
-    return (
-      <EditTextBox
-        componentData={data}
-        setComponentData={setData}
-        index={activeComponent}
-      />
-    );
-  if (name === "EditMatch")
-    return (
-      <EditMatch
-        componentData={data}
-        setComponentData={setData}
-        index={activeComponent}
-      />
-    );
-  return <></>;
+  switch (name) {
+    case "TextBox":
+      return <TextBox componentData={data.get(elementLayoutManifest.i)} />;
+    case "Match":
+      return (
+        <Match
+          componentData={data}
+          setComponentData={setData}
+          i={elementLayoutManifest.i}
+          w={elementLayoutManifest.w}
+          h={elementLayoutManifest.h}
+        />
+      );
+    case "EditTextBox":
+      return (
+        <EditTextBox
+          componentData={data}
+          setComponentData={setData}
+          index={activeComponent}
+        />
+      );
+    case "EditMatch":
+      return (
+        <EditMatch
+          componentData={data}
+          setComponentData={setData}
+          index={activeComponent}
+        />
+      );
+    default:
+      return null;
+  }
 };
 
 export default BaseModule;
