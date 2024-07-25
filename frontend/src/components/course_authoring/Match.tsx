@@ -8,14 +8,17 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
+const defaultColor = "black";
+
 // Custom Node Component
 const Node = ({ data, handleType }) => {
   return (
     <div
       style={{
         padding: "20px",
-        border: "1px solid #007bff",
+        border: "1px solid",
         borderRadius: "10px",
+        borderColor: data.borderColor || defaultColor,
         backgroundColor: "#e9ecef",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
@@ -91,6 +94,8 @@ const temp_dimensions = {
   "node-2-1": { width: 75, height: 75 },
   "node-2-2": { width: 75, height: 75 },
 };
+
+let prevNode = null;
 
 const getXcoord = (
   gridWidth: number,
@@ -217,6 +222,24 @@ const Match: React.FC<ComponentProps> = ({
     insertNodes(numRows, numCols, w * 50, h * 50);
   }, [numRows, numCols, w, h]);
 
+  const setCurrentNodeAndStyle = (node) => {
+    if (prevNode) {
+      modifyNodes(prevNode.id, { borderColor: defaultColor });
+    }
+    if (!node) {
+      setSelectedNode(null);
+      return;
+    }
+    if ((prevNode && prevNode.id !== node.id) || !prevNode) {
+      modifyNodes(node.id, { borderColor: "blue" });
+    } else {
+      modifyNodes(node.id, { borderColor: defaultColor });
+      prevNode = null;
+    }
+    prevNode = node;
+    setSelectedNode(node);
+  };
+
   const onNodeClick = (event, node) => {
     let updatedData = handleChange("lastSelectedNode", node);
     if (selectedNode && selectedNode.type !== node.type) {
@@ -266,7 +289,7 @@ const Match: React.FC<ComponentProps> = ({
           snapGrid={[15, 15]}
           autoPanOnNodeDrag={false}
         >
-          <Background />
+          {/* <Background /> */}
           {/* <Controls /> */}
         </ReactFlow>
         {/* <button onClick={handleClear} style={{ marginTop: "10px" }}>
