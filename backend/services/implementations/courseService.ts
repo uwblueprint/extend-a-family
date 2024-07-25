@@ -14,7 +14,9 @@ const Logger = logger(__filename);
 class CourseService implements ICourseService {
   async getCourseUnits(): Promise<Array<CourseUnitDTO>> {
     try {
-      const courseUnits: Array<CourseUnit> = await MgCourseUnit.find();
+      const courseUnits: Array<CourseUnit> = await MgCourseUnit.find().sort(
+        "displayIndex",
+      );
       return courseUnits.map((courseUnit) => ({
         id: courseUnit.id,
         displayIndex: courseUnit.displayIndex,
@@ -50,13 +52,13 @@ class CourseService implements ICourseService {
   }
 
   async updateCourseUnit(
-    displayIndex: number,
+    id: string,
     courseUnit: UpdateCourseUnitDTO,
   ): Promise<CourseUnitDTO> {
     let oldCourse: CourseUnit | null;
     try {
-      oldCourse = await MgCourseUnit.findOneAndUpdate(
-        { displayIndex },
+      oldCourse = await MgCourseUnit.findByIdAndUpdate(
+        id,
         {
           title: courseUnit.title,
         },
@@ -64,9 +66,7 @@ class CourseService implements ICourseService {
       );
 
       if (!oldCourse) {
-        throw new Error(
-          `Course unit with display index ${displayIndex} not found.`,
-        );
+        throw new Error(`Course unit with id ${id} not found.`);
       }
     } catch (error) {
       Logger.error(
@@ -75,29 +75,27 @@ class CourseService implements ICourseService {
       throw error;
     }
     return {
-      id: oldCourse.id,
+      id,
       title: courseUnit.title,
       displayIndex: oldCourse.displayIndex,
     };
   }
 
-  async deleteCourseUnit(displayIndex: number): Promise<number> {
+  async deleteCourseUnit(id: string): Promise<string> {
     try {
       const deletedCourseUnit: CourseUnit | null =
-        await MgCourseUnit.findOneAndDelete({ displayIndex });
+        await MgCourseUnit.findByIdAndDelete(id);
       if (!deletedCourseUnit) {
-        throw new Error(
-          `Course unit with display index ${displayIndex} not found`,
-        );
+        throw new Error(`Course unit with id ${id} not found`);
       }
 
       // get the index and update the ones behind it
       await MgCourseUnit.updateMany(
-        { displayIndex: { $gt: displayIndex } },
+        { displayIndex: { $gt: deletedCourseUnit.displayIndex } },
         { $inc: { displayIndex: -1 } },
       );
 
-      return displayIndex;
+      return id;
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete course unit. Reason = ${getErrorMessage(error)}`,

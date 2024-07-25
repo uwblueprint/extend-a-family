@@ -40,18 +40,15 @@ courseRouter.post(
 );
 
 courseRouter.put(
-  "/:displayIndex",
+  "/:id",
   isAuthorizedByRole(new Set(["Administrator"])),
   updateCourseUnitDtoValidator,
   async (req, res) => {
-    const { displayIndex } = req.params;
+    const { id } = req.params;
     try {
-      const course = await courseService.updateCourseUnit(
-        parseInt(displayIndex, 10),
-        {
-          title: req.body.title,
-        },
-      );
+      const course = await courseService.updateCourseUnit(id, {
+        title: req.body.title,
+      });
       res.status(200).json(course);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
@@ -60,15 +57,13 @@ courseRouter.put(
 );
 
 courseRouter.delete(
-  "/:displayIndex",
+  "/:id",
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
-    const { displayIndex } = req.params;
+    const { id } = req.params;
     try {
-      const deletedDisplayIndex = await courseService.deleteCourseUnit(
-        parseInt(displayIndex, 10),
-      );
-      res.status(200).json({ displayIndex: deletedDisplayIndex });
+      const deletedCourseUnitId = await courseService.deleteCourseUnit(id);
+      res.status(200).json({ id: deletedCourseUnitId });
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }
