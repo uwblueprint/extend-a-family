@@ -12,8 +12,8 @@ export interface User extends Document {
 }
 
 const baseOptions = {
-  discriminatorKey: "type",
-  collection: "user",
+  discriminatorKey: "role",
+  timestamps: true,
 };
 
 export const UserSchema: Schema = new Schema(
@@ -35,11 +35,30 @@ export const UserSchema: Schema = new Schema(
       required: true,
       enum: ["Administrator", "Facilitator", "Learner"],
     },
+    status: {
+      type: String,
+      required: true,
+      enum: ["Invited", "Active"],
+    },
   },
   baseOptions,
 );
 
+/* eslint-disable no-param-reassign */
+UserSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc: Document, ret: Record<string, unknown>) => {
+    // eslint-disable-next-line no-underscore-dangle
+    delete ret._id;
+    delete ret.createdAt;
+    delete ret.updatedAt;
+  },
+});
+
 const UserModel = mongoose.model<User>("User", UserSchema);
+
+const AdministratorSchema = new Schema({});
 
 const FacilitatorSchema = new Schema({
   learners: { type: [String], default: [] },
@@ -49,8 +68,12 @@ const LearnerSchema = new Schema({
   facilitator: { type: String, required: true },
 });
 
+const Administrator = UserModel.discriminator(
+  "Administrator",
+  AdministratorSchema,
+);
 const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
 const Learner = UserModel.discriminator("Learner", LearnerSchema);
 
-export { Facilitator, Learner, LearnerSchema, FacilitatorSchema };
+export { Administrator, Facilitator, Learner };
 export default UserModel;

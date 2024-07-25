@@ -9,6 +9,7 @@ import Signup from "./components/auth/Signup";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import CreatePage from "./components/pages/CreatePage";
 import Default from "./components/pages/Default";
+import CreateModulePage from "./components/pages/CreateModulePage";
 import DisplayPage from "./components/pages/DisplayPage";
 import NotFound from "./components/pages/NotFound";
 import NotAuthorized from "./components/pages/NotAuthorized";
@@ -33,12 +34,11 @@ import { SocketContext } from "./contexts/SocketContext";
 import HelpModalPage from "./components/pages/HelpModalPage";
 
 const App = (): React.ReactElement => {
-  const currentUser: AuthenticatedUser = getLocalStorageObj<AuthenticatedUser>(
-    AUTHENTICATED_USER_KEY,
-  );
+  const currentUser: AuthenticatedUser | null =
+    getLocalStorageObj<AuthenticatedUser | null>(AUTHENTICATED_USER_KEY);
 
   const [authenticatedUser, setAuthenticatedUser] =
-    useState<AuthenticatedUser>(currentUser);
+    useState<AuthenticatedUser | null>(currentUser);
 
   // Some sort of global state. Context API replaces redux.
   // Split related states into different contexts as necessary.

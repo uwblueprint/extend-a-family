@@ -8,6 +8,13 @@
 **User Auth:** Opt-in<br>
 **File Storage:** Opt-in<br>
 
+## The Team
+### S24
+**Project Lead:** Carolyn Zhang<br>
+**Product Managers:** Olivia Chan, Aatman Shah<br>
+**Designers:** Gaurav Shah, Abeer Das<br>
+**Developers:** Aathithan Chandrabalan, Jeffery Hu, Shannon Cui, Jason D'Souza, Jimmy Liu, Cherry Yang, Maggie Chen, Harishan Ravindranathan, Jeffrey Zhao<br>
+
 ## Table of Contents
 * ⚙️ [Setup](#setup)
 * 🧰 [Useful Commands](#useful-commands)
