@@ -5,9 +5,9 @@ export interface HelpRequest extends Document {
   message: string;
   learner: string;
   facilitator: string;
-  unit: number;
-  module: number;
-  page: number;
+  unit: string;
+  module: string;
+  page: string;
 }
 
 const HelpRequestSchema: Schema = new Schema(
@@ -25,15 +25,15 @@ const HelpRequestSchema: Schema = new Schema(
       required: true,
     },
     unit: {
-      type: Number,
+      type: String,
       required: true,
     },
     module: {
-      type: Number,
+      type: String,
       required: true,
     },
     page: {
-      type: Number,
+      type: String,
       required: true,
     },
   },

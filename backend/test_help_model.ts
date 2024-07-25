@@ -36,7 +36,7 @@ async function runTests() {
     });
     await learner.save();
 
-    await MgCourseUnit.create({
+    const courseUnit = await MgCourseUnit.create({
       displayIndex: 1,
       title: "Fake title",
       modules: [
@@ -51,9 +51,9 @@ async function runTests() {
       message: "send help plz",
       learner: learner.id,
       facilitator: facilitator.id,
-      unit: 1, // now is this the displayIndex or is this the array index?
-      module: 0, // thse two are definitely the array index
-      page: 0,
+      unit: courseUnit.id,
+      module: courseUnit.modules[0].id,
+      page: courseUnit.modules[0].pages[0].id,
     });
   } finally {
     await mongoose.disconnect();
