@@ -7,6 +7,8 @@ import ReactFlow, {
   Position,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import { editComponentDataMap } from "../../utils/GridComponentUtils";
+import { update } from "lodash";
 
 const defaultColor = "black";
 
@@ -77,23 +79,10 @@ const nodeTypes = {
 
 // Initial nodes positioned in two columns
 const initialNodes = [];
-
 const initialEdges = [];
 
 const defaultWidth = 75;
 const defaultHeight = 75;
-
-const temp_dimensions = {
-  "node-0-0": { width: 75, height: 75 },
-  "node-0-1": { width: 75, height: 75 },
-  "node-0-2": { width: 75, height: 75 },
-  "node-1-0": { width: 75, height: 75 },
-  "node-1-1": { width: 100, height: 75 },
-  "node-1-2": { width: 150, height: 75 },
-  "node-2-0": { width: 75, height: 75 },
-  "node-2-1": { width: 75, height: 75 },
-  "node-2-2": { width: 75, height: 75 },
-};
 
 let prevNode = null;
 
@@ -155,19 +144,6 @@ const MatchComponent: React.FC<ComponentProps> = ({
 
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
-
-  const handleChange = (
-    field: string,
-    value: any,
-    currentComponentData = componentData,
-  ) => {
-    const updatedData = new Map<any, any>(currentComponentData);
-    const currentData = updatedData.get(i) || {};
-    const newData = { ...currentData, [field]: value };
-    updatedData.set(i, newData);
-    setComponentData(updatedData);
-    return updatedData;
-  };
 
   const insertNodes = (
     insertRows: number,
@@ -241,7 +217,12 @@ const MatchComponent: React.FC<ComponentProps> = ({
   };
 
   const onNodeClick = (event, node) => {
-    let updatedData = handleChange("lastSelectedNode", node);
+    let updatedComponentDataMap = editComponentDataMap(
+      componentData,
+      "lastSelectedNode",
+      node,
+      i,
+    );
     if (selectedNode && selectedNode.type !== node.type) {
       setEdges((eds) =>
         addEdge(
@@ -257,10 +238,21 @@ const MatchComponent: React.FC<ComponentProps> = ({
           eds,
         ),
       );
-      handleChange("selectedNode", null, updatedData);
+      updatedComponentDataMap = editComponentDataMap(
+        updatedComponentDataMap,
+        "selectedNode",
+        null,
+        i,
+      );
     } else {
-      handleChange("selectedNode", node, updatedData);
+      updatedComponentDataMap = editComponentDataMap(
+        updatedComponentDataMap,
+        "selectedNode",
+        node,
+        i,
+      );
     }
+    setComponentData(updatedComponentDataMap);
   };
 
   const handleClear = () => {
@@ -288,6 +280,7 @@ const MatchComponent: React.FC<ComponentProps> = ({
           minZoom={0.75}
           snapGrid={[15, 15]}
           autoPanOnNodeDrag={false}
+          proOptions={{ hideAttribution: true }}
         >
           {/* <Background /> */}
           {/* <Controls /> */}

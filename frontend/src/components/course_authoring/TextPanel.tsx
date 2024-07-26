@@ -1,4 +1,5 @@
 import React from "react";
+import { editComponentDataMap } from "../../utils/GridComponentUtils";
 
 interface EditTextBoxProps {
   componentData: Map<string, object>;
@@ -12,11 +13,13 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
   index,
 }) => {
   const handleChange = (field: string, value: string) => {
-    const updatedData = new Map(componentData);
-    const currentData = updatedData.get(index) || {};
-    const newData = { ...currentData, [field]: value };
-    updatedData.set(index, newData);
-    setComponentData(updatedData);
+    const updatedComponentData = editComponentDataMap(
+      componentData,
+      field,
+      value,
+      index,
+    );
+    setComponentData(updatedComponentData);
   };
 
   return (

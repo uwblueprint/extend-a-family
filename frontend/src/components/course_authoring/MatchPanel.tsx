@@ -1,4 +1,5 @@
 import React from "react";
+import { editComponentDataMap } from "../../utils/GridComponentUtils";
 
 interface MatchProps {
   numRows?: number;
@@ -28,11 +29,13 @@ const MatchPanel: React.FC<EditMatchProps> = ({
   } = componentData.get(index) || {};
 
   const handleChange = (field: string, value: string) => {
-    const updatedData = new Map(componentData);
-    const currentData = updatedData.get(index) || {};
-    const newData = { ...currentData, [field]: value };
-    updatedData.set(index, newData);
-    setComponentData(updatedData);
+    const updatedComponentData = editComponentDataMap(
+      componentData,
+      field,
+      value,
+      index,
+    );
+    setComponentData(updatedComponentData);
   };
 
   return (

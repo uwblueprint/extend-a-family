@@ -1,6 +1,6 @@
 import React from "react";
-import MatchComponent from "./MatchComponent";
 import TextComponent from "./TextComponent";
+import MatchComponent from "./MatchComponent";
 import TextPanel from "./TextPanel";
 import MatchPanel from "./MatchPanel";
 
