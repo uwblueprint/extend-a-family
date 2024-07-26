@@ -5,6 +5,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import RateLimit from "express-rate-limit";
 import * as firebaseAdmin from "firebase-admin";
+import * as firebaseAuth from "@firebase/auth"
+import * as firebase from "firebase/app";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 

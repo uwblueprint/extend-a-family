@@ -6,6 +6,7 @@ import MgUser, { User } from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
   Role,
+  Status,
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
@@ -342,6 +343,23 @@ class UserService implements IUserService {
       throw error;
     }
     return userDtos;
+  }
+
+  async isFirstTimeInvitedUser(
+    accessToken: string,
+  ): Promise<boolean> {
+    try {
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken = await firebaseAdmin
+        .auth()
+        .verifyIdToken(accessToken, true);
+      const { status } = await getMongoUserByAuthId(
+        decodedIdToken.uid
+      );
+      return status === "Invited";
+    } catch (error: unknown) {
+      Logger.error(`Failed to verify user is first time invited user. Reason = ${getErrorMessage(error)}`);
+      throw error;
+    }
   }
 }
 

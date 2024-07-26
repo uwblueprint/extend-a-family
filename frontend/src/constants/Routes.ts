@@ -8,6 +8,14 @@ export const SIGNUP_PAGE = "/signup";
 
 export const CREATE_MODULE_PAGE = "/create-module";
 
+export const CREATE_ENTITY_PAGE = "/entity/create";
+
+export const UPDATE_ENTITY_PAGE = "/entity/update";
+
+export const HOOKS_PAGE = "/hooks";
+
+export const CREATE_PASSWORD_PAGE = "/create-password";
+
 export const NOT_AUTHORIZED_PAGE = "/not-authorized";
 
 export const MY_ACCOUNT_PAGE = "/account";

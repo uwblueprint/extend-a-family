@@ -16,6 +16,9 @@ services:
   backend:
     container_name: eaf_backend
     restart: always
+    depends_on:
+      database:
+        condition: service_healthy
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -27,6 +30,18 @@ services:
       - ./backend:/app
     env_file:
       - ./.env
+  database:
+    container_name: eaf_database
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=eaf_user
+      - MONGO_INITDB_ROOT_PASSWORD=eaf_password
+    ports:
+      - 27017:27017
+    volumes:
+      - data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
   # database:
   #   container_name: eaf_database
   #   image: mongodb/mongodb-atlas-local
@@ -37,5 +52,5 @@ services:
   #     - 27018:27017
   #   volumes:
   #     - data:/data/db
-# volumes:
-#   data:
+volumes:
+  data:
