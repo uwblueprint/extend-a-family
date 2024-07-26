@@ -16,12 +16,19 @@ class AuthService implements IAuthService {
 
   emailService: IEmailService | null;
 
+  firebaseAuth: firebaseAuth.Auth;
+
   constructor(
     userService: IUserService,
     emailService: IEmailService | null = null,
   ) {
     this.userService = userService;
     this.emailService = emailService;
+    const firebaseApp = firebase.initializeApp({
+      apiKey: process.env.FIREBASE_WEB_API_KEY,
+      projectId: process.env.FIREBASE_PROJECT_ID,
+    });
+    this.firebaseAuth = firebaseAuth.getAuth(firebaseApp);
   }
 
   /* eslint-disable class-methods-use-this */
@@ -136,25 +143,49 @@ class AuthService implements IAuthService {
       throw new Error(errorMessage);
     }
 
-    const emailVerificationLink = await firebaseAdmin
-      .auth()
-      .generateEmailVerificationLink(email);
+    try {
+      const emailVerificationLink = await firebaseAdmin
+        .auth()
+        .generateEmailVerificationLink(email);
 
-    const emailBody = `Hello,<br> <br>
-      You have been invited as an administrator to Smart Saving, Smart Spending.
-      <br> <br>
-      Please click the following link to verify your email and activate your account.
-      <strong>This link is only valid for 1 hour.</strong>
-      <br> <br>
-      <a href=${emailVerificationLink}>Verify email</a>
-      <br> <br>
-      To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`;
+      const emailBody = `Hello,<br> <br>
+        You have been invited as an administrator to Smart Saving, Smart Spending.
+        <br> <br>
+        Please click the following link to verify your email and activate your account.
+        <strong>This link is only valid for 1 hour.</strong>
+        <br> <br>
+        <a href=${emailVerificationLink}>Verify email</a>
+        <br> <br>
+        To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`;
 
-    await this.emailService.sendEmail(
-      email,
-      "Administrator Invitation: Smart Saving, Smart Spending",
-      emailBody,
-    );
+      await this.emailService.sendEmail(
+        email,
+        "Administrator Invitation: Smart Saving, Smart Spending",
+        emailBody,
+      );
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to invite new administrator. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async changeUserPassword(
+    accessToken: string,
+    newPassword: string,
+  ): Promise<void> {
+    try {
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken = await firebaseAdmin
+        .auth()
+        .verifyIdToken(accessToken, true);
+      await FirebaseRestClient.changePassword(decodedIdToken.uid, newPassword);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to change user's password. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
   }
 
   async isAuthorizedByRole(

@@ -6,12 +6,14 @@ import {
   isAuthorizedByEmail,
   isAuthorizedByUserId,
   isAuthorizedByRole,
+  isFirstTimeInvitedUser,
 } from "../middlewares/auth";
 import {
   loginRequestValidator,
   signupRequestValidator,
   inviteAdminRequestValidator,
   forgotPasswordRequestValidator,
+  updateTemporaryPasswordRequestValidator,
 } from "../middlewares/validators/authValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -207,6 +209,22 @@ authRouter.post(
     try {
       await userService.getUserByEmail(req.body.email);
       await authService.resetPassword(req.body.email);
+      res.status(204).send();
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+authRouter.post(
+  "/updateTemporaryPassword",
+  updateTemporaryPasswordRequestValidator,
+  // isFirstTimeInvitedUser,
+  async (req, res) => {
+    console.log("Hit route update temporary password")
+    try {
+      const accessToken = getAccessToken(req)!;
+      await authService.changeUserPassword(accessToken, req.body.newPassword);
       res.status(204).send();
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });

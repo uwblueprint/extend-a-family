@@ -63,6 +63,7 @@ const signup = async (
     return null;
   }
 };
+
 const resetPassword = async (email: string | undefined): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -72,6 +73,23 @@ const resetPassword = async (email: string | undefined): Promise<boolean> => {
     await baseAPIClient.post(
       `/auth/resetPassword/${email}`,
       {},
+      { headers: { Authorization: bearerToken } },
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const updateTemporaryPassword = async (newPassword: string) => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    await baseAPIClient.post(
+      `/auth/updateTemporaryPassword`,
+      { newPassword },
       { headers: { Authorization: bearerToken } },
     );
     return true;
@@ -122,6 +140,7 @@ export default {
   logout,
   signup,
   resetPassword,
+  updateTemporaryPassword,
   refresh,
   isUserVerified,
 };
