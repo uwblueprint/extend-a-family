@@ -7,9 +7,7 @@ import { AuthenticatedUser } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { PresentableError } from "../../types/ErrorTypes";
-import { authErrors, defaultAuthError } from "../../errors/AuthErrors";
 import { isRole } from "../../types/UserTypes";
-
 
 const Login = (): React.ReactElement => {
   const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
