@@ -85,7 +85,6 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
 /* Signup a user, returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
 authRouter.post("/signup", signupRequestValidator, async (req, res) => {
   try {
-    console.log(req);
     await userService.createUser({
       firstName: req.body.firstName,
       lastName: req.body.lastName,

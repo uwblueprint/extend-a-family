@@ -180,9 +180,8 @@ class AuthService implements IAuthService {
 
   async correctRole(accessToken: string): Promise<Role | null> {
     try {
-      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken = await firebaseAdmin
-        .auth()
-        .verifyIdToken(accessToken, true);
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
       const userRole = await this.userService.getUserRoleByAuthId(
         decodedIdToken.uid,
       );
