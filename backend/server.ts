@@ -1,6 +1,8 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import RateLimit from "express-rate-limit";
 import * as firebaseAdmin from "firebase-admin";
 import swaggerUi from "swagger-ui-express";
@@ -10,6 +12,12 @@ import { mongo } from "./models";
 import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
+import {
+  registerNotificationHandlers,
+  removeNotificationHandlers,
+} from "./sockets/notification";
+import helpRequestRouter from "./rest/helpRequestRoutes";
+import notificationRouter from "./rest/notificationRoutes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -37,6 +45,29 @@ const limiter = RateLimit({
 });
 
 const app = express();
+
+const server = createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: CORS_ALLOW_LIST,
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  const { userId } = socket.handshake.query;
+  console.log("userid", userId);
+  // so we can use mongodb id as the key to emit to instead
+  if (!userId) return;
+  socket.join(userId);
+  registerNotificationHandlers(io, socket);
+  socket.on("disconnect", () => {
+    console.log("disconnected", userId);
+    removeNotificationHandlers(io, socket);
+  });
+});
+
 app.use(cookieParser());
 app.use(cors(CORS_OPTIONS));
 app.use(express.json());
@@ -46,7 +77,10 @@ app.use(limiter);
 app.use("/auth", authRouter);
 app.use("/entities", entityRouter);
 app.use("/users", userRouter);
+app.use("/help-request", helpRequestRouter);
+app.use("/notifications", notificationRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.set("io", io);
 
 mongo.connect();
 
@@ -61,7 +95,7 @@ firebaseAdmin.initializeApp({
   }),
 });
 
-app.listen({ port: process.env.PORT || 8080 }, () => {
+server.listen({ port: process.env.PORT || 8080 }, () => {
   /* eslint-disable-next-line no-console */
   console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
 });
