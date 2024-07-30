@@ -1,5 +1,11 @@
 import React from "react";
-import { editComponentDataMap } from "../../utils/GridComponentUtils";
+import {
+  editComponentDataMap,
+  editMatchNodeDataMap,
+} from "../../utils/GridComponentUtils";
+import { last } from "lodash";
+import TextPanel from "./TextPanel";
+import { Last } from "react-bootstrap/esm/PageItem";
 
 interface MatchProps {
   numRows?: number;
@@ -23,18 +29,33 @@ const MatchPanel: React.FC<EditMatchProps> = ({
   const {
     numRows = 0,
     numCols = 0,
-    nodePositionToData = new Map<string, object>(),
+    nodePositionToData = new Map<string, any>(),
     selectedNode = null,
-    lastSelectedNode = { id: "sdfsdf", type: "" },
+    lastSelectedNode = { id: "10000", type: "" },
   } = componentData.get(index) || {};
 
-  const handleChange = (field: string, value: string) => {
-    const updatedComponentData = editComponentDataMap(
-      componentData,
-      field,
-      value,
-      index,
-    );
+  const handleChange = (
+    field: string,
+    value: string,
+    nodeId: string | null = null,
+  ) => {
+    let updatedComponentData;
+    if (nodeId) {
+      updatedComponentData = editMatchNodeDataMap(
+        componentData,
+        nodeId,
+        field,
+        value,
+        index,
+      );
+    } else {
+      updatedComponentData = editComponentDataMap(
+        componentData,
+        field,
+        value,
+        index,
+      );
+    }
     setComponentData(updatedComponentData);
   };
 
@@ -62,6 +83,7 @@ const MatchPanel: React.FC<EditMatchProps> = ({
             type="number"
             min={0}
             max={5}
+            value={componentData.get(index)?.numRows || 0}
             id="numRows"
             name="numRows"
             style={{ marginLeft: "10px", width: "40px" }}
@@ -74,14 +96,78 @@ const MatchPanel: React.FC<EditMatchProps> = ({
             type="number"
             min={0}
             max={5}
+            value={componentData.get(index)?.numCols || 0}
             id="numCols"
             name="numCols"
             style={{ marginLeft: "10px", width: "40px" }}
             onChange={(e) => handleChange("numCols", e.target.value)}
           />
         </label>
-        <p>{lastSelectedNode?.id}</p>
       </div>
+      {lastSelectedNode?.id != "10000" && <p>{lastSelectedNode?.id}</p>}
+      {lastSelectedNode?.id != "10000" && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            marginTop: "20px",
+          }}
+        >
+          <label htmlFor="width">
+            W:
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={nodePositionToData.get(lastSelectedNode?.id)?.w || 75}
+              id="width"
+              name="width"
+              style={{ marginLeft: "10px", width: "100px" }}
+              onChange={(e) =>
+                handleChange("w", e.target.value, lastSelectedNode?.id)
+              }
+            />
+          </label>
+          <label htmlFor="height">
+            H:
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={nodePositionToData.get(lastSelectedNode?.id)?.h || 75}
+              id="height"
+              name="height"
+              style={{ marginLeft: "10px", width: "100px", marginTop: "10px" }}
+              onChange={(e) =>
+                handleChange("h", e.target.value, lastSelectedNode?.id)
+              }
+            />
+          </label>
+          <label htmlFor="dropdown">Type:</label>
+          <select
+            id="dropdown"
+            value={nodePositionToData.get(lastSelectedNode?.id)?.type || ""}
+            onChange={(e) => {
+              handleChange("type", e.target.value, lastSelectedNode?.id);
+            }}
+          >
+            <option value="" disabled>
+              Select an option
+            </option>
+            <option value="text">Text</option>
+            <option value="picture">Picture</option>
+          </select>
+          {nodePositionToData.get(lastSelectedNode?.id)?.type === "text" && (
+            <TextPanel
+              setComponentData={setComponentData}
+              componentData={componentData}
+              index={index}
+              node={lastSelectedNode?.id}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

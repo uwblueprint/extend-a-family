@@ -9,6 +9,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { editComponentDataMap } from "../../utils/GridComponentUtils";
 import { update } from "lodash";
+import TextComponent from "./TextComponent";
 
 const defaultColor = "black";
 
@@ -21,7 +22,7 @@ const Node = ({ data, handleType }) => {
         border: "1px solid",
         borderRadius: "10px",
         borderColor: data.borderColor || defaultColor,
-        backgroundColor: "#e9ecef",
+
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
         height: data.height,
@@ -39,7 +40,8 @@ const Node = ({ data, handleType }) => {
       {(handleType === "left" || handleType === "middle") && (
         <Handle type="source" position={Position.Right} />
       )}
-      <div>{data.label}</div>
+      {data.type === "text" && <TextComponent componentData={data} />}
+
       {(handleType === "right" || handleType === "middle") && (
         <Handle type="target" position={Position.Left} />
       )}
@@ -120,7 +122,7 @@ interface MatchProps {
 }
 
 interface ComponentProps {
-  componentData: Map<string, MatchProps>;
+  componentData: Map<string, any>;
   setComponentData: (data: Map<string, object>) => void;
   i: string;
   w: number;
@@ -152,12 +154,13 @@ const MatchComponent: React.FC<ComponentProps> = ({
     h: number,
   ) => {
     const newNodes = [];
+
     for (let row = 0; row < insertRows; row++) {
       for (let col = 0; col < insertCols; col++) {
-        const nodeWidth =
-          nodePositionToData[`node-${row}-${col}`]?.width ?? defaultWidth;
-        const nodeHeight =
-          nodePositionToData[`node-${row}-${col}`]?.height ?? defaultHeight;
+        const nodeData = nodePositionToData.get(`node-${row}-${col}`) || {};
+        const nodeWidth = parseInt(nodeData.w) || defaultWidth;
+        const nodeHeight = parseInt(nodeData.h) || defaultHeight;
+
         newNodes.push({
           id: `node-${row}-${col}`,
           type: getNodeType(col, insertCols),
@@ -166,10 +169,11 @@ const MatchComponent: React.FC<ComponentProps> = ({
             y: row * (h / insertRows),
           },
           data: {
-            label: `Node ${row}-${col}`,
+            label: `node-${row}-${col}`,
             index: row * insertCols + col,
             width: nodeWidth,
             height: nodeHeight,
+            ...nodeData,
           },
         });
       }
@@ -196,7 +200,7 @@ const MatchComponent: React.FC<ComponentProps> = ({
 
   useEffect(() => {
     insertNodes(numRows, numCols, w * 50, h * 50);
-  }, [numRows, numCols, w, h]);
+  }, [numRows, numCols, w, h, componentData]);
 
   const setCurrentNodeAndStyle = (node) => {
     if (prevNode) {

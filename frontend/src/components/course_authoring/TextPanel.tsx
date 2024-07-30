@@ -1,24 +1,40 @@
 import React from "react";
-import { editComponentDataMap } from "../../utils/GridComponentUtils";
+import {
+  editComponentDataMap,
+  editMatchNodeDataMap,
+} from "../../utils/GridComponentUtils";
 
 interface EditTextBoxProps {
   componentData: Map<string, object>;
   setComponentData: (data: Map<string, object>) => void;
   index: string;
+  node?: string;
 }
 
 const EditTextBox: React.FC<EditTextBoxProps> = ({
   componentData,
   setComponentData,
   index,
+  node = null,
 }) => {
   const handleChange = (field: string, value: string) => {
-    const updatedComponentData = editComponentDataMap(
-      componentData,
-      field,
-      value,
-      index,
-    );
+    let updatedComponentData;
+    if (node) {
+      updatedComponentData = editMatchNodeDataMap(
+        componentData,
+        node,
+        field,
+        value,
+        index,
+      );
+    } else {
+      updatedComponentData = editComponentDataMap(
+        componentData,
+        field,
+        value,
+        index,
+      );
+    }
     setComponentData(updatedComponentData);
   };
 
