@@ -1,8 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useState, useReducer, useEffect, useRef } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
-import { io, Socket } from "socket.io-client";
 import Welcome from "./components/pages/Welcome";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
@@ -30,7 +28,7 @@ import { AuthenticatedUser } from "./types/AuthTypes";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import * as Routes from "./constants/Routes";
 import ManageUserPage from "./components/pages/ManageUserPage";
-import { SocketContext } from "./contexts/SocketContext";
+import { SocketProvider } from "./contexts/SocketContext";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ViewHelpRequestPage from "./components/pages/ViewHelpRequestsPage";
 
@@ -49,8 +47,6 @@ const App = (): React.ReactElement => {
     DEFAULT_SAMPLE_CONTEXT,
   );
 
-  const socketRef = useRef<Socket | null>(null); // avoid infinite rerenders
-
   const HOUR_MS = 3300000;
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -65,32 +61,6 @@ const App = (): React.ReactElement => {
     return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
   }, [currentUser]);
 
-  useEffect(() => {
-    if (!currentUser) return;
-    socketRef.current = io(process.env.REACT_APP_BACKEND_URL as string, {
-      autoConnect: false, // can make it so we need a current user for this to work at all
-      query: { userId: currentUser.id },
-    });
-
-    socketRef.current.connect();
-
-    socketRef.current.on("connect", () => {
-      console.log("connected");
-    });
-    socketRef.current.on(
-      "notification:new",
-      (data) => console.log("new notification", data),
-      // need to like set it in like a global state later
-    );
-    // eslint-disable-next-line consistent-return
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.close();
-        socketRef.current = null;
-      }
-    };
-  }, [currentUser]);
-
   return (
     <SampleContext.Provider value={sampleContext}>
       <SampleContextDispatcherContext.Provider
@@ -99,7 +69,7 @@ const App = (): React.ReactElement => {
         <AuthContext.Provider
           value={{ authenticatedUser, setAuthenticatedUser }}
         >
-          <SocketContext.Provider value={socketRef.current}>
+          <SocketProvider id={authenticatedUser?.id}>
             <Router>
               <Switch>
                 <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
@@ -174,7 +144,7 @@ const App = (): React.ReactElement => {
                 <Route exact path="*" component={NotFound} />
               </Switch>
             </Router>
-          </SocketContext.Provider>
+          </SocketProvider>
         </AuthContext.Provider>
       </SampleContextDispatcherContext.Provider>
     </SampleContext.Provider>

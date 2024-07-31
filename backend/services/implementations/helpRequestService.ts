@@ -1,7 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { IHelpRequestService } from "../interfaces/helpRequestService";
 import MgHelpRequest, { HelpRequest } from "../../models/helprequest.mgmodel";
-import MgNotification from "../../models/notification.mgmodel";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import {
@@ -12,9 +11,11 @@ import {
 const Logger = logger(__filename);
 
 export class HelpRequestService implements IHelpRequestService {
-  async getHelpRequests(): Promise<HelpRequestDTO[]> {
+  async getHelpRequests(userId: string): Promise<HelpRequestDTO[]> {
     try {
-      const helpRequests = await MgHelpRequest.find();
+      const helpRequests = await MgHelpRequest.find({ userId }).sort({
+        createdAt: -1,
+      });
       return helpRequests;
     } catch (error) {
       Logger.error(

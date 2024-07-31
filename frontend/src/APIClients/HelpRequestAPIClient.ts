@@ -24,4 +24,15 @@ const createHelpRequest = async (
   }
 };
 
-export default { createHelpRequest };
+const getHelpRequests = async (
+  userId: string,
+): Promise<HelpRequest[] | null> => {
+  try {
+    const { data } = await baseAPIClient.post(`/help-request?userid=${userId}`);
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+export default { createHelpRequest, getHelpRequests };

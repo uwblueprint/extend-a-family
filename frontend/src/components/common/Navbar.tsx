@@ -37,6 +37,25 @@ export default function Navbar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("notification:new", (notification) => {
+      console.log("new notification", notification);
+      setNotifications((prev) => [notification, ...prev]);
+      setNumUnseenNotification((prev) => prev + 1);
+    });
+    socket.on("notification:readUpdates", (updates) => {
+      console.log("new notification", updates);
+      setNumUnseenNotification((prev) => prev - updates.modifiedCount);
+    });
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      socket.off("notification:new");
+      socket.off("notification:readUpdates");
+    };
+  }, [socket]);
+
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
   );

@@ -7,7 +7,7 @@ export interface IHelpRequestService {
   /**
    * Gets all help requests (will be able to filter in future if needed)
    */
-  getHelpRequests(): Promise<HelpRequestDTO[]>;
+  getHelpRequests(userId: string): Promise<HelpRequestDTO[]>;
 
   /**
    * Creates a help request

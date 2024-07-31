@@ -12,10 +12,7 @@ import { mongo } from "./models";
 import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
-import {
-  registerNotificationHandlers,
-  removeNotificationHandlers,
-} from "./sockets/notification";
+import { registerNotificationHandlers } from "./sockets/notification";
 import helpRequestRouter from "./rest/helpRequestRoutes";
 import notificationRouter from "./rest/notificationRoutes";
 
@@ -57,15 +54,11 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   const { userId } = socket.handshake.query;
-  console.log("userid", userId);
   // so we can use mongodb id as the key to emit to instead
-  if (!userId) return;
+  if (!userId && typeof userId !== "string") return;
   socket.join(userId);
+  console.log(io.sockets.adapter.rooms);
   registerNotificationHandlers(io, socket);
-  socket.on("disconnect", () => {
-    console.log("disconnected", userId);
-    removeNotificationHandlers(io, socket);
-  });
 });
 
 app.use(cookieParser());

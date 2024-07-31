@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import { UpdateWriteOpResult } from "mongoose";
 import {
   NotificationDTO,
   CreateNotificationDTO,
@@ -42,11 +43,11 @@ class NotificationService implements INotificationService {
 
       totalNumberOfNotifications = await MgNotification.where({
         user,
-        read: false,
       }).countDocuments();
 
       numberOfUnseenNotifications = await MgNotification.where({
         user,
+        read: false,
       }).countDocuments();
     } catch (error) {
       Logger.error(
@@ -126,6 +127,24 @@ class NotificationService implements INotificationService {
       read,
       link,
     };
+  }
+
+  async markReadNotifications(userId: string): Promise<UpdateWriteOpResult> {
+    let updates: UpdateWriteOpResult | null;
+    try {
+      updates = await MgNotification.updateMany(
+        { user: userId, read: false },
+        {
+          read: true,
+        },
+      );
+    } catch (error) {
+      Logger.error(
+        `Failed to update notifications. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+    return updates;
   }
 }
 
