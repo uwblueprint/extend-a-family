@@ -72,7 +72,7 @@ export const forgotPasswordRequestValidator = async (
   }
 
   return next();
-}
+};
 
 export const updateTemporaryPasswordRequestValidator = async (
   req: Request,
@@ -96,4 +96,4 @@ export const updateUserStatusRequestValidator = async (
   }
 
   return next();
-}
+};

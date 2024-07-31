@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose";
 import { AuthDTO, Token } from "../../types/authTypes";
-import { Role, Status } from "../../types/userTypes";
+import { Role } from "../../types/userTypes";
 
 interface IAuthService {
   /**

@@ -1,7 +1,12 @@
 import React, { useContext, useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
 import authAPIClient from "../../APIClients/AuthAPIClient";
-import { CREATE_PASSWORD_PAGE, HOME_PAGE, SIGNUP_PAGE, WELCOME_PAGE } from "../../constants/Routes";
+import {
+  CREATE_PASSWORD_PAGE,
+  HOME_PAGE,
+  SIGNUP_PAGE,
+  WELCOME_PAGE,
+} from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";

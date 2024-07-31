@@ -1,5 +1,6 @@
 import * as firebaseAdmin from "firebase-admin";
 import { ObjectId } from "mongoose";
+
 import IAuthService from "../interfaces/authService";
 import IEmailService from "../interfaces/emailService";
 import IUserService from "../interfaces/userService";
@@ -165,7 +166,9 @@ class AuthService implements IAuthService {
       );
     } catch (error: unknown) {
       Logger.error(
-        `Failed to invite new administrator. Reason = ${getErrorMessage(error)}`,
+        `Failed to invite new administrator. Reason = ${getErrorMessage(
+          error,
+        )}`,
       );
       throw error;
     }

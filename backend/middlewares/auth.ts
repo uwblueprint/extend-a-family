@@ -4,7 +4,7 @@ import AuthService from "../services/implementations/authService";
 import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import IUserService from "../services/interfaces/userService";
-import { Role, Status } from "../types/userTypes";
+import { Role } from "../types/userTypes";
 
 const authService: IAuthService = new AuthService(new UserService());
 const userService: IUserService = new UserService();
@@ -83,13 +83,12 @@ export const isFirstTimeInvitedUser = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const accessToken = getAccessToken(req);
     const authorized =
-      accessToken &&
-      await userService.isFirstTimeInvitedUser(accessToken);
+      accessToken && (await userService.isFirstTimeInvitedUser(accessToken));
     if (!authorized) {
       return res
         .status(401)
         .json({ error: "You are not a first-time invited user." });
     }
     return next();
-  }
-}
+  };
+};

@@ -26,8 +26,6 @@ import IUserService from "../services/interfaces/userService";
 import { getErrorMessage } from "../utilities/errorUtils";
 import { AuthErrorCodes } from "../types/authTypes";
 
-import * as firebaseAdmin from "firebase-admin";
-
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
@@ -222,11 +220,14 @@ authRouter.post(
 authRouter.post(
   "/updateTemporaryPassword",
   updateTemporaryPasswordRequestValidator,
-  // isFirstTimeInvitedUser(),
+  isFirstTimeInvitedUser(),
   async (req, res) => {
     try {
       const accessToken = getAccessToken(req)!;
-      const newAccessToken = await authService.changeUserPassword(accessToken, req.body.newPassword);
+      const newAccessToken = await authService.changeUserPassword(
+        accessToken,
+        req.body.newPassword,
+      );
       res.status(200).json({
         accessToken: newAccessToken,
       });
@@ -247,7 +248,7 @@ authRouter.post(
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }
-  }
-)
+  },
+);
 
 export default authRouter;
