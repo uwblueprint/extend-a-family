@@ -57,7 +57,7 @@ interface IAuthService {
    * @param email the user's email address
    * @param newPassword new password chosen to replace the user's old password
    */
-  changeUserPassword(accessToken: string, newPassword: string): Promise<void>;
+  changeUserPassword(accessToken: string, newPassword: string): Promise<string>;
 
   /**
    * Determine if the provided access token is valid and authorized for at least
