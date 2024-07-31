@@ -16,7 +16,7 @@ const CreatePasswordPage = (): React.ReactElement => {
     }
 
     const onSubmitNewPasswordClick = async () => {
-        const changePasswordSuccess = await AuthAPIClient.updateTemporaryPassword(newPassword);
+        const changePasswordSuccess = await AuthAPIClient.updateTemporaryPassword(authenticatedUser.email, newPassword);
         if (!changePasswordSuccess) {
             // change this later to not use an alert
             // eslint-disable-next-line no-alert
@@ -35,7 +35,10 @@ const CreatePasswordPage = (): React.ReactElement => {
             return;
         }
 
-        alert("Successfully changed your password. Please log in with your new credentials.");
+        setAuthenticatedUser({
+            ...authenticatedUser,
+            status: "Active",
+        })
 
         history.push(`${LOGIN_PAGE}?role=${authenticatedUser.role}`);
     }

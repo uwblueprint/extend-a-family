@@ -242,16 +242,7 @@ authRouter.post(
   async (req, res) => {
     try {
       const accessToken = getAccessToken(req)!;
-      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
-        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
-      const currentUser = await userService.getUserById(decodedIdToken.uid);
-      await userService.updateUserById(
-        decodedIdToken.uid,
-        {
-          ...currentUser,
-          status: req.body.status,
-        },
-      );
+      await userService.changeUserStatus(accessToken, req.body.status);
       res.status(204).send();
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });

@@ -6,8 +6,6 @@ import {
   getLocalStorageObjProperty,
   setLocalStorageObjProperty,
 } from "../utils/LocalStorageUtils";
-import { useContext } from "react";
-import AuthContext from "../contexts/AuthContext";
 
 const login = async (
   email: string,
@@ -83,29 +81,28 @@ const resetPassword = async (email: string | undefined): Promise<boolean> => {
   }
 };
 
-const updateTemporaryPassword = async (newPassword: string): Promise<boolean> => {
-  const { authenticatedUser } = useContext(AuthContext);
+const updateTemporaryPassword = async (email: string, newPassword: string): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
   )}`;
   try {
-    const { data } = await baseAPIClient.post(
+    await baseAPIClient.post(
       `/auth/updateTemporaryPassword`,
       { newPassword },
       { headers: { Authorization: bearerToken } },
     );
-    const newAccessToken = await login(
-      authenticatedUser?.email!,
+    const newAuthenticatedUser = await login(
+      email,
       newPassword,
     );
-    if (!newAccessToken) {
+    if (!newAuthenticatedUser) {
       throw new Error("Unable to authenticate user after logging in.");
     }
     setLocalStorageObjProperty(
       AUTHENTICATED_USER_KEY,
       "accessToken",
-      newAccessToken.accessToken,
+      newAuthenticatedUser.accessToken,
     );
     return true;
   } catch (error) {
