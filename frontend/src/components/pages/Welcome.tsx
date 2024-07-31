@@ -1,48 +1,26 @@
-import React, { useState, useContext } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useState } from "react";
 import {
-  Button,
-  TextField,
   Typography,
   Container,
   Card,
   CardMedia,
   Box,
+  Drawer,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import styled from "@emotion/styled";
-import { AuthenticatedUser } from "../../types/AuthTypes";
-import AuthContext from "../../contexts/AuthContext";
-import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
-import authAPIClient from "../../APIClients/AuthAPIClient";
 import background from "./backgroundImage.jpg";
 import icon from "./icon.png";
+import Login from "../auth/Login";
 
 const Welcome = (): React.ReactElement => {
-  const history = useHistory();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { setAuthenticatedUser } = useContext(AuthContext);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState("");
 
-  const handleButtonClick = (selectedRole: string) => {
-    history.push(`/login?role=${selectedRole}`);
-  };
-
-  const onLogInClick = async () => {
-    const user: AuthenticatedUser = await authAPIClient.login(email, password);
-    const isUserVerified = user?.accessToken
-      ? await authAPIClient.isUserVerified(email, user.accessToken)
-      : null;
-    if (!user || !isUserVerified) {
-      alert("Bad login, user not found");
-      return;
-    }
-    if (user.role.toLowerCase() !== "learner") {
-      alert(`Bad login. Expected learner, got ${user.role}`);
-      return;
-    }
-
-    localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
-    setAuthenticatedUser(user);
+  const handleButtonClick = (role: string) => {
+    setSelectedRole(role);
+    setDrawerOpen(true);
   };
 
   interface ImageOverlayProps {
@@ -57,7 +35,7 @@ const Welcome = (): React.ReactElement => {
     title,
   }) => {
     return (
-      <Card style={{height:"100%", position: "relative", textAlign: "left" }}>
+      <Card style={{ height: "100%", position: "relative", textAlign: "left" }}>
         <CardMedia
           component="img"
           height="100%"
@@ -72,8 +50,12 @@ const Welcome = (): React.ReactElement => {
             left: "5%",
           }}
         >
-          <img src={iconImage} alt="icon" style={{ paddingBottom: "10px", width: "100px" }} /> 
-          
+          <img
+            src={iconImage}
+            alt="icon"
+            style={{ paddingBottom: "10px", width: "100px" }}
+          />
+
           <Typography variant="h3" component="div">
             {title}
           </Typography>
@@ -85,80 +67,69 @@ const Welcome = (): React.ReactElement => {
   const AdminButton = styled.button({
     backgroundColor: "#FFDBCF",
     width: "50%",
-    textAlign: "left"
-  }) 
+    textAlign: "left",
+  });
 
   const FacilitatorButton = styled.button({
     backgroundColor: "#E0E0FF",
     width: "50%",
-    textAlign: "left"
+    textAlign: "left",
   });
 
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+    setSelectedRole("");
+  };
+
   return (
-    <Container 
-      style={{height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center",  alignItems: "center", textAlign: "left"}}>
+    <Container
+      style={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "left",
+      }}
+    >
       <Container
-        style={{ height: "60%", display: "flex", alignItems: "center", textAlign: "left", padding: "0" }}
+        style={{
+          height: "60%",
+          display: "flex",
+          alignItems: "center",
+          textAlign: "left",
+          padding: "0",
+        }}
       >
-        <Box style={{height:"100%", flex: 1 }}>
+        <Box style={{ height: "100%", flex: 1 }}>
           <ImageOverlay
             backgroundImage={background}
             iconImage={icon}
             title="Smart Saving, Smart Spending"
           />
         </Box>
-        <Box style={{ height:"100%", flex: 1 }}>
+        <Box style={{ height: "100%", flex: 1 }}>
           <Box
             style={{
               backgroundColor: "#F5FAFC",
               height: "100%",
-              padding:"50px 20px",
+              padding: "50px 20px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
             }}
           >
-            <Typography variant="h4">Learner Login</Typography>
-            <form>
-              <div>
-                <TextField
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  label="Email"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                />
-              </div>
-              <div>
-                <TextField
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  label="Password"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                />
-              </div>
-              <div>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={onLogInClick}
-                  fullWidth
-                  style={{ margin: "16px 0" }}
-                >
-                  Log In
-                </Button>
-              </div>
-            </form>
+            <Login userRole="learner" />
           </Box>
         </Box>
       </Container>
       <div
-        style={{ width: "100%", marginTop: "16px", display: "flex", gap: "10px", }}
+        style={{
+          width: "100%",
+          marginTop: "16px",
+          display: "flex",
+          gap: "10px",
+        }}
         className="button-container"
       >
         <AdminButton
@@ -166,7 +137,7 @@ const Welcome = (): React.ReactElement => {
           onClick={() => handleButtonClick("administrator")}
         >
           Are you an administrator?
-          </AdminButton>
+        </AdminButton>
         <FacilitatorButton
           className="btn"
           onClick={() => handleButtonClick("facilitator")}
@@ -174,6 +145,22 @@ const Welcome = (): React.ReactElement => {
           Are you a facilitator?
         </FacilitatorButton>
       </div>
+      <Drawer  PaperProps={{    
+        sx: { width: "50%" }
+      }} anchor="right" open={drawerOpen} onClose={closeDrawer}>
+         <IconButton
+            onClick={closeDrawer}
+            style={{ position: "absolute", right: 0 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        <Box sx={{ height: "100%", width: "80%", display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center', alignItems: 'center'}} onClick={closeDrawer}>
+         
+          <Login userRole={selectedRole} align="center"/>
+        </Box>
+      </Drawer>
     </Container>
   );
 };
