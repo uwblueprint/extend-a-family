@@ -104,6 +104,11 @@ interface IUserService {
   isFirstTimeInvitedUser(
     accessToken: string,
   ): Promise<boolean>;
+
+  changeUserStatus(
+    accessToken: string,
+    newStatus: Status,
+  ): Promise<void>;
 }
 
 export default IUserService;
