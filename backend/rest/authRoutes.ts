@@ -14,6 +14,7 @@ import {
   inviteAdminRequestValidator,
   forgotPasswordRequestValidator,
   updateTemporaryPasswordRequestValidator,
+  updateUserStatusRequestValidator,
 } from "../middlewares/validators/authValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -24,6 +25,8 @@ import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import { getErrorMessage } from "../utilities/errorUtils";
 import { AuthErrorCodes } from "../types/authTypes";
+
+import * as firebaseAdmin from "firebase-admin";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -219,17 +222,42 @@ authRouter.post(
 authRouter.post(
   "/updateTemporaryPassword",
   updateTemporaryPasswordRequestValidator,
-  // isFirstTimeInvitedUser,
+  isFirstTimeInvitedUser(),
   async (req, res) => {
-    console.log("Hit route update temporary password")
     try {
       const accessToken = getAccessToken(req)!;
-      await authService.changeUserPassword(accessToken, req.body.newPassword);
-      res.status(204).send();
+      const newAccessToken = await authService.changeUserPassword(accessToken, req.body.newPassword);
+      res.status(200).json({
+        accessToken: newAccessToken,
+      });
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }
   },
 );
+
+authRouter.post(
+  "/updateUserStatus",
+  updateUserStatusRequestValidator,
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  async (req, res) => {
+    try {
+      const accessToken = getAccessToken(req)!;
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
+      const currentUser = await userService.getUserById(decodedIdToken.uid);
+      await userService.updateUserById(
+        decodedIdToken.uid,
+        {
+          ...currentUser,
+          status: req.body.status,
+        },
+      );
+      res.status(204).send();
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  }
+)
 
 export default authRouter;

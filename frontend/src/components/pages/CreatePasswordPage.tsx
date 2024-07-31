@@ -16,16 +16,16 @@ const CreatePasswordPage = (): React.ReactElement => {
 
     const onSubmitNewPasswordClick = async () => {
         const success = await AuthAPIClient.updateTemporaryPassword(newPassword);
-        console.log("Completed:", success)
         if (success) {
             // change this later to not use an alert
             // eslint-disable-next-line no-alert
             alert("Successfully changed your password. Please log in with your new credentials.");
+
         } else {
             // change this later to not use an alert
             // eslint-disable-next-line no-alert
-            alert("Error occurred when changing your password. Please try again later.");
             await AuthAPIClient.logout(authenticatedUser.id);
+            alert("Error occurred when changing your password. Please log in again.");
         }
         history.push(`${LOGIN_PAGE}?role=${authenticatedUser.role}`);
     }

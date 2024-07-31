@@ -85,3 +85,15 @@ export const updateTemporaryPasswordRequestValidator = async (
 
   return next();
 };
+
+export const updateUserStatusRequestValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.status, "string")) {
+    return res.status(400).send(getApiValidationError("status", "string"));
+  }
+
+  return next();
+}

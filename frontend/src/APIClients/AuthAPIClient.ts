@@ -81,16 +81,21 @@ const resetPassword = async (email: string | undefined): Promise<boolean> => {
   }
 };
 
-const updateTemporaryPassword = async (newPassword: string) => {
+const updateTemporaryPassword = async (newPassword: string): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
   )}`;
   try {
-    await baseAPIClient.post(
+    const { data } = await baseAPIClient.post(
       `/auth/updateTemporaryPassword`,
       { newPassword },
       { headers: { Authorization: bearerToken } },
+    );
+    setLocalStorageObjProperty(
+      AUTHENTICATED_USER_KEY,
+      "accessToken",
+      data.accessToken,
     );
     return true;
   } catch (error) {

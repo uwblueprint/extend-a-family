@@ -23,6 +23,13 @@ type PasswordSignInResponse = {
   registered: boolean;
 };
 
+type ChangePasswordResponse = {
+  localId: string,
+  email: string,
+  idToken: string,
+  emailVerified: boolean,
+}
+
 type RefreshTokenResponse = {
   expires_in: string;
   token_type: string;
@@ -122,7 +129,7 @@ const FirebaseRestClient = {
     };
   },
 
-  changePassword: async (authId: string, newPassword: string): Promise<void> => {
+  changePassword: async (accessToken: string, newPassword: string): Promise<string> => {
     const response: Response = await fetch(
       `${FIREBASE_CHANGE_PASSWORD_URL}?key=${process.env.FIREBASE_WEB_API_KEY}`,
       {
@@ -131,14 +138,14 @@ const FirebaseRestClient = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          idToken: authId,
+          idToken: accessToken,
           password: newPassword,
         }),
       },
     );
 
     const responseJson:
-      | RefreshTokenResponse
+      | ChangePasswordResponse
       | RequestError = await response.json();
 
     if (!response.ok) {
@@ -152,6 +159,8 @@ const FirebaseRestClient = {
 
       throw new Error("Failed to change password via Firebase REST API");
     }
+
+    return (responseJson as ChangePasswordResponse).idToken;
   },
 };
 

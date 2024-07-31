@@ -174,12 +174,9 @@ class AuthService implements IAuthService {
   async changeUserPassword(
     accessToken: string,
     newPassword: string,
-  ): Promise<void> {
+  ): Promise<string> {
     try {
-      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken = await firebaseAdmin
-        .auth()
-        .verifyIdToken(accessToken, true);
-      await FirebaseRestClient.changePassword(decodedIdToken.uid, newPassword);
+      return await FirebaseRestClient.changePassword(accessToken, newPassword);
     } catch (error: unknown) {
       Logger.error(
         `Failed to change user's password. Reason = ${getErrorMessage(error)}`,
