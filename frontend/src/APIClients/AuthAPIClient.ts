@@ -81,7 +81,10 @@ const resetPassword = async (email: string | undefined): Promise<boolean> => {
   }
 };
 
-const updateTemporaryPassword = async (email: string, newPassword: string): Promise<boolean> => {
+const updateTemporaryPassword = async (
+  email: string,
+  newPassword: string,
+): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
@@ -92,10 +95,7 @@ const updateTemporaryPassword = async (email: string, newPassword: string): Prom
       { newPassword },
       { headers: { Authorization: bearerToken } },
     );
-    const newAuthenticatedUser = await login(
-      email,
-      newPassword,
-    );
+    const newAuthenticatedUser = await login(email, newPassword);
     if (!newAuthenticatedUser) {
       throw new Error("Unable to authenticate user after logging in.");
     }
@@ -125,7 +125,7 @@ const updateUserStatus = async (newStatus: Status): Promise<boolean> => {
   } catch (error) {
     return false;
   }
-}
+};
 
 // for testing only, refresh does not need to be exposed in the client
 const refresh = async (): Promise<boolean> => {

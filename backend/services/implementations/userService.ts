@@ -192,7 +192,12 @@ class UserService implements IUserService {
       // must explicitly specify runValidators when updating through findByIdAndUpdate
       oldUser = await MgUser.findByIdAndUpdate(
         userId,
-        { firstName: user.firstName, lastName: user.lastName, role: user.role, status: user.status },
+        {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          status: user.status,
+        },
         { runValidators: true },
       );
 
@@ -346,41 +351,40 @@ class UserService implements IUserService {
     return userDtos;
   }
 
-  async isFirstTimeInvitedUser(
-    accessToken: string,
-  ): Promise<boolean> {
+  async isFirstTimeInvitedUser(accessToken: string): Promise<boolean> {
     try {
-      console.log("flag 5")
-      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken = await firebaseAdmin
-        .auth()
-        .verifyIdToken(accessToken, true);
-      console.log("flag 6")
-      const { status } = await getMongoUserByAuthId(
-        decodedIdToken.uid
-      );
-      console.log("flag 7")
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
+      const { status } = await getMongoUserByAuthId(decodedIdToken.uid);
       return status === "Invited";
     } catch (error: unknown) {
-      Logger.error(`Failed to verify user is first time invited user. Reason = ${getErrorMessage(error)}`);
+      Logger.error(
+        `Failed to verify user is first time invited user. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
       throw error;
     }
   }
 
-  async changeUserStatus(accessToken: string, newStatus: Status): Promise<void> {
+  async changeUserStatus(
+    accessToken: string,
+    newStatus: Status,
+  ): Promise<void> {
     try {
-      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken = await firebaseAdmin
-        .auth()
-        .verifyIdToken(accessToken, true);
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
       const tokenUserId = await this.getUserIdByAuthId(decodedIdToken.uid);
       const currentUser = await this.getUserById(tokenUserId);
       const updatedUser: UpdateUserDTO = {
         ...currentUser,
         status: newStatus,
       };
-      console.log("Updated user:", updatedUser)
       await this.updateUserById(tokenUserId, updatedUser);
     } catch (error: unknown) {
-      Logger.error(`Failed to change user status. Reason = ${getErrorMessage(error)}`);
+      Logger.error(
+        `Failed to change user status. Reason = ${getErrorMessage(error)}`,
+      );
       throw error;
     }
   }

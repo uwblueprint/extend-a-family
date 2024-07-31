@@ -9,8 +9,6 @@ const FIREBASE_SIGN_IN_URL =
   "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword";
 const FIREBASE_REFRESH_TOKEN_URL =
   "https://securetoken.googleapis.com/v1/token";
-const FIREBASE_OAUTH_SIGN_IN_URL =
-  "https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp";
 const FIREBASE_CHANGE_PASSWORD_URL =
   "https://identitytoolkit.googleapis.com/v1/accounts:update";
 
@@ -24,11 +22,11 @@ type PasswordSignInResponse = {
 };
 
 type ChangePasswordResponse = {
-  localId: string,
-  email: string,
-  idToken: string,
-  emailVerified: boolean,
-}
+  localId: string;
+  email: string;
+  idToken: string;
+  emailVerified: boolean;
+};
 
 type RefreshTokenResponse = {
   expires_in: string;
@@ -129,7 +127,10 @@ const FirebaseRestClient = {
     };
   },
 
-  changePassword: async (accessToken: string, newPassword: string): Promise<string> => {
+  changePassword: async (
+    accessToken: string,
+    newPassword: string,
+  ): Promise<string> => {
     const response: Response = await fetch(
       `${FIREBASE_CHANGE_PASSWORD_URL}?key=${process.env.FIREBASE_WEB_API_KEY}`,
       {
@@ -144,9 +145,8 @@ const FirebaseRestClient = {
       },
     );
 
-    const responseJson:
-      | ChangePasswordResponse
-      | RequestError = await response.json();
+    const responseJson: ChangePasswordResponse | RequestError =
+      await response.json();
 
     if (!response.ok) {
       const errorMessage = [
