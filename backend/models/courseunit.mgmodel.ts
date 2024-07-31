@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { PageType } from "../types/courseTypes";
 
 export type ElementSkeleton = {
   id: string;
@@ -32,6 +31,8 @@ const ElementSkeletonSchema: Schema = new Schema({
     required: true,
   },
 });
+
+export type PageType = "Lesson" | "Activity";
 
 export type Page = {
   id: string;
@@ -93,6 +94,7 @@ const CourseUnitSchema: Schema = new Schema({
   modules: {
     type: [ModuleSchema],
     required: true,
+    default: [],
   },
 });
 

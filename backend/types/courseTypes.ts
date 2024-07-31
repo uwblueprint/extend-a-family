@@ -8,8 +8,6 @@ export type CreateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 
 export type UpdateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 
-export type PageType = "Lesson" | "Activity";
-
 export enum InteractiveElementType {
   TextInput = "TextInput",
   NumberInput = "NumberInput",
