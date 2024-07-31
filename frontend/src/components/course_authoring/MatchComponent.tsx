@@ -88,30 +88,16 @@ const defaultHeight = 75;
 
 let prevNode = null;
 
-const getXcoord = (
-  gridWidth: number,
-  col: number,
-  numCols: number,
-  boxWidth: number,
-) => {
-  if (col == 0) {
-    return 0;
-  }
-
-  if (numCols == 2) {
-    return gridWidth - boxWidth;
-  }
-
-  if (numCols == 3) {
-    const midpoint = gridWidth / 2;
-    if (col == 1) {
-      return midpoint - boxWidth / 2;
-    }
-    return gridWidth - boxWidth;
-  }
-
-  return 0; // this case should never happen as long as max 3 columns
-};
+const getCoordinate = (
+  gridLength: number,
+  row: number,
+  numRows: number,
+  boxHeight: number,
+) => { 
+  const spacing = (gridLength - boxHeight * numRows) / (numRows - 1);
+  const startPoint = row * (boxHeight + spacing);
+  return startPoint || 0;
+}
 
 interface MatchProps {
   numRows?: number;
@@ -165,8 +151,8 @@ const MatchComponent: React.FC<ComponentProps> = ({
           id: `node-${row}-${col}`,
           type: getNodeType(col, insertCols),
           position: {
-            x: getXcoord(w, col, insertCols, nodeWidth),
-            y: row * (h / insertRows),
+            x: getCoordinate(w, col, insertCols, nodeWidth),
+            y: getCoordinate(h, row, insertRows, nodeHeight),
           },
           data: {
             label: `node-${row}-${col}`,
