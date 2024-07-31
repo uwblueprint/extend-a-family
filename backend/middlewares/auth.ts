@@ -81,7 +81,6 @@ export const isAuthorizedByEmail = (emailField: string) => {
 
 export const isFirstTimeInvitedUser = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    console.log("hit check first time invitation")
     const accessToken = getAccessToken(req);
     const authorized =
       accessToken &&
@@ -89,7 +88,7 @@ export const isFirstTimeInvitedUser = () => {
     if (!authorized) {
       return res
         .status(401)
-        .json({ error: "You are not a first-time invited administrator." })
+        .json({ error: "You are not a first-time invited user." });
     }
     return next();
   }

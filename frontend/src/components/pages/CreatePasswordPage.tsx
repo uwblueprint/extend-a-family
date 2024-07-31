@@ -3,9 +3,10 @@ import { Redirect, useHistory } from "react-router-dom";
 import { HOME_PAGE, LOGIN_PAGE } from "../../constants/Routes";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import AuthContext from "../../contexts/AuthContext";
+import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 
 const CreatePasswordPage = (): React.ReactElement => {
-    const { authenticatedUser } = useContext(AuthContext);
+    const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
     const [newPassword, setNewPassword] = useState("");
     const history = useHistory();
 
@@ -15,18 +16,27 @@ const CreatePasswordPage = (): React.ReactElement => {
     }
 
     const onSubmitNewPasswordClick = async () => {
-        const success = await AuthAPIClient.updateTemporaryPassword(newPassword);
-        if (success) {
+        const changePasswordSuccess = await AuthAPIClient.updateTemporaryPassword(newPassword);
+        if (!changePasswordSuccess) {
             // change this later to not use an alert
             // eslint-disable-next-line no-alert
-            alert("Successfully changed your password. Please log in with your new credentials.");
-
-        } else {
-            // change this later to not use an alert
-            // eslint-disable-next-line no-alert
-            await AuthAPIClient.logout(authenticatedUser.id);
+            setAuthenticatedUser(null);
+            localStorage.removeItem(AUTHENTICATED_USER_KEY);
+            // await AuthAPIClient.logout(authenticatedUser.id);
             alert("Error occurred when changing your password. Please log in again.");
+            return;
         }
+
+        // change this later to not use an alert
+        // eslint-disable-next-line no-alert
+        const updateStatusSuccess = await AuthAPIClient.updateUserStatus("Active");
+        if (!updateStatusSuccess) {
+            alert("Failed to update user status to \"Active\"");
+            return;
+        }
+
+        alert("Successfully changed your password. Please log in with your new credentials.");
+
         history.push(`${LOGIN_PAGE}?role=${authenticatedUser.role}`);
     }
 

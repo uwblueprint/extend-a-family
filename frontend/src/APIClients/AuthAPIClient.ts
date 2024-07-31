@@ -1,11 +1,13 @@
 import { AxiosError } from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
-import { AuthenticatedUser, Role } from "../types/AuthTypes";
+import { AuthenticatedUser, Role, Status } from "../types/AuthTypes";
 import baseAPIClient from "./BaseAPIClient";
 import {
   getLocalStorageObjProperty,
   setLocalStorageObjProperty,
 } from "../utils/LocalStorageUtils";
+import { useContext } from "react";
+import AuthContext from "../contexts/AuthContext";
 
 const login = async (
   email: string,
@@ -82,6 +84,7 @@ const resetPassword = async (email: string | undefined): Promise<boolean> => {
 };
 
 const updateTemporaryPassword = async (newPassword: string): Promise<boolean> => {
+  const { authenticatedUser } = useContext(AuthContext);
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
@@ -92,16 +95,40 @@ const updateTemporaryPassword = async (newPassword: string): Promise<boolean> =>
       { newPassword },
       { headers: { Authorization: bearerToken } },
     );
+    const newAccessToken = await login(
+      authenticatedUser?.email!,
+      newPassword,
+    );
+    if (!newAccessToken) {
+      throw new Error("Unable to authenticate user after logging in.");
+    }
     setLocalStorageObjProperty(
       AUTHENTICATED_USER_KEY,
       "accessToken",
-      data.accessToken,
+      newAccessToken.accessToken,
     );
     return true;
   } catch (error) {
     return false;
   }
 };
+
+const updateUserStatus = async (newStatus: Status): Promise<boolean> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    await baseAPIClient.post(
+      `/auth/updateUserStatus`,
+      { status: newStatus },
+      { headers: { Authorization: bearerToken } },
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 
 // for testing only, refresh does not need to be exposed in the client
 const refresh = async (): Promise<boolean> => {
@@ -146,6 +173,7 @@ export default {
   signup,
   resetPassword,
   updateTemporaryPassword,
+  updateUserStatus,
   refresh,
   isUserVerified,
 };
