@@ -222,7 +222,7 @@ authRouter.post(
 authRouter.post(
   "/updateTemporaryPassword",
   updateTemporaryPasswordRequestValidator,
-  isFirstTimeInvitedUser(),
+  // isFirstTimeInvitedUser(),
   async (req, res) => {
     try {
       const accessToken = getAccessToken(req)!;
@@ -239,7 +239,6 @@ authRouter.post(
 authRouter.post(
   "/updateUserStatus",
   updateUserStatusRequestValidator,
-  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
   async (req, res) => {
     try {
       const accessToken = getAccessToken(req)!;
