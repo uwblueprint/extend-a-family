@@ -10,7 +10,6 @@ import { mongo } from "./models";
 import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
-import courseRouter from "./rest/courseRoutes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -47,7 +46,6 @@ app.use(limiter);
 app.use("/auth", authRouter);
 app.use("/entities", entityRouter);
 app.use("/users", userRouter);
-app.use("/courseUnits", courseRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 mongo.connect();
