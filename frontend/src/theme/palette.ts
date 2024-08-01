@@ -1,8 +1,4 @@
-type RGB = `rgb(${number}, ${number}, ${number})`;
-type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;
-type HEX = `#${string}`;
-
-export type Color = RGB | RGBA | HEX;
+export type Color = `#${string}`;
 
 export type Palette = {
   0: Color;
@@ -39,17 +35,17 @@ export const learner: Palette = {
 
 export const administrator: Palette = {
   0: "#000000",
-  10: "#1A1D00",
-  20: "#2E3300",
-  30: "#444B00",
-  40: "#5B6400",
-  50: "#737D00",
-  60: "#8C9800",
-  70: "#A5B400",
-  80: "#C0D023",
-  90: "#E0EA8A",
-  95: "#EEF897",
-  99: "#F7FDFF",
+  10: "#380D00",
+  20: "#5B1A00",
+  30: "#812900",
+  40: "#A93800",
+  50: "#CB4F1C",
+  60: "#EE6835",
+  70: "#F78C61",
+  80: "#FAB59A",
+  90: "#FCDCCF",
+  95: "#FDEDE8",
+  99: "#FFF7F5",
   100: "#FFFFFF",
 };
 
