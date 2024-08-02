@@ -1,8 +1,15 @@
-import React from "react";
-import { useHistory } from "react-router-dom";
+import React, { useContext } from "react";
+import { Redirect, useHistory } from "react-router-dom";
+import { HOME_PAGE } from "../../constants/Routes";
+import AuthContext from "../../contexts/AuthContext";
 
 const Welcome = (): React.ReactElement => {
+  const { authenticatedUser } = useContext(AuthContext);
   const history = useHistory();
+
+  if (authenticatedUser) {
+    return <Redirect to={HOME_PAGE} />;
+  }
 
   const handleButtonClick = (selectedRole: string) => {
     history.push(`/login?role=${selectedRole}`);
