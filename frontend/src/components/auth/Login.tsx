@@ -6,6 +6,7 @@ import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
+import { authErrors } from "../../errors/AuthErrors";
 import { PresentableError } from "../../types/ErrorTypes";
 import { isRole } from "../../types/UserTypes";
 
@@ -42,13 +43,18 @@ const Login = (): React.ReactElement => {
       localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
       setAuthenticatedUser(user);
     } catch (e: unknown) {
-      // eslint-disable-next-line no-alert
-      alert("bad!");
+      if (e instanceof Error && e.message in authErrors) {
+        // eslint-disable-next-line no-alert
+        alert(e.message);
+      } else {
+        // eslint-disable-next-line no-alert
+        alert("bad!");
+      }
     }
   };
 
   const onSignupClick = () => {
-    history.push(`${SIGNUP_PAGE}?role=${role}`);
+    history.push(`${SIGNUP_PAGE}?role=${role.toLowerCase()}`);
   };
 
   return (
