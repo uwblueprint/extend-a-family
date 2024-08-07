@@ -44,8 +44,7 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
     );
 
     const { accessToken, refreshToken, ...rest } = authDTO;
-
-    correctRole = await authService.correctRole(accessToken);
+    correctRole = rest.role;
 
     if (correctRole !== requestedRole) {
       throw new Error("WRONG_USER_TYPE");
