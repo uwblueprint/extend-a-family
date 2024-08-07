@@ -1,13 +1,13 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 export interface HelpRequest extends Document {
-  id: string;
+  id: ObjectId;
   message: string;
-  learner: string;
-  facilitator: string;
-  unit: string;
-  module: string;
-  page: string;
+  learner: ObjectId;
+  facilitator: ObjectId;
+  unit: ObjectId;
+  module: ObjectId;
+  page: ObjectId;
 }
 
 const HelpRequestSchema: Schema = new Schema(
@@ -17,23 +17,28 @@ const HelpRequestSchema: Schema = new Schema(
       required: true,
     },
     learner: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     facilitator: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     unit: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CourseUnit", // Ensure consistency here
       required: true,
     },
     module: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CourseUnit", // Ensure consistency here
       required: true,
     },
     page: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CourseUnit", // Ensure consistency here
       required: true,
     },
   },

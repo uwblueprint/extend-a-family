@@ -12,7 +12,10 @@ import { mongo } from "./models";
 import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
-import { registerNotificationHandlers } from "./sockets/notification";
+import {
+  registerNotificationHandlers,
+  registerNotificationSchemaListener,
+} from "./sockets/notification";
 import helpRequestRouter from "./rest/helpRequestRoutes";
 import notificationRouter from "./rest/notificationRoutes";
 
@@ -57,9 +60,10 @@ io.on("connection", (socket) => {
   // so we can use mongodb id as the key to emit to instead
   if (!userId && typeof userId !== "string") return;
   socket.join(userId);
-  console.log(io.sockets.adapter.rooms);
   registerNotificationHandlers(io, socket);
 });
+
+registerNotificationSchemaListener(io);
 
 app.use(cookieParser());
 app.use(cors(CORS_OPTIONS));

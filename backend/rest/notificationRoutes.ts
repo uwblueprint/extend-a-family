@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getErrorMessage } from "../utilities/errorUtils";
 import NotificationService from "../services/implementations/notificationService";
+import MgCourseUnit from "../models/courseunit.mgmodel";
 
 const notificationRouter: Router = Router();
 
@@ -22,6 +23,11 @@ notificationRouter.get("/", async (req, res) => {
   } catch (error) {
     res.status(500).send(getErrorMessage(error));
   }
+});
+
+notificationRouter.get("/test",  async (req, res) => {
+  const x = await MgCourseUnit.find({});
+  res.json(x);
 });
 
 export default notificationRouter;

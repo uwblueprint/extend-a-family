@@ -12,7 +12,7 @@ import helpRequestAPIClient from "../../APIClients/HelpRequestAPIClient";
 
 const MakeHelpRequestPage = (): React.ReactElement => {
   const learner = useLearner();
-
+  const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -24,15 +24,18 @@ const MakeHelpRequestPage = (): React.ReactElement => {
   };
 
   const handleSubmit = async () => {
-    const data = await helpRequestAPIClient.createHelpRequest(
-      "message",
+    // hardocde, dont actually do this
+    const UNIT = "66a1b0f68eb236cce6df3184"; // wrong one
+    const MODULE = "66a1b0f68eb236cce6df3184";
+    const PAGE = "66a1b0f68eb236cce6df3184"; // also wrong one
+    await helpRequestAPIClient.createHelpRequest(
+      text,
       learner.id,
       learner.facilitator,
-      "unit 1",
-      "module 1",
-      "page 1",
+      UNIT,
+      MODULE,
+      PAGE,
     );
-    console.log(data);
     handleClose();
   };
 
@@ -46,7 +49,10 @@ const MakeHelpRequestPage = (): React.ReactElement => {
           <DialogContentText>
             What are you having trouble with?
           </DialogContentText>
-          <textarea aria-label="help message" />
+          <textarea
+            aria-label="help message"
+            onChange={(e) => setText(e.target.value)}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

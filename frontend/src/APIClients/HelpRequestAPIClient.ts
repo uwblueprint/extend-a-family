@@ -24,14 +24,12 @@ const createHelpRequest = async (
   }
 };
 
-const getHelpRequests = async (
-  userId: string,
-): Promise<HelpRequest[] | null> => {
+const getHelpRequests = async (userId: string): Promise<HelpRequest[]> => {
   try {
-    const { data } = await baseAPIClient.post(`/help-request?userid=${userId}`);
+    const { data } = await baseAPIClient.get(`/help-request?userId=${userId}`);
     return data;
   } catch (error) {
-    return null;
+    return [];
   }
 };
 

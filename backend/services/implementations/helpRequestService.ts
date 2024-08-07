@@ -13,9 +13,24 @@ const Logger = logger(__filename);
 export class HelpRequestService implements IHelpRequestService {
   async getHelpRequests(userId: string): Promise<HelpRequestDTO[]> {
     try {
-      const helpRequests = await MgHelpRequest.find({ userId }).sort({
-        createdAt: -1,
-      });
+      const helpRequests = await MgHelpRequest.find({ facilitator: userId })
+        .populate("learner", "firstName lastName")
+        .populate({
+          path: "unit",
+          select: "displayIndex",
+          populate: {
+            path: "modules",
+            model: "unit.modules",
+            select: "displayIndex",
+          },
+        })
+        .sort({
+          createdAt: -1,
+        });
+      // need a learners tab
+      // put the message in the tab
+      // date of request
+      // location of the request (get all the titles)
       return helpRequests;
     } catch (error) {
       Logger.error(

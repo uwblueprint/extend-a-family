@@ -8,11 +8,13 @@ import Typography from "@mui/material/Typography";
 import Badge from "@mui/material/Badge";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import Button from "@mui/material/Button/Button";
 import NotificationsList from "../notification/NotificationsList";
 import NotificationAPIClient from "../../APIClients/NotificationAPIClient";
 import { useUser } from "../../hooks/useUser";
 import { Notification } from "../../types/NotificationTypes";
 import { useSocket } from "../../contexts/SocketContext";
+
 
 export default function Navbar() {
   const user = useUser();
@@ -22,17 +24,18 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [numUnseenNotifications, setNumUnseenNotification] = useState(0);
 
+  const fetchNotifications = async () => {
+    const data = await NotificationAPIClient.getNotifications(
+      user.id,
+      notifications.length,
+      NUMBER_OF_NOTIFICATIONS_TO_LOAD,
+    );
+    if (!data) return;
+    setNotifications((prev) => [...data.notifications, ...prev]);
+    setNumUnseenNotification(data.numberOfUnseenNotifications);
+  };
+
   useEffect(() => {
-    const fetchNotifications = async () => {
-      const data = await NotificationAPIClient.getNotifications(
-        user.id,
-        notifications.length,
-        NUMBER_OF_NOTIFICATIONS_TO_LOAD,
-      );
-      if (!data) return;
-      setNotifications((prev) => [...data.notifications, ...prev]);
-      setNumUnseenNotification(data.numberOfUnseenNotifications);
-    };
     fetchNotifications();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -124,6 +127,7 @@ export default function Navbar() {
       >
         <Typography sx={{ p: 2 }}>Notifications and stuff go here</Typography>
         <NotificationsList notifications={notifications} />
+        <Button onClick={fetchNotifications}>Load more</Button>
       </Popover>
     </Box>
   );

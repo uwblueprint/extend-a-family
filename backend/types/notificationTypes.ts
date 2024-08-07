@@ -1,9 +1,11 @@
+import { ObjectId } from "mongoose";
+
 export type NotificationDTO = {
-  id: string;
+  id: ObjectId;
   message: string;
   read: boolean;
   createdAt: Date;
-  user: string;
+  user: ObjectId;
   link: string;
 };
 

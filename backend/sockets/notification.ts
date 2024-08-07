@@ -7,6 +7,7 @@ const Logger = logger(__filename);
 const notificationService = new NotificationService();
 
 const registerNotificationHandlers = (io: Server, socket: Socket) => {
+  // change this to http request idk
   const markNotificationAsRead = async (userId: string) => {
     try {
       const updates = await notificationService.markReadNotifications(userId);
@@ -17,14 +18,19 @@ const registerNotificationHandlers = (io: Server, socket: Socket) => {
       );
     }
   };
+  socket.on("notification:read", markNotificationAsRead);
+};
+
+const registerNotificationSchemaListener = (io: Server) => {
   MgNotification.schema.on(
     "notificationSaved",
     (notification: Notification) => {
-      io.to(notification.user).emit("notification:new", notification);
+      io.to(notification.user.toString()).emit(
+        "notification:new",
+        notification,
+      );
     },
   );
-
-  socket.on("notification:read", markNotificationAsRead);
 };
 
 const removeNotificationHandlers = (io: Server, socket: Socket) => {
@@ -32,4 +38,8 @@ const removeNotificationHandlers = (io: Server, socket: Socket) => {
   MgNotification.schema.removeAllListeners();
 };
 
-export { registerNotificationHandlers, removeNotificationHandlers };
+export {
+  registerNotificationHandlers,
+  removeNotificationHandlers,
+  registerNotificationSchemaListener,
+};

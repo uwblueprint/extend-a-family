@@ -37,6 +37,7 @@ export type PageType = "Lesson" | "Activity";
 export type Page = {
   id: string;
   title: string;
+  displayIndex: number;
   type: PageType;
   layout: [ElementSkeleton];
 };
@@ -44,6 +45,10 @@ export type Page = {
 const PageSchema: Schema = new Schema({
   title: {
     type: String,
+    required: true,
+  },
+  displayIndex: {
+    type: Number,
     required: true,
   },
   type: {
@@ -59,6 +64,7 @@ const PageSchema: Schema = new Schema({
 
 export type Module = {
   id: string;
+  displayIndex: number;
   title: string;
   pages: [Page];
 };
@@ -66,6 +72,10 @@ export type Module = {
 const ModuleSchema: Schema = new Schema({
   title: {
     type: String,
+    required: true,
+  },
+  displayIndex: {
+    type: Number,
     required: true,
   },
   pages: {

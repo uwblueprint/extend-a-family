@@ -1,9 +1,9 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 export interface Notification extends Document {
-  id: string;
+  id: ObjectId;
   message: string;
-  user: string;
+  user: ObjectId;
   read: boolean;
   createdAt: Date;
   link: string;
@@ -16,7 +16,8 @@ export const NotificationSchema: Schema = new Schema(
       required: true,
     },
     user: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     read: {

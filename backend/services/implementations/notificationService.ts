@@ -120,7 +120,7 @@ class NotificationService implements INotificationService {
       ? updateNotification.link
       : oldNotification.link;
     return {
-      id: notificationId,
+      id: oldNotification.id,
       user: oldNotification.user,
       createdAt: oldNotification.createdAt,
       message,

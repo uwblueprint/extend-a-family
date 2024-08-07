@@ -1,11 +1,13 @@
+import { ObjectId } from "mongoose";
+
 export type HelpRequestDTO = {
-  id: string;
+  id: ObjectId;
   message: string;
-  learner: string;
-  facilitator: string;
-  unit: string;
-  module: string;
-  page: string;
+  learner: ObjectId;
+  facilitator: ObjectId;
+  unit: ObjectId;
+  module: ObjectId;
+  page: ObjectId;
 };
 
 export type CreateHelpRequestDTO = Omit<HelpRequestDTO, "id">;

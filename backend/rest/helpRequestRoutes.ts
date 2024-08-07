@@ -40,10 +40,9 @@ helpRequestRouter.post("/", createHelpRequestDtoValidator, async (req, res) => {
     });
     // make and send a notificaiton to the facilitator
     await MgNotification.create({
-      message: "genji",
+      message: req.body.message,
       user: req.body.facilitator,
-      read: false,
-      link: "/",
+      link: "https://www.youtube.com",
     });
 
     res.status(201).send(createdHelpRequest);
