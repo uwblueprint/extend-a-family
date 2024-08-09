@@ -25,15 +25,18 @@ const HelpRequestSchema: Schema = new Schema(
       required: true,
     },
     unit: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "CourseUnit",
       required: true,
     },
     module: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "CourseModule",
       required: true,
     },
     page: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "CoursePage",
       required: true,
     },
   },
