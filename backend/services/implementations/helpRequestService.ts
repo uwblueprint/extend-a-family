@@ -13,17 +13,13 @@ const Logger = logger(__filename);
 export class HelpRequestService implements IHelpRequestService {
   async getHelpRequests(userId: string): Promise<HelpRequestDTO[]> {
     try {
-      const helpRequests = await MgHelpRequest.find({ facilitator: userId })
+      const helpRequests = await MgHelpRequest.find({
+        facilitator: userId,
+      })
         .populate("learner", "firstName lastName")
-        .populate({
-          path: "unit",
-          select: "displayIndex",
-          populate: {
-            path: "modules",
-            model: "unit.modules",
-            select: "displayIndex",
-          },
-        })
+        .populate("unit", "title displayIndex")
+        .populate("module", "title displayIndex")
+        .populate("page", "title displayIndex")
         .sort({
           createdAt: -1,
         });

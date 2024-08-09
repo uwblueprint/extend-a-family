@@ -25,7 +25,7 @@ notificationRouter.get("/", async (req, res) => {
   }
 });
 
-notificationRouter.get("/test",  async (req, res) => {
+notificationRouter.get("/test", async (req, res) => {
   const x = await MgCourseUnit.find({});
   res.json(x);
 });

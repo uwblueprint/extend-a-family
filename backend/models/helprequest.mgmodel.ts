@@ -28,17 +28,17 @@ const HelpRequestSchema: Schema = new Schema(
     },
     unit: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CourseUnit", // Ensure consistency here
+      ref: "CourseUnit",
       required: true,
     },
     module: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CourseUnit", // Ensure consistency here
+      ref: "CourseModule",
       required: true,
     },
     page: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CourseUnit", // Ensure consistency here
+      ref: "CoursePage",
       required: true,
     },
   },

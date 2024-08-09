@@ -1,95 +1,10 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
-export type ElementSkeleton = {
-  id: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  content: string;
-};
-
-const ElementSkeletonSchema: Schema = new Schema({
-  x: {
-    type: Number,
-    required: true,
-  },
-  y: {
-    type: Number,
-    required: true,
-  },
-  w: {
-    type: Number,
-    required: true,
-  },
-  h: {
-    type: Number,
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  },
-});
-
-export type PageType = "Lesson" | "Activity";
-
-export type Page = {
-  id: string;
-  title: string;
-  displayIndex: number;
-  type: PageType;
-  layout: [ElementSkeleton];
-};
-
-const PageSchema: Schema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  displayIndex: {
-    type: Number,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-    enum: ["Lesson", "Activity"],
-  },
-  layout: {
-    type: [ElementSkeletonSchema],
-    required: true,
-  },
-});
-
-export type Module = {
-  id: string;
-  displayIndex: number;
-  title: string;
-  pages: [Page];
-};
-
-const ModuleSchema: Schema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  displayIndex: {
-    type: Number,
-    required: true,
-  },
-  pages: {
-    type: [PageSchema],
-    required: true,
-  },
-});
-
-// Course Unit
 export interface CourseUnit extends Document {
   id: string;
   displayIndex: number;
   title: string;
-  modules: [Module];
+  modules: [ObjectId];
 }
 
 const CourseUnitSchema: Schema = new Schema({
@@ -101,10 +16,21 @@ const CourseUnitSchema: Schema = new Schema({
     type: String,
     required: true,
   },
-  modules: {
-    type: [ModuleSchema],
-    required: true,
-    default: [],
+  modules: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "CourseModule",
+    },
+  ],
+});
+
+/* eslint-disable no-param-reassign */
+CourseUnitSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc: Document, ret: Record<string, unknown>) => {
+    // eslint-disable-next-line no-underscore-dangle
+    delete ret._id;
   },
 });
 
