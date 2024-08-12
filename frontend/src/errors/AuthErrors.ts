@@ -1,6 +1,14 @@
 import { PresentableError } from "../types/ErrorTypes";
 
-export const authErrors: Record<string, PresentableError> = {
+export enum AuthErrorCodes {
+  INVALID_LOGIN_CREDENTIALS = "INVALID_LOGIN_CREDENTIALS",
+  UNVERIFIED_EMAIL = "UNVERIFIED_EMAIL",
+  WRONG_USER_TYPE = "WRONG_USER_TYPE",
+  EMAIL_NOT_FOUND = "EMAIL_NOT_FOUND",
+  INCORRECT_PASSWORD = "INCORRECT_PASSWORD",
+}
+
+export const authErrors: Record<AuthErrorCodes, PresentableError> = {
   INVALID_LOGIN_CREDENTIALS: {
     title: () => "Invalid login credentials",
     text: () => "Please check your email and password, and try again.",

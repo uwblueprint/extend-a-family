@@ -21,6 +21,7 @@ import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import { getErrorMessage } from "../utilities/errorUtils";
+import { AuthErrorCodes } from "../types/authTypes";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -47,7 +48,7 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
     correctRole = rest.role;
 
     if (correctRole !== requestedRole) {
-      throw new Error("WRONG_USER_TYPE");
+      throw new Error(AuthErrorCodes.WRONG_USER_TYPE);
     }
 
     const isVerified = await authService.isAuthorizedByEmail(
@@ -56,7 +57,7 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
     );
 
     if (!isVerified) {
-      throw new Error("UNVERIFIED_EMAIL");
+      throw new Error(AuthErrorCodes.UNVERIFIED_EMAIL);
     }
 
     res
@@ -67,10 +68,11 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
     const message = getErrorMessage(error);
     if (
       req.body.attemptedRole !== "Learner" &&
-      (message === "EMAIL_NOT_FOUND" || message === "INCORRECT_PASSWORD")
+      (message === AuthErrorCodes.EMAIL_NOT_FOUND ||
+        message === AuthErrorCodes.INCORRECT_PASSWORD)
     ) {
-      res.status(500).json({ error: "INVALID_LOGIN_CREDENTIALS" });
-    } else if (message === "WRONG_USER_TYPE") {
+      res.status(500).json({ error: AuthErrorCodes.INVALID_LOGIN_CREDENTIALS });
+    } else if (message === AuthErrorCodes.WRONG_USER_TYPE) {
       res.status(500).json({
         error: message,
         errorData: [requestedRole, correctRole],

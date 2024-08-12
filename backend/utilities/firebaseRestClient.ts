@@ -1,6 +1,6 @@
 import fetch, { Response } from "node-fetch";
 
-import { Token } from "../types/authTypes";
+import { AuthErrorCodes, Token } from "../types/authTypes";
 import logger from "./logger";
 
 const Logger = logger(__filename);
@@ -72,7 +72,7 @@ const FirebaseRestClient = {
       ];
       Logger.error(errorMessage.join(" "));
       if (firebaseErrorMessage === "INVALID_LOGIN_CREDENTIALS") {
-        throw new Error("INCORRECT_PASSWORD");
+        throw new Error(AuthErrorCodes.INCORRECT_PASSWORD);
       } else {
         throw new Error("Failed to sign-in via Firebase REST API");
       }
