@@ -1,8 +1,12 @@
+/* eslint-disable no-underscore-dangle */
 import { Router } from "express";
 import { getErrorMessage } from "../utilities/errorUtils";
 import { HelpRequestService } from "../services/implementations/helpRequestService";
 import MgNotification from "../models/notification.mgmodel";
-import { createHelpRequestDtoValidator } from "../middlewares/validators/helpRequestValidators";
+import {
+  createHelpRequestDtoValidator,
+  updateHelpRequestDtoValidator,
+} from "../middlewares/validators/helpRequestValidators";
 
 const helpRequestRouter: Router = Router();
 
@@ -28,6 +32,16 @@ helpRequestRouter.get("/", async (req, res) => {
   }
 });
 
+helpRequestRouter.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const helpRequest = await helpRequestService.getHelpRequest(id);
+    res.status(200).json(helpRequest);
+  } catch (error) {
+    res.status(500).send(getErrorMessage(error));
+  }
+});
+
 helpRequestRouter.post("/", createHelpRequestDtoValidator, async (req, res) => {
   try {
     const createdHelpRequest = await helpRequestService.createHelpRequest({
@@ -42,7 +56,7 @@ helpRequestRouter.post("/", createHelpRequestDtoValidator, async (req, res) => {
     await MgNotification.create({
       message: req.body.message,
       user: req.body.facilitator,
-      link: "https://www.youtube.com",
+      link: `/help-requests/${createdHelpRequest.id}`,
     });
 
     res.status(201).send(createdHelpRequest);
@@ -50,5 +64,27 @@ helpRequestRouter.post("/", createHelpRequestDtoValidator, async (req, res) => {
     res.status(500).send(getErrorMessage(error));
   }
 });
+
+helpRequestRouter.put(
+  "/:id",
+  updateHelpRequestDtoValidator,
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const updatedHelpRequest = await helpRequestService.updateHelpRequest(
+        id,
+        {
+          unit: req.body.unit,
+          module: req.body.module,
+          page: req.body.page,
+          completed: req.body.completed,
+        },
+      );
+      res.status(201).send(updatedHelpRequest);
+    } catch (error) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
 
 export default helpRequestRouter;

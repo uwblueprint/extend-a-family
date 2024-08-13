@@ -27,10 +27,6 @@ const SocketProvider = (props: PropsWithChildren<SocketProviderProps>) => {
 
   useEffect(() => {
     socket.connect();
-    socket.on("connect", () => {
-      console.log("connected");
-    });
-
     // eslint-disable-next-line consistent-return
     return () => {
       socket.close();

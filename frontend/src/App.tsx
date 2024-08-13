@@ -30,7 +30,8 @@ import * as Routes from "./constants/Routes";
 import ManageUserPage from "./components/pages/ManageUserPage";
 import { SocketProvider } from "./contexts/SocketContext";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
-import ViewHelpRequestPage from "./components/pages/ViewHelpRequestsPage";
+import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
+import HelpRequestPage from "./components/pages/HelpRequestPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -138,7 +139,13 @@ const App = (): React.ReactElement => {
                 <PrivateRoute
                   exact
                   path={Routes.VIEW_HELP_REQUESTS_PAGE}
-                  component={ViewHelpRequestPage}
+                  component={ViewHelpRequestsPage}
+                  allowedRoles={["Facilitator"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={`${Routes.VIEW_HELP_REQUESTS_PAGE}/:id`}
+                  component={HelpRequestPage}
                   allowedRoles={["Facilitator"]}
                 />
                 <Route exact path="*" component={NotFound} />

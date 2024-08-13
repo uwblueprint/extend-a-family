@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, ListItem, ListItemButton } from "@mui/material";
+import { useHistory } from "react-router-dom";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { Notification } from "../../types/NotificationTypes";
 import NotificationItem from "./NotificationItem";
@@ -10,10 +11,14 @@ interface NotificationListProps {
 
 const NotificationRow = (props: ListChildComponentProps<Notification[]>) => {
   const { style, index, data } = props;
+  const history = useHistory();
 
   return (
     <ListItem style={style} key={index} component="div" disablePadding>
-      <ListItemButton>
+      <ListItemButton
+        sx={{ width: "100%", height: "100%" }}
+        onClick={() => history.push({ pathname: data[index].link })}
+      >
         <NotificationItem notification={data[index]} />
       </ListItemButton>
     </ListItem>

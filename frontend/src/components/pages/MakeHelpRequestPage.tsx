@@ -25,9 +25,10 @@ const MakeHelpRequestPage = (): React.ReactElement => {
 
   const handleSubmit = async () => {
     // hardocde, dont actually do this
-    const UNIT = "66a1b0f68eb236cce6df3184"; // wrong one
-    const MODULE = "66a1b0f68eb236cce6df3184";
-    const PAGE = "66a1b0f68eb236cce6df3184"; // also wrong one
+    // this assumes ur connected to carolyn_dev btw
+    const UNIT = "66b55d6f827f79dd57710ad9"; // wrong one
+    const MODULE = "66b55d15e2c9ce72d4b65a6f";
+    const PAGE = "66b55a37f55a2e9e071d8363"; // also wrong one
     await helpRequestAPIClient.createHelpRequest(
       text,
       learner.id,

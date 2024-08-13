@@ -8,6 +8,8 @@ export interface HelpRequest extends Document {
   unit: ObjectId;
   module: ObjectId;
   page: ObjectId;
+  completed: boolean;
+  createdAt: Date;
 }
 
 const HelpRequestSchema: Schema = new Schema(
@@ -41,8 +43,22 @@ const HelpRequestSchema: Schema = new Schema(
       ref: "CoursePage",
       required: true,
     },
+    completed: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );
+
+/* eslint-disable no-param-reassign */
+HelpRequestSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc: Document, ret: Record<string, unknown>) => {
+    // eslint-disable-next-line no-underscore-dangle
+    delete ret._id;
+  },
+});
 
 export default mongoose.model<HelpRequest>("HelpRequest", HelpRequestSchema);

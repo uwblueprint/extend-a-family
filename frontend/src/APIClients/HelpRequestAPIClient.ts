@@ -33,4 +33,34 @@ const getHelpRequests = async (userId: string): Promise<HelpRequest[]> => {
   }
 };
 
-export default { createHelpRequest, getHelpRequests };
+const getHelpRequest = async (
+  requestId: string,
+): Promise<HelpRequest | null> => {
+  try {
+    const { data } = await baseAPIClient.get(`/help-request/${requestId}`);
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+const markHelpRequestCompleted = async (
+  requestId: string,
+  completed: boolean,
+): Promise<HelpRequest | null> => {
+  try {
+    const { data } = await baseAPIClient.put(`/help-request/${requestId}`, {
+      completed,
+    });
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+export default {
+  createHelpRequest,
+  getHelpRequests,
+  getHelpRequest,
+  markHelpRequestCompleted,
+};

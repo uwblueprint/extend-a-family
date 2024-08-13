@@ -8,8 +8,14 @@ export type HelpRequestDTO = {
   unit: ObjectId;
   module: ObjectId;
   page: ObjectId;
+  completed: boolean;
 };
 
-export type CreateHelpRequestDTO = Omit<HelpRequestDTO, "id">;
+export type CreateHelpRequestDTO = Omit<HelpRequestDTO, "id" | "completed">;
 
-// export type GetHelpRequestDTO = TODO
+export type UpdateHelpRequestDTO = {
+  unit?: ObjectId;
+  module?: ObjectId;
+  page?: ObjectId;
+  completed?: boolean;
+};

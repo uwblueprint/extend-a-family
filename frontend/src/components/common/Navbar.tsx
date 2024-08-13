@@ -15,7 +15,6 @@ import { useUser } from "../../hooks/useUser";
 import { Notification } from "../../types/NotificationTypes";
 import { useSocket } from "../../contexts/SocketContext";
 
-
 export default function Navbar() {
   const user = useUser();
   const socket = useSocket();
@@ -42,14 +41,13 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!socket) return;
-    socket.on("notification:new", (notification) => {
-      console.log("new notification", notification);
+    socket.on("notification:new", (notification: Notification) => {
       setNotifications((prev) => [notification, ...prev]);
       setNumUnseenNotification((prev) => prev + 1);
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     socket.on("notification:readUpdates", (updates) => {
-      console.log("new notification", updates);
-      setNumUnseenNotification((prev) => prev - updates.modifiedCount);
+      setNumUnseenNotification(0);
     });
 
     // eslint-disable-next-line consistent-return

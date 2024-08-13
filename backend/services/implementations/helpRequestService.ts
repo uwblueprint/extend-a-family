@@ -6,11 +6,27 @@ import logger from "../../utilities/logger";
 import {
   CreateHelpRequestDTO,
   HelpRequestDTO,
+  UpdateHelpRequestDTO,
 } from "../../types/helpRequestTypes";
 
 const Logger = logger(__filename);
 
 export class HelpRequestService implements IHelpRequestService {
+  async getHelpRequest(requestId: string): Promise<HelpRequestDTO> {
+    try {
+      const helpRequest = await MgHelpRequest.findById(requestId);
+      if (!helpRequest) {
+        throw Error(`Help request with id ${requestId} doesn't exist`);
+      }
+      return helpRequest;
+    } catch (error) {
+      Logger.error(
+        `Failed to retrieve help request. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
   async getHelpRequests(userId: string): Promise<HelpRequestDTO[]> {
     try {
       const helpRequests = await MgHelpRequest.find({
@@ -23,10 +39,6 @@ export class HelpRequestService implements IHelpRequestService {
         .sort({
           createdAt: -1,
         });
-      // need a learners tab
-      // put the message in the tab
-      // date of request
-      // location of the request (get all the titles)
       return helpRequests;
     } catch (error) {
       Logger.error(
@@ -49,5 +61,44 @@ export class HelpRequestService implements IHelpRequestService {
       throw error;
     }
     return createdHelpRequest;
+  }
+
+  async updateHelpRequest(requestId: string, updates: UpdateHelpRequestDTO) {
+    let oldHelpRequest: HelpRequest | null;
+    try {
+      oldHelpRequest = await MgHelpRequest.findByIdAndUpdate(
+        requestId,
+        { $set: updates }, // Only update the fields provided in `updateData`
+        { new: true, omitUndefined: true },
+      )
+        .populate("learner", "firstName lastName")
+        .populate("unit", "title displayIndex")
+        .populate("module", "title displayIndex")
+        .populate("page", "title displayIndex");
+
+      if (!oldHelpRequest) {
+        throw new Error(`Help Request with id ${requestId} not found.`);
+      }
+    } catch (error) {
+      Logger.error(
+        `Failed to update help request. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+    return {
+      id: oldHelpRequest.id,
+      message: oldHelpRequest.message,
+      learner: oldHelpRequest.learner,
+      facilitator: oldHelpRequest.facilitator,
+      unit: updates.unit !== undefined ? updates.unit : oldHelpRequest.unit,
+      module:
+        updates.module !== undefined ? updates.module : oldHelpRequest.module,
+      page: updates.page !== undefined ? updates.page : oldHelpRequest.page,
+      completed:
+        updates.completed !== undefined
+          ? updates.completed
+          : oldHelpRequest.completed, // yes i know this sucks
+      createdAt: oldHelpRequest.createdAt,
+    };
   }
 }

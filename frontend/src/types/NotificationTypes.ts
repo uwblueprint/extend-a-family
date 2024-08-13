@@ -2,7 +2,7 @@ export type Notification = {
   id: string;
   message: string;
   read: boolean;
-  createdAt: Date;
+  createdAt: string;
   user: string;
   link: string;
 };
