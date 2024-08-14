@@ -21,6 +21,7 @@ import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import { getErrorMessage } from "../utilities/errorUtils";
+import { AuthErrorCodes } from "../types/authTypes";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -35,20 +36,50 @@ const cookieOptions: CookieOptions = {
 
 /* Returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
 authRouter.post("/login", loginRequestValidator, async (req, res) => {
+  const requestedRole = req.body.attemptedRole;
+  let correctRole = null;
   try {
     const authDTO = await authService.generateToken(
       req.body.email,
       req.body.password,
     );
 
-    const { refreshToken, ...rest } = authDTO;
+    const { accessToken, refreshToken, ...rest } = authDTO;
+    correctRole = rest.role;
+
+    if (correctRole !== requestedRole) {
+      throw new Error(AuthErrorCodes.WRONG_USER_TYPE);
+    }
+
+    const isVerified = await authService.isAuthorizedByEmail(
+      accessToken,
+      req.body.email,
+    );
+
+    if (!isVerified) {
+      throw new Error(AuthErrorCodes.UNVERIFIED_EMAIL);
+    }
 
     res
       .cookie("refreshToken", refreshToken, cookieOptions)
       .status(200)
       .json(rest);
   } catch (error: unknown) {
-    res.status(500).json({ error: getErrorMessage(error) });
+    const message = getErrorMessage(error);
+    if (
+      req.body.attemptedRole !== "Learner" &&
+      (message === AuthErrorCodes.EMAIL_NOT_FOUND ||
+        message === AuthErrorCodes.INCORRECT_PASSWORD)
+    ) {
+      res.status(500).json({ error: AuthErrorCodes.INVALID_LOGIN_CREDENTIALS });
+    } else if (message === AuthErrorCodes.WRONG_USER_TYPE) {
+      res.status(500).json({
+        error: message,
+        errorData: [requestedRole, correctRole],
+      });
+    } else {
+      res.status(500).json({ error: message });
+    }
   }
 });
 

@@ -8,6 +8,7 @@ import {
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
+import { AuthErrorCodes } from "../../types/authTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
@@ -59,7 +60,7 @@ class UserService implements IUserService {
       }
     } catch (error: unknown) {
       Logger.error(`Failed to get user. Reason = ${getErrorMessage(error)}`);
-      throw new Error("EMAIL_NOT_FOUND");
+      throw new Error(AuthErrorCodes.EMAIL_NOT_FOUND);
     }
 
     return {
