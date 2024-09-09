@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ReactFlow, {
   addEdge,
   Background,
@@ -49,6 +49,7 @@ const Node = ({ data, handleType }) => {
 };
 
 const LeftNode = ({ data }) => {
+  console.log(data);
   return <Node data={data} handleType="left" />;
 };
 
@@ -72,6 +73,7 @@ const getNodeType = (col: number, numCols: number): string => {
   return nodeType;
 };
 
+// TO DO: This needs to be wrapped in an useMemo as instructed in ReactFlow docs, but doing so breaks the app...
 const nodeTypes = {
   leftNode: LeftNode,
   rightNode: RightNode,
@@ -213,8 +215,24 @@ const MatchComponent: React.FC<ComponentProps> = ({
       i,
     );
     if (selectedNode && selectedNode.type !== node.type) {
-      setEdges((eds) =>
-        addEdge(
+      setEdges((eds) => {
+        const edgeExists = eds.some(
+          (edge) =>
+            (edge.source === selectedNode.id && edge.target === node.id) ||
+            (edge.source === node.id && edge.target === selectedNode.id),
+        );
+
+        if (edgeExists) {
+          return eds.filter(
+            (edge) =>
+              !(
+                (edge.source === selectedNode.id && edge.target === node.id) ||
+                (edge.source === node.id && edge.target === selectedNode.id)
+              ),
+          );
+        }
+
+        return addEdge(
           {
             id: `${selectedNode.id}-${node.id}`,
             source:
@@ -225,8 +243,8 @@ const MatchComponent: React.FC<ComponentProps> = ({
             style: { stroke: "blue" },
           },
           eds,
-        ),
-      );
+        );
+      });
       updatedComponentDataMap = editComponentDataMap(
         updatedComponentDataMap,
         "selectedNode",
@@ -243,6 +261,14 @@ const MatchComponent: React.FC<ComponentProps> = ({
     }
     setComponentData(updatedComponentDataMap);
   };
+
+  const onConnect = useCallback(
+    (params) =>
+      setEdges((eds) =>
+        addEdge({ ...params, animated: true, style: { stroke: "blue" } }, eds),
+      ),
+    [],
+  );
 
   const handleClear = () => {
     setEdges([]);
@@ -264,11 +290,14 @@ const MatchComponent: React.FC<ComponentProps> = ({
           nodeTypes={nodeTypes}
           zoomOnScroll={false}
           panOnScroll={false}
+          onConnect={onConnect}
           zoomOnPinch={false}
           panOnDrag={false}
+          preventScrolling={true}
           minZoom={0.75}
           snapGrid={[15, 15]}
           autoPanOnNodeDrag={false}
+          autoPanOnConnect={false}
           proOptions={{ hideAttribution: true }}
         >
           {/* <Background /> */}
