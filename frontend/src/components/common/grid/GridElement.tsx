@@ -98,11 +98,7 @@ const GridElement: React.FC<GridElementProps> = ({
       style={{ height: "100%", ...style }}
       className={className}
       onMouseDown={(e) => {
-        setActiveComponent(
-          activeComponent === elementLayoutManifest.i
-            ? "10000"
-            : elementLayoutManifest.i,
-        );
+        setActiveComponent(elementLayoutManifest.i);
         if (onMouseDown) onMouseDown(e);
       }}
       onMouseUp={onMouseUp}

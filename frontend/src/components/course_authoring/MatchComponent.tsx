@@ -13,7 +13,6 @@ import TextComponent from "./TextComponent";
 
 const defaultColor = "black";
 
-// Custom Node Component
 const Node = ({ data, handleType }) => {
   return (
     <div
@@ -93,11 +92,11 @@ const getCoordinate = (
   row: number,
   numRows: number,
   boxHeight: number,
-) => { 
+) => {
   const spacing = (gridLength - boxHeight * numRows) / (numRows - 1);
   const startPoint = row * (boxHeight + spacing);
   return startPoint || 0;
-}
+};
 
 interface MatchProps {
   numRows?: number;
