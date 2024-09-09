@@ -7,15 +7,17 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DraggableSource from "../common/grid/DraggableSource";
 import GridElement from "../common/grid/GridElement";
 import layoutReducer from "../common/grid/layoutReducer";
-import BaseModule from "../course_authoring/BaseModule";
+import BaseComponent from "../course_authoring/BaseComponent";
 import ConfirmationModal from "../common/modals/ConfirmationModal";
 
 const CreateModule = () => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [layout, dispatch] = useReducer(layoutReducer, []);
-  const [activeComponent, setActiveComponent] = useState("10000"); // Arbitrary number that will never be an index, allows us to call Number() without error
-  const [editMode, setEditMode] = useState(true);
-  const [componentData, setComponentData] = useState(new Map<string, object>());
+  const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const [gridLayout, dispatchLayoutAction] = useReducer(layoutReducer, []);
+  const [activeItem, setActiveItem] = useState("10000");
+  const [isEditMode, setEditMode] = useState(true);
+  const [componentDataMap, setComponentDataMap] = useState(
+    new Map<string, object>(),
+  );
   const [isModalOpen, setModalOpen] = useState(false);
 
   const gridContainerStyle = {
@@ -25,21 +27,20 @@ const CreateModule = () => {
     width: "601px",
     height: "601px",
     backgroundImage:
-      "linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)", // Grid lines
+      "linear-gradient(to right, black 1px, transparent 1px), linear-gradient(to bottom, black 1px, transparent 1px)",
     backgroundSize: "50px 50px",
   };
 
   const handleDeleteConfirm = () => {
-    dispatch({ type: "deleteItem", i: activeComponent });
+    dispatchLayoutAction({ type: "deleteItem", i: activeItem });
 
-    // We re-index items in layoutReducer, so we need to update mappings to component data
-    const updatedComponentData = new Map(componentData);
-    updatedComponentData.delete(activeComponent);
+    const updatedComponentData = new Map(componentDataMap);
+    updatedComponentData.delete(activeItem);
 
     const newComponentData = new Map();
     updatedComponentData.forEach((value, key) => {
       const itemId = parseInt(key, 10);
-      const actionId = parseInt(activeComponent || "0", 10);
+      const actionId = parseInt(activeItem || "0", 10);
       if (itemId > actionId) {
         newComponentData.set(`${itemId - 1}`, value);
       } else {
@@ -47,9 +48,9 @@ const CreateModule = () => {
       }
     });
 
-    setComponentData(newComponentData);
+    setComponentDataMap(newComponentData);
     setModalOpen(false);
-    setActiveComponent("10000"); // Reset active component after deletion
+    setActiveItem("10000");
   };
 
   const handleDeleteCancel = () => {
@@ -59,8 +60,8 @@ const CreateModule = () => {
   return (
     <div
       style={{
-        width: "full",
-        height: "full",
+        width: "100%",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -70,26 +71,24 @@ const CreateModule = () => {
       <div
         style={{
           width: "601px",
-          alignContent: "center",
-          justifyContent: "center",
-          alignItems: "center",
           display: "flex",
           height: "110px",
           border: "1px solid black",
           marginTop: "10px",
           marginBottom: "10px",
           position: "relative",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
         <div style={{ position: "absolute", left: "5px", top: "5px" }}>
           <h6>Draggable Components</h6>
         </div>
-        <br />
         <DraggableSource
-          targetRef={ref}
-          dispatch={dispatch}
+          targetRef={gridContainerRef}
+          dispatch={dispatchLayoutAction}
           key="1"
-          componentType="TextBox"
+          componentType="TextComponent"
         >
           <div
             style={{
@@ -103,16 +102,15 @@ const CreateModule = () => {
               zIndex: 1000,
             }}
           >
-            {" "}
             Text Box
           </div>
         </DraggableSource>
         <div style={{ width: "20px" }} />
         <DraggableSource
-          targetRef={ref}
-          dispatch={dispatch}
+          targetRef={gridContainerRef}
+          dispatch={dispatchLayoutAction}
           key="2"
-          componentType="Match"
+          componentType="MatchComponent"
         >
           <div
             style={{
@@ -125,19 +123,17 @@ const CreateModule = () => {
               justifyContent: "center",
             }}
           >
-            {" "}
             Match
           </div>
         </DraggableSource>
       </div>
 
       <div
-        ref={ref}
+        ref={gridContainerRef}
         style={{
           width: "100%",
           display: "flex",
           justifyContent: "center",
-          alignContent: "center",
           alignItems: "center",
           zIndex: 1,
         }}
@@ -145,10 +141,10 @@ const CreateModule = () => {
         <div
           style={{ height: "601px", width: "220px", position: "relative" }}
           onClick={() => {
-            setEditMode(!editMode);
+            setEditMode(!isEditMode);
           }}
         >
-          {editMode ? (
+          {isEditMode ? (
             <VisibilityIcon
               style={{
                 position: "absolute",
@@ -175,13 +171,13 @@ const CreateModule = () => {
         <GridLayout
           className="layout"
           style={
-            editMode
+            isEditMode
               ? gridContainerStyle
               : { width: "601px", height: "601px", border: "1px solid black" }
           }
-          layout={layout}
+          layout={gridLayout}
           onLayoutChange={(newLayout) =>
-            dispatch({ type: "newLayout", layout: newLayout })
+            dispatchLayoutAction({ type: "newLayout", layout: newLayout })
           }
           cols={12}
           rowHeight={50}
@@ -192,40 +188,40 @@ const CreateModule = () => {
           containerPadding={[0, 0]}
           margin={[0, 0]}
           isDroppable
-          isDraggable={editMode}
-          isResizable={editMode}
+          isDraggable={isEditMode}
+          isResizable={isEditMode}
         >
-          {layout.map((item) => (
+          {gridLayout.map((item) => (
             <div
               key={item.i}
               data-grid={item}
               style={
-                editMode
+                isEditMode
                   ? {
                       backgroundColor: "white",
                       borderTop:
-                        item.i === activeComponent
+                        item.i === activeItem
                           ? "1px solid blue"
                           : "1px solid black",
                       borderLeft:
-                        item.i === activeComponent
+                        item.i === activeItem
                           ? "1px solid blue"
                           : "1px solid black",
                       boxShadow:
-                        item.i === activeComponent
+                        item.i === activeItem
                           ? "1px 1px 0 0 blue, 0 1px 0 0 blue"
-                          : "1px 1px 0 0 black, 0 1px 0 0 black", // Box alignment, 1px solid black border does not work
+                          : "1px 1px 0 0 black, 0 1px 0 0 black",
                     }
                   : {}
               }
             >
               <GridElement
                 componentType={item.content}
-                index={item.i}
-                activeComponent={activeComponent}
-                setActiveComponent={setActiveComponent}
-                data={componentData}
-                setData={setComponentData}
+                elementLayoutManifest={{ i: item.i, w: item.w, h: item.h }}
+                activeComponent={activeItem}
+                setActiveComponent={setActiveItem}
+                data={componentDataMap}
+                setData={setComponentDataMap}
                 temp={item.temp}
                 mouseEvent={item.mouseEvent}
                 style={item.style}
@@ -234,6 +230,7 @@ const CreateModule = () => {
                 onMouseUp={item.onMouseUp}
                 onTouchEnd={item.onTouchEnd}
                 onTouchStart={item.onTouchStart}
+                layout={gridLayout}
               />
             </div>
           ))}
@@ -247,13 +244,28 @@ const CreateModule = () => {
             position: "relative",
           }}
         >
-          <div style={{ position: "absolute", top: "5px", left: "5px" }}>
-            <h6>Edit Panel</h6>
-            {activeComponent !== "10000" && (
-              <button type="button" onClick={() => setModalOpen(true)}>
-                Delete
-              </button>
-            )}
+          <div
+            style={{
+              position: "absolute",
+              top: "5px",
+              left: "5px",
+              right: "5px",
+            }}
+          >
+            <div
+              style={{
+                width: "200px",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <h6>Edit Panel</h6>
+              {activeItem !== "10000" && (
+                <button type="button" onClick={() => setModalOpen(true)}>
+                  Delete
+                </button>
+              )}
+            </div>
             <ConfirmationModal
               title="Delete Component"
               message="Are you sure you want to delete this component? This action is not reversible."
@@ -262,11 +274,11 @@ const CreateModule = () => {
               onCancel={handleDeleteCancel}
             />
           </div>
-          <BaseModule
-            name={`Edit${layout[Number(activeComponent)]?.content}` || ""}
-            data={componentData}
-            activeComponent={activeComponent}
-            setData={setComponentData}
+          <BaseComponent
+            name={`Edit${gridLayout[Number(activeItem)]?.content}` || ""}
+            data={componentDataMap}
+            activeComponent={activeItem}
+            setData={setComponentDataMap}
           />
         </div>
       </div>

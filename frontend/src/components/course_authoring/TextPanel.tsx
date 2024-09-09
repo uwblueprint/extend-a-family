@@ -1,22 +1,41 @@
 import React from "react";
+import {
+  editComponentDataMap,
+  editMatchNodeDataMap,
+} from "../../utils/GridComponentUtils";
 
 interface EditTextBoxProps {
   componentData: Map<string, object>;
   setComponentData: (data: Map<string, object>) => void;
   index: string;
+  node?: string;
 }
 
 const EditTextBox: React.FC<EditTextBoxProps> = ({
   componentData,
   setComponentData,
   index,
+  node = null,
 }) => {
   const handleChange = (field: string, value: string) => {
-    const updatedData = new Map(componentData);
-    const currentData = updatedData.get(index) || {};
-    const newData = { ...currentData, [field]: value };
-    updatedData.set(index, newData);
-    setComponentData(updatedData);
+    let updatedComponentData;
+    if (node) {
+      updatedComponentData = editMatchNodeDataMap(
+        componentData,
+        node,
+        field,
+        value,
+        index,
+      );
+    } else {
+      updatedComponentData = editComponentDataMap(
+        componentData,
+        field,
+        value,
+        index,
+      );
+    }
+    setComponentData(updatedComponentData);
   };
 
   return (
@@ -64,7 +83,6 @@ const EditTextBox: React.FC<EditTextBoxProps> = ({
           <input
             type="radio"
             id="flex-start-vertical"
-            name="vertical_align"
             value="flex-start"
             onChange={() => handleChange("verticalAlign", "flex-start")}
           />
