@@ -15,7 +15,7 @@ import {
   Checkbox,
 } from "@mui/material";
 import TablePaginationActions from "@mui/material/TablePagination/TablePaginationActions";
-import Navbar from "../common/Navbar";
+import Navbar from "../common/navbar/Navbar";
 import { useFacilitator } from "../../hooks/useUser";
 import HelpRequestAPIClient from "../../APIClients/HelpRequestAPIClient";
 import { HelpRequest } from "../../types/HelpRequestType";
@@ -24,14 +24,13 @@ import { formatDate } from "../../utils/DateUtils";
 const ViewHelpRequestsPage = (): React.ReactElement => {
   const facilitator = useFacilitator();
   const [helpRequests, setHelpRequests] = useState<HelpRequest[]>([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [helpRequestsPerPage, setHelpRequestsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchHelpRequests = async () => {
       const data = await HelpRequestAPIClient.getHelpRequests(facilitator.id);
       setHelpRequests(data);
-      setPage(0);
     };
     fetchHelpRequests();
     // eslint-disable-next-line react-hooks/exhaustive-deps

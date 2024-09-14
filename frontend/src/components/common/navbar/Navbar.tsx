@@ -6,14 +6,14 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Badge from "@mui/material/Badge";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Button from "@mui/material/Button/Button";
-import NotificationsList from "../notification/NotificationsList";
-import NotificationAPIClient from "../../APIClients/NotificationAPIClient";
-import { useUser } from "../../hooks/useUser";
-import { Notification } from "../../types/NotificationTypes";
-import { useSocket } from "../../contexts/SocketContext";
+import NotificationsList from "../../notification/NotificationsList";
+import NotificationAPIClient from "../../../APIClients/NotificationAPIClient";
+import { useUser } from "../../../hooks/useUser";
+import { Notification } from "../../../types/NotificationTypes";
+import { useSocket } from "../../../contexts/SocketContext";
+import UserButton from "./UserButton";
 
 export default function Navbar() {
   const user = useUser();
@@ -25,7 +25,6 @@ export default function Navbar() {
 
   const fetchNotifications = async () => {
     const data = await NotificationAPIClient.getNotifications(
-      user.id,
       notifications.length,
       NUMBER_OF_NOTIFICATIONS_TO_LOAD,
     );
@@ -101,15 +100,7 @@ export default function Navbar() {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-haspopup="true"
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            <UserButton />
           </Box>
         </Toolbar>
       </AppBar>

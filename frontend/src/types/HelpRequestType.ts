@@ -1,12 +1,10 @@
+import { Facilitator, Learner } from "./UserTypes";
+
 export interface HelpRequest {
   id: string;
   message: string;
-  learner: {
-    id: string;
-    firstName: string;
-    lastName: string;
-  };
-  facilitator: string;
+  learner: Pick<Learner, "id" | "firstName" | "lastName">;
+  facilitator: Pick<Facilitator, "id">;
   unit: {
     id: string;
     displayIndex: number;

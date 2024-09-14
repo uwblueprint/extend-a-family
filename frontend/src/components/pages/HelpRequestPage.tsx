@@ -31,14 +31,9 @@ const HelpRequestPage = () => {
       <Button onClick={() => history.push(`/help-requests`)}>
         Back to all help requests
       </Button>
-      {helpRequest ? (
-        <>
-          Help request ID: {id}
-          <div>{helpRequest?.message}</div>
-        </>
-      ) : (
-        <div>Help request with ID: {id} does not exist</div>
-      )}
+      <div>
+        Help request ID: {id} {helpRequest?.message}
+      </div>
     </div>
   );
 };
