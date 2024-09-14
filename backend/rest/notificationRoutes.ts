@@ -1,33 +1,33 @@
 import { Router } from "express";
 import { getErrorMessage } from "../utilities/errorUtils";
 import NotificationService from "../services/implementations/notificationService";
-import MgCourseUnit from "../models/courseunit.mgmodel";
+import { getAccessToken } from "../middlewares/auth";
+import AuthService from "../services/implementations/authService";
+import UserService from "../services/implementations/userService";
+import { getNotificationtDtoValidator } from "../middlewares/validators/notificationValidator";
 
 const notificationRouter: Router = Router();
 
 const notificationService = new NotificationService();
+const authService = new AuthService(new UserService());
 
-notificationRouter.get("/", async (req, res) => {
-  const { user, skip, limit } = req.query;
+notificationRouter.post("/", getNotificationtDtoValidator, async (req, res) => {
+  const { skip, limit } = req.body;
+  const accessToken = getAccessToken(req);
   try {
-    if (!user) {
-      res.status(400).send("User id must be provided");
-      return;
+    if (!accessToken) {
+      throw new Error("Unauthorized: No access token provided");
     }
+    const userId = await authService.getUserIdFromAccessToken(accessToken);
     const data = await notificationService.getNotifications(
-      user as string,
-      parseInt(skip as string, 10),
-      parseInt(limit as string, 10),
+      userId,
+      skip,
+      limit,
     );
     res.status(200).json(data);
   } catch (error) {
     res.status(500).send(getErrorMessage(error));
   }
-});
-
-notificationRouter.get("/test", async (req, res) => {
-  const x = await MgCourseUnit.find({});
-  res.json(x);
 });
 
 export default notificationRouter;

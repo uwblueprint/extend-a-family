@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import { ObjectId } from "mongoose";
 import { IHelpRequestService } from "../interfaces/helpRequestService";
 import MgHelpRequest, { HelpRequest } from "../../models/helprequest.mgmodel";
 import { getErrorMessage } from "../../utilities/errorUtils";
@@ -12,11 +13,19 @@ import {
 const Logger = logger(__filename);
 
 export class HelpRequestService implements IHelpRequestService {
-  async getHelpRequest(requestId: string): Promise<HelpRequestDTO> {
+  async getHelpRequest(
+    requestId: string,
+    userId: ObjectId,
+  ): Promise<HelpRequestDTO> {
     try {
       const helpRequest = await MgHelpRequest.findById(requestId);
       if (!helpRequest) {
         throw Error(`Help request with id ${requestId} doesn't exist`);
+      }
+      // without .toString, facilitator is in form of new ObjectId('id')
+      // and userId is just in form of 'id
+      if (helpRequest.facilitator.toString() !== userId.toString()) {
+        throw Error(`You are not allowed to view this help request`);
       }
       return helpRequest;
     } catch (error) {
@@ -27,7 +36,7 @@ export class HelpRequestService implements IHelpRequestService {
     }
   }
 
-  async getHelpRequests(userId: string): Promise<HelpRequestDTO[]> {
+  async getHelpRequests(userId: ObjectId): Promise<HelpRequestDTO[]> {
     try {
       const helpRequests = await MgHelpRequest.find({
         facilitator: userId,
@@ -90,14 +99,10 @@ export class HelpRequestService implements IHelpRequestService {
       message: oldHelpRequest.message,
       learner: oldHelpRequest.learner,
       facilitator: oldHelpRequest.facilitator,
-      unit: updates.unit !== undefined ? updates.unit : oldHelpRequest.unit,
-      module:
-        updates.module !== undefined ? updates.module : oldHelpRequest.module,
-      page: updates.page !== undefined ? updates.page : oldHelpRequest.page,
-      completed:
-        updates.completed !== undefined
-          ? updates.completed
-          : oldHelpRequest.completed, // yes i know this sucks
+      unit: updates.unit ?? oldHelpRequest.unit,
+      module: updates.module ?? oldHelpRequest.module,
+      page: updates.page ?? oldHelpRequest.page,
+      completed: updates.completed ?? oldHelpRequest.completed,
       createdAt: oldHelpRequest.createdAt,
     };
   }

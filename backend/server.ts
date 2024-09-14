@@ -18,6 +18,7 @@ import {
 } from "./sockets/notification";
 import helpRequestRouter from "./rest/helpRequestRoutes";
 import notificationRouter from "./rest/notificationRoutes";
+import courseRouter from "./rest/courseRoutes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -76,6 +77,7 @@ app.use("/entities", entityRouter);
 app.use("/users", userRouter);
 app.use("/help-request", helpRequestRouter);
 app.use("/notifications", notificationRouter);
+app.use("/courses", courseRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.set("io", io);
 

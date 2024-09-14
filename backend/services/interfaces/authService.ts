@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 import { AuthDTO, Token } from "../../types/authTypes";
 import { Role } from "../../types/userTypes";
 
@@ -82,6 +83,13 @@ interface IAuthService {
     accessToken: string,
     requestedEmail: string,
   ): Promise<boolean>;
+
+  /**
+   * Returns the userid from the provided access token
+   * @param accessToken user's access token
+   * @returns the userid from the access token
+   */
+  getUserIdFromAccessToken(accessToken: string): Promise<ObjectId>;
 }
 
 export default IAuthService;

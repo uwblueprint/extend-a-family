@@ -1,5 +1,5 @@
 import * as firebaseAdmin from "firebase-admin";
-
+import { ObjectId } from "mongoose";
 import IAuthService from "../interfaces/authService";
 import IEmailService from "../interfaces/emailService";
 import IUserService from "../interfaces/userService";
@@ -218,6 +218,20 @@ class AuthService implements IAuthService {
       );
     } catch (error) {
       return false;
+    }
+  }
+
+  async getUserIdFromAccessToken(accessToken: string): Promise<ObjectId> {
+    try {
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
+      const userId = await this.userService.getUserIdByAuthId(
+        decodedIdToken.uid,
+      );
+      return userId;
+    } catch (error) {
+      Logger.error(`Failed to retrieve a userId from this accessToken`);
+      throw error;
     }
   }
 }

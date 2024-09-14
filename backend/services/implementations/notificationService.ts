@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { UpdateWriteOpResult } from "mongoose";
+import { Schema, UpdateWriteOpResult } from "mongoose";
 import {
   NotificationDTO,
   CreateNotificationDTO,
@@ -18,7 +18,7 @@ const Logger = logger(__filename);
 
 class NotificationService implements INotificationService {
   async getNotifications(
-    user: string,
+    user: Schema.Types.ObjectId,
     skip: number,
     limit: number,
   ): Promise<NotificationsResponseDTO> {
@@ -109,23 +109,26 @@ class NotificationService implements INotificationService {
       throw error;
     }
 
-    // this is digustingly bad ngl
-    const message = updateNotification.message
-      ? updateNotification.message
-      : oldNotification.message;
-    const read = updateNotification.read
-      ? updateNotification.read
-      : oldNotification.read;
-    const link = updateNotification.link
-      ? updateNotification.link
-      : oldNotification.link;
+    // const message = updateNotification.message
+    //   ? updateNotification.message
+    //   : oldNotification.message;
+    // const read = updateNotification.read
+    //   ? updateNotification.read
+    //   : oldNotification.read;
+    // const link = updateNotification.link
+    //   ? updateNotification.link
+    //   : oldNotification.link;
+    // return {
+    //   id: oldNotification.id,
+    //   user: oldNotification.user,
+    //   createdAt: oldNotification.createdAt,
+    //   message,
+    //   read,
+    //   link,
+    // };
     return {
-      id: oldNotification.id,
-      user: oldNotification.user,
-      createdAt: oldNotification.createdAt,
-      message,
-      read,
-      link,
+      ...oldNotification,
+      ...updateNotification,
     };
   }
 

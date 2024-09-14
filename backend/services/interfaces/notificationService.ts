@@ -1,4 +1,4 @@
-import { UpdateWriteOpResult } from "mongoose";
+import { Schema, UpdateWriteOpResult } from "mongoose";
 import {
   NotificationDTO,
   CreateNotificationDTO,
@@ -14,7 +14,7 @@ interface INotificationService {
    * @param limit number of notifications to return
    */
   getNotifications(
-    user: string,
+    user: Schema.Types.ObjectId,
     skip: number,
     limit: number,
   ): Promise<NotificationsResponseDTO>;

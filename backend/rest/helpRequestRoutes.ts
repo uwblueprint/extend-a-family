@@ -7,26 +7,24 @@ import {
   createHelpRequestDtoValidator,
   updateHelpRequestDtoValidator,
 } from "../middlewares/validators/helpRequestValidators";
+import { getAccessToken } from "../middlewares/auth";
+import AuthService from "../services/implementations/authService";
+import UserService from "../services/implementations/userService";
 
 const helpRequestRouter: Router = Router();
 
 const helpRequestService = new HelpRequestService();
+const authService = new AuthService(new UserService());
 
 helpRequestRouter.get("/", async (req, res) => {
-  const { userId } = req.query;
+  const accessToken = getAccessToken(req);
   try {
-    if (!userId) {
-      res
-        .status(400)
-        .json({ error: "userId query parameter must be provided." });
-    } else if (typeof userId !== "string") {
-      res
-        .status(400)
-        .json({ error: "userId query parameter must be a string." });
-    } else {
-      const helpRequests = await helpRequestService.getHelpRequests(userId);
-      res.status(200).json(helpRequests);
+    if (!accessToken) {
+      throw new Error("Unauthorized: No access token provided");
     }
+    const userId = await authService.getUserIdFromAccessToken(accessToken);
+    const helpRequests = await helpRequestService.getHelpRequests(userId);
+    res.status(200).json(helpRequests);
   } catch (error) {
     res.status(500).send(getErrorMessage(error));
   }
@@ -34,8 +32,13 @@ helpRequestRouter.get("/", async (req, res) => {
 
 helpRequestRouter.get("/:id", async (req, res) => {
   const { id } = req.params;
+  const accessToken = getAccessToken(req);
   try {
-    const helpRequest = await helpRequestService.getHelpRequest(id);
+    if (!accessToken) {
+      throw new Error("Unauthorized: No access token provided");
+    }
+    const userId = await authService.getUserIdFromAccessToken(accessToken);
+    const helpRequest = await helpRequestService.getHelpRequest(id, userId);
     res.status(200).json(helpRequest);
   } catch (error) {
     res.status(500).send(getErrorMessage(error));
