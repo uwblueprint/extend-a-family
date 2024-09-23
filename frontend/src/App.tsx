@@ -5,13 +5,10 @@ import Welcome from "./components/pages/Welcome";
 import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import PrivateRoute from "./components/auth/PrivateRoute";
-import CreatePage from "./components/pages/CreatePage";
 import Default from "./components/pages/Default";
 import CreateModulePage from "./components/pages/CreateModulePage";
-import DisplayPage from "./components/pages/DisplayPage";
 import NotFound from "./components/pages/NotFound";
 import NotAuthorized from "./components/pages/NotAuthorized";
-import UpdatePage from "./components/pages/UpdatePage";
 import MyAccount from "./components/pages/MyAccount";
 import AUTHENTICATED_USER_KEY from "./constants/AuthConstants";
 import AuthContext from "./contexts/AuthContext";
@@ -21,8 +18,6 @@ import SampleContext, {
 } from "./contexts/SampleContext";
 import sampleContextReducer from "./reducers/SampleContextReducer";
 import SampleContextDispatcherContext from "./contexts/SampleContextDispatcherContext";
-import EditTeamInfoPage from "./components/pages/EditTeamPage";
-import HooksDemo from "./components/pages/HooksDemo";
 
 import { AuthenticatedUser } from "./types/AuthTypes";
 import authAPIClient from "./APIClients/AuthAPIClient";
@@ -76,7 +71,6 @@ const App = (): React.ReactElement => {
                 <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
                 <Route exact path={Routes.LOGIN_PAGE} component={Login} />
                 <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
-                <Route exact path={Routes.HOOKS_PAGE} component={HooksDemo} />
                 <PrivateRoute
                   exact
                   path={Routes.HOME_PAGE}
@@ -91,33 +85,9 @@ const App = (): React.ReactElement => {
                 />
                 <PrivateRoute
                   exact
-                  path={Routes.CREATE_ENTITY_PAGE}
-                  component={CreatePage}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.UPDATE_ENTITY_PAGE}
-                  component={UpdatePage}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.DISPLAY_ENTITY_PAGE}
-                  component={DisplayPage}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
                   path={Routes.CREATE_MODULE_PAGE}
                   component={CreateModulePage}
                   allowedRoles={["Administrator"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.EDIT_TEAM_PAGE}
-                  component={EditTeamInfoPage}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
                 <Route
                   exact
