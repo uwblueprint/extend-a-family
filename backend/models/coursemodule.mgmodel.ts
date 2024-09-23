@@ -1,31 +1,31 @@
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
-export interface CourseUnit extends Document {
+export interface CourseModule extends Document {
   id: string;
   displayIndex: number;
   title: string;
-  modules: [ObjectId];
+  pages: [ObjectId];
 }
 
-const CourseUnitSchema: Schema = new Schema({
-  displayIndex: {
-    type: Number,
-    required: true,
-  },
+export const CourseModuleSchema: Schema = new Schema({
   title: {
     type: String,
     required: true,
   },
-  modules: [
+  displayIndex: {
+    type: Number,
+    required: true,
+  },
+  pages: [
     {
       type: Schema.Types.ObjectId,
-      ref: "CourseModule",
+      ref: "CoursePage",
     },
   ],
 });
 
 /* eslint-disable no-param-reassign */
-CourseUnitSchema.set("toJSON", {
+CourseModuleSchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
   transform: (_doc: Document, ret: Record<string, unknown>) => {
@@ -34,4 +34,4 @@ CourseUnitSchema.set("toJSON", {
   },
 });
 
-export default mongoose.model<CourseUnit>("CourseUnit", CourseUnitSchema);
+export default mongoose.model<CourseModule>("CourseModule", CourseModuleSchema);

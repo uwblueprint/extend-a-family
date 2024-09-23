@@ -1,5 +1,6 @@
 import * as firebaseAdmin from "firebase-admin";
 
+import { ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
 import MgUser, { User } from "../../models/user.mgmodel";
 import {
@@ -42,7 +43,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...user.toJSON(),
+      ...user.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
@@ -64,7 +65,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...user.toJSON(),
+      ...user.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
@@ -81,7 +82,7 @@ class UserService implements IUserService {
     }
   }
 
-  async getUserIdByAuthId(authId: string): Promise<string> {
+  async getUserIdByAuthId(authId: string): Promise<ObjectId> {
     try {
       const { id } = await getMongoUserByAuthId(authId);
       return id;
@@ -124,7 +125,7 @@ class UserService implements IUserService {
           }
 
           return {
-            ...user.toJSON(),
+            ...user.toObject(),
             email: firebaseUser.email ?? "",
           };
         }),
@@ -177,7 +178,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...newUser.toJSON(),
+      ...newUser.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
@@ -232,7 +233,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...oldUser.toJSON(),
+      ...oldUser.toObject(),
       firstName: user.firstName,
       lastName: user.lastName,
       email: updatedFirebaseUser.email ?? "",
@@ -331,7 +332,7 @@ class UserService implements IUserService {
           }
 
           return {
-            ...user.toJSON(),
+            ...user.toObject(),
             email: firebaseUser.email ?? "",
           };
         }),

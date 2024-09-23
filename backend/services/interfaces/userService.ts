@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 import {
   CreateUserDTO,
   Role,
@@ -36,7 +37,7 @@ interface IUserService {
    * @returns id of the user
    * @throws Error if user id retrieval fails
    */
-  getUserIdByAuthId(authId: string): Promise<string>;
+  getUserIdByAuthId(authId: string): Promise<ObjectId>;
 
   /**
    * Get authId of user associated with id
