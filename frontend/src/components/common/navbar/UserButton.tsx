@@ -4,6 +4,7 @@ import { Box, IconButton, Popover } from "@mui/material";
 import RefreshCredentials from "../../auth/RefreshCredentials";
 import ResetPassword from "../../auth/ResetPassword";
 import Logout from "../../auth/Logout";
+import MyAccountButton from "../../auth/MyAccountButton";
 
 const UserButton = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
@@ -42,6 +43,7 @@ const UserButton = () => {
         }}
       >
         <Box display="flex" sx={{ flexDirection: "column" }}>
+          <MyAccountButton />
           <Logout />
           <RefreshCredentials />
           <ResetPassword />
