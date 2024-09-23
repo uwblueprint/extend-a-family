@@ -43,7 +43,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...user.toJSON(),
+      ...user.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
@@ -65,7 +65,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...user.toJSON(),
+      ...user.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
@@ -125,7 +125,7 @@ class UserService implements IUserService {
           }
 
           return {
-            ...user.toJSON(),
+            ...user.toObject(),
             email: firebaseUser.email ?? "",
           };
         }),
@@ -178,7 +178,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...newUser.toJSON(),
+      ...newUser.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
@@ -233,7 +233,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...oldUser.toJSON(),
+      ...oldUser.toObject(),
       firstName: user.firstName,
       lastName: user.lastName,
       email: updatedFirebaseUser.email ?? "",
@@ -332,7 +332,7 @@ class UserService implements IUserService {
           }
 
           return {
-            ...user.toJSON(),
+            ...user.toObject(),
             email: firebaseUser.email ?? "",
           };
         }),

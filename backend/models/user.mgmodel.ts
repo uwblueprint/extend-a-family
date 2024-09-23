@@ -45,7 +45,7 @@ export const UserSchema: Schema = new Schema(
 );
 
 /* eslint-disable no-param-reassign */
-UserSchema.set("toJSON", {
+UserSchema.set("toObject", {
   virtuals: true,
   versionKey: false,
   transform: (_doc: Document, ret: Record<string, unknown>) => {
