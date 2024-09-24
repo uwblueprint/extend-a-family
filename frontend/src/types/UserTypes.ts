@@ -25,3 +25,9 @@ export function isFacilitator(user: User): user is Facilitator {
 export function isLearner(user: User): user is Learner {
   return user.role === "Learner";
 }
+
+export function isRole(role: string): role is Role {
+  return (
+    role === "Administrator" || role === "Facilitator" || role === "Learner"
+  );
+}

@@ -1,9 +1,9 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 import { Role, Status } from "../types/userTypes";
 
 export interface User extends Document {
-  id: string;
+  id: ObjectId;
   firstName: string;
   lastName: string;
   authId: string;
@@ -16,7 +16,7 @@ const baseOptions = {
   timestamps: true,
 };
 
-const UserSchema: Schema = new Schema(
+export const UserSchema: Schema = new Schema(
   {
     firstName: {
       type: String,
@@ -45,7 +45,7 @@ const UserSchema: Schema = new Schema(
 );
 
 /* eslint-disable no-param-reassign */
-UserSchema.set("toJSON", {
+UserSchema.set("toObject", {
   virtuals: true,
   versionKey: false,
   transform: (_doc: Document, ret: Record<string, unknown>) => {
@@ -61,11 +61,18 @@ const UserModel = mongoose.model<User>("User", UserSchema);
 const AdministratorSchema = new Schema({});
 
 const FacilitatorSchema = new Schema({
-  learners: { type: [String], default: [] },
+  learners: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    default: [],
+  },
 });
 
 const LearnerSchema = new Schema({
-  facilitator: { type: String, required: true },
+  facilitator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 const Administrator = UserModel.discriminator(

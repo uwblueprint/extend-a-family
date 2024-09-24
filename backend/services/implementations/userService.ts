@@ -1,5 +1,6 @@
 import * as firebaseAdmin from "firebase-admin";
 
+import { ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
 import MgUser, { User } from "../../models/user.mgmodel";
 import {
@@ -8,6 +9,7 @@ import {
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
+import { AuthErrorCodes } from "../../types/authTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
@@ -41,7 +43,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...user.toJSON(),
+      ...user.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
@@ -59,11 +61,11 @@ class UserService implements IUserService {
       }
     } catch (error: unknown) {
       Logger.error(`Failed to get user. Reason = ${getErrorMessage(error)}`);
-      throw new Error("EMAIL_NOT_FOUND");
+      throw new Error(AuthErrorCodes.EMAIL_NOT_FOUND);
     }
 
     return {
-      ...user.toJSON(),
+      ...user.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
@@ -80,7 +82,7 @@ class UserService implements IUserService {
     }
   }
 
-  async getUserIdByAuthId(authId: string): Promise<string> {
+  async getUserIdByAuthId(authId: string): Promise<ObjectId> {
     try {
       const { id } = await getMongoUserByAuthId(authId);
       return id;
@@ -123,7 +125,7 @@ class UserService implements IUserService {
           }
 
           return {
-            ...user.toJSON(),
+            ...user.toObject(),
             email: firebaseUser.email ?? "",
           };
         }),
@@ -176,7 +178,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...newUser.toJSON(),
+      ...newUser.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
@@ -231,7 +233,7 @@ class UserService implements IUserService {
     }
 
     return {
-      ...oldUser.toJSON(),
+      ...oldUser.toObject(),
       firstName: user.firstName,
       lastName: user.lastName,
       email: updatedFirebaseUser.email ?? "",
@@ -330,7 +332,7 @@ class UserService implements IUserService {
           }
 
           return {
-            ...user.toJSON(),
+            ...user.toObject(),
             email: firebaseUser.email ?? "",
           };
         }),

@@ -1,4 +1,12 @@
-export type PageType = "Lesson" | "Activity";
+export type CourseUnitDTO = {
+  id: string;
+  displayIndex: number;
+  title: string;
+};
+
+export type CreateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
+
+export type UpdateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 
 export enum InteractiveElementType {
   TextInput = "TextInput",
