@@ -17,19 +17,12 @@ class AuthService implements IAuthService {
 
   emailService: IEmailService | null;
 
-  firebaseAuth: firebaseAuth.Auth;
-
   constructor(
     userService: IUserService,
     emailService: IEmailService | null = null,
   ) {
     this.userService = userService;
     this.emailService = emailService;
-    const firebaseApp = firebase.initializeApp({
-      apiKey: process.env.FIREBASE_WEB_API_KEY,
-      projectId: process.env.FIREBASE_PROJECT_ID,
-    });
-    this.firebaseAuth = firebaseAuth.getAuth(firebaseApp);
   }
 
   /* eslint-disable class-methods-use-this */

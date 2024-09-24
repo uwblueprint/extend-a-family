@@ -22,7 +22,7 @@ const CreatePasswordPage = (): React.ReactElement => {
     if (!changePasswordSuccess) {
       setAuthenticatedUser(null);
       localStorage.removeItem(AUTHENTICATED_USER_KEY);
-      // await AuthAPIClient.logout(authenticatedUser.id);
+      await AuthAPIClient.logout(authenticatedUser.id);
 
       // change this later to not use an alert
       // eslint-disable-next-line no-alert
@@ -43,7 +43,7 @@ const CreatePasswordPage = (): React.ReactElement => {
       status: "Active",
     });
 
-    history.push(`${LOGIN_PAGE}?role=${authenticatedUser.role}`);
+    history.push(HOME_PAGE);
   };
 
   return (
