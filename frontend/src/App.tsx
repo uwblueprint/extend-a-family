@@ -97,6 +97,12 @@ const App = (): React.ReactElement => {
                 />
                 <PrivateRoute
                   exact
+                  path={Routes.CREATE_PASSWORD_PAGE}
+                  component={CreatePasswordPage}
+                  allowedRoles={["Administrator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
                   path={Routes.MANAGE_USERS_PAGE}
                   component={ManageUserPage}
                   allowedRoles={["Administrator"]}
