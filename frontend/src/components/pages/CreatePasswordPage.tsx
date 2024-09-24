@@ -18,6 +18,7 @@ const CreatePasswordPage = (): React.ReactElement => {
     const changePasswordSuccess = await AuthAPIClient.updateTemporaryPassword(
       authenticatedUser.email,
       newPassword,
+      authenticatedUser.role,
     );
     if (!changePasswordSuccess) {
       setAuthenticatedUser(null);

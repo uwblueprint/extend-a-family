@@ -84,6 +84,7 @@ const resetPassword = async (email: string | undefined): Promise<boolean> => {
 const updateTemporaryPassword = async (
   email: string,
   newPassword: string,
+  role: Role,
 ): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -95,7 +96,7 @@ const updateTemporaryPassword = async (
       { newPassword },
       { headers: { Authorization: bearerToken } },
     );
-    const newAuthenticatedUser = await login(email, newPassword);
+    const newAuthenticatedUser = await login(email, newPassword, role);
     if (!newAuthenticatedUser) {
       throw new Error("Unable to authenticate user after logging in.");
     }
