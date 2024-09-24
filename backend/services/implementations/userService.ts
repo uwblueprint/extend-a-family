@@ -26,7 +26,7 @@ const getMongoUserByAuthId = async (authId: string): Promise<User> => {
 
 class UserService implements IUserService {
   /* eslint-disable class-methods-use-this */
-  async getUserById(userId: string): Promise<UserDTO> {
+  async getUserById(userId: string | ObjectId): Promise<UserDTO> {
     let user: User | null;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
 
@@ -184,7 +184,10 @@ class UserService implements IUserService {
     };
   }
 
-  async updateUserById(userId: string, user: UpdateUserDTO): Promise<UserDTO> {
+  async updateUserById(
+    userId: ObjectId | string,
+    user: UpdateUserDTO,
+  ): Promise<UserDTO> {
     let oldUser: User | null;
     let updatedFirebaseUser: firebaseAdmin.auth.UserRecord;
 

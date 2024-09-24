@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Redirect, useHistory } from "react-router-dom";
-import { HOME_PAGE, LOGIN_PAGE } from "../../constants/Routes";
+import { HOME_PAGE } from "../../constants/Routes";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import AuthContext from "../../contexts/AuthContext";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
