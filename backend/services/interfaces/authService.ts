@@ -53,6 +53,14 @@ interface IAuthService {
   sendAdminInvite(email: string, temporaryPassword: string): Promise<void>;
 
   /**
+   * Sends an email invitation to an invited learner with the temporary password specified
+   * @param email email of new learner invited
+   * @param temporaryPassword the new learner's temporary password
+   * @throws Error if unable to generate link or send email
+   */
+  sendLearnerInvite(firstName: string, email: string, temporaryPassword: string): Promise<void>;
+
+  /**
    * Determine if the provided access token is valid and authorized for at least
    * one of the specified roles
    * @param accessToken user's access token
