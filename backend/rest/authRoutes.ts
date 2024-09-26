@@ -10,7 +10,7 @@ import {
 import {
   loginRequestValidator,
   signupRequestValidator,
-  inviteAdminRequestValidator,
+  inviteUserRequestValidator,
   forgotPasswordRequestValidator,
   updateTemporaryPasswordRequestValidator,
   updateUserStatusRequestValidator,
@@ -173,7 +173,7 @@ authRouter.post("/isUserVerified/:email", async (req, res) => {
 
 authRouter.post(
   "/inviteAdmin",
-  inviteAdminRequestValidator,
+  inviteUserRequestValidator,
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
     try {
@@ -195,6 +195,36 @@ authRouter.post(
       res.status(500).json({ error: getErrorMessage(error) });
     }
   },
+);
+
+authRouter.post(
+  "/inviteLearner",
+  inviteUserRequestValidator,
+  isAuthorizedByRole(new Set(["Facilitator"])),
+  async (req, res) => {
+    try {
+      const temporaryPassword = generate({
+        length: 20,
+        numbers: true,
+      });
+      const invitedLearnerUser = await userService.createUser({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        role: "Learner",
+        password: temporaryPassword,
+        status: "Invited",
+      });
+      await authService.sendLearnerInvite(
+        req.body.firstName,
+        req.body.email,
+        temporaryPassword
+      );
+      res.status(200).json(invitedLearnerUser);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  }
 );
 
 // /* Reset password through a "Forgot Password" option */

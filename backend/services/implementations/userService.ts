@@ -184,6 +184,12 @@ class UserService implements IUserService {
     };
   }
 
+  async createLearner(user: CreateUserDTO, facilitatorId: string): Promise<UserDTO> {
+    this.createUser(user);
+    // TODO: this.updateUserById()
+    return {} as UserDTO;
+  }
+
   async updateUserById(
     userId: ObjectId | string,
     user: UpdateUserDTO,
