@@ -44,7 +44,7 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
       req.body.password,
     );
 
-    const { accessToken, refreshToken, ...rest } = authDTO;
+    const { refreshToken, ...rest } = authDTO;
     correctRole = rest.role;
 
     if (correctRole !== requestedRole) {
@@ -52,7 +52,7 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
     }
 
     const isVerified = await authService.isAuthorizedByEmail(
-      accessToken,
+      rest.accessToken,
       req.body.email,
     );
 
