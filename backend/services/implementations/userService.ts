@@ -254,7 +254,7 @@ class UserService implements IUserService {
         await firebaseAdmin.auth().deleteUser(deletedUser.authId);
       } catch (error) {
         // rollback user deletion in MongoDB
-        const { id, ...rest } = deletedUser.toJSON();
+        const { id, ...rest } = deletedUser.toObject();
         try {
           await MgUser.create(rest);
         } catch (mongoDbError: unknown) {
@@ -292,7 +292,7 @@ class UserService implements IUserService {
         await firebaseAdmin.auth().deleteUser(firebaseUser.uid);
       } catch (error) {
         // rollback user deletion in MongoDB
-        const { id, ...rest } = deletedUser.toJSON();
+        const { id, ...rest } = deletedUser.toObject();
         try {
           await MgUser.create(rest);
         } catch (mongoDbError: unknown) {

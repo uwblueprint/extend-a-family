@@ -5,13 +5,13 @@ import {
   UpdateCourseUnitDTO,
 } from "../../types/courseTypes";
 import logger from "../../utilities/logger";
-import ICourseService from "../interfaces/courseService";
+import ICourseUnitService from "../interfaces/courseUnitService";
 import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import { getErrorMessage } from "../../utilities/errorUtils";
 
 const Logger = logger(__filename);
 
-class CourseService implements ICourseService {
+class CourseUnitService implements ICourseUnitService {
   async getCourseUnits(): Promise<Array<CourseUnitDTO>> {
     try {
       const courseUnits: Array<CourseUnit> = await MgCourseUnit.find().sort(
@@ -105,4 +105,4 @@ class CourseService implements ICourseService {
   }
 }
 
-export default CourseService;
+export default CourseUnitService;
