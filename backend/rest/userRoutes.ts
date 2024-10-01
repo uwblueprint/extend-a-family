@@ -210,7 +210,7 @@ userRouter.get(
 
 /* Facilitator will be able to view a list of all their learners */
 userRouter.get(
-  "/myLearners",
+  "/facilitator/myLearners",
   isAuthorizedByRole(new Set(["Facilitator"])),
   async (req, res) => {
     const accessToken = getAccessToken(req);
@@ -227,7 +227,7 @@ userRouter.get(
 
       const learners = await Promise.all(
         facilitator.learners.map(async (learnerId) => {
-          const learner = await userService.getUserById(learnerId);
+          const learner = await userService.getUserById(learnerId.toString());
           return learner;
         }),
       );
@@ -240,7 +240,7 @@ userRouter.get(
 
 /* Facilitator will be able to edit their learners */
 userRouter.put(
-  "/myLearners/:userId",
+  "facilitator/myLearners/:userId",
   isAuthorizedByRole(new Set(["Facilitator"])),
   updateUserDtoValidator,
   async (req, res) => {
@@ -260,7 +260,13 @@ userRouter.put(
         facilitatorId.toString(),
       )) as FacilitatorDTO;
 
-      if (!facilitator.learners.includes(selectedLearnerId)) {
+      // facilitator.learners is an array of ObjectIds
+      // FacilitatorDTO casts it as an array of strings
+      const facilitatorHasLearner = facilitator.learners.find(
+        (learnerId) => learnerId.toString() === selectedLearnerId,
+      );
+
+      if (!facilitatorHasLearner) {
         throw new Error("Unauthorized: Learner does not belong to facilitator");
       }
 
@@ -273,7 +279,7 @@ userRouter.put(
         status: "Active",
       } as UpdateUserDTO;
 
-      const updatedUser = userService.updateUserById(
+      const updatedUser = await userService.updateUserById(
         selectedLearnerId,
         updateLearnerPayload,
       );
