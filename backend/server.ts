@@ -77,7 +77,7 @@ app.use("/entities", entityRouter);
 app.use("/users", userRouter);
 app.use("/help-request", helpRequestRouter);
 app.use("/notifications", notificationRouter);
-app.use("/courses", courseRouter);
+app.use("/course", courseRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.set("io", io);
 
