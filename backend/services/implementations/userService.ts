@@ -184,20 +184,18 @@ class UserService implements IUserService {
     };
   }
 
-  async createLearner(user: CreateUserDTO, facilitatorId: string): Promise<UserDTO> {
-    this.createUser(user);
-    // TODO: this.updateUserById()
+  async createLearner(user: CreateUserDTO, facilitatorId: string): Promise<LearnerDTO> {
     let firebaseUser: firebaseAdmin.auth.UserRecord;
     const newLearner = await Learner.create({
-      ...user, Facilitator: facilitatorId
+      ...user, facilitator: facilitatorId
     });
-
 
     await Facilitator.findByIdAndUpdate(
       facilitatorId,
       { "$push": { learners: newLearner.id } },
       { runValidators: true },
     );
+
     return {} as LearnerDTO;
   }
 
