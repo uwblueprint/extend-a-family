@@ -8,6 +8,7 @@ import {
   Role,
   UpdateUserDTO,
   UserDTO,
+  LearnerDTO,
 } from "../../types/userTypes";
 import { AuthErrorCodes } from "../../types/authTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
@@ -191,7 +192,13 @@ class UserService implements IUserService {
       ...user, Facilitator: facilitatorId
     });
 
-    return {} as UserDTO;
+
+    await Facilitator.findByIdAndUpdate(
+      facilitatorId,
+      { "$push": { learners: newLearner.id } },
+      { runValidators: true },
+    );
+    return {} as LearnerDTO;
   }
 
   async updateUserById(userId: string, user: UpdateUserDTO): Promise<UserDTO> {
