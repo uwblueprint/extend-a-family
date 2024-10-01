@@ -187,10 +187,20 @@ class UserService implements IUserService {
   async createLearner(
     user: CreateUserDTO,
     facilitatorId: string,
-  ): Promise<UserDTO> {
-    this.createUser(user);
-    // TODO: this.updateUserById()
-    return {} as UserDTO;
+  ): Promise<LearnerDTO> {
+    let firebaseUser: firebaseAdmin.auth.UserRecord;
+    const newLearner = await Learner.create({
+      ...user,
+      facilitator: facilitatorId,
+    });
+
+    await Facilitator.findByIdAndUpdate(
+      facilitatorId,
+      { $push: { learners: newLearner.id } },
+      { runValidators: true },
+    );
+
+    return {} as LearnerDTO;
   }
 
   async updateUserById(
