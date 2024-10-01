@@ -4,7 +4,7 @@ import {
   UpdateCourseUnitDTO,
 } from "../../types/courseTypes";
 
-interface ICourseService {
+interface ICourseUnitService {
   /**
    * Returns all courseunits
    * @throwsError if courses were not successfully fetched
@@ -38,4 +38,4 @@ interface ICourseService {
   deleteCourseUnit(id: string): Promise<string>;
 }
 
-export default ICourseService;
+export default ICourseUnitService;
