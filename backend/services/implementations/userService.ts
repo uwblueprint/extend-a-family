@@ -2,7 +2,7 @@ import * as firebaseAdmin from "firebase-admin";
 
 import { ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
-import MgUser, { User } from "../../models/user.mgmodel";
+import MgUser, { Facilitator, Learner, User } from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
   Role,
@@ -187,6 +187,11 @@ class UserService implements IUserService {
   async createLearner(user: CreateUserDTO, facilitatorId: string): Promise<UserDTO> {
     this.createUser(user);
     // TODO: this.updateUserById()
+    let firebaseUser: firebaseAdmin.auth.UserRecord;
+    const newLearner = await Learner.create({
+      ...user, Facilitator: facilitatorId
+    });
+
     return {} as UserDTO;
   }
 
