@@ -29,6 +29,7 @@ import { AuthenticatedUser } from "./types/AuthTypes";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import * as Routes from "./constants/Routes";
 import ManageUserPage from "./components/pages/ManageUserPage";
+import ForgotPasswordPage from "./components/auth/ForgotPasswordPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -73,6 +74,7 @@ const App = (): React.ReactElement => {
               <Route exact path={Routes.LOGIN_PAGE} component={Login} />
               <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
               <Route exact path={Routes.HOOKS_PAGE} component={HooksDemo} />
+              <Route exact path={Routes.FORGOT_PASSWORD_PAGE} component={ForgotPasswordPage} />
               <PrivateRoute
                 exact
                 path={Routes.HOME_PAGE}
