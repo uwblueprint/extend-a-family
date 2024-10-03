@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
-import { Role, Status } from "../types/userTypes";
+import { FacilitatorDTO, Role, Status } from "../types/userTypes";
 
 export interface User extends Document {
   id: ObjectId;
@@ -9,6 +9,14 @@ export interface User extends Document {
   authId: string;
   role: Role;
   status: Status;
+}
+
+export interface Learner extends User {
+  facilitator: ObjectId;
+}
+
+export interface Facilitator extends User {
+  learners: Array<ObjectId>;
 }
 
 const baseOptions = {
@@ -79,8 +87,8 @@ const Administrator = UserModel.discriminator(
   "Administrator",
   AdministratorSchema,
 );
-const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
-const Learner = UserModel.discriminator("Learner", LearnerSchema);
+const FacilitatorModel = UserModel.discriminator<Facilitator>("Facilitator", FacilitatorSchema);
+const LearnerModel = UserModel.discriminator<Learner>("Learner", LearnerSchema);
 
-export { Administrator, Facilitator, Learner };
+export { Administrator, FacilitatorModel, LearnerModel };
 export default UserModel;
