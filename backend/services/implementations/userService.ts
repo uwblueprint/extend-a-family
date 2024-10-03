@@ -216,12 +216,14 @@ class UserService implements IUserService {
       Logger.error(`Failed to create user. Reason = ${getErrorMessage(err)}`);
       throw err;
     }
-    
 
-    return {
-      ...newLearner.toObject(), 
-      email: firebaseUser.email?? ""
-    };
+    await FacilitatorModel.findByIdAndUpdate(
+      facilitatorId,
+      { "$push": { learners: newLearner.id } },
+      { runValidators: true },
+    );
+
+    return {} as LearnerDTO;
   }
 
   async updateUserById(userId: string, user: UpdateUserDTO): Promise<UserDTO> {
