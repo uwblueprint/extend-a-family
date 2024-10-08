@@ -3,9 +3,7 @@ import {
   editComponentDataMap,
   editMatchNodeDataMap,
 } from "../../utils/GridComponentUtils";
-import { last } from "lodash";
 import TextPanel from "./TextPanel";
-import { Last } from "react-bootstrap/esm/PageItem";
 
 interface MatchProps {
   numRows?: number;
@@ -27,10 +25,10 @@ const MatchPanel: React.FC<EditMatchProps> = ({
   index,
 }) => {
   const {
-    numRows = 0,
-    numCols = 0,
-    nodePositionToData = new Map<string, any>(),
-    selectedNode = null,
+    nodePositionToData = new Map<
+      string,
+      { w: number; h: number; type: string }
+    >(),
     lastSelectedNode = { id: "10000", type: "" },
   } = componentData.get(index) || {};
 

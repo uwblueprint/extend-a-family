@@ -1,93 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
-import ReactFlow, {
-  addEdge,
-  Background,
-  Controls,
-  Handle,
-  Position,
-} from "reactflow";
+import ReactFlow, { addEdge } from "reactflow";
 import "reactflow/dist/style.css";
 import { editComponentDataMap } from "../../utils/GridComponentUtils";
-import { update } from "lodash";
-import TextComponent from "./TextComponent";
-
-const defaultColor = "black";
-
-const Node = ({ data, handleType }) => {
-  return (
-    <div
-      style={{
-        padding: "20px",
-        border: "1px solid",
-        borderRadius: "10px",
-        borderColor: data.borderColor || defaultColor,
-
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-        height: data.height,
-        width: data.width,
-      }}
-      onMouseEnter={(e) => {
-        // e.currentTarget.style.transform = "translateY(-5px)";
-        e.currentTarget.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.2)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "";
-        e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
-      }}
-    >
-      {(handleType === "left" || handleType === "middle") && (
-        <Handle type="source" position={Position.Right} />
-      )}
-      {data.type === "text" && <TextComponent componentData={data} />}
-
-      {(handleType === "right" || handleType === "middle") && (
-        <Handle type="target" position={Position.Left} />
-      )}
-    </div>
-  );
-};
-
-const LeftNode = ({ data }) => {
-  console.log(data);
-  return <Node data={data} handleType="left" />;
-};
-
-const RightNode = ({ data }) => {
-  return <Node data={data} handleType="right" />;
-};
-
-const MiddleNode = ({ data }) => {
-  return <Node data={data} handleType="middle" />;
-};
-
-const getNodeType = (col: number, numCols: number): string => {
-  let nodeType = "";
-  if (numCols == 2) {
-    nodeType = col % 2 === 0 ? "leftNode" : "rightNode";
-  } else {
-    if (col % 3 === 0) nodeType = "leftNode";
-    if (col % 3 === 1) nodeType = "middleNode";
-    if (col % 3 === 2) nodeType = "rightNode";
-  }
-  return nodeType;
-};
-
-// TO DO: This needs to be wrapped in an useMemo as instructed in ReactFlow docs, but doing so breaks the app...
-const nodeTypes = {
-  leftNode: LeftNode,
-  rightNode: RightNode,
-  middleNode: MiddleNode,
-};
+import { getNodeType, nodeTypes, NodeType } from "./Node";
 
 // Initial nodes positioned in two columns
-const initialNodes = [];
+const initialNodes: NodeType[] = [];
 const initialEdges = [];
 
 const defaultWidth = 75;
 const defaultHeight = 75;
-
-let prevNode = null;
 
 const getCoordinate = (
   gridLength: number,
@@ -100,16 +22,16 @@ const getCoordinate = (
   return startPoint || 0;
 };
 
-interface MatchProps {
-  numRows?: number;
-  numCols?: number;
-  nodePositionToData?: Map<string, object>;
-  selectedNode?: { id: string; type: string };
-  lastSelectedNode?: { id: string; type: string };
-}
-
 interface ComponentProps {
-  componentData: Map<string, any>;
+  componentData: Map<
+    string,
+    {
+      numRows?: number;
+      numCols?: number;
+      nodePositionToData?: Map<string, object>;
+      selectedNode?: NodeType;
+    }
+  >;
   setComponentData: (data: Map<string, object>) => void;
   i: string;
   w: number;
@@ -128,7 +50,6 @@ const MatchComponent: React.FC<ComponentProps> = ({
     numCols = 0,
     nodePositionToData = new Map<string, object>(),
     selectedNode = null,
-    lastSelectedNode = null,
   } = componentData.get(i) || {};
 
   const [nodes, setNodes] = useState(initialNodes);
@@ -137,29 +58,30 @@ const MatchComponent: React.FC<ComponentProps> = ({
   const insertNodes = (
     insertRows: number,
     insertCols: number,
-    w: number,
-    h: number,
+    width: number,
+    height: number,
   ) => {
     const newNodes = [];
 
-    for (let row = 0; row < insertRows; row++) {
-      for (let col = 0; col < insertCols; col++) {
+    for (let row = 0; row < insertRows; row += 1) {
+      for (let col = 0; col < insertCols; col += 1) {
         const nodeData = nodePositionToData.get(`node-${row}-${col}`) || {};
-        const nodeWidth = parseInt(nodeData.w) || defaultWidth;
-        const nodeHeight = parseInt(nodeData.h) || defaultHeight;
+        const nodeWidth = parseInt(nodeData.w, 10) || defaultWidth;
+        const nodeHeight = parseInt(nodeData.h, 10) || defaultHeight;
 
         newNodes.push({
           id: `node-${row}-${col}`,
           type: getNodeType(col, insertCols),
           position: {
-            x: getCoordinate(w, col, insertCols, nodeWidth),
-            y: getCoordinate(h, row, insertRows, nodeHeight),
+            x: getCoordinate(width, col, insertCols, nodeWidth),
+            y: getCoordinate(height, row, insertRows, nodeHeight),
           },
           data: {
             label: `node-${row}-${col}`,
             index: row * insertCols + col,
             width: nodeWidth,
             height: nodeHeight,
+            type: getNodeType(col, insertCols),
             ...nodeData,
           },
         });
@@ -168,44 +90,12 @@ const MatchComponent: React.FC<ComponentProps> = ({
     setNodes(newNodes);
   };
 
-  const modifyNodes = (id: string, data: any) => {
-    setNodes((prevNodes) =>
-      prevNodes.map((node) => {
-        if (node.id === id) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              ...data,
-            },
-          };
-        }
-        return node;
-      }),
-    );
-  };
+  //
 
   useEffect(() => {
     insertNodes(numRows, numCols, w * 50, h * 50);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [numRows, numCols, w, h, componentData]);
-
-  const setCurrentNodeAndStyle = (node) => {
-    if (prevNode) {
-      modifyNodes(prevNode.id, { borderColor: defaultColor });
-    }
-    if (!node) {
-      setSelectedNode(null);
-      return;
-    }
-    if ((prevNode && prevNode.id !== node.id) || !prevNode) {
-      modifyNodes(node.id, { borderColor: "blue" });
-    } else {
-      modifyNodes(node.id, { borderColor: defaultColor });
-      prevNode = null;
-    }
-    prevNode = node;
-    setSelectedNode(node);
-  };
 
   const onNodeClick = (event, node) => {
     let updatedComponentDataMap = editComponentDataMap(
@@ -270,10 +160,6 @@ const MatchComponent: React.FC<ComponentProps> = ({
     [],
   );
 
-  const handleClear = () => {
-    setEdges([]);
-  };
-
   return (
     <div
       className="drag-handle"
@@ -293,7 +179,7 @@ const MatchComponent: React.FC<ComponentProps> = ({
           onConnect={onConnect}
           zoomOnPinch={false}
           panOnDrag={false}
-          preventScrolling={true}
+          preventScrolling
           minZoom={0.75}
           snapGrid={[15, 15]}
           autoPanOnNodeDrag={false}
@@ -312,3 +198,42 @@ const MatchComponent: React.FC<ComponentProps> = ({
 };
 
 export default MatchComponent;
+
+// This code below should add a blue highlight around currently selected node
+// const defaultColor = "black";
+// let prevNode: NodeType | null = null;
+
+// const setCurrentNodeAndStyle = (node) => {
+//   if (prevNode) {
+//     modifyNodes(prevNode.id, { borderColor: defaultColor });
+//   }
+//   if (!node) {
+//     setSelectedNode(null);
+//     return;
+//   }
+//   if ((prevNode && prevNode.id !== node.id) || !prevNode) {
+//     modifyNodes(node.id, { borderColor: "blue" });
+//   } else {
+//     modifyNodes(node.id, { borderColor: defaultColor });
+//     prevNode = null;
+//   }
+//   prevNode = node;
+//   setSelectedNode(node);
+// };
+
+// const modifyNodes = (id: string, data: any) => {
+//   setNodes((prevNodes) =>
+//     prevNodes.map((node) => {
+//       if (node.id === id) {
+//         return {
+//           ...node,
+//           data: {
+//             ...node.data,
+//             ...data,
+//           },
+//         };
+//       }
+//       return node;
+//     }),
+//   );
+// };

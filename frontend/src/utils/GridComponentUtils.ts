@@ -20,12 +20,11 @@ export const editMatchNodeDataMap = (
 ) => {
   const updatedComponentDataMap = new Map(componentDataMap);
   const componentDataByIndex = updatedComponentDataMap.get(index) || {};
-  const updatedNodeMap =
-    componentDataByIndex?.["nodePositionToData"] || new Map();
+  const updatedNodeMap = componentDataByIndex?.nodePositionToData || new Map();
   const nodeDataByIndex = updatedNodeMap.get(node) || {};
   const updatedNodeData = { ...nodeDataByIndex, [field]: value };
   updatedNodeMap.set(node, updatedNodeData);
-  componentDataByIndex["nodePositionToData"] = updatedNodeMap;
+  componentDataByIndex.nodePositionToData = updatedNodeMap;
   updatedComponentDataMap.set(index, componentDataByIndex);
   return updatedComponentDataMap;
 };

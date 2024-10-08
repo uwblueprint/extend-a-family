@@ -21,7 +21,6 @@ interface GridElementProps {
   onMouseUp?: React.MouseEventHandler<HTMLDivElement>;
   onTouchEnd?: React.TouchEventHandler<HTMLDivElement>;
   onTouchStart?: React.TouchEventHandler<HTMLDivElement>;
-  layout?: any;
 }
 
 const createDragStartEvent = (
@@ -73,7 +72,6 @@ const GridElement: React.FC<GridElementProps> = ({
   onMouseUp,
   onTouchEnd,
   onTouchStart,
-  layout,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
