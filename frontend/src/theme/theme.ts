@@ -5,7 +5,7 @@ import {
   TypographyOptions,
 } from "@mui/material/styles";
 import { TypographyStyleOptions } from "@mui/material/styles/createTypography";
-import { error, learner, administrator, facilitator } from "./palette";
+import { error, learner, administrator, facilitator, neutral } from "./palette";
 import "@fontsource/roboto";
 
 // adding custom attributes to palette
@@ -20,6 +20,8 @@ declare module "@mui/material/styles" {
 
     // Figma: tertiary colour palette
     facilitator: SimplePaletteColorOptions;
+
+    neutral: SimplePaletteColorOptions;
   }
 
   interface TypographyOptions {
@@ -102,6 +104,12 @@ const lightThemePalette: PaletteOptions = {
     light: error[90],
     dark: error[10],
   },
+
+  neutral: {
+    main: neutral[40],
+    light: neutral[98],
+    dark: neutral[10],
+  },
 };
 
 const darkThemePalette: PaletteOptions = {
@@ -126,101 +134,106 @@ const darkThemePalette: PaletteOptions = {
     light: error[30],
     dark: error[90],
   },
+  neutral: {
+    main: neutral[60],
+    light: neutral[10],
+    dark: neutral[90], // change these later
+  },
 };
 
 const typography: TypographyOptions = {
   displayLarge: {
-    fontSize: "57pt",
+    fontSize: "57px",
     fontWeight: 700,
-    lineHeight: "64pt",
-    letterSpacing: "-0.25pt",
+    lineHeight: "64px",
+    letterSpacing: "-0.25px",
   },
   displayMedium: {
-    fontSize: "45pt",
+    fontSize: "45px",
     fontWeight: 700,
-    lineHeight: "52pt",
-    letterSpacing: "0pt",
+    lineHeight: "52px",
+    letterSpacing: "0px",
   },
   displaySmall: {
-    fontSize: "36pt",
+    fontSize: "36px",
     fontWeight: 700,
-    lineHeight: "44pt",
-    letterSpacing: "0pt",
+    lineHeight: "44px",
+    letterSpacing: "0px",
   },
   headlineLarge: {
-    fontSize: "32pt",
+    fontSize: "32px",
     fontWeight: 600,
-    lineHeight: "40pt",
-    letterSpacing: "0pt",
+    lineHeight: "40px",
+    letterSpacing: "0px",
   },
   headlineMedium: {
-    fontSize: "28pt",
+    fontSize: "28px",
     fontWeight: 600,
-    lineHeight: "36pt",
-    letterSpacing: "0pt",
+    lineHeight: "36px",
+    letterSpacing: "0px",
   },
   headlineSmall: {
-    fontSize: "24pt",
+    fontSize: "24px",
     fontWeight: 600,
-    lineHeight: "32pt",
-    letterSpacing: "0pt",
+    lineHeight: "32px",
+    letterSpacing: "0px",
   },
   titleLarge: {
-    fontSize: "22pt",
+    fontSize: "22px",
     fontWeight: 600,
-    lineHeight: "28pt",
-    letterSpacing: "0pt",
+    lineHeight: "28px",
+    letterSpacing: "0px",
   },
   titleMedium: {
-    fontSize: "16pt",
+    fontSize: "16px",
     fontWeight: 600,
-    lineHeight: "24pt",
-    letterSpacing: "+0.15pt",
+    lineHeight: "24px",
+    letterSpacing: "+0.15px",
   },
   titleSmall: {
-    fontSize: "24pt",
+    fontSize: "24px",
     fontWeight: 600,
-    lineHeight: "20pt",
-    letterSpacing: "+0.1pt",
+    lineHeight: "20px",
+    letterSpacing: "+0.1px",
   },
   labelLarge: {
-    fontSize: "14pt",
+    fontSize: "14px",
     fontWeight: 300,
-    lineHeight: "20pt",
-    letterSpacing: "+0.1pt",
+    lineHeight: "20px",
+    letterSpacing: "+0.1px",
     textTransform: "uppercase",
   },
   labelMedium: {
-    fontSize: "12pt",
+    fontSize: "12px",
     fontWeight: 300,
-    lineHeight: "16pt",
-    letterSpacing: "+0.5pt",
+    lineHeight: "16px",
+    letterSpacing: "+0.5px",
     textTransform: "uppercase",
   },
   labelSmall: {
-    fontSize: "11pt",
+    fontSize: "11px",
     fontWeight: 300,
-    lineHeight: "16pt",
-    letterSpacing: "+0.5pt",
+    lineHeight: "16px",
+    letterSpacing: "+0.5px",
     textTransform: "uppercase",
   },
   bodyLarge: {
-    fontSize: "16pt",
+    fontSize: "16px",
     fontWeight: 400,
-    lineHeight: "24pt",
-    letterSpacing: "+0.5pt",
+    lineHeight: "24px",
+    letterSpacing: "+0.5px",
   },
   bodyMedium: {
-    fontSize: "14pt",
+    fontSize: "14px",
     fontWeight: 400,
-    lineHeight: "20pt",
-    letterSpacing: "+0.25pt",
+    lineHeight: "20px",
+    letterSpacing: "+0.25px",
   },
   bodySmall: {
-    fontSize: "12pt",
+    fontSize: "12px",
     fontWeight: 400,
-    lineHeight: "16pt",
-    letterSpacing: "+0.4pt",
+    lineHeight: "16px",
+    letterSpacing: "+0.4px",
   },
 };
 

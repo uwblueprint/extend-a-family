@@ -17,3 +17,5 @@ export const MANAGE_USERS_PAGE = "/manage-users";
 export const MAKE_HELP_REQUEST_PAGE = "/ask-for-help";
 
 export const VIEW_HELP_REQUESTS_PAGE = "/help-requests";
+
+export const COURSES_PAGE = "/courses";
