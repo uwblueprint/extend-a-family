@@ -12,6 +12,12 @@ interface ICourseUnitService {
   getCourseUnits(): Promise<Array<CourseUnitDTO>>;
 
   /**
+   * Returns course unit based on unit id
+   * @throwsError if course were not successfully fetched or not found
+   */
+  getCourseUnit(unitId: string): Promise<CourseUnitDTO>;
+
+  /**
    * Creates a course unit
    * @param course the info (currently just title) about course we want to create
    * @throws Error if course was not successfully created
