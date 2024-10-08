@@ -1,5 +1,7 @@
 export type Role = "Administrator" | "Facilitator" | "Learner";
 
+export type Status = "Active" | "Invited";
+
 export type AuthenticatedUser = {
   id: string;
   firstName: string;
@@ -7,6 +9,7 @@ export type AuthenticatedUser = {
   email: string;
   role: Role;
   accessToken: string;
+  status: Status;
 };
 
 export type AuthenticatedAdministrator = AuthenticatedUser;

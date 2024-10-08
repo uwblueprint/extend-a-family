@@ -27,6 +27,7 @@ import { SocketProvider } from "./contexts/SocketContext";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
+import CreatePasswordPage from "./components/pages/CreatePasswordPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -93,6 +94,12 @@ const App = (): React.ReactElement => {
                   exact
                   path={Routes.NOT_AUTHORIZED_PAGE}
                   component={NotAuthorized}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.CREATE_PASSWORD_PAGE}
+                  component={CreatePasswordPage}
+                  allowedRoles={["Administrator", "Learner"]}
                 />
                 <PrivateRoute
                   exact

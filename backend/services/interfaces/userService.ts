@@ -2,6 +2,7 @@ import { ObjectId } from "mongoose";
 import {
   CreateUserDTO,
   Role,
+  Status,
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
@@ -94,6 +95,20 @@ interface IUserService {
    * @returns an Array of UserDtos that all have the corresponding role
    */
   getUsersByRole(role: Role): Promise<Array<UserDTO>>;
+
+  /**
+   * Determine if the provided access token is valid and the user to which it belongs has the specified status
+   * @param accessToken user's access token
+   * @param status status to check for match
+   */
+  isFirstTimeInvitedUser(accessToken: string): Promise<boolean>;
+
+  /**
+   * Update the user's status to the specified new status value
+   * @param accessToken user's access token
+   * @param newStatus status to update to
+   */
+  changeUserStatus(accessToken: string, newStatus: Status): Promise<void>;
 }
 
 export default IUserService;

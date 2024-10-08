@@ -9,6 +9,8 @@ const FIREBASE_SIGN_IN_URL =
   "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword";
 const FIREBASE_REFRESH_TOKEN_URL =
   "https://securetoken.googleapis.com/v1/token";
+const FIREBASE_CHANGE_PASSWORD_URL =
+  "https://identitytoolkit.googleapis.com/v1/accounts:update";
 
 type PasswordSignInResponse = {
   idToken: string;
@@ -17,6 +19,13 @@ type PasswordSignInResponse = {
   expiresIn: string;
   localId: string;
   registered: boolean;
+};
+
+type ChangePasswordResponse = {
+  localId: string;
+  email: string;
+  idToken: string;
+  emailVerified: boolean;
 };
 
 type RefreshTokenResponse = {
@@ -116,6 +125,42 @@ const FirebaseRestClient = {
       accessToken: (responseJson as RefreshTokenResponse).id_token,
       refreshToken: (responseJson as RefreshTokenResponse).refresh_token,
     };
+  },
+
+  changePassword: async (
+    accessToken: string,
+    newPassword: string,
+  ): Promise<string> => {
+    const response: Response = await fetch(
+      `${FIREBASE_CHANGE_PASSWORD_URL}?key=${process.env.FIREBASE_WEB_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idToken: accessToken,
+          password: newPassword,
+        }),
+      },
+    );
+
+    const responseJson: ChangePasswordResponse | RequestError =
+      await response.json();
+
+    if (!response.ok) {
+      const errorMessage = [
+        "Failed to change password via Firebase REST API, status code =",
+        `${response.status},`,
+        "error message =",
+        (responseJson as RequestError).error.message,
+      ];
+      Logger.error(errorMessage.join(" "));
+
+      throw new Error("Failed to change password via Firebase REST API");
+    }
+
+    return (responseJson as ChangePasswordResponse).idToken;
   },
 };
 

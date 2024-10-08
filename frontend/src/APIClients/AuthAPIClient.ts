@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
-import { AuthenticatedUser, Role } from "../types/AuthTypes";
+import { AuthenticatedUser, Role, Status } from "../types/AuthTypes";
 import baseAPIClient from "./BaseAPIClient";
 import {
   getLocalStorageObjProperty,
@@ -63,6 +63,7 @@ const signup = async (
     return null;
   }
 };
+
 const resetPassword = async (email: string | undefined): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -72,6 +73,53 @@ const resetPassword = async (email: string | undefined): Promise<boolean> => {
     await baseAPIClient.post(
       `/auth/resetPassword/${email}`,
       {},
+      { headers: { Authorization: bearerToken } },
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const updateTemporaryPassword = async (
+  email: string,
+  newPassword: string,
+  role: Role,
+): Promise<boolean> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    await baseAPIClient.post(
+      `/auth/updateTemporaryPassword`,
+      { newPassword },
+      { headers: { Authorization: bearerToken } },
+    );
+    const newAuthenticatedUser = await login(email, newPassword, role);
+    if (!newAuthenticatedUser) {
+      throw new Error("Unable to authenticate user after logging in.");
+    }
+    setLocalStorageObjProperty(
+      AUTHENTICATED_USER_KEY,
+      "accessToken",
+      newAuthenticatedUser.accessToken,
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const updateUserStatus = async (newStatus: Status): Promise<boolean> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    await baseAPIClient.post(
+      `/auth/updateUserStatus`,
+      { status: newStatus },
       { headers: { Authorization: bearerToken } },
     );
     return true;
@@ -122,6 +170,8 @@ export default {
   logout,
   signup,
   resetPassword,
+  updateTemporaryPassword,
+  updateUserStatus,
   refresh,
   isUserVerified,
 };
