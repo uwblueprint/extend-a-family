@@ -207,7 +207,7 @@ authRouter.post(
       const accessToken = getAccessToken(req)!;
       const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
         await firebaseAdmin.auth().verifyIdToken(accessToken, true);
-      //const { id } = await userService.getUserById(decodedIdToken.uid);
+      const { id } = await userService.getUserById(decodedIdToken.uid);
       const temporaryPassword = generate({
         length: 20,
         numbers: true,
@@ -219,7 +219,7 @@ authRouter.post(
         role: "Learner",
         password: temporaryPassword,
         status: "Invited",
-      }, ""); // TODO: pass in facilitator Object ID in here
+      }, id);
       await authService.sendLearnerInvite(
         req.body.firstName,
         req.body.email,
