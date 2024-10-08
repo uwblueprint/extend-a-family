@@ -13,6 +13,7 @@ import {
   inviteUserRequestValidator,
   forgotPasswordRequestValidator,
 } from "../middlewares/validators/authValidators";
+import * as firebaseAdmin from "firebase-admin"
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
 import EmailService from "../services/implementations/emailService";
@@ -205,6 +206,10 @@ authRouter.post(
   isAuthorizedByRole(new Set(["Facilitator"])),
   async (req, res) => {
     try {
+      const accessToken = getAccessToken(req)!;
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
+      const { id } = await userService.getUserById(decodedIdToken.uid);
       const temporaryPassword = generate({
         length: 20,
         numbers: true,
@@ -216,7 +221,7 @@ authRouter.post(
         role: "Learner",
         password: temporaryPassword,
         status: "Invited",
-      }, ""); // TODO: pass in facilitator Object ID in here
+      }, id);
       await authService.sendLearnerInvite(
         req.body.firstName,
         req.body.email,
