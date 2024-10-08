@@ -1,5 +1,6 @@
 import * as firebaseAdmin from "firebase-admin";
-import mongoose, { mongo, ObjectId } from "mongoose";
+
+import mongoose, { ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
 import MgUser, { User } from "../../models/user.mgmodel";
 import {
@@ -183,10 +184,7 @@ class UserService implements IUserService {
     };
   }
 
-  async createLearner(
-    user: CreateUserDTO,
-    facilitatorId: string,
-  ): Promise<LearnerDTO> {
+  async createLearner(user: CreateUserDTO, facilitatorId: string): Promise<LearnerDTO> {
     let newLearner: Learner;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
     try {
@@ -198,7 +196,6 @@ class UserService implements IUserService {
         newLearner = await LearnerModel.create({
           ...user,
           facilitator: facilitatorId,
-          authId: firebaseUser.uid,
         });
         await FacilitatorModel.findByIdAndUpdate(
           facilitatorId,
@@ -224,18 +221,10 @@ class UserService implements IUserService {
       throw err;
     }
 
-    await Facilitator.findByIdAndUpdate(
-      facilitatorId,
-      { $push: { learners: newLearner.id } },
-      { runValidators: true },
-    );
-
     return {
       ...newLearner.toObject(),
       email: firebaseUser.email ?? "",
     }
-    
-
   }
 
   async updateUserById(

@@ -212,7 +212,6 @@ authRouter.post(
         length: 20,
         numbers: true,
       });
-      
       const invitedLearnerUser = await userService.createLearner({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -220,8 +219,7 @@ authRouter.post(
         role: "Learner",
         password: temporaryPassword,
         status: "Invited",
-        
-      }, req.body.facilitatorId );
+      }, ""); // TODO: pass in facilitator Object ID in here
       await authService.sendLearnerInvite(
         req.body.firstName,
         req.body.email,
