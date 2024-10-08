@@ -207,14 +207,15 @@ authRouter.post(
         length: 20,
         numbers: true,
       });
-      const invitedLearnerUser = await userService.createUser({
+      const invitedLearnerUser = await userService.createLearner({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
         role: "Learner",
         password: temporaryPassword,
         status: "Invited",
-      });
+        
+      }, req.body.facilitatorId);
       await authService.sendLearnerInvite(
         req.body.firstName,
         req.body.email,
