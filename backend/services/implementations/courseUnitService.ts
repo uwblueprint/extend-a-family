@@ -28,6 +28,31 @@ class CourseUnitService implements ICourseUnitService {
     }
   }
 
+  async getCourseUnit(
+    unitId: string,
+  ): Promise<CourseUnitDTO & { modules: string[] }> {
+    try {
+      const courseUnit: CourseUnit | null = await MgCourseUnit.findById(unitId);
+
+      if (!courseUnit) {
+        throw new Error(`Course unit with id ${unitId} not found.`);
+      }
+
+      const courseModuleIds = courseUnit.modules.map((id) => {
+        return id.toString();
+      });
+
+      return { ...(courseUnit as CourseUnitDTO), modules: courseModuleIds };
+    } catch (error) {
+      Logger.error(
+        `Failed to get course with id ${unitId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
   async createCourseUnit(
     courseUnit: CreateCourseUnitDTO,
   ): Promise<CourseUnitDTO> {
