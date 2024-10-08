@@ -1,6 +1,6 @@
 import * as firebaseAdmin from "firebase-admin";
 
-import { ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
 import MgUser, { Facilitator, Learner, User, LearnerModel, FacilitatorModel } from "../../models/user.mgmodel";
 import {
@@ -185,7 +185,6 @@ class UserService implements IUserService {
   }
 
   async createLearner(user: CreateUserDTO, facilitatorId: string): Promise<LearnerDTO> {
-        // TODO: this.updateUserById()
     let newLearner: Learner;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
     try {
@@ -196,9 +195,14 @@ class UserService implements IUserService {
       try {
         newLearner = await LearnerModel.create({
           ...user,
-          facilitator: facilitatorId
+          facilitator: facilitatorId,
         });
-      } catch(mongoError) {
+        await FacilitatorModel.findByIdAndUpdate(
+          facilitatorId,
+          { "$push": { learners: newLearner.id } },
+          { runValidators: true },
+        );
+      } catch (mongoError) {
         try {
           await firebaseAdmin.auth().deleteUser(firebaseUser.uid);
         } catch (firebaseError: unknown) {
@@ -212,18 +216,15 @@ class UserService implements IUserService {
         }
         throw mongoError
       }
-    } catch(err: unknown) {
-      Logger.error(`Failed to create user. Reason = ${getErrorMessage(err)}`);
+    } catch (err: unknown) {
+      Logger.error(`Failed to create learner. Reason = ${getErrorMessage(err)}`);
       throw err;
     }
 
-    await FacilitatorModel.findByIdAndUpdate(
-      facilitatorId,
-      { "$push": { learners: newLearner.id } },
-      { runValidators: true },
-    );
-
-    return {} as LearnerDTO;
+    return {
+      ...newLearner.toObject(),
+      email: firebaseUser.email ?? "",
+    }
   }
 
   async updateUserById(userId: string, user: UpdateUserDTO): Promise<UserDTO> {
