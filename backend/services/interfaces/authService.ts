@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 import { AuthDTO, Token } from "../../types/authTypes";
 import { Role } from "../../types/userTypes";
 
@@ -45,11 +46,18 @@ interface IAuthService {
 
   /**
    * Sends an email invitation to an invited administrator with the temporary password specified
-   * @param email email of new administrator invited
+   * @param email email address of new administrator invited
    * @param temporaryPassword the new administrator's temporary password
    * @throws Error if unable to generate link or send email
    */
   sendAdminInvite(email: string, temporaryPassword: string): Promise<void>;
+
+  /**
+   * Changes a user's password
+   * @param email the user's email address
+   * @param newPassword new password chosen to replace the user's old password
+   */
+  changeUserPassword(accessToken: string, newPassword: string): Promise<string>;
 
   /**
    * Determine if the provided access token is valid and authorized for at least
@@ -82,6 +90,13 @@ interface IAuthService {
     accessToken: string,
     requestedEmail: string,
   ): Promise<boolean>;
+
+  /**
+   * Returns the userid from the provided access token
+   * @param accessToken user's access token
+   * @returns the userid from the access token
+   */
+  getUserIdFromAccessToken(accessToken: string): Promise<ObjectId>;
 }
 
 export default IAuthService;

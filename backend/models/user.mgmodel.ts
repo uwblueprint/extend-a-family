@@ -1,9 +1,9 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 import { Role, Status } from "../types/userTypes";
 
 export interface User extends Document {
-  id: string;
+  id: ObjectId;
   firstName: string;
   lastName: string;
   authId: string;
@@ -11,7 +11,12 @@ export interface User extends Document {
   status: Status;
 }
 
-const UserSchema: Schema = new Schema(
+const baseOptions = {
+  discriminatorKey: "role",
+  timestamps: true,
+};
+
+export const UserSchema: Schema = new Schema(
   {
     firstName: {
       type: String,
@@ -36,7 +41,46 @@ const UserSchema: Schema = new Schema(
       enum: ["Invited", "Active"],
     },
   },
-  { timestamps: true },
+  baseOptions,
 );
 
-export default mongoose.model<User>("User", UserSchema);
+/* eslint-disable no-param-reassign */
+UserSchema.set("toObject", {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc: Document, ret: Record<string, unknown>) => {
+    // eslint-disable-next-line no-underscore-dangle
+    delete ret._id;
+    delete ret.createdAt;
+    delete ret.updatedAt;
+  },
+});
+
+const UserModel = mongoose.model<User>("User", UserSchema);
+
+const AdministratorSchema = new Schema({});
+
+const FacilitatorSchema = new Schema({
+  learners: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    default: [],
+  },
+});
+
+const LearnerSchema = new Schema({
+  facilitator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+});
+
+const Administrator = UserModel.discriminator(
+  "Administrator",
+  AdministratorSchema,
+);
+const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
+const Learner = UserModel.discriminator("Learner", LearnerSchema);
+
+export { Administrator, Facilitator, Learner };
+export default UserModel;

@@ -6,11 +6,15 @@ import {
   isAuthorizedByEmail,
   isAuthorizedByUserId,
   isAuthorizedByRole,
+  isFirstTimeInvitedUser,
 } from "../middlewares/auth";
 import {
   loginRequestValidator,
   signupRequestValidator,
   inviteAdminRequestValidator,
+  forgotPasswordRequestValidator,
+  updateTemporaryPasswordRequestValidator,
+  updateUserStatusRequestValidator,
 } from "../middlewares/validators/authValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -20,6 +24,7 @@ import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import { getErrorMessage } from "../utilities/errorUtils";
+import { AuthErrorCodes } from "../types/authTypes";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -34,6 +39,8 @@ const cookieOptions: CookieOptions = {
 
 /* Returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
 authRouter.post("/login", loginRequestValidator, async (req, res) => {
+  const requestedRole = req.body.attemptedRole;
+  let correctRole = null;
   try {
     const authDTO = await authService.generateToken(
       req.body.email,
@@ -41,13 +48,41 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
     );
 
     const { refreshToken, ...rest } = authDTO;
+    correctRole = rest.role;
+
+    if (correctRole !== requestedRole) {
+      throw new Error(AuthErrorCodes.WRONG_USER_TYPE);
+    }
+
+    const isVerified = await authService.isAuthorizedByEmail(
+      rest.accessToken,
+      req.body.email,
+    );
+
+    if (!isVerified) {
+      throw new Error(AuthErrorCodes.UNVERIFIED_EMAIL);
+    }
 
     res
       .cookie("refreshToken", refreshToken, cookieOptions)
       .status(200)
       .json(rest);
   } catch (error: unknown) {
-    res.status(500).json({ error: getErrorMessage(error) });
+    const message = getErrorMessage(error);
+    if (
+      req.body.attemptedRole !== "Learner" &&
+      (message === AuthErrorCodes.EMAIL_NOT_FOUND ||
+        message === AuthErrorCodes.INCORRECT_PASSWORD)
+    ) {
+      res.status(500).json({ error: AuthErrorCodes.INVALID_LOGIN_CREDENTIALS });
+    } else if (message === AuthErrorCodes.WRONG_USER_TYPE) {
+      res.status(500).json({
+        error: message,
+        errorData: [requestedRole, correctRole],
+      });
+    } else {
+      res.status(500).json({ error: message });
+    }
   }
 });
 
@@ -161,6 +196,55 @@ authRouter.post(
       });
       await authService.sendAdminInvite(req.body.email, temporaryPassword);
       res.status(200).json(invitedAdminUser);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+// /* Reset password through a "Forgot Password" option */
+authRouter.post(
+  "/forgotPassword",
+  forgotPasswordRequestValidator,
+  async (req, res) => {
+    try {
+      await userService.getUserByEmail(req.body.email);
+      await authService.resetPassword(req.body.email);
+      res.status(204).send();
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+authRouter.post(
+  "/updateTemporaryPassword",
+  updateTemporaryPasswordRequestValidator,
+  isFirstTimeInvitedUser(),
+  async (req, res) => {
+    try {
+      const accessToken = getAccessToken(req)!;
+      const newAccessToken = await authService.changeUserPassword(
+        accessToken,
+        req.body.newPassword,
+      );
+      res.status(200).json({
+        accessToken: newAccessToken,
+      });
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+authRouter.post(
+  "/updateUserStatus",
+  updateUserStatusRequestValidator,
+  async (req, res) => {
+    try {
+      const accessToken = getAccessToken(req)!;
+      await userService.changeUserStatus(accessToken, req.body.status);
+      res.status(204).send();
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }

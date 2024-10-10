@@ -1,13 +1,16 @@
 import * as firebaseAdmin from "firebase-admin";
 
+import { ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
 import MgUser, { User } from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
   Role,
+  Status,
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
+import { AuthErrorCodes } from "../../types/authTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
@@ -23,7 +26,7 @@ const getMongoUserByAuthId = async (authId: string): Promise<User> => {
 
 class UserService implements IUserService {
   /* eslint-disable class-methods-use-this */
-  async getUserById(userId: string): Promise<UserDTO> {
+  async getUserById(userId: string | ObjectId): Promise<UserDTO> {
     let user: User | null;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
 
@@ -41,12 +44,8 @@ class UserService implements IUserService {
     }
 
     return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      ...user.toObject(),
       email: firebaseUser.email ?? "",
-      role: user.role,
-      status: user.status,
     };
   }
 
@@ -63,16 +62,12 @@ class UserService implements IUserService {
       }
     } catch (error: unknown) {
       Logger.error(`Failed to get user. Reason = ${getErrorMessage(error)}`);
-      throw error;
+      throw new Error(AuthErrorCodes.EMAIL_NOT_FOUND);
     }
 
     return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      ...user.toObject(),
       email: firebaseUser.email ?? "",
-      role: user.role,
-      status: user.status,
     };
   }
 
@@ -88,7 +83,7 @@ class UserService implements IUserService {
     }
   }
 
-  async getUserIdByAuthId(authId: string): Promise<string> {
+  async getUserIdByAuthId(authId: string): Promise<ObjectId> {
     try {
       const { id } = await getMongoUserByAuthId(authId);
       return id;
@@ -131,12 +126,8 @@ class UserService implements IUserService {
           }
 
           return {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            ...user.toObject(),
             email: firebaseUser.email ?? "",
-            role: user.role,
-            status: user.status,
           };
         }),
       );
@@ -188,16 +179,15 @@ class UserService implements IUserService {
     }
 
     return {
-      id: newUser.id,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
+      ...newUser.toObject(),
       email: firebaseUser.email ?? "",
-      role: newUser.role,
-      status: newUser.status,
     };
   }
 
-  async updateUserById(userId: string, user: UpdateUserDTO): Promise<UserDTO> {
+  async updateUserById(
+    userId: ObjectId | string,
+    user: UpdateUserDTO,
+  ): Promise<UserDTO> {
     let oldUser: User | null;
     let updatedFirebaseUser: firebaseAdmin.auth.UserRecord;
 
@@ -205,7 +195,12 @@ class UserService implements IUserService {
       // must explicitly specify runValidators when updating through findByIdAndUpdate
       oldUser = await MgUser.findByIdAndUpdate(
         userId,
-        { firstName: user.firstName, lastName: user.lastName, role: user.role },
+        {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          status: user.status,
+        },
         { runValidators: true },
       );
 
@@ -226,6 +221,7 @@ class UserService implements IUserService {
               firstName: oldUser.firstName,
               lastName: oldUser.lastName,
               role: oldUser.role,
+              status: oldUser.status,
             },
             { runValidators: true },
           );
@@ -247,7 +243,7 @@ class UserService implements IUserService {
     }
 
     return {
-      id: userId,
+      ...oldUser.toObject(),
       firstName: user.firstName,
       lastName: user.lastName,
       email: updatedFirebaseUser.email ?? "",
@@ -268,13 +264,9 @@ class UserService implements IUserService {
         await firebaseAdmin.auth().deleteUser(deletedUser.authId);
       } catch (error) {
         // rollback user deletion in MongoDB
+        const { id, ...rest } = deletedUser.toObject();
         try {
-          await MgUser.create({
-            firstName: deletedUser.firstName,
-            lastName: deletedUser.lastName,
-            authId: deletedUser.authId,
-            role: deletedUser.role,
-          });
+          await MgUser.create(rest);
         } catch (mongoDbError: unknown) {
           const errorMessage = [
             "Failed to rollback MongoDB user deletion after Firebase user deletion failure. Reason =",
@@ -309,14 +301,10 @@ class UserService implements IUserService {
       try {
         await firebaseAdmin.auth().deleteUser(firebaseUser.uid);
       } catch (error) {
+        // rollback user deletion in MongoDB
+        const { id, ...rest } = deletedUser.toObject();
         try {
-          // rollback user deletion in MongoDB
-          await MgUser.create({
-            firstName: deletedUser.firstName,
-            lastName: deletedUser.lastName,
-            authId: deletedUser.authId,
-            role: deletedUser.role,
-          });
+          await MgUser.create(rest);
         } catch (mongoDbError: unknown) {
           const errorMessage = [
             "Failed to rollback MongoDB user deletion after Firebase user deletion failure. Reason =",
@@ -354,12 +342,8 @@ class UserService implements IUserService {
           }
 
           return {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            ...user.toObject(),
             email: firebaseUser.email ?? "",
-            role: user.role,
-            status: user.status,
           };
         }),
       );
@@ -368,6 +352,44 @@ class UserService implements IUserService {
       throw error;
     }
     return userDtos;
+  }
+
+  async isFirstTimeInvitedUser(accessToken: string): Promise<boolean> {
+    try {
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
+      const { status } = await getMongoUserByAuthId(decodedIdToken.uid);
+      return status === "Invited";
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to verify user is first time invited user. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async changeUserStatus(
+    accessToken: string,
+    newStatus: Status,
+  ): Promise<void> {
+    try {
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
+      const tokenUserId = await this.getUserIdByAuthId(decodedIdToken.uid);
+      const currentUser = await this.getUserById(tokenUserId);
+      const updatedUser: UpdateUserDTO = {
+        ...currentUser,
+        status: newStatus,
+      };
+      await this.updateUserById(tokenUserId, updatedUser);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to change user status. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
   }
 }
 

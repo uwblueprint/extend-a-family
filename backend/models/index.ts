@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import { getErrorMessage } from "../utilities/errorUtils";
+import { CourseModule, CourseModuleSchema } from "./coursemodule.mgmodel";
+import { CoursePage, CoursePageSchema } from "./coursepage.mgmodel";
 
 /* eslint-disable-next-line import/prefer-default-export */
 export const mongo = {
@@ -12,6 +14,9 @@ export const mongo = {
       });
       /* eslint-disable-next-line no-console */
       console.info(`Successfully connected to MongoDB (${dbName})!`);
+
+      mongoose.model<CourseModule>("CourseModule", CourseModuleSchema);
+      mongoose.model<CoursePage>("CoursePage", CoursePageSchema);
     } catch (error) {
       /* eslint-disable-next-line no-console */
       console.error(`Error connecting to MongoDB: ${getErrorMessage(error)}`);

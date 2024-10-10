@@ -8,7 +8,8 @@
     "dev": "nodemon -L",
     "lint": "eslint . --ext .ts,.js",
     "fix": "eslint . --ext .ts,.js --fix",
-    "postinstall": "tsc"
+    "postinstall": "tsc",
+    "sync-user-dbs": "ts-node ./scripts/sync-user-databases.ts"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +36,7 @@
     "nodemailer": "^6.9.9",
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.13",
+    "socket.io": "^4.7.5",
     "swagger-ui-express": "^4.1.6",
     "ts-node": "^10.9.2",
     "umzug": "^3.0.0-beta.16",

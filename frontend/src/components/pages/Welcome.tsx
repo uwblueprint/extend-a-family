@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import {
+import React, { useState }, { useContext } from "react";
+import { Redirect,
   Typography,
   Container,
   Card,
@@ -13,10 +13,17 @@ import styled from "@emotion/styled";
 import background from "./backgroundImage.jpg";
 import icon from "./icon.png";
 import Login from "../auth/Login";
+import { HOME_PAGE } from "../../constants/Routes";
+import AuthContext from "../../contexts/AuthContext";
 
 const Welcome = (): React.ReactElement => {
+  const { authenticatedUser } = useContext(AuthContext);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
+
+  if (authenticatedUser) {
+    return <Redirect to={HOME_PAGE} />;
+  }
 
   const handleButtonClick = (role: string) => {
     setSelectedRole(role);
