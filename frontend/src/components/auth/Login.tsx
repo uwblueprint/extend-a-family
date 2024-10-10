@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Redirect, useHistory } from "react-router-dom";
+import { Redirect, useHistory, useLocation } from "react-router-dom";
 import { Button, TextField, Typography, Container } from "@mui/material";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, SIGNUP_PAGE, WELCOME_PAGE } from "../../constants/Routes";
@@ -7,15 +7,19 @@ import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
+import { isRole } from "../../types/UserTypes";
+import { PresentableError } from "../../types/ErrorTypes";
+import { authErrors } from "../../errors/AuthErrors";
+
 
 interface LoginProps {
   userRole: string;
-  align?: "left" | "center" | "right";  // Restrict to valid values
+  align?: "left" | "center" | "right"; // Restrict to valid values
 }
 
 const Login: React.FC<LoginProps> = ({
   userRole,
-  align = "left" // Default to "left" alignment
+  align = "left", // Default to "left" alignment
 }: LoginProps): React.ReactElement => {
   const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
   const [loginError, setLoginError] = useState<PresentableError>();
@@ -33,7 +37,6 @@ const Login: React.FC<LoginProps> = ({
   }
 
   if (!role || !isRole(role)) {
-  if (!userRole || !["administrator", "facilitator", "learner"].includes(userRole)) {
     return <Redirect to={WELCOME_PAGE} />;
   }
 
@@ -46,22 +49,6 @@ const Login: React.FC<LoginProps> = ({
         password,
         role,
       );
-    const user: AuthenticatedUser = await authAPIClient.login(email, password);
-    const isUserVerified = user?.accessToken
-      ? await authAPIClient.isUserVerified(email, user.accessToken)
-      : null;
-    if (!user || !isUserVerified) {
-      // will need to change this for different errors
-      // eslint-disable-next-line no-alert
-      alert("Bad login, user not found");
-      return;
-    }
-    if (user.role.toLowerCase() !== userRole.toLowerCase()) {
-      // change this later to not use an alert
-      // eslint-disable-next-line no-alert
-      alert(`Bad login. Expected ${user.role}, got ${userRole}`);
-      return;
-    }
 
       localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
       setAuthenticatedUser(user);
@@ -83,7 +70,9 @@ const Login: React.FC<LoginProps> = ({
 
   return (
     <Container style={{ textAlign: align }}>
-      <Typography variant="h4">{capitalizeFirstLetter(userRole)} Login</Typography>
+      <Typography variant="h4">
+        {capitalizeFirstLetter(userRole)} Login
+      </Typography>
       {loginError && (
         <div
           style={{
@@ -132,7 +121,6 @@ const Login: React.FC<LoginProps> = ({
         </div>
       </form>
       {role === "Facilitator" && (
-      {userRole === "facilitator" && (
         <div>
           <Button
             variant="contained"

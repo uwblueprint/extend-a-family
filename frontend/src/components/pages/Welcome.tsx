@@ -1,5 +1,6 @@
-import React, { useState }, { useContext } from "react";
-import { Redirect,
+import React, { useState, useContext } from "react";
+import { Redirect } from "react-router-dom";
+import {
   Typography,
   Container,
   Card,
@@ -10,11 +11,12 @@ import { Redirect,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import styled from "@emotion/styled";
-import background from "./backgroundImage.jpg";
+import background from "../assets/backgroundImage.png";
 import icon from "./icon.png";
 import Login from "../auth/Login";
 import { HOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
+
 
 const Welcome = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
