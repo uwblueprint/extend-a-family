@@ -13,9 +13,9 @@ import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import {
-  FacilitatorDTO,
   UpdateUserDTO,
   UserDTO,
+  isFacilitator,
   isRole,
 } from "../types/userTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
@@ -221,17 +221,21 @@ userRouter.get(
       const facilitatorId = await authService.getUserIdFromAccessToken(
         accessToken,
       );
-      const facilitator = (await userService.getUserById(
+      const facilitator = await userService.getUserById(
         facilitatorId.toString(),
-      )) as FacilitatorDTO;
-
-      const learners = await Promise.all(
-        facilitator.learners.map(async (learnerId) => {
-          const learner = await userService.getUserById(learnerId.toString());
-          return learner;
-        }),
       );
-      res.status(200).json(learners);
+
+      if (isFacilitator(facilitator)) {
+        const learners = await Promise.all(
+          facilitator.learners.map(async (learnerId) => {
+            const learner = await userService.getUserById(learnerId.toString());
+            return learner;
+          }),
+        );
+        res.status(200).json(learners);
+      } else {
+        throw new Error("Unathorized: User retrieved is not a facilitator.");
+      }
     } catch (error) {
       res.status(500).send(getErrorMessage(error));
     }
@@ -240,7 +244,7 @@ userRouter.get(
 
 /* Facilitator will be able to edit their learners */
 userRouter.put(
-  "facilitator/myLearners/:userId",
+  "/facilitator/myLearners/:userId",
   isAuthorizedByRole(new Set(["Facilitator"])),
   updateUserDtoValidator,
   async (req, res) => {
@@ -254,30 +258,36 @@ userRouter.put(
         accessToken,
       );
       const selectedLearnerId = req.params.userId;
-
-      // verify that selected learner userId corresponds to learner belonging to facilitator
-      const facilitator = (await userService.getUserById(
+      const facilitator = await userService.getUserById(
         facilitatorId.toString(),
-      )) as FacilitatorDTO;
-
-      // facilitator.learners is an array of ObjectIds
-      // FacilitatorDTO casts it as an array of strings
-      const facilitatorHasLearner = facilitator.learners.find(
-        (learnerId) => learnerId.toString() === selectedLearnerId,
       );
 
-      if (!facilitatorHasLearner) {
-        throw new Error("Unauthorized: Learner does not belong to facilitator");
+      if (isFacilitator(facilitator)) {
+        // verify that selected learner userId corresponds to learner belonging to facilitator
+
+        // facilitator.learners is an array of ObjectIds
+        // FacilitatorDTO casts it as an array of strings
+        const facilitatorHasLearner = facilitator.learners.find(
+          (learnerId) => learnerId.toString() === selectedLearnerId,
+        );
+
+        if (!facilitatorHasLearner) {
+          throw new Error(
+            "Unauthorized: Learner does not belong to facilitator.",
+          );
+        }
+      } else {
+        throw new Error("Unauthorized: User retrieved is not a facilitator.");
       }
 
       // update learner
-      const updateLearnerPayload = {
+      const updateLearnerPayload: UpdateUserDTO = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
         role: req.body.role,
         status: "Active",
-      } as UpdateUserDTO;
+      };
 
       const updatedUser = await userService.updateUserById(
         selectedLearnerId,
