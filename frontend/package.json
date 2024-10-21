@@ -24,7 +24,7 @@
     "@types/react-window": "^1.8.8",
     "@types/react-window-infinite-loader": "^1.0.9",
     "axios": "^0.28.0",
-    "bootstrap": "^4.6.0",
+    "bootstrap": "^5.0.0",
     "framer-motion": "^11.2.12",
     "humps": "^2.0.1",
     "json-schema": "^0.4.0",
