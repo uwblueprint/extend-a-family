@@ -1,4 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import { CssBaseline } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
 import React, { useState, useReducer, useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Welcome from "./components/pages/Welcome";
@@ -22,12 +25,27 @@ import SampleContextDispatcherContext from "./contexts/SampleContextDispatcherCo
 import { AuthenticatedUser } from "./types/AuthTypes";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import * as Routes from "./constants/Routes";
-import ManageUserPage from "./components/pages/ManageUserPage";
 import { SocketProvider } from "./contexts/SocketContext";
+
+import ManageUserPage from "./components/pages/ManageUserPage";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/pages/CreatePasswordPage";
+import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
+
+// Makes Lexend Deca the default font everywhere
+const link = document.createElement("link");
+link.href = "https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;600&display=swap";
+link.rel = "stylesheet";
+document.head.appendChild(link);
+
+const theme = createTheme({
+  typography: {
+    fontFamily: "'Lexend Deca', sans-serif",
+  },
+});
+
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -60,6 +78,8 @@ const App = (): React.ReactElement => {
 
   return (
     <SampleContext.Provider value={sampleContext}>
+        <ThemeProvider theme={theme}>
+      <CssBaseline />
       <SampleContextDispatcherContext.Provider
         value={dispatchSampleContextUpdate}
       >
@@ -72,6 +92,8 @@ const App = (): React.ReactElement => {
                 <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
                 <Route exact path={Routes.LOGIN_PAGE} component={Login} />
                 <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
+                <Route exact path={Routes.FORGOT_PASSWORD_PAGE} component={ForgotPasswordPage} />
+
                 <PrivateRoute
                   exact
                   path={Routes.HOME_PAGE}
@@ -131,6 +153,7 @@ const App = (): React.ReactElement => {
           </SocketProvider>
         </AuthContext.Provider>
       </SampleContextDispatcherContext.Provider>
+      </ThemeProvider>
     </SampleContext.Provider>
   );
 };
