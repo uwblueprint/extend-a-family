@@ -215,7 +215,7 @@ authRouter.post(
         password: temporaryPassword,
         status: "Invited",
         
-      }, req.body.facilitatorId);
+      }, req.body.facilitatorId );
       await authService.sendLearnerInvite(
         req.body.firstName,
         req.body.email,
