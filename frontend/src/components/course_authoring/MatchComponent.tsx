@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
-import ReactFlow, { addEdge } from "reactflow";
+import ReactFlow, { addEdge, Edge } from "reactflow";
 import "reactflow/dist/style.css";
 import { editComponentDataMap } from "../../utils/GridComponentUtils";
 import { getNodeType, nodeTypes, NodeType } from "./Node";
 
 // Initial nodes positioned in two columns
 const initialNodes: NodeType[] = [];
-const initialEdges = [];
 
-const defaultWidth = 75;
-const defaultHeight = 75;
+const initialEdges: Edge[] = [];
+
+const defaultWidth = "75";
+const defaultHeight = "75";
 
 const getCoordinate = (
   gridLength: number,
@@ -28,7 +29,7 @@ interface ComponentProps {
     {
       numRows?: number;
       numCols?: number;
-      nodePositionToData?: Map<string, object>;
+      nodePositionToData?: Map<string, { w: string; h: string }>;
       selectedNode?: NodeType;
     }
   >;
@@ -48,7 +49,7 @@ const MatchComponent: React.FC<ComponentProps> = ({
   const {
     numRows = 0,
     numCols = 0,
-    nodePositionToData = new Map<string, object>(),
+    nodePositionToData = new Map<string, { w: string; h: string }>(),
     selectedNode = null,
   } = componentData.get(i) || {};
 
@@ -65,9 +66,9 @@ const MatchComponent: React.FC<ComponentProps> = ({
 
     for (let row = 0; row < insertRows; row += 1) {
       for (let col = 0; col < insertCols; col += 1) {
-        const nodeData = nodePositionToData.get(`node-${row}-${col}`) || {};
-        const nodeWidth = parseInt(nodeData.w, 10) || defaultWidth;
-        const nodeHeight = parseInt(nodeData.h, 10) || defaultHeight;
+        const nodeData = nodePositionToData.get(`node-${row}-${col}`) || { w: defaultWidth, h: defaultHeight };
+        const nodeWidth = parseInt(nodeData.w, 10);
+        const nodeHeight = parseInt(nodeData.h, 10);
 
         newNodes.push({
           id: `node-${row}-${col}`,
@@ -97,7 +98,7 @@ const MatchComponent: React.FC<ComponentProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [numRows, numCols, w, h, componentData]);
 
-  const onNodeClick = (event, node) => {
+  const onNodeClick = (event: React.MouseEvent, node: NodeType) => {
     let updatedComponentDataMap = editComponentDataMap(
       componentData,
       "lastSelectedNode",
@@ -153,7 +154,7 @@ const MatchComponent: React.FC<ComponentProps> = ({
   };
 
   const onConnect = useCallback(
-    (params) =>
+    (params: Edge) =>
       setEdges((eds) =>
         addEdge({ ...params, animated: true, style: { stroke: "blue" } }, eds),
       ),

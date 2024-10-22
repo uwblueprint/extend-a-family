@@ -1,29 +1,47 @@
+import { NodeType } from "../components/course_authoring/Node";
+
 export const editComponentDataMap = (
-  componentDataMap: Map<string, any>,
+  componentDataMap: Map<
+    string,
+    {
+      numRows?: number;
+      numCols?: number;
+      nodePositionToData?: Map<string, object>;
+      selectedNode?: NodeType;
+    }
+  >,
   field: string,
-  value: any,
+  node: NodeType | null,
   index: string,
 ) => {
   const updatedComponentDataMap = new Map(componentDataMap);
   const componentDataByIndex = updatedComponentDataMap.get(index) || {};
-  const updatedComponentData = { ...componentDataByIndex, [field]: value };
+  const updatedComponentData = { ...componentDataByIndex, [field]: node };
   updatedComponentDataMap.set(index, updatedComponentData);
   return updatedComponentDataMap;
 };
 
 export const editMatchNodeDataMap = (
-  componentDataMap: Map<string, any>,
-  node: string,
+  componentDataMap: Map<
+    string,
+    {
+      numRows?: number;
+      numCols?: number;
+      nodePositionToData?: Map<string, object>;
+      selectedNode?: NodeType;
+    }
+  >,
+  nodeIndex: string,
   field: string,
-  value: any,
+  node: NodeType,
   index: string,
 ) => {
   const updatedComponentDataMap = new Map(componentDataMap);
   const componentDataByIndex = updatedComponentDataMap.get(index) || {};
   const updatedNodeMap = componentDataByIndex?.nodePositionToData || new Map();
-  const nodeDataByIndex = updatedNodeMap.get(node) || {};
-  const updatedNodeData = { ...nodeDataByIndex, [field]: value };
-  updatedNodeMap.set(node, updatedNodeData);
+  const nodeDataByIndex = updatedNodeMap.get(nodeIndex) || {};
+  const updatedNodeData = { ...nodeDataByIndex, [field]: node };
+  updatedNodeMap.set(nodeIndex, updatedNodeData);
   componentDataByIndex.nodePositionToData = updatedNodeMap;
   updatedComponentDataMap.set(index, componentDataByIndex);
   return updatedComponentDataMap;

@@ -77,7 +77,7 @@ const MiddleNode: React.FC<{ data: NodeData }> = ({ data }) => {
 
 export const getNodeType = (col: number, numCols: number): string => {
   let nodeType = "";
-  if (numCols == 2) { // TODO: I know this will break something
+  if (numCols === 2) {
     nodeType = col % 2 === 0 ? "leftNode" : "rightNode";
   } else {
     if (col % 3 === 0) nodeType = "leftNode";

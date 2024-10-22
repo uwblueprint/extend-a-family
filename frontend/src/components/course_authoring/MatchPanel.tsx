@@ -8,7 +8,7 @@ import TextPanel from "./TextPanel";
 interface MatchProps {
   numRows?: number;
   numCols?: number;
-  nodePositionToData?: Map<string, object>;
+  nodePositionToData?: Map<string, { w: number; h: number; type: string }>;
   selectedNode?: { id: string; type: string };
   lastSelectedNode?: { id: string; type: string };
 }
@@ -29,7 +29,7 @@ const MatchPanel: React.FC<EditMatchProps> = ({
       string,
       { w: number; h: number; type: string }
     >(),
-    lastSelectedNode = { id: "10000", type: "" },
+    lastSelectedNode = { id: "10000", type: "", w: 75, h: 75 },
   } = componentData.get(index) || {};
 
   const handleChange = (
@@ -102,8 +102,8 @@ const MatchPanel: React.FC<EditMatchProps> = ({
           />
         </label>
       </div>
-      {lastSelectedNode?.id != "10000" && <p>{lastSelectedNode?.id}</p>}
-      {lastSelectedNode?.id != "10000" && (
+      {lastSelectedNode?.id !== "10000" && <p>{lastSelectedNode?.id}</p>}
+      {lastSelectedNode?.id !== "10000" && (
         <div
           style={{
             display: "flex",
@@ -142,20 +142,22 @@ const MatchPanel: React.FC<EditMatchProps> = ({
               }
             />
           </label>
-          <label htmlFor="dropdown">Type:</label>
-          <select
-            id="dropdown"
-            value={nodePositionToData.get(lastSelectedNode?.id)?.type || ""}
-            onChange={(e) => {
-              handleChange("type", e.target.value, lastSelectedNode?.id);
-            }}
-          >
-            <option value="" disabled>
-              Select an option
-            </option>
-            <option value="text">Text</option>
-            <option value="picture">Picture</option>
-          </select>
+          <label htmlFor="dropdown">
+            Type:
+            <select
+              id="dropdown"
+              value={nodePositionToData.get(lastSelectedNode?.id)?.type || ""}
+              onChange={(e) => {
+                handleChange("type", e.target.value, lastSelectedNode?.id);
+              }}
+            >
+              <option value="" disabled>
+                Select an option
+              </option>
+              <option value="text">Text</option>
+              <option value="picture">Picture</option>
+            </select>
+          </label>
           {nodePositionToData.get(lastSelectedNode?.id)?.type === "text" && (
             <TextPanel
               setComponentData={setComponentData}
