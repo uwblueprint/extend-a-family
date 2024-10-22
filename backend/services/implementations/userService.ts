@@ -1,6 +1,6 @@
 import * as firebaseAdmin from "firebase-admin";
 
-import { ObjectId } from "mongoose";
+import mongoose, { mongo, ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
 import MgUser, { User } from "../../models/user.mgmodel";
 import {
@@ -188,11 +188,37 @@ class UserService implements IUserService {
     user: CreateUserDTO,
     facilitatorId: string,
   ): Promise<LearnerDTO> {
+    let newLearner: Learner;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
-    const newLearner = await Learner.create({
-      ...user,
-      facilitator: facilitatorId,
-    });
+    try {
+      firebaseUser = await firebaseAdmin.auth().createUser({
+        email: user.email,
+        password: user.password,
+      });
+      try {
+        newLearner = await LearnerModel.create({
+          ...user,
+          authId: firebaseUser.uid,
+          facilitator: facilitatorId,
+        });
+      } catch (mongoError) {
+        try {
+          await firebaseAdmin.auth().deleteUser(firebaseUser.uid);
+        } catch (firebaseError: unknown) {
+          const errorMessage = [
+            "Failed to rollback Firebase user creation after MongoDB user creation failure. Reason =",
+            getErrorMessage(firebaseError),
+            "Orphaned authId (Firebase uid) =",
+            firebaseUser.uid,
+          ];
+          Logger.error(errorMessage.join(" "));
+        }
+        throw mongoError;
+      }
+    } catch (err: unknown) {
+      Logger.error(`Failed to create user. Reason = ${getErrorMessage(err)}`);
+      throw err;
+    }
 
     await Facilitator.findByIdAndUpdate(
       facilitatorId,
@@ -200,7 +226,7 @@ class UserService implements IUserService {
       { runValidators: true },
     );
 
-    return {} as LearnerDTO;
+    return { ...newLearner.toObject(), email: firebaseUser.email ?? "" };
   }
 
   async updateUserById(
