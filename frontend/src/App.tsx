@@ -1,7 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CssBaseline } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-
 import React, { useState, useReducer, useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Welcome from "./components/pages/Welcome";
@@ -34,7 +33,7 @@ import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/pages/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 
-// Makes Lexend Deca the default font everywhere
+// Add Lexend Deca font globally
 const link = document.createElement("link");
 link.href = "https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;600&display=swap";
 link.rel = "stylesheet";
@@ -46,7 +45,6 @@ const theme = createTheme({
   },
 });
 
-
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
     getLocalStorageObj<AuthenticatedUser | null>(AUTHENTICATED_USER_KEY);
@@ -54,6 +52,7 @@ const App = (): React.ReactElement => {
   const [authenticatedUser, setAuthenticatedUser] =
     useState<AuthenticatedUser | null>(currentUser);
 
+  
   // Some sort of global state. Context API replaces redux.
   // Split related states into different contexts as necessary.
   // Split dispatcher and state into separate contexts as necessary.
@@ -78,81 +77,81 @@ const App = (): React.ReactElement => {
 
   return (
     <SampleContext.Provider value={sampleContext}>
-        <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <SampleContextDispatcherContext.Provider
-        value={dispatchSampleContextUpdate}
-      >
-        <AuthContext.Provider
-          value={{ authenticatedUser, setAuthenticatedUser }}
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <SampleContextDispatcherContext.Provider
+          value={dispatchSampleContextUpdate}
         >
-          <SocketProvider id={authenticatedUser?.id}>
-            <Router>
-              <Switch>
-                <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
-                <Route exact path={Routes.LOGIN_PAGE} component={Login} />
-                <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
-                <Route exact path={Routes.FORGOT_PASSWORD_PAGE} component={ForgotPasswordPage} />
+          <AuthContext.Provider
+            value={{ authenticatedUser, setAuthenticatedUser }}
+          >
+            <SocketProvider id={authenticatedUser?.id}>
+              <Router>
+                <Switch>
+                  <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
+                  <Route exact path={Routes.LOGIN_PAGE} component={Login} />
+                  <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
+                  <Route exact path={Routes.FORGOT_PASSWORD_PAGE} component={ForgotPasswordPage} />
 
-                <PrivateRoute
-                  exact
-                  path={Routes.HOME_PAGE}
-                  component={Default}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.MY_ACCOUNT_PAGE}
-                  component={MyAccount}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.CREATE_MODULE_PAGE}
-                  component={CreateModulePage}
-                  allowedRoles={["Administrator"]}
-                />
-                <Route
-                  exact
-                  path={Routes.NOT_AUTHORIZED_PAGE}
-                  component={NotAuthorized}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.CREATE_PASSWORD_PAGE}
-                  component={CreatePasswordPage}
-                  allowedRoles={["Administrator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.MANAGE_USERS_PAGE}
-                  component={ManageUserPage}
-                  allowedRoles={["Administrator"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.MAKE_HELP_REQUEST_PAGE}
-                  component={MakeHelpRequestPage}
-                  allowedRoles={["Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.VIEW_HELP_REQUESTS_PAGE}
-                  component={ViewHelpRequestsPage}
-                  allowedRoles={["Facilitator"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={`${Routes.VIEW_HELP_REQUESTS_PAGE}/:id`}
-                  component={HelpRequestPage}
-                  allowedRoles={["Facilitator"]}
-                />
-                <Route exact path="*" component={NotFound} />
-              </Switch>
-            </Router>
-          </SocketProvider>
-        </AuthContext.Provider>
-      </SampleContextDispatcherContext.Provider>
+                  <PrivateRoute
+                    exact
+                    path={Routes.HOME_PAGE}
+                    component={Default}
+                    allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.MY_ACCOUNT_PAGE}
+                    component={MyAccount}
+                    allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.CREATE_MODULE_PAGE}
+                    component={CreateModulePage}
+                    allowedRoles={["Administrator"]}
+                  />
+                  <Route
+                    exact
+                    path={Routes.NOT_AUTHORIZED_PAGE}
+                    component={NotAuthorized}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.CREATE_PASSWORD_PAGE}
+                    component={CreatePasswordPage}
+                    allowedRoles={["Administrator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.MANAGE_USERS_PAGE}
+                    component={ManageUserPage}
+                    allowedRoles={["Administrator"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.MAKE_HELP_REQUEST_PAGE}
+                    component={MakeHelpRequestPage}
+                    allowedRoles={["Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.VIEW_HELP_REQUESTS_PAGE}
+                    component={ViewHelpRequestsPage}
+                    allowedRoles={["Facilitator"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={`${Routes.VIEW_HELP_REQUESTS_PAGE}/:id`}
+                    component={HelpRequestPage}
+                    allowedRoles={["Facilitator"]}
+                  />
+                  <Route exact path="*" component={NotFound} />
+                </Switch>
+              </Router>
+            </SocketProvider>
+          </AuthContext.Provider>
+        </SampleContextDispatcherContext.Provider>
       </ThemeProvider>
     </SampleContext.Provider>
   );

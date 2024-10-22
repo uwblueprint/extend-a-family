@@ -1,23 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from "react";
 import {
   Container,
   TextField,
   Button,
   Typography,
   InputAdornment,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { useHistory } from 'react-router-dom';
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import { useHistory, Redirect } from "react-router-dom";
 
-import ForgotPasswordConfirmation from './ForgotPasswordConfirmation';
-import authAPIClient from '../../../APIClients/AuthAPIClient';
-import { LOGIN_PAGE } from '../../../constants/Routes';
+import AuthContext from "../../../contexts/AuthContext";
+import ForgotPasswordConfirmation from "./ForgotPasswordConfirmation";
+import authAPIClient from "../../../APIClients/AuthAPIClient";
+import { LOGIN_PAGE, HOME_PAGE } from "../../../constants/Routes";
 
 const ForgotPasswordPage = (): React.ReactElement => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
   const history = useHistory();
 
+  const { authenticatedUser } = useContext(AuthContext);
+  if (authenticatedUser) {
+    return <Redirect to={HOME_PAGE} />;
+  }
+ 
   const handleResetPassword = async () => {
     try {
       const response = await authAPIClient.resetPassword(email);
@@ -25,17 +31,17 @@ const ForgotPasswordPage = (): React.ReactElement => {
         setIsEmailSent(true);
       }
     } catch (error) {
-      console.error('Failed to reset password:', error);
+      setIsEmailSent(false);
     }
   };
 
   const handleBackToEmail = () => {
     setIsEmailSent(false);
-    setEmail('');
+    setEmail("");
   };
 
   const handleBackToLogin = () => {
-    history.push(LOGIN_PAGE); // Navigate to the login route
+    history.push(LOGIN_PAGE);
   };
 
   if (isEmailSent) {
@@ -50,30 +56,30 @@ const ForgotPasswordPage = (): React.ReactElement => {
   return (
     <Container
       sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        width: '100vw',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        width: "100vw",
       }}
     >
       <Container
         sx={{
-          display: 'flex',
+          display: "flex",
           width: 548,
-          flexDirection: 'column',
+          flexDirection: "column",
           gap: 4,
           padding: 0,
         }}
       >
         <Container
           sx={{
-            display: 'flex',
+            display: "flex",
             paddingBottom: 2,
-            flexDirection: 'column',
+            flexDirection: "column",
             width: 548,
-            justifyContent: 'center',
-            alignItems: 'flex-start',
+            justifyContent: "center",
+            alignItems: "flex-start",
             gap: 1,
             padding: 0,
             marginLeft: -3,
@@ -83,12 +89,12 @@ const ForgotPasswordPage = (): React.ReactElement => {
             variant="h4"
             gutterBottom
             sx={{
-              color: '#000',
-              fontFamily: 'Lexend Deca',
+              color: "#000",
+              fontFamily: "Lexend Deca",
               fontSize: 28,
               fontWeight: 600,
               width: 500,
-              lineHeight: '120%',
+              lineHeight: "120%",
             }}
           >
             Forgot your password?
@@ -115,31 +121,31 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 </InputAdornment>
               ),
               sx: {
-                fontFamily: 'Lexend Deca',
+                fontFamily: "Lexend Deca",
                 fontSize: 16,
                 fontWeight: 400,
                 width: 500,
-                lineHeight: '140%',
+                lineHeight: "140%",
                 letterSpacing: 0.2,
-                color: '#6F797B',
+                color: "#6F797B",
               },
             }}
             InputLabelProps={{
               sx: {
-                color: '#3F484B',
-                fontFamily: 'Lexend Deca',
+                color: "#3F484B",
+                fontFamily: "Lexend Deca",
                 fontSize: 14,
                 fontWeight: 400,
-                lineHeight: '140%',
+                lineHeight: "140%",
                 letterSpacing: 0.32,
               },
             }}
           />
           <Container
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
               gap: 2,
             }}
           >
@@ -148,20 +154,20 @@ const ForgotPasswordPage = (): React.ReactElement => {
               color="primary"
               onClick={handleResetPassword}
               sx={{
-                padding: '20px 24px',
-                justifyContent: 'center',
-                alignItems: 'center',
+                padding: "20px 24px",
+                justifyContent: "center",
+                alignItems: "center",
                 gap: 1,
                 borderRadius: 1,
                 width: 500,
-                backgroundColor: '#006877',
-                color: '#FFF',
-                fontFamily: 'Lexend Deca',
+                backgroundColor: "#006877",
+                color: "#FFF",
+                fontFamily: "Lexend Deca",
                 fontSize: 16,
                 fontWeight: 600,
-                lineHeight: '120%',
+                lineHeight: "120%",
                 letterSpacing: 0.08,
-                textTransform: 'none',
+                textTransform: "none",
                 marginTop: 4,
               }}
             >
@@ -170,15 +176,15 @@ const ForgotPasswordPage = (): React.ReactElement => {
             <Typography
               variant="body2"
               sx={{
-                color: '#006877',
-                textAlign: 'center',
-                fontFamily: 'Lexend Deca',
+                color: "#006877",
+                textAlign: "center",
+                fontFamily: "Lexend Deca",
                 fontSize: 12.5,
                 fontWeight: 300,
-                lineHeight: '120%',
+                lineHeight: "120%",
                 letterSpacing: 0.625,
-                textTransform: 'uppercase',
-                cursor: 'pointer',
+                textTransform: "uppercase",
+                cursor: "pointer",
               }}
               onClick={handleBackToLogin}
             >

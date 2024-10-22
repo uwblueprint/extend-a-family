@@ -6,7 +6,10 @@ interface ForgotPasswordConfirmationProps {
   onBackToEmail: () => void;
 }
 
-const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({ email, onBackToEmail }) => {
+const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
+  email,
+  onBackToEmail,
+}) => {
   return (
     <Container
       sx={{
@@ -73,7 +76,7 @@ const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
             color: "#006877",
             fontSize: "12.5px",
             fontWeight: 300,
-            lineHeight: "120%", 
+            lineHeight: "120%",
             letterSpacing: "0.625px",
             textTransform: "uppercase",
             padding: 0,
