@@ -15,6 +15,7 @@ import {
   updateTemporaryPasswordRequestValidator,
   updateUserStatusRequestValidator,
 } from "../middlewares/validators/authValidators";
+import * as firebaseAdmin from "firebase-admin"
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
 import EmailService from "../services/implementations/emailService";
@@ -203,10 +204,15 @@ authRouter.post(
   isAuthorizedByRole(new Set(["Facilitator"])),
   async (req, res) => {
     try {
+      const accessToken = getAccessToken(req)!;
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
+      const { id } = await userService.getUserById(decodedIdToken.uid);
       const temporaryPassword = generate({
         length: 20,
         numbers: true,
       });
+      
       const invitedLearnerUser = await userService.createLearner({
         firstName: req.body.firstName,
         lastName: req.body.lastName,

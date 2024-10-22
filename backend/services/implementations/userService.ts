@@ -1,5 +1,4 @@
 import * as firebaseAdmin from "firebase-admin";
-
 import mongoose, { mongo, ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
 import MgUser, { User } from "../../models/user.mgmodel";
@@ -198,9 +197,14 @@ class UserService implements IUserService {
       try {
         newLearner = await LearnerModel.create({
           ...user,
-          authId: firebaseUser.uid,
           facilitator: facilitatorId,
+          authId: firebaseUser.uid,
         });
+        await FacilitatorModel.findByIdAndUpdate(
+          facilitatorId,
+          { "$push": { learners: newLearner.id } },
+          { runValidators: true },
+        );
       } catch (mongoError) {
         try {
           await firebaseAdmin.auth().deleteUser(firebaseUser.uid);
@@ -216,7 +220,7 @@ class UserService implements IUserService {
         throw mongoError;
       }
     } catch (err: unknown) {
-      Logger.error(`Failed to create user. Reason = ${getErrorMessage(err)}`);
+      Logger.error(`Failed to create learner. Reason = ${getErrorMessage(err)}`);
       throw err;
     }
 
@@ -226,7 +230,12 @@ class UserService implements IUserService {
       { runValidators: true },
     );
 
-    return { ...newLearner.toObject(), email: firebaseUser.email ?? "" };
+    return {
+      ...newLearner.toObject(),
+      email: firebaseUser.email ?? "",
+    }
+    
+
   }
 
   async updateUserById(
