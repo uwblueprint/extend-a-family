@@ -64,17 +64,9 @@ const signup = async (
   }
 };
 
-const resetPassword = async (email: string | undefined): Promise<boolean> => {
-  const bearerToken = `Bearer ${getLocalStorageObjProperty(
-    AUTHENTICATED_USER_KEY,
-    "accessToken",
-  )}`;
+const resetPassword = async (email: string): Promise<boolean> => {
   try {
-    await baseAPIClient.post(
-      `/auth/resetPassword/${email}`,
-      {},
-      { headers: { Authorization: bearerToken } },
-    );
+    await baseAPIClient.post(`/auth/resetPassword/${email}`, {});
     return true;
   } catch (error) {
     return false;
