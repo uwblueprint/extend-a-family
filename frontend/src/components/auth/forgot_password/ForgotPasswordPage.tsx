@@ -1,77 +1,101 @@
-import React, { useState } from "react";
-import { Container, TextField, Button, Typography, InputAdornment } from "@mui/material";
-import styled from "styled-components";
-import SearchIcon from "@mui/icons-material/Search";
+import React, { useState } from 'react';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  InputAdornment,
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import { useHistory } from 'react-router-dom';
 
-import ForgotPasswordConfirmation from "./ForgotPasswordConfirmation";
-
-import authAPIClient from "../../../APIClients/AuthAPIClient";
-
-const DivContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-`;
+import ForgotPasswordConfirmation from './ForgotPasswordConfirmation';
+import authAPIClient from '../../../APIClients/AuthAPIClient';
+import { LOGIN_PAGE } from '../../../constants/Routes';
 
 const ForgotPasswordPage = (): React.ReactElement => {
-    const [email, setEmail] = useState("");
-    const [isEmailSent, setIsEmailSent] = useState(false); // New state to control rendering
-  
-    const onResetPasswordClick = async () => {
+  const [email, setEmail] = useState('');
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const history = useHistory();
+
+  const handleResetPassword = async () => {
+    try {
       const response = await authAPIClient.resetPassword(email);
-      if (response) { // Check if the email was sent successfully
+      if (response) {
         setIsEmailSent(true);
       }
-    };
-  
-    // Conditionally render either the form or the confirmation page
-    if (isEmailSent) {
-        return <ForgotPasswordConfirmation onBackToEmail={() => setIsEmailSent(false)} />;
-      }
+    } catch (error) {
+      console.error('Failed to reset password:', error);
+    }
+  };
 
+  const handleBackToEmail = () => {
+    setIsEmailSent(false);
+    setEmail('');
+  };
+
+  const handleBackToLogin = () => {
+    history.push(LOGIN_PAGE); // Navigate to the login route
+  };
+
+  if (isEmailSent) {
+    return (
+      <ForgotPasswordConfirmation
+        email={email}
+        onBackToEmail={handleBackToEmail}
+      />
+    );
+  }
 
   return (
-    <DivContainer>
+    <Container
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        width: '100vw',
+      }}
+    >
       <Container
         sx={{
-          display: "flex",
-          width: "548px",
-          flexDirection: "column",
-          gap: "40px",
+          display: 'flex',
+          width: 548,
+          flexDirection: 'column',
+          gap: 4,
           padding: 0,
         }}
       >
         <Container
           sx={{
-            display: "flex",
-            paddingBottom: "20px",
-            flexDirection: "column",
-            width: "548px",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            gap: "8px",
+            display: 'flex',
+            paddingBottom: 2,
+            flexDirection: 'column',
+            width: 548,
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            gap: 1,
             padding: 0,
-            marginLeft: "-24px",
+            marginLeft: -3,
           }}
         >
           <Typography
             variant="h4"
             gutterBottom
             sx={{
-              color: "#000",
-              fontFamily: "Lexend Deca",
-              fontSize: "28px",
+              color: '#000',
+              fontFamily: 'Lexend Deca',
+              fontSize: 28,
               fontWeight: 600,
-              width: "500px",
-              lineHeight: "120%",
+              width: 500,
+              lineHeight: '120%',
             }}
           >
             Forgot your password?
           </Typography>
           <Typography variant="body1">
-            Enter your email, and we&apos;ll send you a link to reset your password
+            Enter your email, and we&apos;ll send you a link to reset your
+            password
           </Typography>
         </Container>
         <form>
@@ -91,54 +115,54 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 </InputAdornment>
               ),
               sx: {
-                fontFamily: "Lexend Deca",
-                fontSize: "16px",
+                fontFamily: 'Lexend Deca',
+                fontSize: 16,
                 fontWeight: 400,
-                width: "500px",
-                lineHeight: "140%",
-                letterSpacing: "0.2px",
-                color: "#6F797B",
+                width: 500,
+                lineHeight: '140%',
+                letterSpacing: 0.2,
+                color: '#6F797B',
               },
             }}
             InputLabelProps={{
               sx: {
-                color: "#3F484B",
-                fontFamily: "Lexend Deca",
-                fontSize: "14px",
+                color: '#3F484B',
+                fontFamily: 'Lexend Deca',
+                fontSize: 14,
                 fontWeight: 400,
-                lineHeight: "140%",
-                letterSpacing: "0.32px",
+                lineHeight: '140%',
+                letterSpacing: 0.32,
               },
             }}
           />
           <Container
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "20px",
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
             }}
           >
             <Button
               variant="contained"
               color="primary"
-              onClick={onResetPasswordClick}
+              onClick={handleResetPassword}
               sx={{
-                padding: "20px 24px",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "8px",
-                borderRadius: "4px",
-                width: "500px",
-                background: "#006877",
-                color: "#FFF",
-                fontFamily: "Lexend Deca",
-                fontSize: "16px",
+                padding: '20px 24px',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 1,
+                borderRadius: 1,
+                width: 500,
+                backgroundColor: '#006877',
+                color: '#FFF',
+                fontFamily: 'Lexend Deca',
+                fontSize: 16,
                 fontWeight: 600,
-                lineHeight: "120%",
-                letterSpacing: "0.08px",
-                textTransform: "none",
-                marginTop: "32px",
+                lineHeight: '120%',
+                letterSpacing: 0.08,
+                textTransform: 'none',
+                marginTop: 4,
               }}
             >
               Send reset link to email
@@ -146,22 +170,24 @@ const ForgotPasswordPage = (): React.ReactElement => {
             <Typography
               variant="body2"
               sx={{
-                color: "#006877",
-                textAlign: "center",
-                fontFamily: "Lexend Deca",
-                fontSize: "12.5px",
+                color: '#006877',
+                textAlign: 'center',
+                fontFamily: 'Lexend Deca',
+                fontSize: 12.5,
                 fontWeight: 300,
-                lineHeight: "120%",
-                letterSpacing: "0.625px",
-                textTransform: "uppercase",
+                lineHeight: '120%',
+                letterSpacing: 0.625,
+                textTransform: 'uppercase',
+                cursor: 'pointer',
               }}
+              onClick={handleBackToLogin}
             >
               Remember your password? Back to Login
             </Typography>
           </Container>
         </form>
       </Container>
-    </DivContainer>
+    </Container>
   );
 };
 
