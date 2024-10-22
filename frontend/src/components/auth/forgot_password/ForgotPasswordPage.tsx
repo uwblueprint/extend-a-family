@@ -6,7 +6,7 @@ import {
   Typography,
   InputAdornment,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import { useHistory, Redirect } from "react-router-dom";
 
 import AuthContext from "../../../contexts/AuthContext";
@@ -117,7 +117,7 @@ const ForgotPasswordPage = (): React.ReactElement => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon />
+                  <AlternateEmailIcon />
                 </InputAdornment>
               ),
               sx: {
