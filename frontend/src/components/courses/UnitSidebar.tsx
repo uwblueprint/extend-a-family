@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
-  Divider,
   Drawer,
   List,
+  ListItem,
   ListItemButton,
   ListItemText,
   useTheme,
 } from "@mui/material";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { CourseUnit } from "../../types/CourseTypes";
 import { neutral } from "../../theme/palette";
 
@@ -52,6 +52,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
           height="59px"
           display="flex"
           p="12px"
+          paddingLeft="20px"
           alignItems="center"
           justifyContent="space-between"
           fontWeight="700"
@@ -63,8 +64,10 @@ export default function UnitSidebar(props: UnitSideBarProps) {
             sx={{
               p: "8px",
               fontSize: "12px",
+              color: theme.palette.neutral.main,
+              lineHeight: "1.5",
             }}
-            endIcon={<ArrowBackIosIcon />}
+            endIcon={<MenuOpenIcon />}
             onClick={handleClose}
           >
             Close
@@ -73,8 +76,19 @@ export default function UnitSidebar(props: UnitSideBarProps) {
         <List sx={{ width: "100%" }}>
           {courseUnits.map((course, index) => {
             return (
-              <React.Fragment key={course.id}>
+              <ListItem
+                key={course.id}
+                disablePadding
+                sx={{
+                  borderBottom: 1,
+                  borderColor:
+                    index !== courseUnits.length - 1
+                      ? "#DBE4E7"
+                      : "transparent",
+                }}
+              >
                 <ListItemButton
+                  key={course.id}
                   sx={{
                     py: "15px",
                     px: "32px",
@@ -93,10 +107,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
                     }
                   />
                 </ListItemButton>
-                {index !== courseUnits.length - 1 && (
-                  <Divider component="li" sx={{ color: "#FCF8F8" }} />
-                )}
-              </React.Fragment>
+              </ListItem>
             );
           })}
         </List>

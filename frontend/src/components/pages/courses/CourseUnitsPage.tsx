@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import UnitSidebar from "../../courses/UnitSidebar";
 import { CourseUnit } from "../../../types/CourseTypes";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 
 export default function CourseUnitsPage() {
+  const theme = useTheme();
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
 
   const [open, setOpen] = useState(true);
 
-  // const handleDrawerOpen = () => {
-  //   setOpen(true);
-  // };
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
 
   const handleDrawerClose = () => {
     setOpen(false);
@@ -32,6 +34,28 @@ export default function CourseUnitsPage() {
         handleClose={handleDrawerClose}
         open={open}
       />
+      {!open && (
+        <Button
+          type="button"
+          sx={{
+            color: theme.palette.neutral.dark,
+            backgroundColor: theme.palette.neutral.light,
+            borderRadius: "4px",
+            width: "34px",
+            minWidth: "34px",
+            height: "34px",
+            padding: 0,
+          }}
+          onClick={handleDrawerOpen}
+        >
+          <MenuOpenIcon
+            sx={{
+              fontSize: "18px",
+            }}
+          />
+        </Button>
+      )}
+
       <Box sx={{ flexGrow: 1 }}>
         <Typography paragraph>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

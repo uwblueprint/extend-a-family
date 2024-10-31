@@ -12,7 +12,6 @@ const getUnits = async (): Promise<CourseUnit[]> => {
     const { data } = await baseAPIClient.get("/course/", {
       headers: { Authorization: bearerToken },
     });
-    console.log(data)
     return data;
   } catch (error) {
     return [];
