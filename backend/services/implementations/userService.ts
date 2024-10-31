@@ -1,12 +1,16 @@
 import * as firebaseAdmin from "firebase-admin";
-
-import mongoose, { ObjectId } from "mongoose";
+import { ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
-import MgUser, { User } from "../../models/user.mgmodel";
+import MgUser, {
+  Learner,
+  User,
+  LearnerModel,
+  FacilitatorModel,
+} from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
+  LearnerDTO,
   Role,
-  Status,
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
@@ -184,7 +188,10 @@ class UserService implements IUserService {
     };
   }
 
-  async createLearner(user: CreateUserDTO, facilitatorId: string): Promise<LearnerDTO> {
+  async createLearner(
+    user: CreateUserDTO,
+    facilitatorId: string,
+  ): Promise<LearnerDTO> {
     let newLearner: Learner;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
     try {
@@ -195,11 +202,12 @@ class UserService implements IUserService {
       try {
         newLearner = await LearnerModel.create({
           ...user,
+          authId: firebaseUser.uid,
           facilitator: facilitatorId,
         });
         await FacilitatorModel.findByIdAndUpdate(
           facilitatorId,
-          { "$push": { learners: newLearner.id } },
+          { $push: { learners: newLearner.id } },
           { runValidators: true },
         );
       } catch (mongoError) {
@@ -217,14 +225,16 @@ class UserService implements IUserService {
         throw mongoError;
       }
     } catch (err: unknown) {
-      Logger.error(`Failed to create learner. Reason = ${getErrorMessage(err)}`);
+      Logger.error(
+        `Failed to create learner. Reason = ${getErrorMessage(err)}`,
+      );
       throw err;
     }
 
     return {
       ...newLearner.toObject(),
       email: firebaseUser.email ?? "",
-    }
+    };
   }
 
   async updateUserById(

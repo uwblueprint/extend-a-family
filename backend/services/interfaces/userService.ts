@@ -74,8 +74,6 @@ interface IUserService {
    */
   createLearner(user: CreateUserDTO, facilitatorId: string): Promise<UserDTO>;
 
-  // TODO: add addLearner
-
   /**
    * Update a user.
    * Note: the password cannot be updated using this method, use IAuthService.resetPassword instead
