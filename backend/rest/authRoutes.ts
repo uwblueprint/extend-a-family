@@ -204,10 +204,6 @@ authRouter.post(
   isAuthorizedByRole(new Set(["Facilitator"])),
   async (req, res) => {
     try {
-      const accessToken = getAccessToken(req)!;
-      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
-        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
-      const { id } = await userService.getUserById(decodedIdToken.uid);
       const temporaryPassword = generate({
         length: 20,
         numbers: true,
