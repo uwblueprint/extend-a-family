@@ -1,5 +1,6 @@
 import * as firebaseAdmin from "firebase-admin";
 import { ObjectId } from "mongoose";
+
 import IAuthService from "../interfaces/authService";
 import IEmailService from "../interfaces/emailService";
 import IUserService from "../interfaces/userService";
@@ -136,25 +137,48 @@ class AuthService implements IAuthService {
       throw new Error(errorMessage);
     }
 
-    const emailVerificationLink = await firebaseAdmin
-      .auth()
-      .generateEmailVerificationLink(email);
+    try {
+      const emailVerificationLink = await firebaseAdmin
+        .auth()
+        .generateEmailVerificationLink(email);
 
-    const emailBody = `Hello,<br> <br>
-      You have been invited as an administrator to Smart Saving, Smart Spending.
-      <br> <br>
-      Please click the following link to verify your email and activate your account.
-      <strong>This link is only valid for 1 hour.</strong>
-      <br> <br>
-      <a href=${emailVerificationLink}>Verify email</a>
-      <br> <br>
-      To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`;
+      const emailBody = `Hello,<br> <br>
+        You have been invited as an administrator to Smart Saving, Smart Spending.
+        <br> <br>
+        Please click the following link to verify your email and activate your account.
+        <strong>This link is only valid for 1 hour.</strong>
+        <br> <br>
+        <a href=${emailVerificationLink}>Verify email</a>
+        <br> <br>
+        To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`;
 
-    await this.emailService.sendEmail(
-      email,
-      "Administrator Invitation: Smart Saving, Smart Spending",
-      emailBody,
-    );
+      await this.emailService.sendEmail(
+        email,
+        "Administrator Invitation: Smart Saving, Smart Spending",
+        emailBody,
+      );
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to invite new administrator. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async changeUserPassword(
+    accessToken: string,
+    newPassword: string,
+  ): Promise<string> {
+    try {
+      return await FirebaseRestClient.changePassword(accessToken, newPassword);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to change user's password. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
   }
 
   async isAuthorizedByRole(

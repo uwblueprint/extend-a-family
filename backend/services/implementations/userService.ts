@@ -6,6 +6,7 @@ import MgUser, { User } from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
   Role,
+  Status,
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
@@ -25,7 +26,7 @@ const getMongoUserByAuthId = async (authId: string): Promise<User> => {
 
 class UserService implements IUserService {
   /* eslint-disable class-methods-use-this */
-  async getUserById(userId: string): Promise<UserDTO> {
+  async getUserById(userId: string | ObjectId): Promise<UserDTO> {
     let user: User | null;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
 
@@ -183,7 +184,10 @@ class UserService implements IUserService {
     };
   }
 
-  async updateUserById(userId: string, user: UpdateUserDTO): Promise<UserDTO> {
+  async updateUserById(
+    userId: ObjectId | string,
+    user: UpdateUserDTO,
+  ): Promise<UserDTO> {
     let oldUser: User | null;
     let updatedFirebaseUser: firebaseAdmin.auth.UserRecord;
 
@@ -191,7 +195,12 @@ class UserService implements IUserService {
       // must explicitly specify runValidators when updating through findByIdAndUpdate
       oldUser = await MgUser.findByIdAndUpdate(
         userId,
-        { firstName: user.firstName, lastName: user.lastName, role: user.role },
+        {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          status: user.status,
+        },
         { runValidators: true },
       );
 
@@ -212,6 +221,7 @@ class UserService implements IUserService {
               firstName: oldUser.firstName,
               lastName: oldUser.lastName,
               role: oldUser.role,
+              status: oldUser.status,
             },
             { runValidators: true },
           );
@@ -342,6 +352,44 @@ class UserService implements IUserService {
       throw error;
     }
     return userDtos;
+  }
+
+  async isFirstTimeInvitedUser(accessToken: string): Promise<boolean> {
+    try {
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
+      const { status } = await getMongoUserByAuthId(decodedIdToken.uid);
+      return status === "Invited";
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to verify user is first time invited user. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async changeUserStatus(
+    accessToken: string,
+    newStatus: Status,
+  ): Promise<void> {
+    try {
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken =
+        await firebaseAdmin.auth().verifyIdToken(accessToken, true);
+      const tokenUserId = await this.getUserIdByAuthId(decodedIdToken.uid);
+      const currentUser = await this.getUserById(tokenUserId);
+      const updatedUser: UpdateUserDTO = {
+        ...currentUser,
+        status: newStatus,
+      };
+      await this.updateUserById(tokenUserId, updatedUser);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to change user status. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
   }
 }
 

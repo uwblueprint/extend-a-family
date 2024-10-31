@@ -73,3 +73,27 @@ export const forgotPasswordRequestValidator = async (
 
   return next();
 };
+
+export const updateTemporaryPasswordRequestValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.newPassword, "string")) {
+    return res.status(400).send(getApiValidationError("newPassword", "string"));
+  }
+
+  return next();
+};
+
+export const updateUserStatusRequestValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.status, "string")) {
+    return res.status(400).send(getApiValidationError("status", "string"));
+  }
+
+  return next();
+};
