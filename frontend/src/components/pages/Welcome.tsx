@@ -11,23 +11,24 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import styled from "@emotion/styled";
-import background from "../assets/backgroundImage.png";
+import background from "../assets/loginPageCover.png";
 import icon from "./icon.png";
 import Login from "../auth/Login";
 import { HOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
-
 
 const Welcome = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
 
+  // const theme = useTheme();
   if (authenticatedUser) {
     return <Redirect to={HOME_PAGE} />;
   }
 
   const handleButtonClick = (role: string) => {
+    console.log("Opening drawer for role:", role);
     setSelectedRole(role);
     setDrawerOpen(true);
   };
@@ -128,10 +129,12 @@ const Welcome = (): React.ReactElement => {
               justifyContent: "center",
             }}
           >
+            <Typography>Hello</Typography>
             <Login userRole="learner" />
           </Box>
         </Box>
       </Container>
+
       <div
         style={{
           width: "100%",
@@ -145,29 +148,43 @@ const Welcome = (): React.ReactElement => {
           className="btn"
           onClick={() => handleButtonClick("administrator")}
         >
-          Are you an administrator?
+          <Typography variant="titleLarge">
+            Are you an administrator?
+          </Typography>
         </AdminButton>
         <FacilitatorButton
           className="btn"
           onClick={() => handleButtonClick("facilitator")}
         >
-          Are you a facilitator?
+          <Typography variant="titleLarge">Are you a facilitator?</Typography>
         </FacilitatorButton>
       </div>
-      <Drawer  PaperProps={{    
-        sx: { width: "50%" }
-      }} anchor="right" open={drawerOpen} onClose={closeDrawer}>
-         <IconButton
-            onClick={closeDrawer}
-            style={{ position: "absolute", right: 0 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        <Box sx={{ height: "100%", width: "80%", display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center', alignItems: 'center'}} onClick={closeDrawer}>
-         
-          <Login userRole={selectedRole} align="center"/>
+      <Drawer
+        PaperProps={{
+          sx: { width: "50%" },
+        }}
+        anchor="right"
+        open={drawerOpen}
+        onClose={closeDrawer}
+      >
+        <IconButton
+          onClick={closeDrawer}
+          style={{ position: "absolute", right: 0 }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <Box
+          sx={{
+            height: "100%",
+            width: "80%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Typography>Hello</Typography>
+          <Login userRole={selectedRole} align="center" />
         </Box>
       </Drawer>
     </Container>
