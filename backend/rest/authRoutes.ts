@@ -3,7 +3,6 @@ import { CookieOptions, Router } from "express";
 import { generate } from "generate-password";
 import {
   getAccessToken,
-  isAuthorizedByEmail,
   isAuthorizedByUserId,
   isAuthorizedByRole,
   isFirstTimeInvitedUser,
@@ -144,17 +143,14 @@ authRouter.post(
 );
 
 /* Emails a password reset link to the user with the specified email */
-authRouter.post(
-  "/resetPassword/:email",
-  async (req, res) => {
-    try {
-      await authService.resetPassword(req.params.email);
-      res.status(204).send();
-    } catch (error: unknown) {
-      res.status(500).json({ error: getErrorMessage(error) });
-    }
-  },
-);
+authRouter.post("/resetPassword/:email", async (req, res) => {
+  try {
+    await authService.resetPassword(req.params.email);
+    res.status(204).send();
+  } catch (error: unknown) {
+    res.status(500).json({ error: getErrorMessage(error) });
+  }
+});
 
 authRouter.post("/isUserVerified/:email", async (req, res) => {
   try {

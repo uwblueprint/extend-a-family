@@ -6,7 +6,7 @@ import {
 } from "@mui/material/styles";
 import { TypographyStyleOptions } from "@mui/material/styles/createTypography";
 import { error, learner, administrator, facilitator } from "./palette";
-import "@fontsource/roboto";
+import "@fontsource/lexend-deca";
 
 // adding custom attributes to palette
 declare module "@mui/material/styles" {
@@ -227,7 +227,7 @@ const typography: TypographyOptions = {
 const getTheme = (darkMode: boolean) => {
   const theme = createTheme({
     typography: {
-      fontFamily: "Roboto, sans-serif",
+      fontFamily: "Lexend Deca, sans-serif",
       ...typography,
     },
     palette: darkMode ? { ...darkThemePalette } : { ...lightThemePalette },

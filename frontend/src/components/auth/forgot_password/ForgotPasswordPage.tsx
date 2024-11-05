@@ -5,6 +5,7 @@ import {
   Button,
   Typography,
   InputAdornment,
+  useTheme,
 } from "@mui/material";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import { useHistory, Redirect } from "react-router-dom";
@@ -18,12 +19,13 @@ const ForgotPasswordPage = (): React.ReactElement => {
   const [email, setEmail] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
   const history = useHistory();
+  const theme = useTheme();
 
   const { authenticatedUser } = useContext(AuthContext);
   if (authenticatedUser) {
     return <Redirect to={HOME_PAGE} />;
   }
- 
+
   const handleResetPassword = async () => {
     try {
       const response = await authAPIClient.resetPassword(email);
@@ -90,7 +92,6 @@ const ForgotPasswordPage = (): React.ReactElement => {
             gutterBottom
             sx={{
               color: "#000",
-              fontFamily: "Lexend Deca",
               fontSize: 28,
               fontWeight: 600,
               width: 500,
@@ -121,7 +122,6 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 </InputAdornment>
               ),
               sx: {
-                fontFamily: "Lexend Deca",
                 fontSize: 16,
                 fontWeight: 400,
                 width: 500,
@@ -133,8 +133,6 @@ const ForgotPasswordPage = (): React.ReactElement => {
             InputLabelProps={{
               sx: {
                 color: "#3F484B",
-                fontFamily: "Lexend Deca",
-                fontSize: 14,
                 fontWeight: 400,
                 lineHeight: "140%",
                 letterSpacing: 0.32,
@@ -160,15 +158,22 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 gap: 1,
                 borderRadius: 1,
                 width: 500,
-                backgroundColor: "#006877",
+                backgroundColor: theme.palette.learner.main,
                 color: "#FFF",
-                fontFamily: "Lexend Deca",
-                fontSize: 16,
-                fontWeight: 600,
+                fontSize: "16px",
+                fontWeight: 300,
                 lineHeight: "120%",
                 letterSpacing: 0.08,
                 textTransform: "none",
                 marginTop: 4,
+                "&:hover": {
+                  backgroundColor:
+                    "#00424C",
+                },
+                "&:active": {
+                  backgroundColor:
+                    "#002A32",
+                },
               }}
             >
               Send reset link to email
@@ -176,11 +181,10 @@ const ForgotPasswordPage = (): React.ReactElement => {
             <Typography
               variant="body2"
               sx={{
-                color: "#006877",
+                color: theme.palette.learner.main,
                 textAlign: "center",
-                fontFamily: "Lexend Deca",
-                fontSize: 12.5,
-                fontWeight: 300,
+                fontSize: "12.5px",
+                fontWeight: theme.typography.bodySmall?.fontWeight,
                 lineHeight: "120%",
                 letterSpacing: 0.625,
                 textTransform: "uppercase",

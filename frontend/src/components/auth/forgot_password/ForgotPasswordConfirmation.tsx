@@ -1,5 +1,6 @@
-import React from "react";
-import { Container, Typography, Button } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Container, Typography, Button, useTheme } from "@mui/material";
+import authAPIClient from "../../../APIClients/AuthAPIClient";
 
 interface ForgotPasswordConfirmationProps {
   email: string;
@@ -10,6 +11,32 @@ const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
   email,
   onBackToEmail,
 }) => {
+  const theme = useTheme();
+  const [seconds, setSeconds] = useState(30);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    if (seconds > 0) {
+      const timer = setTimeout(() => setSeconds(seconds - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+
+    setCanResend(true);
+    return undefined;
+  }, [seconds]);
+
+  const handleResendEmail = async () => {
+    if (canResend) {
+      setSeconds(30);
+      setCanResend(false);
+      try {
+        await authAPIClient.resetPassword(email);
+      } catch (error) {
+        console.error("Error resending email:", error);
+      }
+    }
+  };
+
   return (
     <Container
       sx={{
@@ -83,6 +110,26 @@ const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
           }}
         >
           NOT YOUR EMAIL? Go back to change your email
+        </Button>
+        <Button
+          variant="text"
+          onClick={handleResendEmail}
+          disabled={!canResend}
+          sx={{
+            color: canResend
+              ? theme.palette.learner.main
+              : "var(--Schemes-Outline, #6F797B)",
+            fontSize: "12.5px",
+            fontWeight: 300,
+            lineHeight: "120%",
+            letterSpacing: "0.625px",
+            textTransform: "uppercase",
+            padding: 0,
+          }}
+        >
+          {canResend
+            ? "Didn’t get the email? Send it again now."
+            : `Didn’t get the email? You can request a new one in ${seconds}s.`}
         </Button>
       </Container>
     </Container>

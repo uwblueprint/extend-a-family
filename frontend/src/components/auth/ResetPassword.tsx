@@ -8,7 +8,6 @@ const ResetPassword = (): React.ReactElement => {
 
   const onResetPasswordClick = async () => {
     if (!authenticatedUser?.email) {
-      console.error("Email is undefined. Cannot reset password.");
       return;
     }
     await authAPIClient.resetPassword(authenticatedUser.email);
