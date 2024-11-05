@@ -11,11 +11,11 @@ import {
   TableFooter,
   TablePagination,
   TableHead,
+  Table,
   Stack,
   FormControl,
 } from "@mui/material";
 import TablePaginationActions from "@mui/material/TablePagination/TablePaginationActions";
-import { Table } from "react-bootstrap";
 import { Role } from "../../types/AuthTypes";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import { User } from "../../types/UserTypes";
