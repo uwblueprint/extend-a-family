@@ -7,7 +7,9 @@ import {
 import logger from "../../utilities/logger";
 import ICourseUnitService from "../interfaces/courseUnitService";
 import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
+import MgCoursePage
 import { getErrorMessage } from "../../utilities/errorUtils";
+import { CoursePage } from "../../models/coursepage.mgmodel";
 
 const Logger = logger(__filename);
 

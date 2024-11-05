@@ -1,8 +1,17 @@
+import { PageType } from "../models/coursepage.mgmodel";
+
 export type CourseUnitDTO = {
   id: string;
   displayIndex: number;
   title: string;
 };
+
+export type CoursePageDTO = {
+  id: string;
+  displayIndex: number;
+  title: string;
+  layout: [Element ]
+}
 
 export type CreateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 
@@ -10,8 +19,9 @@ export type UpdateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 
 export type CourseModuleDTO = {
   id: string;
-  displayIndex: number;
   title: string;
+  displayIndex: number;
+  type: PageType;
 };
 
 export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;

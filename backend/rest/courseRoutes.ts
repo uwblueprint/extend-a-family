@@ -41,6 +41,21 @@ courseRouter.get(
   },
 );
 
+courseRouter.get(
+  "/:unitId/:moduleId",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  async (req, res) => {
+    try {
+      const coursePages = await courseModuleService.getCourseModules(
+        req.params.unitId, req.params.moduleId
+      );
+      res.status(200).json(coursePages);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
 courseRouter.post(
   "/",
   isAuthorizedByRole(new Set(["Administrator"])),
