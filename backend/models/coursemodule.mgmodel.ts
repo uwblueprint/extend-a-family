@@ -25,7 +25,7 @@ export const CourseModuleSchema: Schema = new Schema({
 });
 
 /* eslint-disable no-param-reassign */
-CourseModuleSchema.set("toJSON", {
+CourseModuleSchema.set("toObject", {
   virtuals: true,
   versionKey: false,
   transform: (_doc: Document, ret: Record<string, unknown>) => {
