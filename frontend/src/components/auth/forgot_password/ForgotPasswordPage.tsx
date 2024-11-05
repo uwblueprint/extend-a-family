@@ -88,19 +88,20 @@ const ForgotPasswordPage = (): React.ReactElement => {
           }}
         >
           <Typography
-            variant="h4"
+            variant="headlineLarge"
             gutterBottom
             sx={{
-              color: "#000",
-              fontSize: 28,
-              fontWeight: 600,
-              width: 500,
-              lineHeight: "120%",
+              fontSize: theme.typography.headlineMedium?.fontSize,
+              fontWeight: theme.typography.headlineLarge?.fontWeight,
+              lineHeight: theme.typography.headlineLarge?.lineHeight,
             }}
           >
             Forgot your password?
           </Typography>
-          <Typography variant="body1">
+          <Typography variant="bodyMedium"
+           sx={{
+            fontSize: theme.typography.bodyLarge?.fontSize,
+          }}>
             Enter your email, and we&apos;ll send you a link to reset your
             password
           </Typography>
@@ -122,19 +123,18 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 </InputAdornment>
               ),
               sx: {
-                fontSize: 16,
-                fontWeight: 400,
-                width: 500,
-                lineHeight: "140%",
+                fontSize: theme.typography.bodyLarge?.fontSize,
+                fontWeight: theme.typography.bodyLarge?.fontWeight,
+                lineHeight: theme.typography.bodyLarge?.lineHeight,
                 letterSpacing: 0.2,
-                color: "#6F797B",
+                color: theme.palette.neutral.dark,
               },
             }}
             InputLabelProps={{
               sx: {
-                color: "#3F484B",
-                fontWeight: 400,
-                lineHeight: "140%",
+                color: theme.palette.neutral.main,
+                fontWeight: theme.typography.bodyLarge?.fontWeight,
+                lineHeight: theme.typography.bodyLarge?.lineHeight,
                 letterSpacing: 0.32,
               },
             }}
@@ -149,7 +149,7 @@ const ForgotPasswordPage = (): React.ReactElement => {
           >
             <Button
               variant="contained"
-              color="primary"
+              color="learner"
               onClick={handleResetPassword}
               sx={{
                 padding: "20px 24px",
@@ -159,33 +159,31 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 borderRadius: 1,
                 width: 500,
                 backgroundColor: theme.palette.learner.main,
-                color: "#FFF",
-                fontSize: "16px",
-                fontWeight: 300,
-                lineHeight: "120%",
+                color: theme.palette.neutral.light,
+                fontSize: theme.typography.bodyLarge?.fontSize,
+                fontWeight: theme.typography.bodyLarge?.fontWeight,
+                lineHeight: theme.typography.bodyLarge?.lineHeight,
                 letterSpacing: 0.08,
                 textTransform: "none",
                 marginTop: 4,
                 "&:hover": {
-                  backgroundColor:
-                    "#00424C",
+                  backgroundColor: theme.palette.learner.dark,
                 },
                 "&:active": {
-                  backgroundColor:
-                    "#002A32",
+                  backgroundColor: theme.palette.learner.dark,
                 },
               }}
             >
               Send reset link to email
             </Button>
             <Typography
-              variant="body2"
+              variant="bodySmall"
               sx={{
                 color: theme.palette.learner.main,
                 textAlign: "center",
-                fontSize: "12.5px",
+                fontSize: theme.typography.bodySmall?.fontSize,
                 fontWeight: theme.typography.bodySmall?.fontWeight,
-                lineHeight: "120%",
+                lineHeight: theme.typography.bodySmall?.lineHeight,
                 letterSpacing: 0.625,
                 textTransform: "uppercase",
                 cursor: "pointer",
