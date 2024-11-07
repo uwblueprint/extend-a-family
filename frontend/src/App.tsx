@@ -1,35 +1,36 @@
-import "bootstrap/dist/css/bootstrap.min.css";
 import { CssBaseline } from "@mui/material";
-import React, { useState, useReducer, useEffect } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Welcome from "./components/auth/WelcomePage";
-import Signup from "./components/auth/SignupPage";
+import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useEffect, useReducer, useState } from "react";
+import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
+import authAPIClient from "./APIClients/AuthAPIClient";
 import PrivateRoute from "./components/auth/PrivateRoute";
-import Default from "./components/pages/Default";
+import Signup from "./components/auth/SignupPage";
+import Welcome from "./components/auth/WelcomePage";
 import CreateModulePage from "./components/pages/CreateModulePage";
-import NotFound from "./components/pages/NotFound";
-import NotAuthorized from "./components/pages/NotAuthorized";
+import Default from "./components/pages/Default";
 import MyAccount from "./components/pages/MyAccountPage";
+import NotAuthorized from "./components/pages/NotAuthorized";
+import NotFound from "./components/pages/NotFound";
 import AUTHENTICATED_USER_KEY from "./constants/AuthConstants";
+import * as Routes from "./constants/Routes";
 import AuthContext from "./contexts/AuthContext";
-import { getLocalStorageObj } from "./utils/LocalStorageUtils";
 import SampleContext, {
   DEFAULT_SAMPLE_CONTEXT,
 } from "./contexts/SampleContext";
-import sampleContextReducer from "./reducers/SampleContextReducer";
 import SampleContextDispatcherContext from "./contexts/SampleContextDispatcherContext";
-import { AuthenticatedUser } from "./types/AuthTypes";
-import authAPIClient from "./APIClients/AuthAPIClient";
-import * as Routes from "./constants/Routes";
 import { SocketProvider } from "./contexts/SocketContext";
+import sampleContextReducer from "./reducers/SampleContextReducer";
+import { AuthenticatedUser } from "./types/AuthTypes";
+import { getLocalStorageObj } from "./utils/LocalStorageUtils";
 
-import ManageUserPage from "./components/pages/ManageUserPage";
-import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
-import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
-import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
+import HelpRequestPage from "./components/pages/HelpRequestPage";
+import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
+import ManageUserPage from "./components/pages/ManageUserPage";
+import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
+import ViewModulePage from "./components/pages/ViewModulePage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -134,6 +135,12 @@ const App = (): React.ReactElement => {
                   exact
                   path={Routes.COURSE_PAGE}
                   component={CourseViewingPage}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={`${Routes.VIEW_PAGE}`}
+                  component={ViewModulePage}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
                 <Route exact path="*" component={NotFound} />
