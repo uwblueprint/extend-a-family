@@ -231,7 +231,7 @@ const typography: TypographyOptions = {
     letterSpacing: "+0.25px",
   },
   bodySmall: {
-    fontSize: "12px",
+    fontSize: "12.5px",
     fontWeight: 400,
     lineHeight: "16px",
     letterSpacing: "+0.4px",

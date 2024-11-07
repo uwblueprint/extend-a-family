@@ -61,15 +61,23 @@ const App = (): React.ReactElement => {
   return (
     <SampleContext.Provider value={sampleContext}>
       <CssBaseline />
-      <SampleContextDispatcherContext.Provider value={dispatchSampleContextUpdate}>
-        <AuthContext.Provider value={{ authenticatedUser, setAuthenticatedUser }}>
+      <SampleContextDispatcherContext.Provider
+        value={dispatchSampleContextUpdate}
+      >
+        <AuthContext.Provider
+          value={{ authenticatedUser, setAuthenticatedUser }}
+        >
           <SocketProvider id={authenticatedUser?.id}>
             <Router>
               <Switch>
                 <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
                 <Route exact path={Routes.LOGIN_PAGE} component={Login} />
                 <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
-                <Route exact path={Routes.FORGOT_PASSWORD_PAGE} component={ForgotPasswordPage} />
+                <Route
+                  exact
+                  path={Routes.FORGOT_PASSWORD_PAGE}
+                  component={ForgotPasswordPage}
+                />
 
                 <PrivateRoute
                   exact
@@ -89,7 +97,11 @@ const App = (): React.ReactElement => {
                   component={CreateModulePage}
                   allowedRoles={["Administrator"]}
                 />
-                <Route exact path={Routes.NOT_AUTHORIZED_PAGE} component={NotAuthorized} />
+                <Route
+                  exact
+                  path={Routes.NOT_AUTHORIZED_PAGE}
+                  component={NotAuthorized}
+                />
                 <PrivateRoute
                   exact
                   path={Routes.CREATE_PASSWORD_PAGE}

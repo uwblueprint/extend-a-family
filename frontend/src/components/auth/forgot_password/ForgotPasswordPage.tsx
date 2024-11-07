@@ -94,14 +94,18 @@ const ForgotPasswordPage = (): React.ReactElement => {
               fontSize: theme.typography.headlineMedium?.fontSize,
               fontWeight: theme.typography.headlineLarge?.fontWeight,
               lineHeight: theme.typography.headlineLarge?.lineHeight,
+              color: "#000",
             }}
           >
             Forgot your password?
           </Typography>
-          <Typography variant="bodyMedium"
-           sx={{
-            fontSize: theme.typography.bodyLarge?.fontSize,
-          }}>
+          <Typography
+            variant="bodyMedium"
+            sx={{
+              fontSize: theme.typography.bodyLarge?.fontSize,
+              color: "#000",
+            }}
+          >
             Enter your email, and we&apos;ll send you a link to reset your
             password
           </Typography>
@@ -161,13 +165,13 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 backgroundColor: theme.palette.learner.main,
                 color: theme.palette.neutral.light,
                 fontSize: theme.typography.bodyLarge?.fontSize,
-                fontWeight: theme.typography.bodyLarge?.fontWeight,
+                fontWeight: theme.typography.titleSmall?.fontWeight,
                 lineHeight: theme.typography.bodyLarge?.lineHeight,
                 letterSpacing: 0.08,
                 textTransform: "none",
                 marginTop: 4,
                 "&:hover": {
-                  backgroundColor: theme.palette.learner.dark,
+                  backgroundColor: "#002A32",
                 },
                 "&:active": {
                   backgroundColor: theme.palette.learner.dark,
