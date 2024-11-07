@@ -28,6 +28,7 @@ import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/pages/CreatePasswordPage";
+import ViewModulePage from "./components/pages/ViewModulePage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -124,6 +125,12 @@ const App = (): React.ReactElement => {
                   path={`${Routes.VIEW_HELP_REQUESTS_PAGE}/:id`}
                   component={HelpRequestPage}
                   allowedRoles={["Facilitator"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={`${Routes.VIEW_PAGE}`}
+                  component={ViewModulePage}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
                 <Route exact path="*" component={NotFound} />
               </Switch>
