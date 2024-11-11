@@ -7,7 +7,10 @@ const ResetPassword = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
 
   const onResetPasswordClick = async () => {
-    await authAPIClient.resetPassword(authenticatedUser?.email);
+    if (!authenticatedUser?.email) {
+      return;
+    }
+    await authAPIClient.resetPassword(authenticatedUser.email);
   };
 
   return (

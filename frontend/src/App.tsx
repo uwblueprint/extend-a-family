@@ -1,4 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import { CssBaseline } from "@mui/material";
 import React, { useState, useReducer, useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Welcome from "./components/pages/Welcome";
@@ -18,16 +19,18 @@ import SampleContext, {
 } from "./contexts/SampleContext";
 import sampleContextReducer from "./reducers/SampleContextReducer";
 import SampleContextDispatcherContext from "./contexts/SampleContextDispatcherContext";
-
 import { AuthenticatedUser } from "./types/AuthTypes";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import * as Routes from "./constants/Routes";
-import ManageUserPage from "./components/pages/ManageUserPage";
 import { SocketProvider } from "./contexts/SocketContext";
+
+import ManageUserPage from "./components/pages/ManageUserPage";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/pages/CreatePasswordPage";
+import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
+import CourseUnitsPage from "./components/pages/courses/CourseUnitsPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -36,9 +39,6 @@ const App = (): React.ReactElement => {
   const [authenticatedUser, setAuthenticatedUser] =
     useState<AuthenticatedUser | null>(currentUser);
 
-  // Some sort of global state. Context API replaces redux.
-  // Split related states into different contexts as necessary.
-  // Split dispatcher and state into separate contexts as necessary.
   const [sampleContext, dispatchSampleContextUpdate] = useReducer(
     sampleContextReducer,
     DEFAULT_SAMPLE_CONTEXT,
@@ -55,11 +55,12 @@ const App = (): React.ReactElement => {
       }
     }, HOUR_MS);
 
-    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+    return () => clearInterval(interval);
   }, [currentUser]);
 
   return (
     <SampleContext.Provider value={sampleContext}>
+      <CssBaseline />
       <SampleContextDispatcherContext.Provider
         value={dispatchSampleContextUpdate}
       >
@@ -72,6 +73,12 @@ const App = (): React.ReactElement => {
                 <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
                 <Route exact path={Routes.LOGIN_PAGE} component={Login} />
                 <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
+                <Route
+                  exact
+                  path={Routes.FORGOT_PASSWORD_PAGE}
+                  component={ForgotPasswordPage}
+                />
+
                 <PrivateRoute
                   exact
                   path={Routes.HOME_PAGE}
@@ -124,6 +131,12 @@ const App = (): React.ReactElement => {
                   path={`${Routes.VIEW_HELP_REQUESTS_PAGE}/:id`}
                   component={HelpRequestPage}
                   allowedRoles={["Facilitator"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.COURSES_PAGE}
+                  component={CourseUnitsPage}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
                 <Route exact path="*" component={NotFound} />
               </Switch>

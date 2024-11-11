@@ -1,20 +1,6 @@
 export type Color = `#${string}`;
 
-export type Palette = {
-  0: Color;
-  10: Color;
-  20: Color;
-  30: Color;
-  40: Color;
-  50: Color;
-  60: Color;
-  70: Color;
-  80: Color;
-  90: Color;
-  95: Color;
-  99: Color;
-  100: Color;
-};
+export type Palette = Record<number, Color>;
 
 // Defined in Figma Design Document
 export const learner: Palette = {
@@ -93,6 +79,7 @@ export const neutral: Palette = {
   80: "#C5C7C7",
   90: "#E1E3E3",
   95: "#F0F1F1",
+  98: "#F9F9F9",
   99: "#F7FDFF",
   100: "#FFFFFF",
 };
