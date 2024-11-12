@@ -8,7 +8,10 @@ import {
   Box,
   Drawer,
   IconButton,
-} from "@mui/material";
+  TextField,
+  Button,
+} from '@mui/material';
+
 import CloseIcon from "@mui/icons-material/Close";
 import styled from "@emotion/styled";
 import background from "../assets/loginPageCover.png";
@@ -161,30 +164,58 @@ const Welcome = (): React.ReactElement => {
       </div>
       <Drawer
         PaperProps={{
-          sx: { width: "50%" },
+          sx: { width: '40%' },
         }}
         anchor="right"
         open={drawerOpen}
         onClose={closeDrawer}
       >
-        <IconButton
-          onClick={closeDrawer}
-          style={{ position: "absolute", right: 0 }}
-        >
+        <IconButton onClick={closeDrawer} style={{ position: 'absolute', right: 0 }}>
           <CloseIcon />
         </IconButton>
         <Box
           sx={{
-            height: "100%",
-            width: "80%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
+            height: '100%',
+            width: '60%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: 'normal',
           }}
         >
-          <Typography>Hello</Typography>
-          <Login userRole={selectedRole} align="center" />
+          <Typography variant="h5">{selectedRole} Login</Typography>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              variant="outlined"
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Password"
+              type="password"
+              variant="outlined"
+              margin="normal"
+            />
+            <Button variant="contained" fullWidth sx={{ mb: 2, bgcolor: '#7B3F00', color: 'white' }}>
+              Login as {selectedRole}
+            </Button>
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              Forgot Password
+              {/* <Link href="#">Forgot Password</Link> */}
+            </Typography>
+            <Typography variant="body2">
+              Dont have an account
+              {/* <Link href="#">Don't have an account? Sign Up</Link> */}
+            </Typography>
+            <Login userRole={selectedRole} align="center" />
+
+          </Box>
         </Box>
       </Drawer>
     </Container>
