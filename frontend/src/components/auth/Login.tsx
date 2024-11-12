@@ -1,16 +1,25 @@
 import React, { useContext, useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
+import { Button, TextField, Typography, Container } from "@mui/material";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, SIGNUP_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
-import { authErrors } from "../../errors/AuthErrors";
-import { PresentableError } from "../../types/ErrorTypes";
 import { isRole } from "../../types/UserTypes";
+import { PresentableError } from "../../types/ErrorTypes";
+import { authErrors } from "../../errors/AuthErrors";
 
-const Login = (): React.ReactElement => {
+interface LoginProps {
+  userRole: string;
+  align?: "left" | "center" | "right"; // Restrict to valid values
+}
+
+const Login: React.FC<LoginProps> = ({
+  userRole,
+  align = "left", // Default to "left" alignment
+}: LoginProps): React.ReactElement => {
   const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
   const [loginError, setLoginError] = useState<PresentableError>();
   const [emailError, setEmailError] = useState<PresentableError>();
@@ -55,11 +64,14 @@ const Login = (): React.ReactElement => {
 
   const onSignupClick = () => {
     history.push(`${SIGNUP_PAGE}?role=${role.toLowerCase()}`);
+    history.push(`${SIGNUP_PAGE}?role=${userRole}`);
   };
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <h1>{capitalizeFirstLetter(role)} Login</h1>
+    <Container style={{ textAlign: align }} sx={{ height: "100%" }}>
+      <Typography variant="h4">
+        {capitalizeFirstLetter(userRole)} Login
+      </Typography>
       {loginError && (
         <div
           style={{
@@ -75,44 +87,51 @@ const Login = (): React.ReactElement => {
       )}
       <form>
         <div>
-          <input
+          <TextField
             type="email"
-            value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="username@domain.com"
+            label="Email"
+            variant="outlined"
+            fullWidth
+            margin="normal"
           />
           {emailError && <p style={{ color: "red" }}>{emailError.text()}</p>}
         </div>
         <div>
-          <input
+          <TextField
             type="password"
-            value={password}
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="password"
+            label="Password"
+            variant="outlined"
+            fullWidth
+            margin="normal"
           />
         </div>
         <div>
-          <button
-            className="btn btn-primary"
-            type="button"
+          <Button
+            variant="contained"
+            color="primary"
             onClick={onLogInClick}
+            fullWidth
+            style={{ margin: "16px 0" }}
           >
             Log In
-          </button>
+          </Button>
         </div>
       </form>
       {role === "Facilitator" && (
         <div>
-          <button
-            className="btn btn-primary"
-            type="button"
+          <Button
+            variant="contained"
+            color="secondary"
             onClick={onSignupClick}
+            fullWidth
           >
             Sign Up
-          </button>
+          </Button>
         </div>
       )}
-    </div>
+    </Container>
   );
 };
 
