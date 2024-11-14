@@ -121,6 +121,21 @@ courseRouter.get(
   },
 );
 
+courseRouter.get(
+  "/module/:moduleId",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  moduleBelongsToUnitValidator,
+  async (req, res) => {
+    const { moduleId } = req.params;
+    try {
+      const courseModule = await courseModuleService.getCourseModule(moduleId);
+      res.status(200).json(courseModule);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
 courseRouter.post(
   "/",
   isAuthorizedByRole(new Set(["Administrator"])),
