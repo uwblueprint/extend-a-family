@@ -40,7 +40,7 @@ const ManageUser = (): React.ReactElement => {
       handleChangePage(0);
     }
     getUsers();
-  }, [role]);
+  }, [role, handleChangePage]);
 
   const setSortFieldAndSortDirection = useCallback(
     (selectedSortField: keyof User) => {
