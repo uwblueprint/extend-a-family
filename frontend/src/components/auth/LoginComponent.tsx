@@ -8,6 +8,8 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { AlternateEmail, Password } from "@mui/icons-material";
+import InputAdornment from "@mui/material/InputAdornment";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
@@ -16,16 +18,17 @@ import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import { authErrors } from "../../errors/AuthErrors";
 import { PresentableError } from "../../types/ErrorTypes";
+import { PaletteRole } from "../../theme/theme";
 
 interface LoginProps {
   userRole: Role;
   isDrawerComponent: boolean;
-  align?: "left" | "center" | "right"; // Restrict to valid values
+  signInPrompt?: string;
 }
 const LoginComponent: React.FC<LoginProps> = ({
   userRole,
   isDrawerComponent,
-  align = "left",
+  signInPrompt,
 }: LoginProps): React.ReactElement => {
   const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
   const [loginError, setLoginError] = useState<PresentableError>();
@@ -63,8 +66,27 @@ const LoginComponent: React.FC<LoginProps> = ({
 
   const DrawerComponent = () => {
     return (
-      <Container style={{ textAlign: align }}>
-        <h1>{capitalizeFirstLetter(userRole)} Login</h1>
+      <Container
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          padding: "80px 80px 80px 80px",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+        disableGutters
+      >
+        <Box sx={{ textAlign: "center" }}>
+          <Typography
+            variant="headlineLarge"
+            style={{
+              color: "black",
+            }}
+          >
+            {capitalizeFirstLetter(userRole)} Login
+          </Typography>
+        </Box>
         {loginError && (
           <div
             style={{
@@ -79,39 +101,134 @@ const LoginComponent: React.FC<LoginProps> = ({
           </div>
         )}
         <form>
-          <div>
+          <Box
+            sx={{
+              margin: "40px 0 40px 0",
+            }}
+          >
             <TextField
-              type="email"
-              onChange={(event) => setEmail(event.target.value)}
+              required
               label="Email"
+              type="email"
+              InputProps={{
+                sx: {
+                  fontSize: "16px",
+                  fontWeight: 400,
+                  lineHeight: "22.4px",
+                  letterSpacing: "0.2px",
+                  fontFamily: "Lexend Deca, sans-serif",
+                },
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <AlternateEmail />
+                  </InputAdornment>
+                ),
+              }}
+              placeholder="example@gmail.com"
+              onChange={(event) => setEmail(event.target.value)}
               variant="outlined"
               fullWidth
-              margin="normal"
+              margin="none"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignSelf: "stretch",
+                maxHeight: "56px",
+              }}
             />
             {emailError && <p style={{ color: "red" }}>{emailError.text()}</p>}
-          </div>
-          <div>
+          </Box>
+          <Box
+            sx={{
+              marginBottom: "8px",
+            }}
+          >
             <TextField
+              required
+              label="Password"
               type="password"
               onChange={(event) => setPassword(event.target.value)}
-              label="Password"
               variant="outlined"
               fullWidth
-              margin="normal"
+              margin="none"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignSelf: "stretch",
+                maxHeight: "56px",
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Password />
+                  </InputAdornment>
+                ),
+              }}
+              placeholder="Your Password"
             />
-          </div>
-          <div>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={onLogInClick}
-              fullWidth
-              style={{ margin: "16px 0" }}
+          </Box>
+          <Box sx={{ textAlign: "right" }}>
+            <Typography
+              variant="bodySmall"
+              style={{
+                color:
+                  theme.palette[userRole.toLowerCase() as PaletteRole]?.main ||
+                  "primary",
+              }}
             >
-              Log In
-            </Button>
-          </div>
+              Forgot Password
+            </Typography>
+          </Box>
         </form>
+        <Box
+          sx={{
+            width: "100%",
+            height: "59px",
+            marginTop: "40px",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={onLogInClick}
+            style={{
+              height: "59px",
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: "4px",
+              backgroundColor:
+                theme.palette[userRole.toLowerCase() as PaletteRole]?.main ||
+                "primary",
+              marginBottom: "20px",
+            }}
+          >
+            <Typography
+              variant="labelLargeProminent"
+              style={{
+                color: "white",
+              }}
+            >
+              Login as {userRole}
+            </Typography>
+          </Button>
+          <Box sx={{ textAlign: "center" }}>
+            {signInPrompt && (
+              <Typography
+                variant="labelSmall"
+                style={{
+                  color:
+                    theme.palette[userRole.toLowerCase() as PaletteRole]
+                      ?.main || "primary",
+                }}
+              >
+                {signInPrompt}
+              </Typography>
+            )}
+          </Box>
+        </Box>
       </Container>
     );
   };
@@ -136,24 +253,12 @@ const LoginComponent: React.FC<LoginProps> = ({
             display: "flex",
             alignItems: "flex-start",
             flexDirection: "column",
-            gap: " 40px",
             alignSelf: "stretch",
           }}
           disableGutters
         >
           <Box>
-            <Typography
-              style={{
-                fontSize: "28px",
-                fontWeight: 600,
-                lineHeight: "33.6px",
-                letterSpacing: "0.4px",
-                fontFamily: "Lexend Deca, sans-serif",
-                color: "black",
-                textTransform: "none",
-                fontStyle: "normal",
-              }}
-            >
+            <Typography variant="headlineLarge" style={{ color: "black" }}>
               {capitalizeFirstLetter(userRole)} Login
             </Typography>
           </Box>
@@ -177,96 +282,111 @@ const LoginComponent: React.FC<LoginProps> = ({
               }}
             >
               <TextField
-                type="email"
-                onChange={(event) => setEmail(event.target.value)}
+                required
                 label="Email"
+                type="email"
+                InputProps={{
+                  sx: {
+                    fontSize: "16px",
+                    fontWeight: 400,
+                    lineHeight: "22.4px",
+                    letterSpacing: "0.2px",
+                    fontFamily: "Lexend Deca, sans-serif",
+                  },
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AlternateEmail />
+                    </InputAdornment>
+                  ),
+                }}
+                placeholder="example@gmail.com"
+                onChange={(event) => setEmail(event.target.value)}
                 variant="outlined"
                 fullWidth
-                margin="normal"
+                margin="none"
                 sx={{
                   display: "flex",
                   flexDirection: "column",
                   alignSelf: "stretch",
                   maxHeight: "56px",
                 }}
-                placeholder="example@gmail.com"
               />
               {emailError && (
                 <p style={{ color: "red" }}>{emailError.text()}</p>
               )}
             </Box>
-            <Box>
+            <Box
+              sx={{
+                marginBottom: "8px",
+              }}
+            >
               <TextField
+                required
+                label="Password"
                 type="password"
                 onChange={(event) => setPassword(event.target.value)}
-                label="Password"
                 variant="outlined"
                 fullWidth
-                margin="normal"
+                margin="none"
                 sx={{
                   display: "flex",
                   flexDirection: "column",
                   alignSelf: "stretch",
                   maxHeight: "56px",
                 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Password />
+                    </InputAdornment>
+                  ),
+                }}
                 placeholder="Your Password"
               />
             </Box>
-            <Typography
-              style={{
-                fontSize: "14px",
-                fontWeight: 400,
-                lineHeight: "140%",
-                letterSpacing: "0.4px",
-                fontFamily: "Lexend Deca, sans-serif",
-                color: theme.palette.learner.main,
-                textTransform: "none",
-                fontStyle: "normal",
-                textAlign: "right",
-              }}
-            >
-              Forgot Password
-            </Typography>
-
-            <Box
-              sx={{
-                maxWidth: "158px",
-                maxHeight: "62px",
-                marginTop: "40px",
-              }}
-            >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={onLogInClick}
+            <Box sx={{ textAlign: "right" }}>
+              <Typography
+                variant="bodySmall"
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: "4px",
-                  backgroundColor: theme.palette.learner.main,
+                  color: theme.palette.learner.main,
                 }}
               >
-                <Typography
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: 600,
-                    lineHeight: "26.4px",
-                    letterSpacing: "0.4px",
-                    fontFamily: "Lexend Deca, sans-serif",
-                    color: "white",
-                    textTransform: "none",
-                    fontStyle: "normal",
-                  }}
-                >
-                  Login
-                </Typography>
-              </Button>
+                Forgot Password
+              </Typography>
             </Box>
           </form>
+          <Box
+            sx={{
+              width: "158px",
+              height: "62px",
+              marginTop: "40px",
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={onLogInClick}
+              style={{
+                height: "62px",
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "4px",
+                backgroundColor: theme.palette.learner.main,
+              }}
+            >
+              <Typography
+                variant="headlineSmall"
+                style={{
+                  color: "white",
+                }}
+              >
+                Login
+              </Typography>
+            </Button>
+          </Box>
         </Container>
       </Container>
     );

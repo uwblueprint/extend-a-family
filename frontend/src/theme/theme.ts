@@ -36,6 +36,7 @@ declare module "@mui/material/styles" {
     titleMedium?: TypographyStyleOptions;
     titleSmall?: TypographyStyleOptions;
     labelLarge?: TypographyStyleOptions;
+    labelLargeProminent?: TypographyStyleOptions;
     labelMedium?: TypographyStyleOptions;
     labelSmall?: TypographyStyleOptions;
     bodyLarge?: TypographyStyleOptions;
@@ -78,6 +79,7 @@ declare module "@mui/material/Typography" {
     bodyLarge: true;
     bodyMedium: true;
     bodySmall: true;
+    labelLargeProminent: true;
   }
 }
 
@@ -196,6 +198,15 @@ const typography: TypographyOptions = {
     lineHeight: "20px",
     letterSpacing: "+0.1px",
   },
+  labelLargeProminent: {
+    fontSize: "16px",
+    fontWeight: 600,
+    lineHeight: "19.2px",
+    letterSpacing: "0.08px",
+    fontFamily: "Lexend Deca, sans-serif",
+    textTransform: "none",
+    fontStyle: "normal",
+  },
   labelLarge: {
     fontSize: "14px",
     fontWeight: 300,
@@ -236,7 +247,11 @@ const typography: TypographyOptions = {
     letterSpacing: "+0.4px",
   },
 };
-
+export enum PaletteRole {
+  Administrator = "administrator",
+  Facilitator = "facilitator",
+  Learner = "learner",
+}
 const getTheme = (darkMode: boolean) => {
   const theme = createTheme({
     typography: {
@@ -244,6 +259,18 @@ const getTheme = (darkMode: boolean) => {
       ...typography,
     },
     palette: darkMode ? { ...darkThemePalette } : { ...lightThemePalette },
+    components: {
+      MuiInputLabel: {
+        styleOverrides: {
+          root: typography.bodySmall,
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: {
+          input: typography.bodyMedium,
+        },
+      },
+    },
   });
   return theme;
 };
