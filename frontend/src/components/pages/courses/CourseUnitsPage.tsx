@@ -51,6 +51,7 @@ export default function CourseUnitsPage() {
           <MenuOpenIcon
             sx={{
               fontSize: "18px",
+              transform: "scaleX(-1)",
             }}
           />
         </Button>
