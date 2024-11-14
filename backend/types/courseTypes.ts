@@ -12,6 +12,7 @@ export type CourseModuleDTO = {
   id: string;
   displayIndex: number;
   title: string;
+  lessonPdfUrl?: string;
 };
 
 export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
