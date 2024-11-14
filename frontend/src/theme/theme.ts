@@ -34,6 +34,7 @@ declare module "@mui/material/styles" {
     titleMedium?: TypographyStyleOptions;
     titleSmall?: TypographyStyleOptions;
     labelLarge?: TypographyStyleOptions;
+    labelLargeProminent?: TypographyStyleOptions;
     labelMedium?: TypographyStyleOptions;
     labelSmall?: TypographyStyleOptions;
     bodyLarge?: TypographyStyleOptions;
@@ -76,6 +77,7 @@ declare module "@mui/material/Typography" {
     bodyLarge: true;
     bodyMedium: true;
     bodySmall: true;
+    labelLargeProminent: true;
   }
 }
 
@@ -148,22 +150,28 @@ const typography: TypographyOptions = {
     letterSpacing: "0pt",
   },
   headlineLarge: {
-    fontSize: "32pt",
+    fontSize: "28px",
     fontWeight: 600,
-    lineHeight: "40pt",
-    letterSpacing: "0pt",
+    lineHeight: "33.6px",
+    fontFamily: "Lexend Deca, sans-serif",
+    textTransform: "none",
+    fontStyle: "normal",
   },
   headlineMedium: {
-    fontSize: "28pt",
+    fontSize: "26px",
     fontWeight: 600,
-    lineHeight: "36pt",
-    letterSpacing: "0pt",
+    lineHeight: "31.2px",
+    textTransform: "none",
+    fontFamily: "Lexend Deca, sans-serif",
   },
   headlineSmall: {
-    fontSize: "24pt",
+    fontSize: "22px",
     fontWeight: 600,
-    lineHeight: "32pt",
-    letterSpacing: "0pt",
+    lineHeight: "26.4px",
+    letterSpacing: "0.4px",
+    fontFamily: "Lexend Deca, sans-serif",
+    textTransform: "none",
+    fontStyle: "normal",
   },
   titleLarge: {
     fontSize: "22pt",
@@ -172,16 +180,26 @@ const typography: TypographyOptions = {
     letterSpacing: "0pt",
   },
   titleMedium: {
-    fontSize: "16pt",
+    fontSize: "18px",
     fontWeight: 600,
-    lineHeight: "24pt",
-    letterSpacing: "+0.15pt",
+    lineHeight: "21.6px",
+    letterSpacing: "0.12px",
+    fontFamily: "Lexend Deca, sans-serif",
   },
   titleSmall: {
     fontSize: "24pt",
     fontWeight: 600,
     lineHeight: "20pt",
     letterSpacing: "+0.1pt",
+  },
+  labelLargeProminent: {
+    fontSize: "16px",
+    fontWeight: 600,
+    lineHeight: "19.2px",
+    letterSpacing: "0.08px",
+    fontFamily: "Lexend Deca, sans-serif",
+    textTransform: "none",
+    fontStyle: "normal",
   },
   labelLarge: {
     fontSize: "14pt",
@@ -198,32 +216,42 @@ const typography: TypographyOptions = {
     textTransform: "uppercase",
   },
   labelSmall: {
-    fontSize: "11pt",
+    fontSize: "12.5px",
     fontWeight: 300,
-    lineHeight: "16pt",
-    letterSpacing: "+0.5pt",
+    letterSpacing: "5%",
+    fontFamily: "Lexend Deca, sans-serif",
+    fontStyle: "normal",
     textTransform: "uppercase",
   },
   bodyLarge: {
-    fontSize: "16pt",
+    fontSize: "18px",
     fontWeight: 400,
-    lineHeight: "24pt",
-    letterSpacing: "+0.5pt",
+    lineHeight: "25.2px",
+    letterSpacing: "0.4px",
+    fontFamily: "Lexend Deca, sans-serif",
   },
   bodyMedium: {
-    fontSize: "14pt",
+    fontSize: "16px",
     fontWeight: 400,
-    lineHeight: "20pt",
-    letterSpacing: "+0.25pt",
+    lineHeight: "22.4px",
+    letterSpacing: "0.2px",
+    fontFamily: "Lexend Deca, sans-serif",
   },
   bodySmall: {
-    fontSize: "12pt",
+    fontSize: "14px",
     fontWeight: 400,
-    lineHeight: "16pt",
-    letterSpacing: "+0.4pt",
+    lineHeight: "19.6px",
+    letterSpacing: "0.4px",
+    fontFamily: "Lexend Deca, sans-serif",
+    textTransform: "none",
+    fontStyle: "normal",
   },
 };
-
+export enum PaletteRole {
+  Administrator = "administrator",
+  Facilitator = "facilitator",
+  Learner = "learner",
+}
 const getTheme = (darkMode: boolean) => {
   const theme = createTheme({
     typography: {
@@ -231,6 +259,18 @@ const getTheme = (darkMode: boolean) => {
       ...typography,
     },
     palette: darkMode ? { ...darkThemePalette } : { ...lightThemePalette },
+    components: {
+      MuiInputLabel: {
+        styleOverrides: {
+          root: typography.bodySmall,
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: {
+          input: typography.bodyMedium,
+        },
+      },
+    },
   });
   return theme;
 };

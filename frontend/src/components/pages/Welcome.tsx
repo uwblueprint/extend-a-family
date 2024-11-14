@@ -12,8 +12,8 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import React, { useContext, useState } from "react";
-import { Redirect } from "react-router-dom";
-import { HOME_PAGE } from "../../constants/Routes";
+import { Link, Redirect } from "react-router-dom";
+import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 
 import background from "../assets/backgroundImage.png";
@@ -21,12 +21,12 @@ import icon from "../assets/icon.png";
 import LoginComponent from "../auth/LoginComponent";
 import { Role } from "../../types/AuthTypes";
 import { administrator, facilitator, learner } from "../../theme/palette";
+import { PaletteRole } from "../../theme/theme";
 
 const Welcome = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
-
   const theme = useTheme();
   if (authenticatedUser) {
     return <Redirect to={HOME_PAGE} />;
@@ -36,12 +36,6 @@ const Welcome = (): React.ReactElement => {
     setSelectedRole(role);
     setDrawerOpen(true);
   };
-
-  enum PaletteRole {
-    Administrator = "administrator",
-    Facilitator = "facilitator",
-    Learner = "learner",
-  }
 
   interface CustomButtonProps {
     role: PaletteRole;
@@ -71,18 +65,14 @@ const Welcome = (): React.ReactElement => {
           }}
           onClick={() => handleButtonClick(role)}
         >
-          <div
+          <Typography
+            variant="bodyLarge"
             style={{
-              fontSize: "18px",
-              fontWeight: 400,
               color: "black",
-              lineHeight: "25.2px",
-              letterSpacing: "0.4px",
-              fontFamily: "Lexend Deca, sans-serif",
             }}
           >
             {buttonText}
-          </div>
+          </Typography>
           <ArrowForwardIcon sx={{ color: "black" }} />
         </Button>
       </Container>
@@ -92,9 +82,10 @@ const Welcome = (): React.ReactElement => {
   interface InfoBoxProps {
     title: string;
     description: string;
-    instruction: string;
     backgroundColor: string;
     borderColor: string;
+    instruction?: string;
+    signUpRedirect?: boolean;
   }
   const InfoBox: React.FC<InfoBoxProps> = ({
     title,
@@ -102,72 +93,73 @@ const Welcome = (): React.ReactElement => {
     instruction,
     backgroundColor,
     borderColor,
+    signUpRedirect,
   }) => {
     return (
       <Box
         sx={{
-          width: "366.67px",
-          height: "281px",
+          width: "100%",
+          minWidth: "280px",
+          maxWidth: "386.67px",
+          maxHeight: "100%",
+          height: "auto",
           border: "1px solid",
           padding: "40px",
+          gap: "20px",
+          justifyContent: "space-between",
           backgroundColor,
           borderColor,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          flexShrink: 1,
+          flexBasis: "auto",
         }}
       >
-        <Typography
-          style={{
-            fontSize: "26px",
-            fontWeight: 600,
-            color: "black",
-            lineHeight: "31.2px",
-            letterSpacing: "0.4px",
-            fontFamily: "Lexend Deca, sans-serif",
-          }}
-          sx={{ marginBottom: "16px" }}
-        >
-          {title}
-        </Typography>
-
-        <Typography
-          style={{
-            fontSize: "16px",
-            fontWeight: 400,
-            color: "black",
-            lineHeight: "22.4px",
-            letterSpacing: "0.2px",
-            fontFamily: "Lexend Deca, sans-serif",
-          }}
-          sx={{ marginBottom: "16px" }}
-        >
-          {description}
-        </Typography>
-
-        <Typography
-          style={{
-            fontSize: "18px",
-            fontWeight: 600,
-            color: "black",
-            lineHeight: "21.6px",
-            letterSpacing: "0.12px",
-            fontFamily: "Lexend Deca, sans-serif",
-          }}
-          sx={{ marginBottom: "8px" }}
-        >
-          Don&apos;t have an account?
-        </Typography>
-
-        <Typography
-          style={{
-            fontSize: "16px",
-            fontWeight: 400,
-            color: "black",
-            lineHeight: "22.4px",
-            letterSpacing: "0.2px",
-            fontFamily: "Lexend Deca, sans-serif",
-          }}
-        >
-          {instruction}
-        </Typography>
+        <Box>
+          <Typography variant="headlineMedium" style={{ color: "black" }}>
+            {title}
+          </Typography>
+        </Box>
+        <Box>
+          <Typography variant="bodyMedium" style={{ color: "black" }}>
+            {description}
+          </Typography>
+        </Box>
+        <Box>
+          <Typography variant="titleMedium" style={{ color: "black" }}>
+            Don&apos;t have an account?
+          </Typography>
+        </Box>
+        {instruction && (
+          <Box>
+            <Typography variant="bodyMedium" sx={{ color: "black" }}>
+              {instruction}
+            </Typography>
+          </Box>
+        )}
+        {signUpRedirect && (
+          <Box>
+            <Typography variant="bodyMedium" sx={{ color: "black" }}>
+              Create a new account by signing up{" "}
+            </Typography>
+            <Typography
+              variant="bodyMedium"
+              sx={{
+                color: "primary.main",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+              onClick={() => <Link to={SIGNUP_PAGE} />}
+            >
+              here
+            </Typography>
+            <Typography variant="bodyMedium" sx={{ color: "black" }}>
+              .
+            </Typography>
+          </Box>
+        )}
       </Box>
     );
   };
@@ -252,7 +244,6 @@ const Welcome = (): React.ReactElement => {
           maxHeight: "749px",
           flexDirection: "column",
           justifyContent: "center",
-          padding: "0 0 0 0",
         }}
         disableGutters
       >
@@ -265,7 +256,6 @@ const Welcome = (): React.ReactElement => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "stretch",
-            padding: "0",
             backgroundColor: learner[98],
           }}
           disableGutters
@@ -273,7 +263,7 @@ const Welcome = (): React.ReactElement => {
           {/* Container for ImageOverlay with 50% width */}
           <Container
             sx={{
-              width: "calc(50% - 10px)",
+              width: "calc(50%)",
               height: "640px",
               display: "flex",
             }}
@@ -346,9 +336,9 @@ const Welcome = (): React.ReactElement => {
         <InfoBox
           title="Facilitators"
           description="The person who is helping people learn about money."
-          instruction="Create a new account by signing up here."
           backgroundColor={facilitator[98]}
           borderColor={theme.palette.facilitator.main}
+          signUpRedirect
         />
         <InfoBox
           title="Administrator"
@@ -361,7 +351,7 @@ const Welcome = (): React.ReactElement => {
 
       <Drawer
         PaperProps={{
-          sx: { width: "50%" },
+          sx: { maxWidth: "560px", width: "100%" },
         }}
         anchor="right"
         open={drawerOpen}
@@ -376,7 +366,7 @@ const Welcome = (): React.ReactElement => {
         <Box
           sx={{
             height: "100%",
-            width: "80%",
+            width: "100%",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
@@ -386,7 +376,7 @@ const Welcome = (): React.ReactElement => {
           <LoginComponent
             userRole={selectedRole as Role}
             isDrawerComponent
-            align="center"
+            signInPrompt="Don't have an account?"
           />
         </Box>
       </Drawer>
