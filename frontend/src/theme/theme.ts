@@ -8,7 +8,6 @@ import { TypographyStyleOptions } from "@mui/material/styles/createTypography";
 import { error, learner, administrator, facilitator, neutral } from "./palette";
 import "@fontsource/lexend-deca";
 
-
 // adding custom attributes to palette
 declare module "@mui/material/styles" {
   // allow configuration using `createTheme`
