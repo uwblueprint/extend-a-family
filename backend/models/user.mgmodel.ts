@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
-import { FacilitatorDTO, Role, Status } from "../types/userTypes";
+import { Role, Status } from "../types/userTypes";
 
 export interface User extends Document {
   id: ObjectId;
@@ -83,12 +83,15 @@ const LearnerSchema = new Schema({
   },
 });
 
-const Administrator = UserModel.discriminator(
+const AdministratorModel = UserModel.discriminator(
   "Administrator",
   AdministratorSchema,
 );
-const FacilitatorModel = UserModel.discriminator<Facilitator>("Facilitator", FacilitatorSchema);
+const FacilitatorModel = UserModel.discriminator<Facilitator>(
+  "Facilitator",
+  FacilitatorSchema,
+);
 const LearnerModel = UserModel.discriminator<Learner>("Learner", LearnerSchema);
 
-export { Administrator, FacilitatorModel, LearnerModel };
+export { AdministratorModel, FacilitatorModel, LearnerModel };
 export default UserModel;

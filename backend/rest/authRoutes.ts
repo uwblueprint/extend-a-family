@@ -15,7 +15,6 @@ import {
   updateTemporaryPasswordRequestValidator,
   updateUserStatusRequestValidator,
 } from "../middlewares/validators/authValidators";
-import * as firebaseAdmin from "firebase-admin"
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
 import EmailService from "../services/implementations/emailService";
@@ -208,24 +207,27 @@ authRouter.post(
         length: 20,
         numbers: true,
       });
-      const invitedLearnerUser = await userService.createLearner({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        role: "Learner",
-        password: temporaryPassword,
-        status: "Invited",
-      }, id);
+      const invitedLearnerUser = await userService.createLearner(
+        {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          email: req.body.email,
+          role: "Learner",
+          password: temporaryPassword,
+          status: "Invited",
+        },
+        req.body.facilitatorId,
+      );
       await authService.sendLearnerInvite(
         req.body.firstName,
         req.body.email,
-        temporaryPassword
+        temporaryPassword,
       );
       res.status(200).json(invitedLearnerUser);
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }
-  }
+  },
 );
 
 // /* Reset password through a "Forgot Password" option */

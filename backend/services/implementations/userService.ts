@@ -11,6 +11,7 @@ import {
   CreateUserDTO,
   LearnerDTO,
   Role,
+  Status,
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
