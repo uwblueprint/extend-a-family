@@ -18,6 +18,7 @@ export const learner: Palette = {
   98: "#F5FAFC",
   99: "#F7FDFF",
   100: "#FFFFFF",
+  light: "#F5FDFF",
   default: "#006877",
 };
 
@@ -36,6 +37,7 @@ export const administrator: Palette = {
   98: "#FFDBCF80",
   99: "#FFF7F5",
   100: "#FFFFFF",
+  light: "#FFDBCF",
   default: "#8F4C34",
 };
 
@@ -54,6 +56,7 @@ export const facilitator: Palette = {
   98: "#E0E0FF80",
   99: "#FFFBFF",
   100: "#FFFFFF",
+  light: "#E0E0FF80",
   default: "#555A92",
 };
 

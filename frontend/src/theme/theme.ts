@@ -138,10 +138,10 @@ const typography: TypographyOptions = {
     letterSpacing: "-0.25pt",
   },
   displayMedium: {
-    fontSize: "45pt",
+    fontSize: "36pt",
     fontWeight: 700,
-    lineHeight: "52pt",
-    letterSpacing: "0pt",
+    lineHeight: "39.6pt",
+    fontFamily: "Lexend Deca, sans-serif",
   },
   displaySmall: {
     fontSize: "36pt",
