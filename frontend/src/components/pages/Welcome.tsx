@@ -18,7 +18,7 @@ import AuthContext from "../../contexts/AuthContext";
 
 import background from "../assets/backgroundImage.png";
 import icon from "../assets/icon.png";
-import LoginComponent from "../auth/LoginComponent";
+import Login from "../auth/Login";
 import { Role } from "../../types/AuthTypes";
 import { administrator, facilitator, learner } from "../../theme/palette";
 import { PaletteRole } from "../../theme/theme";
@@ -71,13 +71,12 @@ const Welcome = (): React.ReactElement => {
 
   const CustomButton: React.FC<CustomButtonProps> = ({ role, buttonText }) => {
     return (
-      <Container
+      <Box
         sx={{
           display: "flex",
           width: "100%",
           height: "100%",
         }}
-        disableGutters
       >
         <Button
           sx={{
@@ -89,6 +88,7 @@ const Welcome = (): React.ReactElement => {
             alignItems: "center",
             padding: "32px",
             textTransform: "none",
+            borderRadius: "0",
           }}
           onClick={() => handleButtonClick(role)}
         >
@@ -102,7 +102,7 @@ const Welcome = (): React.ReactElement => {
           </Typography>
           <ArrowForwardIcon sx={{ color: "black" }} />
         </Button>
-      </Container>
+      </Box>
     );
   };
 
@@ -211,6 +211,8 @@ const Welcome = (): React.ReactElement => {
           height: "100%",
           position: "relative",
           textAlign: "left",
+          borderRadius: "0",
+          boxShadow: "none",
         }}
       >
         <CardMedia
@@ -232,17 +234,7 @@ const Welcome = (): React.ReactElement => {
             alt="icon"
             style={{ paddingBottom: "10px", width: "100px" }}
           />
-          <Typography
-            style={{
-              fontSize: "36px",
-              fontWeight: 700,
-              lineHeight: "39.6px",
-              letterSpacing: "0.4px",
-              fontFamily: "Lexend Deca, sans-serif",
-              color: "white",
-            }}
-            component="div"
-          >
+          <Typography variant="displayMedium" component="div">
             {title}
           </Typography>
         </Box>
@@ -258,6 +250,7 @@ const Welcome = (): React.ReactElement => {
   return (
     <Container
       style={{
+        maxWidth: "100vw",
         minWidth: "1136px",
         minHeight: "100vh",
         width: "100%",
@@ -267,16 +260,17 @@ const Welcome = (): React.ReactElement => {
         alignItems: "center",
         textAlign: "left",
         padding: "120px 120px 0 120px",
+        margin: "0 auto",
       }}
+      disableGutters
     >
-      <Container
+      <Box
         sx={{
           width: "100%",
           maxHeight: "749px",
           flexDirection: "column",
           justifyContent: "center",
         }}
-        disableGutters
       >
         {/* Splash and Login */}
         <Container
@@ -291,36 +285,31 @@ const Welcome = (): React.ReactElement => {
           }}
           disableGutters
         >
-          {/* Container for ImageOverlay with 50% width */}
-          <Container
+          {/* Image Overlay */}
+          <Box
             sx={{
               width: "calc(50%)",
               height: "640px",
               display: "flex",
             }}
-            disableGutters
           >
             <ImageOverlay
               backgroundImage={background}
               iconImage={icon}
               title="Smart Saving, Smart Spending"
             />
-          </Container>
+          </Box>
 
-          {/* Container for LoginComponent with 50% width */}
-          <Container
+          {/* Login Component */}
+          <Box
             sx={{
               width: "calc(50% - 10px)",
               height: "640px",
               display: "flex",
             }}
-            disableGutters
           >
-            <LoginComponent
-              userRole={"Learner" as Role}
-              isDrawerComponent={false}
-            />
-          </Container>
+            <Login userRole={"Learner" as Role} isDrawerComponent={false} />
+          </Box>
         </Container>
 
         {/* Buttons */}
@@ -336,20 +325,20 @@ const Welcome = (): React.ReactElement => {
           className="button-container"
           disableGutters
         >
-          <Container style={{ width: "50%" }} disableGutters>
+          <Box style={{ width: "50%" }}>
             <CustomButton
               role={PaletteRole.Facilitator}
               buttonText="Are you a facilitator?"
             />
-          </Container>
-          <Container style={{ width: "50%" }} disableGutters>
+          </Box>
+          <Box style={{ width: "50%" }}>
             <CustomButton
               role={PaletteRole.Administrator}
               buttonText="Are you an administrator?"
             />
-          </Container>
+          </Box>
         </Container>
-      </Container>
+      </Box>
 
       <Container
         style={{
@@ -365,13 +354,13 @@ const Welcome = (): React.ReactElement => {
           title="Learners"
           description="The person who is learning about money."
           instruction="Ask a facilitator to setup your account."
-          backgroundColor={learner[98]}
+          backgroundColor={learner.light}
           borderColor={theme.palette.learner.main}
         />
         <InfoBox
           title="Facilitators"
           description="The person who is helping people learn about money."
-          backgroundColor={facilitator[98]}
+          backgroundColor={facilitator.light}
           borderColor={theme.palette.facilitator.main}
           signUpRedirect
         />
@@ -409,7 +398,7 @@ const Welcome = (): React.ReactElement => {
           }}
         >
           {drawerOpen && (
-            <LoginComponent
+            <Login
               userRole={selectedRole as Role}
               isDrawerComponent
               signUpPrompt={getSignUpPrompt(selectedRole)}
