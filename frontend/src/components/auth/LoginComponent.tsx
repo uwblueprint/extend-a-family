@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Redirect } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import {
   Box,
   Button,
@@ -23,18 +23,21 @@ import { PaletteRole } from "../../theme/theme";
 interface LoginProps {
   userRole: Role;
   isDrawerComponent: boolean;
-  signInPrompt?: string;
+  signUpPrompt?: string;
+  signUpPath?: string;
 }
 const LoginComponent: React.FC<LoginProps> = ({
   userRole,
   isDrawerComponent,
-  signInPrompt,
+  signUpPrompt,
+  signUpPath,
 }: LoginProps): React.ReactElement => {
   const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
   const [loginError, setLoginError] = useState<PresentableError>();
   const [emailError, setEmailError] = useState<PresentableError>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showDrawerLogin, setShowDrawerLogin] = useState<boolean>(true);
 
   const theme = useTheme();
   if (authenticatedUser) {
@@ -64,6 +67,48 @@ const LoginComponent: React.FC<LoginProps> = ({
     }
   };
 
+  const handleTextClick = () => {
+    setShowDrawerLogin(false);
+  };
+
+  const redirectSignUpPath = (): boolean => {
+    if (signUpPath) {
+      return !!signUpPrompt;
+    }
+    return false;
+  };
+
+  interface InfoTextProps {
+    title: string;
+    description: string;
+  }
+  const InfoText: React.FC<InfoTextProps> = ({ title, description }) => {
+    return (
+      <Box>
+        <Box>
+          <Typography
+            variant="headlineLarge"
+            style={{
+              color: "#390C00",
+            }}
+          >
+            {title}
+          </Typography>
+        </Box>
+        <Box marginTop="12px">
+          <Typography
+            variant="bodyMedium"
+            style={{
+              color: "#390C00",
+            }}
+          >
+            {description}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  };
+
   const DrawerComponent = () => {
     return (
       <Container
@@ -77,158 +122,193 @@ const LoginComponent: React.FC<LoginProps> = ({
         }}
         disableGutters
       >
-        <Box sx={{ textAlign: "center" }}>
-          <Typography
-            variant="headlineLarge"
-            style={{
-              color: "black",
-            }}
-          >
-            {capitalizeFirstLetter(userRole)} Login
-          </Typography>
-        </Box>
-        {loginError && (
-          <div
-            style={{
-              backgroundColor: "lavenderblush",
-              display: "inline-block",
-              textAlign: "center",
-            }}
-          >
-            <strong>{loginError.title?.()}</strong>
-            <br />
-            {loginError.text()}
-          </div>
-        )}
-        <form>
-          <Box
-            sx={{
-              margin: "40px 0 40px 0",
-            }}
-          >
-            <TextField
-              required
-              label="Email"
-              type="email"
-              InputProps={{
-                sx: {
-                  fontSize: "16px",
-                  fontWeight: 400,
-                  lineHeight: "22.4px",
-                  letterSpacing: "0.2px",
-                  fontFamily: "Lexend Deca, sans-serif",
-                },
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <AlternateEmail />
-                  </InputAdornment>
-                ),
-              }}
-              placeholder="example@gmail.com"
-              onChange={(event) => setEmail(event.target.value)}
-              variant="outlined"
-              fullWidth
-              margin="none"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignSelf: "stretch",
-                maxHeight: "56px",
-              }}
-            />
-            {emailError && <p style={{ color: "red" }}>{emailError.text()}</p>}
-          </Box>
-          <Box
-            sx={{
-              marginBottom: "8px",
-            }}
-          >
-            <TextField
-              required
-              label="Password"
-              type="password"
-              onChange={(event) => setPassword(event.target.value)}
-              variant="outlined"
-              fullWidth
-              margin="none"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignSelf: "stretch",
-                maxHeight: "56px",
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Password />
-                  </InputAdornment>
-                ),
-              }}
-              placeholder="Your Password"
-            />
-          </Box>
-          <Box sx={{ textAlign: "right" }}>
-            <Typography
-              variant="bodySmall"
-              style={{
-                color:
-                  theme.palette[userRole.toLowerCase() as PaletteRole]?.main ||
-                  "primary",
-              }}
-            >
-              Forgot Password
-            </Typography>
-          </Box>
-        </form>
-        <Box
-          sx={{
-            width: "100%",
-            height: "59px",
-            marginTop: "40px",
-          }}
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={onLogInClick}
-            style={{
-              height: "59px",
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: "4px",
-              backgroundColor:
-                theme.palette[userRole.toLowerCase() as PaletteRole]?.main ||
-                "primary",
-              marginBottom: "20px",
-            }}
-          >
-            <Typography
-              variant="labelLargeProminent"
-              style={{
-                color: "white",
-              }}
-            >
-              Login as {userRole}
-            </Typography>
-          </Button>
-          <Box sx={{ textAlign: "center" }}>
-            {signInPrompt && (
+        {showDrawerLogin && (
+          <Box>
+            <Box sx={{ textAlign: "center" }}>
               <Typography
-                variant="labelSmall"
+                variant="headlineLarge"
                 style={{
-                  color:
-                    theme.palette[userRole.toLowerCase() as PaletteRole]
-                      ?.main || "primary",
+                  color: "black",
                 }}
               >
-                {signInPrompt}
+                {capitalizeFirstLetter(userRole)} Login
               </Typography>
+            </Box>
+            {loginError && (
+              <div
+                style={{
+                  backgroundColor: "lavenderblush",
+                  display: "inline-block",
+                  textAlign: "center",
+                }}
+              >
+                <strong>{loginError.title?.()}</strong>
+                <br />
+                {loginError.text()}
+              </div>
             )}
+            <form>
+              <Box
+                sx={{
+                  margin: "40px 0 40px 0",
+                }}
+              >
+                <TextField
+                  required
+                  label="Email"
+                  type="email"
+                  InputProps={{
+                    sx: {
+                      fontSize: "16px",
+                      fontWeight: 400,
+                      lineHeight: "22.4px",
+                      letterSpacing: "0.2px",
+                      fontFamily: "Lexend Deca, sans-serif",
+                    },
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AlternateEmail />
+                      </InputAdornment>
+                    ),
+                  }}
+                  placeholder="example@gmail.com"
+                  onChange={(event) => setEmail(event.target.value)}
+                  variant="outlined"
+                  fullWidth
+                  margin="none"
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignSelf: "stretch",
+                    maxHeight: "56px",
+                  }}
+                />
+                {emailError && (
+                  <p style={{ color: "red" }}>{emailError.text()}</p>
+                )}
+              </Box>
+              <Box
+                sx={{
+                  marginBottom: "8px",
+                }}
+              >
+                <TextField
+                  required
+                  label="Password"
+                  type="password"
+                  onChange={(event) => setPassword(event.target.value)}
+                  variant="outlined"
+                  fullWidth
+                  margin="none"
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignSelf: "stretch",
+                    maxHeight: "56px",
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Password />
+                      </InputAdornment>
+                    ),
+                  }}
+                  placeholder="Your Password"
+                />
+              </Box>
+              <Box sx={{ textAlign: "right" }}>
+                <Typography
+                  variant="bodySmall"
+                  style={{
+                    color:
+                      theme.palette[userRole.toLowerCase() as PaletteRole]
+                        ?.main || "primary",
+                  }}
+                >
+                  Forgot Password
+                </Typography>
+              </Box>
+            </form>
+            <Box
+              sx={{
+                width: "100%",
+                height: "59px",
+                marginTop: "40px",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={onLogInClick}
+                style={{
+                  height: "59px",
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "4px",
+                  backgroundColor:
+                    theme.palette[userRole.toLowerCase() as PaletteRole]
+                      ?.main || "primary",
+                  marginBottom: "20px",
+                }}
+              >
+                <Typography
+                  variant="labelLargeProminent"
+                  style={{
+                    color: "white",
+                  }}
+                >
+                  Login as {userRole}
+                </Typography>
+              </Button>
+              {redirectSignUpPath() && (
+                <Box sx={{ textAlign: "center" }}>
+                  <Link
+                    to={signUpPath as string}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Typography
+                      variant="labelSmall"
+                      style={{
+                        color:
+                          theme.palette[userRole.toLowerCase() as PaletteRole]
+                            ?.main || "primary",
+                      }}
+                    >
+                      {signUpPrompt}
+                    </Typography>
+                  </Link>
+                </Box>
+              )}
+              {!redirectSignUpPath() && (
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography
+                    variant="labelSmall"
+                    style={{
+                      color:
+                        theme.palette[userRole.toLowerCase() as PaletteRole]
+                          ?.main || "primary",
+                    }}
+                    onClick={handleTextClick}
+                    sx={{
+                      cursor: "pointer",
+                    }}
+                  >
+                    {signUpPrompt}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           </Box>
-        </Box>
+        )}
+        {!showDrawerLogin && (
+          <InfoText
+            title="Contact an administrator"
+            description="Please contact an existing administrator to set up your account."
+          />
+        )}
       </Container>
     );
   };

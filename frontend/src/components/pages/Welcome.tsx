@@ -37,6 +37,33 @@ const Welcome = (): React.ReactElement => {
     setDrawerOpen(true);
   };
 
+  const getSignUpPrompt = (role: string): string | undefined => {
+    if (role === "administrator") {
+      return "Don't have an account?";
+    }
+
+    if (role === "facilitator") {
+      return "Sign up as facilitator";
+    }
+
+    return undefined;
+  };
+
+  const getSignUpPath = (role: string): unknown | undefined => {
+    if (role === "administrator") {
+      return undefined;
+    }
+
+    if (role === "facilitator") {
+      return {
+        pathname: SIGNUP_PAGE,
+        search: `?role=facilitator`,
+      };
+    }
+
+    return undefined;
+  };
+
   interface CustomButtonProps {
     role: PaletteRole;
     buttonText: string;
@@ -99,7 +126,6 @@ const Welcome = (): React.ReactElement => {
       <Box
         sx={{
           width: "100%",
-          minWidth: "280px",
           maxWidth: "386.67px",
           maxHeight: "100%",
           height: "auto",
@@ -118,7 +144,14 @@ const Welcome = (): React.ReactElement => {
         }}
       >
         <Box>
-          <Typography variant="headlineMedium" style={{ color: "black" }}>
+          <Typography
+            variant="headlineMedium"
+            style={{
+              color: "black",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
             {title}
           </Typography>
         </Box>
@@ -144,17 +177,14 @@ const Welcome = (): React.ReactElement => {
             <Typography variant="bodyMedium" sx={{ color: "black" }}>
               Create a new account by signing up{" "}
             </Typography>
-            <Typography
-              variant="bodyMedium"
-              sx={{
-                color: "primary.main",
-                cursor: "pointer",
-                textDecoration: "underline",
+            <Link
+              to={{
+                pathname: SIGNUP_PAGE,
+                search: `?role=facilitator`,
               }}
-              onClick={() => <Link to={SIGNUP_PAGE} />}
             >
-              here
-            </Typography>
+              <Typography variant="bodyMedium">here</Typography>
+            </Link>
             <Typography variant="bodyMedium" sx={{ color: "black" }}>
               .
             </Typography>
@@ -228,6 +258,7 @@ const Welcome = (): React.ReactElement => {
   return (
     <Container
       style={{
+        minWidth: "1136px",
         minHeight: "100vh",
         width: "100%",
         display: "flex",
@@ -305,14 +336,18 @@ const Welcome = (): React.ReactElement => {
           className="button-container"
           disableGutters
         >
-          <CustomButton
-            role={PaletteRole.Facilitator}
-            buttonText="Are you a facilitator?"
-          />
-          <CustomButton
-            role={PaletteRole.Administrator}
-            buttonText="Are you an administrator?"
-          />
+          <Container style={{ width: "50%" }} disableGutters>
+            <CustomButton
+              role={PaletteRole.Facilitator}
+              buttonText="Are you a facilitator?"
+            />
+          </Container>
+          <Container style={{ width: "50%" }} disableGutters>
+            <CustomButton
+              role={PaletteRole.Administrator}
+              buttonText="Are you an administrator?"
+            />
+          </Container>
         </Container>
       </Container>
 
@@ -373,11 +408,14 @@ const Welcome = (): React.ReactElement => {
             alignItems: "center",
           }}
         >
-          <LoginComponent
-            userRole={selectedRole as Role}
-            isDrawerComponent
-            signInPrompt="Don't have an account?"
-          />
+          {drawerOpen && (
+            <LoginComponent
+              userRole={selectedRole as Role}
+              isDrawerComponent
+              signUpPrompt={getSignUpPrompt(selectedRole)}
+              signUpPath={getSignUpPath(selectedRole) as string}
+            />
+          )}
         </Box>
       </Drawer>
     </Container>
