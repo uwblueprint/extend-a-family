@@ -1,81 +1,143 @@
-import React, { useContext, useState } from "react";
-import { Redirect, useHistory } from "react-router-dom";
-import { HOME_PAGE } from "../../constants/Routes";
-import AuthAPIClient from "../../APIClients/AuthAPIClient";
-import AuthContext from "../../contexts/AuthContext";
-import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
+import React, { useState } from "react";
+import {
+  Container,
+  Typography,
+  TextField,
+  InputAdornment,
+  Button,
+} from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock"; // Import for icon used in TextField
 
 const CreatePasswordPage = (): React.ReactElement => {
-  const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
   const [newPassword, setNewPassword] = useState("");
-  const history = useHistory();
 
-  if (authenticatedUser?.status !== "Invited") {
-    return <Redirect to={HOME_PAGE} />;
-  }
-
-  const onSubmitNewPasswordClick = async () => {
-    const changePasswordSuccess = await AuthAPIClient.updateTemporaryPassword(
-      authenticatedUser.email,
-      newPassword,
-      authenticatedUser.role,
-    );
-    if (!changePasswordSuccess) {
-      setAuthenticatedUser(null);
-      localStorage.removeItem(AUTHENTICATED_USER_KEY);
-      await AuthAPIClient.logout(authenticatedUser.id);
-
-      // change this later to not use an alert
-      // eslint-disable-next-line no-alert
-      alert("Error occurred when changing your password. Please log in again.");
-      return;
-    }
-
-    const updateStatusSuccess = await AuthAPIClient.updateUserStatus("Active");
-    if (!updateStatusSuccess) {
-      // change this later to not use an alert
-      // eslint-disable-next-line no-alert
-      alert('Failed to update user status to "Active"');
-      return;
-    }
-
-    setAuthenticatedUser({
-      ...authenticatedUser,
-      status: "Active",
-    });
-
-    history.push(HOME_PAGE);
+  const onSubmitNewPasswordClick = () => {
+    alert("Password updated (placeholder functionality).");
   };
 
   return (
-    <div style={{ textAlign: "center", padding: "1em" }}>
-      <h1>Choose a New Password</h1>
-      <div style={{ marginBottom: "0.5em" }}>
-        Since this is your first time logging in, please choose a new password.
-      </div>
-      <div
-        style={{
+    <Container
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        width: "100vw",
+      }}
+    >
+      <Container
+        sx={{
           display: "flex",
-          flexDirection: "row",
-          gap: "0.5em",
-          justifyContent: "center",
+          width: 548,
+          flexDirection: "column",
+          gap: 4,
+          padding: 0,
         }}
       >
-        <input
-          type="password"
-          value={newPassword}
-          onChange={(event) => setNewPassword(event.target.value)}
-          placeholder="New Password"
-        />
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={onSubmitNewPasswordClick}
+        <Container
+          sx={{
+            display: "flex",
+            paddingBottom: 2,
+            flexDirection: "column",
+            width: 548,
+            justifyContent: "center",
+            alignItems: "flex-start",
+            gap: 1,
+            padding: 0,
+            marginLeft: -3,
+          }}
         >
-          Update Password
-        </button>
-      </div>
-    </div>
+          <Typography
+            variant="headlineLarge"
+            gutterBottom
+            sx={{
+              fontSize: (theme) => theme.typography.headlineMedium?.fontSize,
+              fontWeight: (theme) =>
+                theme.typography.headlineLarge?.fontWeight,
+              lineHeight: (theme) =>
+                theme.typography.headlineLarge?.lineHeight,
+              color: "#000",
+            }}
+          >
+            Create Password
+          </Typography>
+        </Container>
+        <form>
+          <TextField
+            label="New password"
+            variant="outlined"
+            type="password"
+            fullWidth
+            margin="normal"
+            placeholder="Your new password"
+            value={newPassword}
+            onChange={(event) => setNewPassword(event.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon />
+                </InputAdornment>
+              ),
+              sx: {
+                fontSize: (theme) => theme.typography.bodyLarge?.fontSize,
+                fontWeight: (theme) => theme.typography.bodyLarge?.fontWeight,
+                lineHeight: (theme) => theme.typography.bodyLarge?.lineHeight,
+                letterSpacing: 0.2,
+                color: (theme) => theme.palette.learner.dark,
+              },
+            }}
+            InputLabelProps={{
+              sx: {
+                color: (theme) => theme.palette.learner.main,
+                fontWeight: (theme) =>
+                  theme.typography.bodyLarge?.fontWeight,
+                lineHeight: (theme) =>
+                  theme.typography.bodyLarge?.lineHeight,
+                letterSpacing: 0.32,
+              },
+            }}
+          />
+          <Container
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <Button
+              variant="contained"
+              color="learner"
+              onClick={onSubmitNewPasswordClick}
+              sx={{
+                padding: "20px 24px",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 1,
+                borderRadius: 1,
+                width: 500,
+                backgroundColor: (theme) => theme.palette.learner.main,
+                color: (theme) => theme.palette.learner.light,
+                fontSize: (theme) => theme.typography.bodyLarge?.fontSize,
+                fontWeight: (theme) => theme.typography.titleSmall?.fontWeight,
+                lineHeight: (theme) => theme.typography.bodyLarge?.lineHeight,
+                letterSpacing: 0.08,
+                textTransform: "none",
+                marginTop: 4,
+                "&:hover": {
+                  backgroundColor: "#002A32",
+                },
+                "&:active": {
+                  backgroundColor: (theme) => theme.palette.learner.dark,
+                },
+              }}
+            >
+              Create Password
+            </Button>
+          </Container>
+        </form>
+      </Container>
+    </Container>
   );
 };
 

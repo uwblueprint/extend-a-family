@@ -110,7 +110,7 @@ const App = (): React.ReactElement => {
                   exact
                   path={Routes.CREATE_PASSWORD_PAGE}
                   component={CreatePasswordPage}
-                  allowedRoles={["Administrator", "Learner"]}
+                  allowedRoles={["Administrator", "Facilitator", "Learner",]}
                 />
                 <PrivateRoute
                   exact
