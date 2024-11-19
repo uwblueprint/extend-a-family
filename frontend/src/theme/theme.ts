@@ -85,17 +85,17 @@ declare module "@mui/material/Typography" {
 const lightThemePalette: PaletteOptions = {
   mode: "light",
   learner: {
-    main: learner[40],
+    main: learner.default,
     light: learner[90], // container - corresponds to Figma design document
     dark: learner[10], // on container
   },
   administrator: {
-    main: administrator[40],
+    main: administrator.default,
     light: administrator[90],
     dark: administrator[10],
   },
   facilitator: {
-    main: facilitator[40],
+    main: facilitator.default,
     light: facilitator[90],
     dark: facilitator[10],
   },
