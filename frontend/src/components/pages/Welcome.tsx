@@ -17,7 +17,7 @@ import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 
 import background from "../assets/backgroundImage.png";
-import icon from "../assets/icon.png";
+import logo from "../assets/logoWhite.png";
 import Login from "../auth/Login";
 import { Role } from "../../types/AuthTypes";
 import { administrator, facilitator, learner } from "../../theme/palette";
@@ -295,7 +295,7 @@ const Welcome = (): React.ReactElement => {
           >
             <ImageOverlay
               backgroundImage={background}
-              iconImage={icon}
+              iconImage={logo}
               title="Smart Saving, Smart Spending"
             />
           </Box>

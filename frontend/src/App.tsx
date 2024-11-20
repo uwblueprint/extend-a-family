@@ -4,7 +4,7 @@ import React, { useState, useReducer, useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Welcome from "./components/pages/Welcome";
 import Login from "./components/auth/Login";
-import Signup from "./components/auth/Signup";
+import Signup from "./components/pages/Signup";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import Default from "./components/pages/Default";
 import CreateModulePage from "./components/pages/CreateModulePage";
