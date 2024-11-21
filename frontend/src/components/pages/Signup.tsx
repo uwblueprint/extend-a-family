@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
-
 import {
   Box,
   Button,
   Container,
+  Drawer,
+  IconButton,
   InputAdornment,
   Link,
   Stack,
@@ -12,12 +13,19 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { AlternateEmail, BadgeOutlined, Password } from "@mui/icons-material";
+import {
+  AlternateEmail,
+  BadgeOutlined,
+  Password,
+  Close,
+} from "@mui/icons-material";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import logo from "../assets/logoColoured.png";
+import { getSignUpPath, getSignUpPrompt } from "./Welcome";
+import Login from "../auth/Login";
 
 const Signup = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
@@ -26,6 +34,8 @@ const Signup = (): React.ReactElement => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
 
   const onSignupClick = async () => {
     const user: AuthenticatedUser | null = await authAPIClient.signup(
@@ -224,7 +234,18 @@ const Signup = (): React.ReactElement => {
                   Not a facilitator?
                 </Typography>
               </Link>
-              <Link href={WELCOME_PAGE}>
+              <Button
+                variant="text"
+                onClick={() => setLoginDrawerOpen(true)}
+                sx={{
+                  position: "absolute",
+                  right: 0,
+                  width: "50%",
+                  "&:hover": {
+                    bgcolor: "transparent",
+                  },
+                }}
+              >
                 <Typography
                   sx={{
                     ...theme.typography.labelSmall,
@@ -235,11 +256,53 @@ const Signup = (): React.ReactElement => {
                 >
                   Already have an account?
                 </Typography>
-              </Link>
+              </Button>
             </Stack>
           </Box>
         </Box>
       </Box>
+
+      <Drawer
+        PaperProps={{
+          sx: { maxWidth: "560px", width: "100%" },
+        }}
+        anchor="right"
+        open={loginDrawerOpen}
+        onClose={() => setLoginDrawerOpen(false)}
+        style={{
+          position: "relative",
+        }}
+      >
+        <IconButton
+          onClick={() => setLoginDrawerOpen(false)}
+          style={{
+            position: "absolute",
+            right: 56,
+            top: 56,
+          }}
+        >
+          <Close />
+        </IconButton>
+        <Box
+          sx={{
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {loginDrawerOpen && (
+            <Login
+              userRole="Facilitator"
+              isDrawerComponent
+              signUpPrompt={getSignUpPrompt("facilitator")}
+              signUpPath={getSignUpPath("facilitator")}
+            />
+          )}
+        </Box>
+      </Drawer>
     </Container>
   );
 };

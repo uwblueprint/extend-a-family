@@ -1,9 +1,10 @@
 import React, { useContext, useState } from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import {
   Box,
   Button,
   Container,
+  Link,
   TextField,
   Typography,
   useTheme,
@@ -11,7 +12,7 @@ import {
 import { AlternateEmail, Password } from "@mui/icons-material";
 import InputAdornment from "@mui/material/InputAdornment";
 import authAPIClient from "../../APIClients/AuthAPIClient";
-import { HOME_PAGE } from "../../constants/Routes";
+import { FORGOT_PASSWORD_PAGE, HOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser, Role } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
@@ -217,16 +218,18 @@ const Login: React.FC<LoginProps> = ({
                 />
               </Box>
               <Box sx={{ textAlign: "right" }}>
-                <Typography
-                  variant="bodySmall"
-                  style={{
-                    color:
-                      theme.palette[userRole.toLowerCase() as PaletteRole]
-                        ?.main || "primary",
-                  }}
-                >
-                  Forgot Password
-                </Typography>
+                <Link href={FORGOT_PASSWORD_PAGE} underline="none">
+                  <Typography
+                    variant="bodySmall"
+                    style={{
+                      color:
+                        theme.palette[userRole.toLowerCase() as PaletteRole]
+                          ?.main || "primary",
+                    }}
+                  >
+                    Forgot Password
+                  </Typography>
+                </Link>
               </Box>
             </form>
             <Box
@@ -267,15 +270,16 @@ const Login: React.FC<LoginProps> = ({
               {redirectSignUpPath() && (
                 <Box sx={{ textAlign: "center" }}>
                   <Link
-                    to={signUpPath as string}
+                    href={signUpPath as string}
                     style={{ textDecoration: "none" }}
                   >
                     <Typography
-                      variant="labelSmall"
+                      variant="bodySmall"
                       style={{
                         color:
                           theme.palette[userRole.toLowerCase() as PaletteRole]
                             ?.main || "primary",
+                        textTransform: "uppercase",
                       }}
                     >
                       {signUpPrompt}
@@ -425,14 +429,16 @@ const Login: React.FC<LoginProps> = ({
               />
             </Box>
             <Box sx={{ textAlign: "right" }}>
-              <Typography
-                variant="bodySmall"
-                style={{
-                  color: theme.palette.learner.main,
-                }}
-              >
-                Forgot Password
-              </Typography>
+              <Link href={FORGOT_PASSWORD_PAGE} underline="none">
+                <Typography
+                  variant="bodySmall"
+                  style={{
+                    color: theme.palette.learner.main,
+                  }}
+                >
+                  Forgot Password
+                </Typography>
+              </Link>
             </Box>
           </form>
           <Box
@@ -459,7 +465,7 @@ const Login: React.FC<LoginProps> = ({
               }}
             >
               <Typography
-                variant="headlineSmall"
+                variant="titleLarge"
                 style={{
                   color: "white",
                 }}

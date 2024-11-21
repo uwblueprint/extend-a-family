@@ -8,20 +8,25 @@ import { TypographyStyleOptions } from "@mui/material/styles/createTypography";
 import { error, learner, administrator, facilitator, neutral } from "./palette";
 import "@fontsource/lexend-deca";
 
+interface CustomPaletteColorOptions extends SimplePaletteColorOptions {
+  light: string;
+  dark: string;
+}
+
 // adding custom attributes to palette
 declare module "@mui/material/styles" {
   // allow configuration using `createTheme`
   interface PaletteOptions {
     // Figma: primary colour palette
-    learner: SimplePaletteColorOptions;
+    learner: CustomPaletteColorOptions;
 
     // Figma: secondary colour palette
-    administrator: SimplePaletteColorOptions;
+    administrator: CustomPaletteColorOptions;
 
     // Figma: tertiary colour palette
-    facilitator: SimplePaletteColorOptions;
+    facilitator: CustomPaletteColorOptions;
 
-    neutral: SimplePaletteColorOptions;
+    neutral: CustomPaletteColorOptions;
   }
 
   interface TypographyOptions {
@@ -88,7 +93,7 @@ const lightThemePalette: PaletteOptions = {
   mode: "light",
   learner: {
     main: learner[40],
-    light: learner[90], // container - corresponds to Figma design document
+    light: learner[98], // container - corresponds to Figma design document
     dark: learner[10], // on container
   },
   administrator: {
@@ -185,6 +190,7 @@ const typography: TypographyOptions = {
     fontWeight: 600,
     lineHeight: "28px",
     letterSpacing: "0px",
+    textTransform: "none",
   },
   titleMedium: {
     fontSize: "16px",
