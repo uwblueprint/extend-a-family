@@ -6,22 +6,37 @@ import {
   Container,
   Drawer,
   IconButton,
+  Link,
   Typography,
   useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import React, { useContext, useState } from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
-
 import background from "../assets/backgroundImage.png";
 import logo from "../assets/logoWhite.png";
 import Login from "../auth/Login";
 import { Role } from "../../types/AuthTypes";
-import { administrator, facilitator, learner } from "../../theme/palette";
 import { PaletteRole } from "../../theme/theme";
+
+export const getSignUpPrompt = (role: string): string | undefined => {
+  if (role === "administrator") {
+    return "Don't have an account?";
+  }
+
+  if (role === "facilitator") {
+    return "Sign up as a facilitator";
+  }
+
+  return undefined;
+};
+
+export const getSignUpPath = (role: string): string => {
+  return role === "facilitator" ? SIGNUP_PAGE : "";
+};
 
 const Welcome = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
@@ -35,33 +50,6 @@ const Welcome = (): React.ReactElement => {
   const handleButtonClick = (role: string) => {
     setSelectedRole(role);
     setDrawerOpen(true);
-  };
-
-  const getSignUpPrompt = (role: string): string | undefined => {
-    if (role === "administrator") {
-      return "Don't have an account?";
-    }
-
-    if (role === "facilitator") {
-      return "Sign up as facilitator";
-    }
-
-    return undefined;
-  };
-
-  const getSignUpPath = (role: string): unknown | undefined => {
-    if (role === "administrator") {
-      return undefined;
-    }
-
-    if (role === "facilitator") {
-      return {
-        pathname: SIGNUP_PAGE,
-        search: `?role=facilitator`,
-      };
-    }
-
-    return undefined;
   };
 
   interface CustomButtonProps {
@@ -177,12 +165,7 @@ const Welcome = (): React.ReactElement => {
             <Typography variant="bodyMedium" sx={{ color: "black" }}>
               Create a new account by signing up{" "}
             </Typography>
-            <Link
-              to={{
-                pathname: SIGNUP_PAGE,
-                search: `?role=facilitator`,
-              }}
-            >
+            <Link href={SIGNUP_PAGE} color="inherit">
               <Typography variant="bodyMedium">here</Typography>
             </Link>
             <Typography variant="bodyMedium" sx={{ color: "black" }}>
@@ -234,7 +217,7 @@ const Welcome = (): React.ReactElement => {
             alt="icon"
             style={{ paddingBottom: "10px", width: "100px" }}
           />
-          <Typography variant="displayMedium" component="div">
+          <Typography variant="displaySmall" component="div" maxWidth="300px">
             {title}
           </Typography>
         </Box>
@@ -281,7 +264,7 @@ const Welcome = (): React.ReactElement => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "stretch",
-            backgroundColor: learner[98],
+            backgroundColor: theme.palette.learner.light,
           }}
           disableGutters
         >
@@ -354,13 +337,13 @@ const Welcome = (): React.ReactElement => {
           title="Learners"
           description="The person who is learning about money."
           instruction="Ask a facilitator to setup your account."
-          backgroundColor={learner.light}
+          backgroundColor={theme.palette.learner.light}
           borderColor={theme.palette.learner.main}
         />
         <InfoBox
           title="Facilitators"
           description="The person who is helping people learn about money."
-          backgroundColor={facilitator.light}
+          backgroundColor={`${theme.palette.facilitator.light}50`}
           borderColor={theme.palette.facilitator.main}
           signUpRedirect
         />
@@ -368,7 +351,7 @@ const Welcome = (): React.ReactElement => {
           title="Administrator"
           description="The person who monitors the program."
           instruction="Ask an existing administrator to help setup your account."
-          backgroundColor={administrator[98]}
+          backgroundColor={`${theme.palette.administrator.light}50`}
           borderColor={theme.palette.administrator.main}
         />
       </Container>
@@ -380,10 +363,17 @@ const Welcome = (): React.ReactElement => {
         anchor="right"
         open={drawerOpen}
         onClose={closeDrawer}
+        style={{
+          position: "relative",
+        }}
       >
         <IconButton
           onClick={closeDrawer}
-          style={{ position: "absolute", right: 0 }}
+          style={{
+            position: "absolute",
+            right: 56,
+            top: 56,
+          }}
         >
           <CloseIcon />
         </IconButton>
@@ -402,7 +392,7 @@ const Welcome = (): React.ReactElement => {
               userRole={selectedRole as Role}
               isDrawerComponent
               signUpPrompt={getSignUpPrompt(selectedRole)}
-              signUpPath={getSignUpPath(selectedRole) as string}
+              signUpPath={getSignUpPath(selectedRole)}
             />
           )}
         </Box>

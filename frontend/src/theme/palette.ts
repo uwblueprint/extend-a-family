@@ -15,7 +15,7 @@ export const learner: Palette = {
   80: "#6CD5EA",
   90: "#A4EEFF",
   95: "#D5F7FF",
-  98: "#F5FAFC",
+  98: "#F5FDFF",
   99: "#F7FDFF",
   100: "#FFFFFF",
 };
@@ -30,7 +30,7 @@ export const administrator: Palette = {
   60: "#EE6835",
   70: "#F78C61",
   80: "#FAB59A",
-  90: "#FCDCCF",
+  90: "#FFD9CC",
   95: "#FDEDE8",
   98: "#FFDBCF80",
   99: "#FFF7F5",

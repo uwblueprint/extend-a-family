@@ -13,7 +13,7 @@ import { useHistory, Redirect } from "react-router-dom";
 import AuthContext from "../../../contexts/AuthContext";
 import ForgotPasswordConfirmation from "./ForgotPasswordConfirmation";
 import authAPIClient from "../../../APIClients/AuthAPIClient";
-import { LOGIN_PAGE, HOME_PAGE } from "../../../constants/Routes";
+import { HOME_PAGE, WELCOME_PAGE } from "../../../constants/Routes";
 
 const ForgotPasswordPage = (): React.ReactElement => {
   const [email, setEmail] = useState("");
@@ -43,7 +43,7 @@ const ForgotPasswordPage = (): React.ReactElement => {
   };
 
   const handleBackToLogin = () => {
-    history.push(LOGIN_PAGE);
+    history.push(WELCOME_PAGE);
   };
 
   if (isEmailSent) {
