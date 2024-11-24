@@ -168,9 +168,9 @@ const typography: TypographyOptions = {
     letterSpacing: "0px",
   },
   headlineLarge: {
-    fontSize: "32px",
+    fontSize: "28px",
     fontWeight: 600,
-    lineHeight: "40px",
+    lineHeight: "33.6px",
     letterSpacing: "0px",
   },
   headlineMedium: {
@@ -180,10 +180,11 @@ const typography: TypographyOptions = {
     letterSpacing: "0px",
   },
   headlineSmall: {
-    fontSize: "24px",
+    fontSize: "22px",
     fontWeight: 600,
-    lineHeight: "32px",
+    lineHeight: "26.4px",
     letterSpacing: "0px",
+    textTransform: "none",
   },
   titleLarge: {
     fontSize: "22px",
