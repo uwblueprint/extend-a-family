@@ -291,7 +291,7 @@ const Welcome = (): React.ReactElement => {
               display: "flex",
             }}
           >
-            <Login userRole={"Learner" as Role} isDrawerComponent={false} />
+            <Login userRole="Learner" isDrawerComponent={false} />
           </Box>
         </Container>
 
