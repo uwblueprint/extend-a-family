@@ -1,25 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Container,
-  Link,
-  TextField,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { AlternateEmail, Password } from "@mui/icons-material";
-import InputAdornment from "@mui/material/InputAdornment";
-import authAPIClient from "../../APIClients/AuthAPIClient";
-import { FORGOT_PASSWORD_PAGE, HOME_PAGE } from "../../constants/Routes";
+import { Box, Container, Link, Typography, useTheme } from "@mui/material";
+import { HOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
-import { AuthenticatedUser, Role } from "../../types/AuthTypes";
-import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
-import { capitalizeFirstLetter } from "../../utils/StringUtils";
-import { authErrors } from "../../errors/AuthErrors";
-import { PresentableError } from "../../types/ErrorTypes";
+import { Role } from "../../types/AuthTypes";
 import { PaletteRole } from "../../theme/theme";
+import LoginForm from "./LoginForm";
 
 interface LoginProps {
   userRole: Role;
@@ -27,50 +13,20 @@ interface LoginProps {
   signUpPrompt?: string;
   signUpPath?: string;
 }
+
 const Login: React.FC<LoginProps> = ({
   userRole,
   isDrawerComponent,
   signUpPrompt,
   signUpPath,
 }: LoginProps): React.ReactElement => {
-  const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
-  const [loginError, setLoginError] = useState<PresentableError>();
-  const [emailError, setEmailError] = useState<PresentableError>();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { authenticatedUser } = useContext(AuthContext);
   const [showDrawerLogin, setShowDrawerLogin] = useState<boolean>(true);
 
   const theme = useTheme();
   if (authenticatedUser) {
     return <Redirect to={HOME_PAGE} />;
   }
-
-  const onLogInClick = async () => {
-    try {
-      setLoginError(undefined);
-      setEmailError(undefined);
-      const user: AuthenticatedUser | null = await authAPIClient.login(
-        email,
-        password,
-        userRole,
-      );
-
-      localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
-      setAuthenticatedUser(user);
-    } catch (e: unknown) {
-      if (e instanceof Error && e.message in authErrors) {
-        // eslint-disable-next-line no-alert
-        alert(e.message);
-      } else {
-        // eslint-disable-next-line no-alert
-        alert("bad!");
-      }
-    }
-  };
-
-  const handleTextClick = () => {
-    setShowDrawerLogin(false);
-  };
 
   const redirectSignUpPath = (): boolean => {
     if (signUpPath) {
@@ -87,22 +43,12 @@ const Login: React.FC<LoginProps> = ({
     return (
       <Box>
         <Box>
-          <Typography
-            variant="headlineLarge"
-            style={{
-              color: "#390C00",
-            }}
-          >
+          <Typography variant="headlineLarge" style={{ color: "#390C00" }}>
             {title}
           </Typography>
         </Box>
         <Box marginTop="12px">
-          <Typography
-            variant="bodyMedium"
-            style={{
-              color: "#390C00",
-            }}
-          >
+          <Typography variant="bodyMedium" style={{ color: "#390C00" }}>
             {description}
           </Typography>
         </Box>
@@ -125,148 +71,14 @@ const Login: React.FC<LoginProps> = ({
       >
         {showDrawerLogin && (
           <Box>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography
-                variant="headlineLarge"
-                style={{
-                  color: "black",
-                }}
-              >
-                {capitalizeFirstLetter(userRole)} Login
-              </Typography>
-            </Box>
-            {loginError && (
-              <div
-                style={{
-                  backgroundColor: "lavenderblush",
-                  display: "inline-block",
-                  textAlign: "center",
-                }}
-              >
-                <strong>{loginError.title?.()}</strong>
-                <br />
-                {loginError.text()}
-              </div>
-            )}
-            <form>
-              <Box
-                sx={{
-                  margin: "40px 0 40px 0",
-                }}
-              >
-                <TextField
-                  required
-                  label="Email"
-                  type="email"
-                  InputProps={{
-                    sx: {
-                      fontSize: "16px",
-                      fontWeight: 400,
-                      lineHeight: "22.4px",
-                      letterSpacing: "0.2px",
-                      fontFamily: "Lexend Deca, sans-serif",
-                    },
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AlternateEmail />
-                      </InputAdornment>
-                    ),
-                  }}
-                  placeholder="example@gmail.com"
-                  onChange={(event) => setEmail(event.target.value)}
-                  variant="outlined"
-                  fullWidth
-                  margin="none"
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignSelf: "stretch",
-                    maxHeight: "56px",
-                  }}
-                />
-                {emailError && (
-                  <p style={{ color: "red" }}>{emailError.text()}</p>
-                )}
-              </Box>
-              <Box
-                sx={{
-                  marginBottom: "8px",
-                }}
-              >
-                <TextField
-                  required
-                  label="Password"
-                  type="password"
-                  onChange={(event) => setPassword(event.target.value)}
-                  variant="outlined"
-                  fullWidth
-                  margin="none"
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignSelf: "stretch",
-                    maxHeight: "56px",
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Password />
-                      </InputAdornment>
-                    ),
-                  }}
-                  placeholder="Your Password"
-                />
-              </Box>
-              <Box sx={{ textAlign: "right" }}>
-                <Link href={FORGOT_PASSWORD_PAGE} underline="none">
-                  <Typography
-                    variant="bodySmall"
-                    style={{
-                      color:
-                        theme.palette[userRole.toLowerCase() as PaletteRole]
-                          ?.main || "primary",
-                    }}
-                  >
-                    Forgot Password
-                  </Typography>
-                </Link>
-              </Box>
-            </form>
+            <LoginForm userRole={userRole} />
             <Box
               sx={{
                 width: "100%",
                 height: "59px",
-                marginTop: "40px",
+                marginTop: "20px",
               }}
             >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={onLogInClick}
-                style={{
-                  height: "59px",
-                  width: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: "4px",
-                  backgroundColor:
-                    theme.palette[userRole.toLowerCase() as PaletteRole]
-                      ?.main || "primary",
-                  marginBottom: "20px",
-                  boxShadow: "none",
-                }}
-              >
-                <Typography
-                  variant="labelLargeProminent"
-                  style={{
-                    color: "white",
-                  }}
-                >
-                  Login as {userRole}
-                </Typography>
-              </Button>
               {redirectSignUpPath() && (
                 <Box sx={{ textAlign: "center" }}>
                   <Link
@@ -274,7 +86,7 @@ const Login: React.FC<LoginProps> = ({
                     style={{ textDecoration: "none" }}
                   >
                     <Typography
-                      variant="bodySmall"
+                      variant="labelSmall"
                       style={{
                         color:
                           theme.palette[userRole.toLowerCase() as PaletteRole]
@@ -296,10 +108,8 @@ const Login: React.FC<LoginProps> = ({
                         theme.palette[userRole.toLowerCase() as PaletteRole]
                           ?.main || "primary",
                     }}
-                    onClick={handleTextClick}
-                    sx={{
-                      cursor: "pointer",
-                    }}
+                    onClick={() => setShowDrawerLogin(false)}
+                    sx={{ cursor: "pointer" }}
                   >
                     {signUpPrompt}
                   </Typography>
@@ -331,150 +141,7 @@ const Login: React.FC<LoginProps> = ({
         }}
         disableGutters
       >
-        <Box
-          style={{
-            width: "100%",
-            maxHeight: "254px",
-            display: "flex",
-            alignItems: "flex-start",
-            flexDirection: "column",
-            alignSelf: "stretch",
-          }}
-        >
-          <Box>
-            <Typography variant="headlineLarge" style={{ color: "black" }}>
-              {capitalizeFirstLetter(userRole)} Login
-            </Typography>
-          </Box>
-
-          {loginError && (
-            <div
-              style={{
-                display: "inline-block",
-                textAlign: "center",
-              }}
-            >
-              <strong>{loginError.title?.()}</strong>
-              <br />
-              {loginError.text()}
-            </div>
-          )}
-          <form style={{ width: "100%", height: "100%" }}>
-            <Box
-              sx={{
-                margin: "40px 0 40px 0",
-              }}
-            >
-              <TextField
-                required
-                label="Email"
-                type="email"
-                InputProps={{
-                  sx: {
-                    fontSize: "16px",
-                    fontWeight: 400,
-                    lineHeight: "22.4px",
-                    letterSpacing: "0.2px",
-                    fontFamily: "Lexend Deca, sans-serif",
-                  },
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <AlternateEmail />
-                    </InputAdornment>
-                  ),
-                }}
-                placeholder="example@gmail.com"
-                onChange={(event) => setEmail(event.target.value)}
-                variant="outlined"
-                fullWidth
-                margin="none"
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignSelf: "stretch",
-                  maxHeight: "56px",
-                }}
-              />
-              {emailError && (
-                <p style={{ color: "red" }}>{emailError.text()}</p>
-              )}
-            </Box>
-            <Box
-              sx={{
-                marginBottom: "8px",
-              }}
-            >
-              <TextField
-                required
-                label="Password"
-                type="password"
-                onChange={(event) => setPassword(event.target.value)}
-                variant="outlined"
-                fullWidth
-                margin="none"
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignSelf: "stretch",
-                  maxHeight: "56px",
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Password />
-                    </InputAdornment>
-                  ),
-                }}
-                placeholder="Your Password"
-              />
-            </Box>
-            <Box sx={{ textAlign: "right" }}>
-              <Link href={FORGOT_PASSWORD_PAGE} underline="none">
-                <Typography
-                  variant="bodySmall"
-                  style={{
-                    color: theme.palette.learner.main,
-                  }}
-                >
-                  Forgot Password
-                </Typography>
-              </Link>
-            </Box>
-          </form>
-          <Box
-            sx={{
-              width: "158px",
-              height: "62px",
-              marginTop: "40px",
-            }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={onLogInClick}
-              style={{
-                height: "62px",
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: "4px",
-                backgroundColor: theme.palette.learner.main,
-                boxShadow: "none",
-              }}
-            >
-              <Typography
-                variant="titleLarge"
-                style={{
-                  color: "white",
-                }}
-              >
-                Login
-              </Typography>
-            </Button>
-          </Box>
-        </Box>
+        <LoginForm userRole="Learner" />
       </Container>
     );
   };
