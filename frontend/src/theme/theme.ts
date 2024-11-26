@@ -164,8 +164,8 @@ const typography: TypographyOptions = {
   displaySmall: {
     fontSize: "36px",
     fontWeight: 700,
-    lineHeight: "44px",
-    letterSpacing: "0px",
+    lineHeight: "110%",
+    letterSpacing: "1.2px",
   },
   headlineLarge: {
     fontSize: "28px",
@@ -269,12 +269,18 @@ const getTheme = (darkMode: boolean) => {
     components: {
       MuiInputLabel: {
         styleOverrides: {
-          root: typography.bodySmall,
+          root: {
+            typography: typography.bodySmall,
+            color: neutral[600],
+          },
         },
       },
       MuiInputBase: {
         styleOverrides: {
-          input: typography.bodyMedium,
+          input: {
+            typography: typography.bodyMedium,
+            color: neutral[500],
+          },
         },
       },
     },

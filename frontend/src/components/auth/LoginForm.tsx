@@ -19,6 +19,7 @@ import AuthContext from "../../contexts/AuthContext";
 import { authErrors } from "../../errors/AuthErrors";
 import { PaletteRole } from "../../theme/theme";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
+import { neutral } from "../../theme/palette";
 
 function isDrawerLogin(userRole: Role) {
   return userRole !== "Learner";
@@ -66,7 +67,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       <Typography
         variant="headlineLarge"
         sx={{
-          color: "black",
+          color: neutral[700],
           display: "flex",
           justifyContent: isDrawerLogin(userRole) ? "center" : "left",
         }}
