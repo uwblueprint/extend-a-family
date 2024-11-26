@@ -8,21 +8,25 @@ import { TypographyStyleOptions } from "@mui/material/styles/createTypography";
 import { error, learner, administrator, facilitator, neutral } from "./palette";
 import "@fontsource/lexend-deca";
 
+interface CustomPaletteColorOptions extends SimplePaletteColorOptions {
+  light: string;
+  dark: string;
+}
 
 // adding custom attributes to palette
 declare module "@mui/material/styles" {
   // allow configuration using `createTheme`
   interface PaletteOptions {
     // Figma: primary colour palette
-    learner: SimplePaletteColorOptions;
+    learner: CustomPaletteColorOptions;
 
     // Figma: secondary colour palette
-    administrator: SimplePaletteColorOptions;
+    administrator: CustomPaletteColorOptions;
 
     // Figma: tertiary colour palette
-    facilitator: SimplePaletteColorOptions;
+    facilitator: CustomPaletteColorOptions;
 
-    neutral: SimplePaletteColorOptions;
+    neutral: CustomPaletteColorOptions;
   }
 
   interface TypographyOptions {
@@ -37,6 +41,7 @@ declare module "@mui/material/styles" {
     titleMedium?: TypographyStyleOptions;
     titleSmall?: TypographyStyleOptions;
     labelLarge?: TypographyStyleOptions;
+    labelLargeProminent?: TypographyStyleOptions;
     labelMedium?: TypographyStyleOptions;
     labelSmall?: TypographyStyleOptions;
     bodyLarge?: TypographyStyleOptions;
@@ -79,6 +84,7 @@ declare module "@mui/material/Typography" {
     bodyLarge: true;
     bodyMedium: true;
     bodySmall: true;
+    labelLargeProminent: true;
   }
 }
 
@@ -87,7 +93,7 @@ const lightThemePalette: PaletteOptions = {
   mode: "light",
   learner: {
     main: learner[40],
-    light: learner[90], // container - corresponds to Figma design document
+    light: learner[98], // container - corresponds to Figma design document
     dark: learner[10], // on container
   },
   administrator: {
@@ -158,13 +164,13 @@ const typography: TypographyOptions = {
   displaySmall: {
     fontSize: "36px",
     fontWeight: 700,
-    lineHeight: "44px",
-    letterSpacing: "0px",
+    lineHeight: "110%",
+    letterSpacing: "1.2px",
   },
   headlineLarge: {
-    fontSize: "32px",
+    fontSize: "28px",
     fontWeight: 600,
-    lineHeight: "40px",
+    lineHeight: "33.6px",
     letterSpacing: "0px",
   },
   headlineMedium: {
@@ -174,16 +180,18 @@ const typography: TypographyOptions = {
     letterSpacing: "0px",
   },
   headlineSmall: {
-    fontSize: "24px",
+    fontSize: "22px",
     fontWeight: 600,
-    lineHeight: "32px",
+    lineHeight: "26.4px",
     letterSpacing: "0px",
+    textTransform: "none",
   },
   titleLarge: {
     fontSize: "22px",
     fontWeight: 600,
     lineHeight: "28px",
     letterSpacing: "0px",
+    textTransform: "none",
   },
   titleMedium: {
     fontSize: "16px",
@@ -196,6 +204,15 @@ const typography: TypographyOptions = {
     fontWeight: 600,
     lineHeight: "20px",
     letterSpacing: "+0.1px",
+  },
+  labelLargeProminent: {
+    fontSize: "16px",
+    fontWeight: 600,
+    lineHeight: "19.2px",
+    letterSpacing: "0.08px",
+    fontFamily: "Lexend Deca, sans-serif",
+    textTransform: "none",
+    fontStyle: "normal",
   },
   labelLarge: {
     fontSize: "14px",
@@ -237,7 +254,11 @@ const typography: TypographyOptions = {
     letterSpacing: "+0.4px",
   },
 };
-
+export enum PaletteRole {
+  Administrator = "administrator",
+  Facilitator = "facilitator",
+  Learner = "learner",
+}
 const getTheme = (darkMode: boolean) => {
   const theme = createTheme({
     typography: {
@@ -245,6 +266,24 @@ const getTheme = (darkMode: boolean) => {
       ...typography,
     },
     palette: darkMode ? { ...darkThemePalette } : { ...lightThemePalette },
+    components: {
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            typography: typography.bodySmall,
+            color: neutral[600],
+          },
+        },
+      },
+      MuiInputBase: {
+        styleOverrides: {
+          input: {
+            typography: typography.bodyMedium,
+            color: neutral[500],
+          },
+        },
+      },
+    },
   });
   return theme;
 };

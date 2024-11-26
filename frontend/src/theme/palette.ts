@@ -1,6 +1,6 @@
 export type Color = `#${string}`;
 
-export type Palette = Record<number, Color>;
+export type Palette = Record<number | string, Color>;
 
 // Defined in Figma Design Document
 export const learner: Palette = {
@@ -15,6 +15,7 @@ export const learner: Palette = {
   80: "#6CD5EA",
   90: "#A4EEFF",
   95: "#D5F7FF",
+  98: "#F5FDFF",
   99: "#F7FDFF",
   100: "#FFFFFF",
 };
@@ -24,15 +25,18 @@ export const administrator: Palette = {
   10: "#380D00",
   20: "#5B1A00",
   30: "#812900",
-  40: "#A93800",
+  40: "#8F4C34",
   50: "#CB4F1C",
   60: "#EE6835",
   70: "#F78C61",
   80: "#FAB59A",
-  90: "#FCDCCF",
+  90: "#FFD9CC",
   95: "#FDEDE8",
+  98: "#FFDBCF80",
   99: "#FFF7F5",
   100: "#FFFFFF",
+  hover: "#FFD9CC",
+  pressed: "#5C1900",
 };
 
 export const facilitator: Palette = {
@@ -40,15 +44,18 @@ export const facilitator: Palette = {
   10: "#030667",
   20: "#1F257A",
   30: "#373D91",
-  40: "#4F56AB",
+  40: "#555A92",
   50: "#696FC6",
   60: "#8289E2",
   70: "#9DA4FE",
   80: "#BEC2FF",
   90: "#E0E0FF",
   95: "#F1EFFF",
+  98: "#E0E0FF80",
   99: "#FFFBFF",
   100: "#FFFFFF",
+  hover: "#D6D6FF",
+  pressed: "#1F257A",
 };
 
 export const error: Palette = {
@@ -82,6 +89,9 @@ export const neutral: Palette = {
   98: "#F9F9F9",
   99: "#F7FDFF",
   100: "#FFFFFF",
+  500: "#6F797B",
+  600: "#404B4D",
+  700: "#111111",
 };
 
 export const neutralVariant: Palette = {
