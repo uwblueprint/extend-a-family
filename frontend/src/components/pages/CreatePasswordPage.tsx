@@ -1,44 +1,30 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  TextField,
-  InputAdornment,
-  Button,
-  useTheme,
-} from "@mui/material";
-
-import PasswordIcon from "@mui/icons-material/Password";
+import { Box, Container, Typography, Button, useTheme } from "@mui/material";
 import Logo from "../images/logo.svg";
-
 import CreatePasswordHelpModal from "../help/CreatePasswordHelpModal";
 import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
+import PasswordCheck from "../auth/PassowrdCheck";
 
 const CreatePasswordPage = (): React.ReactElement => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+
   const theme = useTheme();
 
   const onSubmitNewPasswordClick = () => {
-    if (newPassword === confirmPassword) {
+    if (isFormValid) {
       setIsPasswordConfirmed(true);
     } else {
-      alert("Passwords do not match.");
+      alert("Passwords do not match or do not meet the criteria.");
     }
   };
 
-  const handleOpenHelpModal = () => {
-    setIsHelpModalOpen(true);
-  };
+  const handleOpenHelpModal = () => setIsHelpModalOpen(true);
+  const handleCloseHelpModal = () => setIsHelpModalOpen(false);
 
-  const handleCloseHelpModal = () => {
-    setIsHelpModalOpen(false);
-  };
-
-  // Conditional rendering based on password confirmation
   if (isPasswordConfirmed) {
     return <CreatePasswordConfirmationPage />;
   }
@@ -51,7 +37,7 @@ const CreatePasswordPage = (): React.ReactElement => {
         padding: "61px 470px 0px 470px",
         flexDirection: "column",
         alignItems: "center",
-        gap: "100px",
+        gap: "70px",
       }}
     >
       <Box
@@ -79,12 +65,10 @@ const CreatePasswordPage = (): React.ReactElement => {
           }}
         >
           <Typography
-            variant="headlineLarge"
+            variant="h5"
             gutterBottom
             sx={{
-              fontSize: theme.typography.headlineMedium?.fontSize,
-              fontWeight: theme.typography.headlineLarge?.fontWeight,
-              lineHeight: theme.typography.headlineLarge?.lineHeight,
+              fontWeight: "bold",
               color: "#000",
               textAlign: "center",
             }}
@@ -92,151 +76,49 @@ const CreatePasswordPage = (): React.ReactElement => {
             Create Password
           </Typography>
           <form>
-            <Container
+            <PasswordCheck
+              newPassword={newPassword}
+              confirmPassword={confirmPassword}
+              setNewPassword={setNewPassword}
+              setConfirmPassword={setConfirmPassword}
+              onValidationChange={setIsFormValid}
+            />
+            <Button
+              variant="contained"
+              onClick={onSubmitNewPasswordClick}
+              disabled={!isFormValid}
               sx={{
-                alignItems: "center",
+                marginTop: 4,
+                padding: "10px 24px",
+                width: "100%",
+                textTransform: "none",
+                backgroundColor: theme.palette.learner.main,
+                "&:hover": { backgroundColor: "#002A32" },
+                "&.Mui-disabled": {
+                  backgroundColor: "#ccc",
+                  color: "#666",
+                },
               }}
             >
-              <TextField
-                label="New password"
-                variant="outlined"
-                type="password"
-                fullWidth
-                margin="normal"
-                placeholder="Your new password"
-                value={newPassword}
-                onChange={(event) => setNewPassword(event.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PasswordIcon />
-                    </InputAdornment>
-                  ),
-                  sx: {
-                    fontSize: theme.typography.bodyLarge?.fontSize,
-                    fontWeight: theme.typography.bodyLarge?.fontWeight,
-                    lineHeight: theme.typography.bodyLarge?.lineHeight,
-                    letterSpacing: 0.2,
-                    color: theme.palette.learner.dark,
-                    width: 500,
-                    alignItems: "center",
-                  },
-                }}
-                InputLabelProps={{
-                  sx: {
-                    color: theme.palette.learner.main,
-                    fontWeight: theme.typography.bodyLarge?.fontWeight,
-                    lineHeight: theme.typography.bodyLarge?.lineHeight,
-                    letterSpacing: 0.32,
-                  },
-                }}
-              />
-              <TextField
-                label="Confirm new password"
-                variant="outlined"
-                type="password"
-                fullWidth
-                margin="normal"
-                placeholder="Rewrite your new password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PasswordIcon />
-                    </InputAdornment>
-                  ),
-                  sx: {
-                    fontSize: theme.typography.bodyLarge?.fontSize,
-                    fontWeight: theme.typography.bodyLarge?.fontWeight,
-                    lineHeight: theme.typography.bodyLarge?.lineHeight,
-                    letterSpacing: 0.2,
-                    color: theme.palette.learner.dark,
-                    width: 500,
-                    alignItems: "center",
-                  },
-                }}
-                InputLabelProps={{
-                  sx: {
-                    color: theme.palette.learner.main,
-                    fontWeight: theme.typography.bodyLarge?.fontWeight,
-                    lineHeight: theme.typography.bodyLarge?.lineHeight,
-                    letterSpacing: 0.32,
-                  },
-                }}
-              />
-            </Container>
-            <Container
+              Create Password
+            </Button>
+            <Typography
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                alignSelf: "stretch",
+                textAlign: "right",
+                marginTop: 2,
+                color: theme.palette.learner.main,
+                cursor: "pointer",
               }}
+              onClick={handleOpenHelpModal}
             >
-              <Button
-                variant="contained"
-                color="learner"
-                onClick={onSubmitNewPasswordClick} // Navigate instead of alert
-                sx={{
-                  padding: "20px 24px",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 1,
-                  borderRadius: 1,
-                  width: 500,
-                  backgroundColor: theme.palette.learner.main,
-                  color: "white",
-                  fontSize: theme.typography.bodyLarge?.fontSize,
-                  fontWeight: theme.typography.titleSmall?.fontWeight,
-                  lineHeight: theme.typography.bodyLarge?.lineHeight,
-                  letterSpacing: 0.08,
-                  textTransform: "none",
-                  marginTop: 4,
-                  "&:hover": {
-                    backgroundColor: "#002A32",
-                  },
-                  "&:active": {
-                    backgroundColor: theme.palette.learner.dark,
-                  },
-                }}
-              >
-                Create Password
-              </Button>
-              <Container
-                sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  alignItems: "center",
-                  width: "100%",
-                  marginTop: 2,
-                  padding: 0,
-                }}
-              >
-                <Typography
-                  variant="bodySmall"
-                  sx={{
-                    color: theme.palette.learner.main,
-                    textAlign: "right",
-                    fontSize: theme.typography.bodySmall?.fontSize,
-                    fontWeight: theme.typography.bodySmall?.fontWeight,
-                    lineHeight: theme.typography.bodySmall?.lineHeight,
-                    letterSpacing: 0.625,
-                    textTransform: "uppercase",
-                    cursor: "pointer",
-                  }}
-                  onClick={handleOpenHelpModal} // Open Help modal on click
-                >
-                  Help
-                </Typography>
-              </Container>
-            </Container>
+              Help
+            </Typography>
           </form>
         </Container>
       </Container>
       <CreatePasswordHelpModal
         open={isHelpModalOpen}
-        onClose={handleCloseHelpModal} // Close modal handler
+        onClose={handleCloseHelpModal}
       />
     </Container>
   );
