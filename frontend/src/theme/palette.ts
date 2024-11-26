@@ -1,6 +1,6 @@
 export type Color = `#${string}`;
 
-export type Palette = Record<number, Color>;
+export type Palette = Record<number | string, Color>;
 
 // Defined in Figma Design Document
 export const learner: Palette = {
@@ -35,6 +35,8 @@ export const administrator: Palette = {
   98: "#FFDBCF80",
   99: "#FFF7F5",
   100: "#FFFFFF",
+  hover: "#FFD9CC",
+  pressed: "#5C1900",
 };
 
 export const facilitator: Palette = {
@@ -52,6 +54,8 @@ export const facilitator: Palette = {
   98: "#E0E0FF80",
   99: "#FFFBFF",
   100: "#FFFFFF",
+  hover: "#D6D6FF",
+  pressed: "#1F257A",
 };
 
 export const error: Palette = {
@@ -85,6 +89,9 @@ export const neutral: Palette = {
   98: "#F9F9F9",
   99: "#F7FDFF",
   100: "#FFFFFF",
+  500: "#6F797B",
+  600: "#404B4D",
+  700: "#111111",
 };
 
 export const neutralVariant: Palette = {

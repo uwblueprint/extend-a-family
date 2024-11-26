@@ -21,6 +21,7 @@ import logo from "../assets/logoWhite.png";
 import Login from "../auth/Login";
 import { Role } from "../../types/AuthTypes";
 import { PaletteRole } from "../../theme/theme";
+import { administrator, facilitator, neutral } from "../../theme/palette";
 
 export const getSignUpPrompt = (role: string): string | undefined => {
   if (role === "administrator") {
@@ -58,6 +59,12 @@ const Welcome = (): React.ReactElement => {
   }
 
   const CustomButton: React.FC<CustomButtonProps> = ({ role, buttonText }) => {
+    let palette = facilitator;
+
+    if (role === PaletteRole.Administrator) {
+      palette = administrator;
+    }
+
     return (
       <Box
         sx={{
@@ -67,28 +74,33 @@ const Welcome = (): React.ReactElement => {
         }}
       >
         <Button
+          disableRipple
           sx={{
             width: "100%",
             height: "100%",
-            backgroundColor: theme.palette[role].light,
+            backgroundColor: palette.hover,
             justifyContent: "space-between",
             display: "flex",
             alignItems: "center",
             padding: "32px",
             textTransform: "none",
-            borderRadius: "0",
+            borderRadius: "8px",
+            "&:hover": {
+              background: palette.hover,
+            },
+
           }}
           onClick={() => handleButtonClick(role)}
         >
           <Typography
             variant="bodyLarge"
             style={{
-              color: "black",
+              color: palette.pressed,
             }}
           >
             {buttonText}
           </Typography>
-          <ArrowForwardIcon sx={{ color: "black" }} />
+          <ArrowForwardIcon sx={{ color: palette.pressed }} />
         </Button>
       </Box>
     );
@@ -129,13 +141,14 @@ const Welcome = (): React.ReactElement => {
           flexGrow: 1,
           flexShrink: 1,
           flexBasis: "auto",
+          borderRadius: "8px",
         }}
       >
         <Box>
           <Typography
             variant="headlineMedium"
             style={{
-              color: "black",
+              color: neutral[700],
               wordWrap: "break-word",
               overflowWrap: "break-word",
             }}
@@ -144,31 +157,31 @@ const Welcome = (): React.ReactElement => {
           </Typography>
         </Box>
         <Box>
-          <Typography variant="bodyMedium" style={{ color: "black" }}>
+          <Typography variant="bodyMedium" style={{ color: neutral[700] }}>
             {description}
           </Typography>
         </Box>
         <Box>
-          <Typography variant="titleMedium" style={{ color: "black" }}>
+          <Typography variant="titleMedium" style={{ color: neutral[700] }}>
             Don&apos;t have an account?
           </Typography>
         </Box>
         {instruction && (
           <Box>
-            <Typography variant="bodyMedium" sx={{ color: "black" }}>
+            <Typography variant="bodyMedium" sx={{ color: neutral[700] }}>
               {instruction}
             </Typography>
           </Box>
         )}
         {signUpRedirect && (
           <Box>
-            <Typography variant="bodyMedium" sx={{ color: "black" }}>
+            <Typography variant="bodyMedium" sx={{ color: neutral[700] }}>
               Create a new account by signing up{" "}
             </Typography>
             <Link href={SIGNUP_PAGE} color="inherit">
               <Typography variant="bodyMedium">here</Typography>
             </Link>
-            <Typography variant="bodyMedium" sx={{ color: "black" }}>
+            <Typography variant="bodyMedium" sx={{ color: neutral[700] }}>
               .
             </Typography>
           </Box>
@@ -203,6 +216,10 @@ const Welcome = (): React.ReactElement => {
           height="100%"
           image={backgroundImage}
           alt={title}
+          sx={{
+            borderBottomLeftRadius: "8px",
+            borderTopLeftRadius: "8px",
+          }}
         />
         <Box
           style={{
