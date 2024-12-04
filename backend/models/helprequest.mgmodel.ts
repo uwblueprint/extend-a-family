@@ -52,7 +52,7 @@ const HelpRequestSchema: Schema = new Schema(
 );
 
 /* eslint-disable no-param-reassign */
-HelpRequestSchema.set("toJSON", {
+HelpRequestSchema.set("toObject", {
   virtuals: true,
   versionKey: false,
   transform: (_doc: Document, ret: Record<string, unknown>) => {
