@@ -1,10 +1,15 @@
 import * as firebaseAdmin from "firebase-admin";
-
 import { ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
-import MgUser, { User } from "../../models/user.mgmodel";
+import MgUser, {
+  Learner,
+  User,
+  LearnerModel,
+  FacilitatorModel,
+} from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
+  LearnerDTO,
   Role,
   Status,
   UpdateUserDTO,
@@ -180,6 +185,55 @@ class UserService implements IUserService {
 
     return {
       ...newUser.toObject(),
+      email: firebaseUser.email ?? "",
+    };
+  }
+
+  async createLearner(
+    user: CreateUserDTO,
+    facilitatorId: string,
+  ): Promise<LearnerDTO> {
+    let newLearner: Learner;
+    let firebaseUser: firebaseAdmin.auth.UserRecord;
+    try {
+      firebaseUser = await firebaseAdmin.auth().createUser({
+        email: user.email,
+        password: user.password,
+      });
+      try {
+        newLearner = await LearnerModel.create({
+          ...user,
+          authId: firebaseUser.uid,
+          facilitator: facilitatorId,
+        });
+        await FacilitatorModel.findByIdAndUpdate(
+          facilitatorId,
+          { $push: { learners: newLearner.id } },
+          { runValidators: true },
+        );
+      } catch (mongoError) {
+        try {
+          await firebaseAdmin.auth().deleteUser(firebaseUser.uid);
+        } catch (firebaseError: unknown) {
+          const errorMessage = [
+            "Failed to rollback Firebase user creation after MongoDB user creation failure. Reason =",
+            getErrorMessage(firebaseError),
+            "Orphaned authId (Firebase uid) =",
+            firebaseUser.uid,
+          ];
+          Logger.error(errorMessage.join(" "));
+        }
+        throw mongoError;
+      }
+    } catch (err: unknown) {
+      Logger.error(
+        `Failed to create learner. Reason = ${getErrorMessage(err)}`,
+      );
+      throw err;
+    }
+
+    return {
+      ...newLearner.toObject(),
       email: firebaseUser.email ?? "",
     };
   }
