@@ -9,6 +9,7 @@ export interface User extends Document {
   authId: string;
   role: Role;
   status: Status;
+  email: string;
 }
 
 export interface Learner extends User {
@@ -47,6 +48,10 @@ export const UserSchema: Schema = new Schema(
       type: String,
       required: true,
       enum: ["Invited", "Active"],
+    },
+    email: {
+      type: String,
+      required: true,
     },
   },
   baseOptions,
