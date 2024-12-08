@@ -18,7 +18,6 @@ import authAPIClient from "../../APIClients/AuthAPIClient";
 import AuthContext from "../../contexts/AuthContext";
 import { authErrors } from "../../errors/AuthErrors";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
-import { neutral } from "../../theme/palette";
 
 function isDrawerLogin(userRole: Role) {
   return userRole !== "Learner";
@@ -66,7 +65,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       <Typography
         variant="headlineLarge"
         sx={{
-          color: neutral[700],
+          color: theme.palette.Neutral[700],
           display: "flex",
           justifyContent: isDrawerLogin(userRole) ? "center" : "left",
         }}

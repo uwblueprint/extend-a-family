@@ -136,14 +136,13 @@ const Welcome = (): React.ReactElement => {
           flexGrow: 1,
           flexShrink: 1,
           flexBasis: "auto",
-          borderRadius: "8px",
         }}
       >
         <Box>
           <Typography
             variant="headlineMedium"
             style={{
-              color: neutral[700],
+              color: theme.palette.Neutral[700],
               wordWrap: "break-word",
               overflowWrap: "break-word",
             }}
@@ -152,31 +151,46 @@ const Welcome = (): React.ReactElement => {
           </Typography>
         </Box>
         <Box>
-          <Typography variant="bodyMedium" style={{ color: neutral[700] }}>
+          <Typography
+            variant="bodyMedium"
+            style={{ color: theme.palette.Neutral[700] }}
+          >
             {description}
           </Typography>
         </Box>
         <Box>
-          <Typography variant="titleMedium" style={{ color: neutral[700] }}>
+          <Typography
+            variant="titleMedium"
+            style={{ color: theme.palette.Neutral[700] }}
+          >
             Don&apos;t have an account?
           </Typography>
         </Box>
         {instruction && (
           <Box>
-            <Typography variant="bodyMedium" sx={{ color: neutral[700] }}>
+            <Typography
+              variant="bodyMedium"
+              sx={{ color: theme.palette.Neutral[700] }}
+            >
               {instruction}
             </Typography>
           </Box>
         )}
         {signUpRedirect && (
           <Box>
-            <Typography variant="bodyMedium" sx={{ color: neutral[700] }}>
+            <Typography
+              variant="bodyMedium"
+              sx={{ color: theme.palette.Neutral[700] }}
+            >
               Create a new account by signing up{" "}
             </Typography>
             <Link href={SIGNUP_PAGE} color="inherit">
               <Typography variant="bodyMedium">here</Typography>
             </Link>
-            <Typography variant="bodyMedium" sx={{ color: neutral[700] }}>
+            <Typography
+              variant="bodyMedium"
+              sx={{ color: theme.palette.Neutral[700] }}
+            >
               .
             </Typography>
           </Box>
