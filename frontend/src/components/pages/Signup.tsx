@@ -104,7 +104,7 @@ const Signup = (): React.ReactElement => {
             marginTop: "12.62%",
           }}
         >
-          <Typography sx={theme.typography.headlineLarge}>
+          <Typography variant="headlineLarge">
             Sign Up as a Facilitator
           </Typography>
           <TextField
@@ -204,7 +204,7 @@ const Signup = (): React.ReactElement => {
               onClick={onSignupClick}
               fullWidth
               sx={{
-                bgcolor: "facilitator.main",
+                bgcolor: theme.palette.Facilitator.Default,
                 display: "flex",
                 flexDirection: "column",
                 padding: "20px 24px",
@@ -213,20 +213,20 @@ const Signup = (): React.ReactElement => {
                 gap: "8px",
                 alignSelf: "stretch",
                 "&:hover": {
-                  bgcolor: "facilitator.dark",
+                  bgcolor: theme.palette.Facilitator.Default,
                 },
               }}
             >
-              <Typography sx={theme.typography.labelLargeProminent}>
+              <Typography variant="labelLargeProminent">
                 Sign up as a facilitator
               </Typography>
             </Button>
             <Stack direction="row" sx={{ position: "relative" }}>
               <Link href={WELCOME_PAGE}>
                 <Typography
+                  variant="labelSmall"
                   sx={{
-                    ...theme.typography.labelSmall,
-                    color: "facilitator.main",
+                    color: theme.palette.Facilitator.Default,
                     position: "absolute",
                     left: 0,
                   }}
@@ -247,9 +247,9 @@ const Signup = (): React.ReactElement => {
                 }}
               >
                 <Typography
+                  variant="labelSmall"
                   sx={{
-                    ...theme.typography.labelSmall,
-                    color: "facilitator.main",
+                    color: theme.palette.Facilitator.Default,
                     position: "absolute",
                     right: 0,
                   }}
@@ -297,8 +297,8 @@ const Signup = (): React.ReactElement => {
             <Login
               userRole="Facilitator"
               isDrawerComponent
-              signUpPrompt={getSignUpPrompt("facilitator")}
-              signUpPath={getSignUpPath("facilitator")}
+              signUpPrompt={getSignUpPrompt("Facilitator")}
+              signUpPath={getSignUpPath("Facilitator")}
             />
           )}
         </Box>
