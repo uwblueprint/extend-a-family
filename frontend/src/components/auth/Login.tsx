@@ -4,7 +4,6 @@ import { Box, Container, Link, Typography, useTheme } from "@mui/material";
 import { HOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { Role } from "../../types/AuthTypes";
-import { PaletteRole } from "../../theme/theme";
 import LoginForm from "./LoginForm";
 
 interface LoginProps {
@@ -43,12 +42,18 @@ const Login: React.FC<LoginProps> = ({
     return (
       <Box>
         <Box>
-          <Typography variant="headlineLarge" style={{ color: "#390C00" }}>
+          <Typography
+            variant="headlineMedium"
+            sx={{ color: theme.palette.Administrator.Pressed }}
+          >
             {title}
           </Typography>
         </Box>
         <Box marginTop="12px">
-          <Typography variant="bodyMedium" style={{ color: "#390C00" }}>
+          <Typography
+            variant="bodyMedium"
+            sx={{ color: theme.palette.Administrator.Pressed }}
+          >
             {description}
           </Typography>
         </Box>
@@ -88,9 +93,7 @@ const Login: React.FC<LoginProps> = ({
                     <Typography
                       variant="labelSmall"
                       style={{
-                        color:
-                          theme.palette[userRole.toLowerCase() as PaletteRole]
-                            ?.main || "primary",
+                        color: theme.palette[userRole].Default,
                         textTransform: "uppercase",
                       }}
                     >
@@ -104,9 +107,7 @@ const Login: React.FC<LoginProps> = ({
                   <Typography
                     variant="labelSmall"
                     style={{
-                      color:
-                        theme.palette[userRole.toLowerCase() as PaletteRole]
-                          ?.main || "primary",
+                      color: theme.palette[userRole].Default,
                     }}
                     onClick={() => setShowDrawerLogin(false)}
                     sx={{ cursor: "pointer" }}

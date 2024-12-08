@@ -20,15 +20,13 @@ import background from "../assets/backgroundImage.png";
 import logo from "../assets/logoWhite.png";
 import Login from "../auth/Login";
 import { Role } from "../../types/AuthTypes";
-import { PaletteRole } from "../../theme/theme";
-import { administrator, facilitator, neutral } from "../../theme/palette";
 
-export const getSignUpPrompt = (role: string): string | undefined => {
-  if (role === "administrator") {
+export const getSignUpPrompt = (role: Role): string | undefined => {
+  if (role === "Administrator") {
     return "Don't have an account?";
   }
 
-  if (role === "facilitator") {
+  if (role === "Facilitator") {
     return "Sign up as a facilitator";
   }
 
@@ -36,35 +34,32 @@ export const getSignUpPrompt = (role: string): string | undefined => {
 };
 
 export const getSignUpPath = (role: string): string => {
-  return role === "facilitator" ? SIGNUP_PAGE : "";
+  return role === "Facilitator" ? SIGNUP_PAGE : "";
 };
 
 const Welcome = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState<Role>("Learner");
   const theme = useTheme();
   if (authenticatedUser) {
     return <Redirect to={HOME_PAGE} />;
   }
 
-  const handleButtonClick = (role: string) => {
+  const handleButtonClick = (role: Role) => {
     setSelectedRole(role);
     setDrawerOpen(true);
   };
 
   interface CustomButtonProps {
-    role: PaletteRole;
+    userRole: Role;
     buttonText: string;
   }
 
-  const CustomButton: React.FC<CustomButtonProps> = ({ role, buttonText }) => {
-    let palette = facilitator;
-
-    if (role === PaletteRole.Administrator) {
-      palette = administrator;
-    }
-
+  const CustomButton: React.FC<CustomButtonProps> = ({
+    userRole,
+    buttonText,
+  }) => {
     return (
       <Box
         sx={{
@@ -78,29 +73,28 @@ const Welcome = (): React.ReactElement => {
           sx={{
             width: "100%",
             height: "100%",
-            backgroundColor: palette.hover,
+            backgroundColor: theme.palette[userRole].Hover,
             justifyContent: "space-between",
             display: "flex",
             alignItems: "center",
             padding: "32px",
             textTransform: "none",
-            borderRadius: "8px",
+            borderRadius: "0",
             "&:hover": {
-              background: palette.hover,
+              bgcolor: theme.palette[userRole].Hover,
             },
-
           }}
-          onClick={() => handleButtonClick(role)}
+          onClick={() => handleButtonClick(userRole)}
         >
           <Typography
             variant="bodyLarge"
             style={{
-              color: palette.pressed,
+              color: theme.palette[userRole].Pressed,
             }}
           >
             {buttonText}
           </Typography>
-          <ArrowForwardIcon sx={{ color: palette.pressed }} />
+          <ArrowForwardIcon sx={{ color: theme.palette[userRole].Pressed }} />
         </Button>
       </Box>
     );
@@ -130,6 +124,7 @@ const Welcome = (): React.ReactElement => {
           maxHeight: "100%",
           height: "auto",
           border: "1px solid",
+          borderRadius: "8px",
           padding: "40px",
           gap: "20px",
           justifyContent: "space-between",
@@ -141,14 +136,13 @@ const Welcome = (): React.ReactElement => {
           flexGrow: 1,
           flexShrink: 1,
           flexBasis: "auto",
-          borderRadius: "8px",
         }}
       >
         <Box>
           <Typography
             variant="headlineMedium"
             style={{
-              color: neutral[700],
+              color: theme.palette.Neutral[700],
               wordWrap: "break-word",
               overflowWrap: "break-word",
             }}
@@ -157,31 +151,46 @@ const Welcome = (): React.ReactElement => {
           </Typography>
         </Box>
         <Box>
-          <Typography variant="bodyMedium" style={{ color: neutral[700] }}>
+          <Typography
+            variant="bodyMedium"
+            style={{ color: theme.palette.Neutral[700] }}
+          >
             {description}
           </Typography>
         </Box>
         <Box>
-          <Typography variant="titleMedium" style={{ color: neutral[700] }}>
+          <Typography
+            variant="titleMedium"
+            style={{ color: theme.palette.Neutral[700] }}
+          >
             Don&apos;t have an account?
           </Typography>
         </Box>
         {instruction && (
           <Box>
-            <Typography variant="bodyMedium" sx={{ color: neutral[700] }}>
+            <Typography
+              variant="bodyMedium"
+              sx={{ color: theme.palette.Neutral[700] }}
+            >
               {instruction}
             </Typography>
           </Box>
         )}
         {signUpRedirect && (
           <Box>
-            <Typography variant="bodyMedium" sx={{ color: neutral[700] }}>
+            <Typography
+              variant="bodyMedium"
+              sx={{ color: theme.palette.Neutral[700] }}
+            >
               Create a new account by signing up{" "}
             </Typography>
             <Link href={SIGNUP_PAGE} color="inherit">
               <Typography variant="bodyMedium">here</Typography>
             </Link>
-            <Typography variant="bodyMedium" sx={{ color: neutral[700] }}>
+            <Typography
+              variant="bodyMedium"
+              sx={{ color: theme.palette.Neutral[700] }}
+            >
               .
             </Typography>
           </Box>
@@ -225,8 +234,8 @@ const Welcome = (): React.ReactElement => {
           style={{
             position: "absolute",
             color: "#fff",
-            top: "68.75%",
-            left: "6.25%",
+            bottom: "40px",
+            left: "40px",
           }}
         >
           <img
@@ -234,7 +243,7 @@ const Welcome = (): React.ReactElement => {
             alt="icon"
             style={{ paddingBottom: "10px", width: "100px" }}
           />
-          <Typography variant="displaySmall" component="div" maxWidth="300px">
+          <Typography variant="displayMedium" component="div" maxWidth="300px">
             {title}
           </Typography>
         </Box>
@@ -244,7 +253,7 @@ const Welcome = (): React.ReactElement => {
 
   const closeDrawer = () => {
     setDrawerOpen(false);
-    setSelectedRole("");
+    setSelectedRole("Learner");
   };
 
   return (
@@ -263,6 +272,7 @@ const Welcome = (): React.ReactElement => {
         margin: "0 auto",
       }}
       disableGutters
+      role="main"
     >
       <Box
         sx={{
@@ -281,7 +291,7 @@ const Welcome = (): React.ReactElement => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "stretch",
-            backgroundColor: theme.palette.learner.light,
+            backgroundColor: theme.palette.Learner.Light,
           }}
           disableGutters
         >
@@ -327,13 +337,13 @@ const Welcome = (): React.ReactElement => {
         >
           <Box style={{ width: "50%" }}>
             <CustomButton
-              role={PaletteRole.Facilitator}
+              userRole="Facilitator"
               buttonText="Are you a facilitator?"
             />
           </Box>
           <Box style={{ width: "50%" }}>
             <CustomButton
-              role={PaletteRole.Administrator}
+              userRole="Administrator"
               buttonText="Are you an administrator?"
             />
           </Box>
@@ -354,22 +364,22 @@ const Welcome = (): React.ReactElement => {
           title="Learners"
           description="The person who is learning about money."
           instruction="Ask a facilitator to setup your account."
-          backgroundColor={theme.palette.learner.light}
-          borderColor={theme.palette.learner.main}
+          backgroundColor={theme.palette.Learner.Light}
+          borderColor={theme.palette.Learner.Default}
         />
         <InfoBox
           title="Facilitators"
           description="The person who is helping people learn about money."
-          backgroundColor={`${theme.palette.facilitator.light}50`}
-          borderColor={theme.palette.facilitator.main}
+          backgroundColor={`${theme.palette.Facilitator.Light}50`}
+          borderColor={theme.palette.Facilitator.Default}
           signUpRedirect
         />
         <InfoBox
           title="Administrator"
           description="The person who monitors the program."
           instruction="Ask an existing administrator to help setup your account."
-          backgroundColor={`${theme.palette.administrator.light}50`}
-          borderColor={theme.palette.administrator.main}
+          backgroundColor={`${theme.palette.Administrator.Light}50`}
+          borderColor={theme.palette.Administrator.Default}
         />
       </Container>
 
@@ -406,7 +416,7 @@ const Welcome = (): React.ReactElement => {
         >
           {drawerOpen && (
             <Login
-              userRole={selectedRole as Role}
+              userRole={selectedRole}
               isDrawerComponent
               signUpPrompt={getSignUpPrompt(selectedRole)}
               signUpPath={getSignUpPath(selectedRole)}

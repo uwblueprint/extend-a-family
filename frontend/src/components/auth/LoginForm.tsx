@@ -17,9 +17,7 @@ import { FORGOT_PASSWORD_PAGE } from "../../constants/Routes";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import AuthContext from "../../contexts/AuthContext";
 import { authErrors } from "../../errors/AuthErrors";
-import { PaletteRole } from "../../theme/theme";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
-import { neutral } from "../../theme/palette";
 
 function isDrawerLogin(userRole: Role) {
   return userRole !== "Learner";
@@ -67,7 +65,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       <Typography
         variant="headlineLarge"
         sx={{
-          color: neutral[700],
+          color: theme.palette.Neutral[700],
           display: "flex",
           justifyContent: isDrawerLogin(userRole) ? "center" : "left",
         }}
@@ -159,8 +157,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                 <Typography
                   variant="bodySmall"
                   style={{
-                    color:
-                      theme.palette[userRole.toLowerCase() as PaletteRole].main,
+                    color: theme.palette[userRole].Default,
                   }}
                 >
                   Forgot Password
@@ -180,9 +177,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
               justifyContent: "center",
               alignItems: "center",
               borderRadius: "4px",
-              backgroundColor:
-                theme.palette[userRole.toLowerCase() as PaletteRole]?.main ||
-                "primary",
+              backgroundColor: theme.palette[userRole].Default,
               boxShadow: "none",
             }}
           >
