@@ -38,8 +38,8 @@ export default function CourseUnitsPage() {
         <Button
           type="button"
           sx={{
-            color: theme.palette.neutral.dark,
-            backgroundColor: theme.palette.neutral.light,
+            color: theme.palette.Neutral[700],
+            backgroundColor: theme.palette.Neutral[200],
             borderRadius: "4px",
             width: "34px",
             minWidth: "34px",

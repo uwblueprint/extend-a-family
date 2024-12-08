@@ -78,7 +78,7 @@ export default function Navbar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar position="static" sx={{ bgcolor: `${user.role}.Default` }}>
         <Toolbar>
           <Typography
             variant="h6"

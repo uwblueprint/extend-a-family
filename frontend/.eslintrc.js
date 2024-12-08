@@ -32,5 +32,5 @@ module.exports = {
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-static-element-interactions": "off",
   },
-  ignorePatterns: ["build/*", ".eslintrc.js"],
+  ignorePatterns: ["build/*", ".eslintrc.js", "src/theme/themeAugmentation.d.ts"],
 };
