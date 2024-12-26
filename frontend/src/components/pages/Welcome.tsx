@@ -79,7 +79,7 @@ const Welcome = (): React.ReactElement => {
             alignItems: "center",
             padding: "32px",
             textTransform: "none",
-            borderRadius: "0",
+            borderRadius: "8px",
             "&:hover": {
               bgcolor: theme.palette[userRole].Hover,
             },
@@ -184,7 +184,11 @@ const Welcome = (): React.ReactElement => {
             >
               Create a new account by signing up{" "}
             </Typography>
-            <Link href={SIGNUP_PAGE} color="inherit">
+            <Link
+              href={SIGNUP_PAGE}
+              color="inherit"
+              sx={{ "&:hover": { color: "inherit" } }}
+            >
               <Typography variant="bodyMedium">here</Typography>
             </Link>
             <Typography
@@ -370,7 +374,7 @@ const Welcome = (): React.ReactElement => {
         <InfoBox
           title="Facilitators"
           description="The person who is helping people learn about money."
-          backgroundColor={`${theme.palette.Facilitator.Light}50`}
+          backgroundColor={`${theme.palette.Facilitator.Light}`}
           borderColor={theme.palette.Facilitator.Default}
           signUpRedirect
         />
@@ -378,7 +382,7 @@ const Welcome = (): React.ReactElement => {
           title="Administrator"
           description="The person who monitors the program."
           instruction="Ask an existing administrator to help setup your account."
-          backgroundColor={`${theme.palette.Administrator.Light}50`}
+          backgroundColor={`${theme.palette.Administrator.Light}`}
           borderColor={theme.palette.Administrator.Default}
         />
       </Container>
