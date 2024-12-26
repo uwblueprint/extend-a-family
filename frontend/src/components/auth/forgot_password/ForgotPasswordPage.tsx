@@ -13,7 +13,7 @@ import { useHistory, Redirect } from "react-router-dom";
 import AuthContext from "../../../contexts/AuthContext";
 import ForgotPasswordConfirmation from "./ForgotPasswordConfirmation";
 import authAPIClient from "../../../APIClients/AuthAPIClient";
-import { LOGIN_PAGE, HOME_PAGE } from "../../../constants/Routes";
+import { HOME_PAGE, WELCOME_PAGE } from "../../../constants/Routes";
 
 const ForgotPasswordPage = (): React.ReactElement => {
   const [email, setEmail] = useState("");
@@ -43,7 +43,7 @@ const ForgotPasswordPage = (): React.ReactElement => {
   };
 
   const handleBackToLogin = () => {
-    history.push(LOGIN_PAGE);
+    history.push(WELCOME_PAGE);
   };
 
   if (isEmailSent) {
@@ -87,25 +87,10 @@ const ForgotPasswordPage = (): React.ReactElement => {
             marginLeft: -3,
           }}
         >
-          <Typography
-            variant="headlineLarge"
-            gutterBottom
-            sx={{
-              fontSize: theme.typography.headlineMedium?.fontSize,
-              fontWeight: theme.typography.headlineLarge?.fontWeight,
-              lineHeight: theme.typography.headlineLarge?.lineHeight,
-              color: "#000",
-            }}
-          >
+          <Typography variant="headlineLarge" gutterBottom>
             Forgot your password?
           </Typography>
-          <Typography
-            variant="bodyMedium"
-            sx={{
-              fontSize: theme.typography.bodyLarge?.fontSize,
-              color: "#000",
-            }}
-          >
+          <Typography variant="bodyMedium">
             Enter your email, and we&apos;ll send you a link to reset your
             password
           </Typography>
@@ -131,12 +116,12 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 fontWeight: theme.typography.bodyLarge?.fontWeight,
                 lineHeight: theme.typography.bodyLarge?.lineHeight,
                 letterSpacing: 0.2,
-                color: theme.palette.neutral.dark,
+                color: theme.palette.Neutral[500],
               },
             }}
             InputLabelProps={{
               sx: {
-                color: theme.palette.neutral.main,
+                color: theme.palette.Neutral[500],
                 fontWeight: theme.typography.bodyLarge?.fontWeight,
                 lineHeight: theme.typography.bodyLarge?.lineHeight,
                 letterSpacing: 0.32,
@@ -153,7 +138,7 @@ const ForgotPasswordPage = (): React.ReactElement => {
           >
             <Button
               variant="contained"
-              color="learner"
+              color="Learner"
               onClick={handleResetPassword}
               sx={{
                 padding: "20px 24px",
@@ -162,40 +147,30 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 gap: 1,
                 borderRadius: 1,
                 width: 500,
-                backgroundColor: theme.palette.learner.main,
-                color: theme.palette.neutral.light,
-                fontSize: theme.typography.bodyLarge?.fontSize,
-                fontWeight: theme.typography.titleSmall?.fontWeight,
-                lineHeight: theme.typography.bodyLarge?.lineHeight,
-                letterSpacing: 0.08,
-                textTransform: "none",
+                backgroundColor: theme.palette.Learner.Default,
+                color: theme.palette.Neutral[300],
                 marginTop: 4,
                 "&:hover": {
                   backgroundColor: "#002A32",
                 },
                 "&:active": {
-                  backgroundColor: theme.palette.learner.dark,
+                  backgroundColor: theme.palette.Learner.Pressed,
                 },
               }}
             >
-              Send reset link to email
+              <Typography variant="labelLargeProminent">
+                Send reset link to email
+              </Typography>
             </Button>
-            <Typography
-              variant="bodySmall"
-              sx={{
-                color: theme.palette.learner.main,
-                textAlign: "center",
-                fontSize: theme.typography.bodySmall?.fontSize,
-                fontWeight: theme.typography.bodySmall?.fontWeight,
-                lineHeight: theme.typography.bodySmall?.lineHeight,
-                letterSpacing: 0.625,
-                textTransform: "uppercase",
-                cursor: "pointer",
-              }}
-              onClick={handleBackToLogin}
-            >
-              Remember your password? Back to Login
-            </Typography>
+            <Button variant="text" sx={{ padding: 0 }}>
+              <Typography
+                variant="labelSmall"
+                sx={{ color: theme.palette.Learner.Default }}
+                onClick={handleBackToLogin}
+              >
+                Remember your password? Back to Login
+              </Typography>
+            </Button>
           </Container>
         </form>
       </Container>

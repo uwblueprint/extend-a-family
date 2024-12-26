@@ -1,118 +1,162 @@
 import React, { useContext, useState } from "react";
-import { Redirect, useHistory, useLocation } from "react-router-dom";
-import authAPIClient from "../../APIClients/AuthAPIClient";
-import { HOME_PAGE, SIGNUP_PAGE, WELCOME_PAGE } from "../../constants/Routes";
+import { Redirect } from "react-router-dom";
+import { Box, Container, Link, Typography, useTheme } from "@mui/material";
+import { HOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
-import { AuthenticatedUser } from "../../types/AuthTypes";
-import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
-import { capitalizeFirstLetter } from "../../utils/StringUtils";
-import { authErrors } from "../../errors/AuthErrors";
-import { PresentableError } from "../../types/ErrorTypes";
-import { isRole } from "../../types/UserTypes";
+import { Role } from "../../types/AuthTypes";
+import LoginForm from "./LoginForm";
 
-const Login = (): React.ReactElement => {
-  const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
-  const [loginError, setLoginError] = useState<PresentableError>();
-  const [emailError, setEmailError] = useState<PresentableError>();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const history = useHistory();
+interface LoginProps {
+  userRole: Role;
+  isDrawerComponent: boolean;
+  signUpPrompt?: string;
+  signUpPath?: string;
+}
 
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const role = capitalizeFirstLetter(searchParams.get("role"));
+const Login: React.FC<LoginProps> = ({
+  userRole,
+  isDrawerComponent,
+  signUpPrompt,
+  signUpPath,
+}: LoginProps): React.ReactElement => {
+  const { authenticatedUser } = useContext(AuthContext);
+  const [showDrawerLogin, setShowDrawerLogin] = useState<boolean>(true);
 
+  const theme = useTheme();
   if (authenticatedUser) {
     return <Redirect to={HOME_PAGE} />;
   }
 
-  if (!role || !isRole(role)) {
-    return <Redirect to={WELCOME_PAGE} />;
-  }
-
-  const onLogInClick = async () => {
-    try {
-      setLoginError(undefined);
-      setEmailError(undefined);
-      const user: AuthenticatedUser | null = await authAPIClient.login(
-        email,
-        password,
-        role,
-      );
-
-      localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
-      setAuthenticatedUser(user);
-    } catch (e: unknown) {
-      if (e instanceof Error && e.message in authErrors) {
-        // eslint-disable-next-line no-alert
-        alert(e.message);
-      } else {
-        // eslint-disable-next-line no-alert
-        alert("bad!");
-      }
+  const redirectSignUpPath = (): boolean => {
+    if (signUpPath) {
+      return !!signUpPrompt;
     }
+    return false;
   };
 
-  const onSignupClick = () => {
-    history.push(`${SIGNUP_PAGE}?role=${role.toLowerCase()}`);
+  interface InfoTextProps {
+    title: string;
+    description: string;
+  }
+  const InfoText: React.FC<InfoTextProps> = ({ title, description }) => {
+    return (
+      <Box>
+        <Box>
+          <Typography
+            variant="headlineMedium"
+            sx={{ color: theme.palette.Administrator.Pressed }}
+          >
+            {title}
+          </Typography>
+        </Box>
+        <Box marginTop="12px">
+          <Typography
+            variant="bodyMedium"
+            sx={{ color: theme.palette.Administrator.Pressed }}
+          >
+            {description}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  };
+
+  const DrawerComponent = () => {
+    return (
+      <Container
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          padding: "80px 80px 80px 80px",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+        disableGutters
+      >
+        {showDrawerLogin && (
+          <Box>
+            <LoginForm userRole={userRole} />
+            <Box
+              sx={{
+                width: "100%",
+                height: "59px",
+                marginTop: "20px",
+              }}
+            >
+              {redirectSignUpPath() && (
+                <Box sx={{ textAlign: "center" }}>
+                  <Link
+                    href={signUpPath as string}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Typography
+                      variant="labelSmall"
+                      style={{
+                        color: theme.palette[userRole].Default,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {signUpPrompt}
+                    </Typography>
+                  </Link>
+                </Box>
+              )}
+              {!redirectSignUpPath() && (
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography
+                    variant="labelSmall"
+                    style={{
+                      color: theme.palette[userRole].Default,
+                    }}
+                    onClick={() => setShowDrawerLogin(false)}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    {signUpPrompt}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
+        )}
+        {!showDrawerLogin && (
+          <InfoText
+            title="Contact an administrator"
+            description="Please contact an existing administrator to set up your account."
+          />
+        )}
+      </Container>
+    );
+  };
+
+  const MainComponent = () => {
+    return (
+      <Container
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          padding: "40px 40px 40px 20px",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+        disableGutters
+      >
+        <LoginForm userRole="Learner" />
+      </Container>
+    );
   };
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <h1>{capitalizeFirstLetter(role)} Login</h1>
-      {loginError && (
-        <div
-          style={{
-            backgroundColor: "lavenderblush",
-            display: "inline-block",
-            textAlign: "center",
-          }}
-        >
-          <strong>{loginError.title?.()}</strong>
-          <br />
-          {loginError.text()}
-        </div>
-      )}
-      <form>
-        <div>
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="username@domain.com"
-          />
-          {emailError && <p style={{ color: "red" }}>{emailError.text()}</p>}
-        </div>
-        <div>
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="password"
-          />
-        </div>
-        <div>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={onLogInClick}
-          >
-            Log In
-          </button>
-        </div>
-      </form>
-      {role === "Facilitator" && (
-        <div>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={onSignupClick}
-          >
-            Sign Up
-          </button>
-        </div>
-      )}
-    </div>
+    <Container
+      sx={{
+        width: "100%",
+        height: "100%",
+      }}
+      disableGutters
+    >
+      {isDrawerComponent ? <DrawerComponent /> : <MainComponent />}
+    </Container>
   );
 };
 

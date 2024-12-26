@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { CourseUnit } from "../../types/CourseTypes";
-import { neutral } from "../../theme/palette";
 
 interface UnitSideBarProps {
   courseUnits: CourseUnit[];
@@ -47,7 +46,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
       anchor="left"
       open={open}
     >
-      <Box height="100%" sx={{ backgroundColor: theme.palette.neutral.light }}>
+      <Box height="100%" sx={{ backgroundColor: theme.palette.Learner.Light }}>
         <Box
           height="59px"
           display="flex"
@@ -64,7 +63,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
             sx={{
               p: "8px",
               fontSize: "12px",
-              color: theme.palette.neutral.main,
+              color: theme.palette.Neutral[700],
               lineHeight: "1.5",
             }}
             endIcon={<MenuOpenIcon />}
@@ -93,7 +92,12 @@ export default function UnitSidebar(props: UnitSideBarProps) {
                     py: "15px",
                     px: "32px",
                     backgroundColor:
-                      selectedIndex === index ? neutral[90] : "transparent",
+                      selectedIndex === index
+                        ? theme.palette.Learner.Hover
+                        : "transparent",
+                    "&:hover": {
+                      backgroundColor: theme.palette.Learner.Hover,
+                    },
                   }}
                   onClick={(event) => handleListItemClick(event, index)}
                 >
