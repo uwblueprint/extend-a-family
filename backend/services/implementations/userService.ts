@@ -33,47 +33,34 @@ class UserService implements IUserService {
   /* eslint-disable class-methods-use-this */
   async getUserById(userId: string | ObjectId): Promise<UserDTO> {
     let user: User | null;
-    let firebaseUser: firebaseAdmin.auth.UserRecord;
-
     try {
       user = await MgUser.findById(userId);
 
       if (!user) {
         throw new Error(`userId ${userId} not found.`);
       }
-
-      firebaseUser = await firebaseAdmin.auth().getUser(user.authId);
     } catch (error: unknown) {
       Logger.error(`Failed to get user. Reason = ${getErrorMessage(error)}`);
       throw error;
     }
 
-    return {
-      ...user.toObject(),
-      email: firebaseUser.email ?? "",
-    };
+    return user.toObject();
   }
 
   async getUserByEmail(email: string): Promise<UserDTO> {
     let user: User | null;
-    let firebaseUser: firebaseAdmin.auth.UserRecord;
 
     try {
-      firebaseUser = await firebaseAdmin.auth().getUserByEmail(email);
-      user = await MgUser.findOne({ authId: firebaseUser.uid });
-
+      user = await MgUser.findOne({ email });
       if (!user) {
-        throw new Error(`userId with authId ${firebaseUser.uid} not found.`);
+        throw new Error(`user with email ${email} not found.`);
       }
     } catch (error: unknown) {
       Logger.error(`Failed to get user. Reason = ${getErrorMessage(error)}`);
       throw new Error(AuthErrorCodes.EMAIL_NOT_FOUND);
     }
 
-    return {
-      ...user.toObject(),
-      email: firebaseUser.email ?? "",
-    };
+    return user.toObject();
   }
 
   async getUserRoleByAuthId(authId: string): Promise<Role> {
@@ -117,25 +104,7 @@ class UserService implements IUserService {
     try {
       const users: Array<User> = await MgUser.find();
 
-      userDtos = await Promise.all(
-        users.map(async (user) => {
-          let firebaseUser: firebaseAdmin.auth.UserRecord;
-
-          try {
-            firebaseUser = await firebaseAdmin.auth().getUser(user.authId);
-          } catch (error) {
-            Logger.error(
-              `user with authId ${user.authId} could not be fetched from Firebase`,
-            );
-            throw error;
-          }
-
-          return {
-            ...user.toObject(),
-            email: firebaseUser.email ?? "",
-          };
-        }),
-      );
+      userDtos = await Promise.all(users.map(async (user) => user.toObject()));
     } catch (error: unknown) {
       Logger.error(`Failed to get users. Reason = ${getErrorMessage(error)}`);
       throw error;
@@ -184,10 +153,7 @@ class UserService implements IUserService {
       throw error;
     }
 
-    return {
-      ...newUser.toObject(),
-      email: firebaseUser.email ?? "",
-    };
+    return newUser.toObject();
   }
 
   async createLearner(
@@ -233,10 +199,7 @@ class UserService implements IUserService {
       throw err;
     }
 
-    return {
-      ...newLearner.toObject(),
-      email: firebaseUser.email ?? "",
-    };
+    return newLearner.toObject();
   }
 
   async updateUserById(
@@ -244,7 +207,6 @@ class UserService implements IUserService {
     user: UpdateUserDTO,
   ): Promise<UserDTO> {
     let oldUser: User | null;
-    let updatedFirebaseUser: firebaseAdmin.auth.UserRecord;
 
     try {
       // must explicitly specify runValidators when updating through findByIdAndUpdate
@@ -255,6 +217,7 @@ class UserService implements IUserService {
           lastName: user.lastName,
           role: user.role,
           status: user.status,
+          email: user.email,
         },
         { runValidators: true },
       );
@@ -264,7 +227,7 @@ class UserService implements IUserService {
       }
 
       try {
-        updatedFirebaseUser = await firebaseAdmin
+        await firebaseAdmin
           .auth()
           .updateUser(oldUser.authId, { email: user.email });
       } catch (error) {
@@ -301,7 +264,7 @@ class UserService implements IUserService {
       ...oldUser.toObject(),
       firstName: user.firstName,
       lastName: user.lastName,
-      email: updatedFirebaseUser.email ?? "",
+      email: user.email,
       role: user.role,
       status: user.status,
     };
@@ -383,25 +346,7 @@ class UserService implements IUserService {
     try {
       const users: Array<User> = await MgUser.find({ role });
 
-      userDtos = await Promise.all(
-        users.map(async (user) => {
-          let firebaseUser: firebaseAdmin.auth.UserRecord;
-
-          try {
-            firebaseUser = await firebaseAdmin.auth().getUser(user.authId);
-          } catch (error) {
-            Logger.error(
-              `user with authId ${user.authId} could not be fetched from Firebase`,
-            );
-            throw error;
-          }
-
-          return {
-            ...user.toObject(),
-            email: firebaseUser.email ?? "",
-          };
-        }),
-      );
+      userDtos = await Promise.all(users.map(async (user) => user.toObject()));
     } catch (error: unknown) {
       Logger.error(`Failed to get users. Reason = ${getErrorMessage(error)}`);
       throw error;
