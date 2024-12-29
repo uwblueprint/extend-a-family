@@ -132,7 +132,7 @@ const App = (): React.ReactElement => {
                 />
                 <PrivateRoute
                   exact
-                  path={Routes.COURSES_PAGE}
+                  path={Routes.COURSE_PAGE}
                   component={CourseUnitsPage}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
