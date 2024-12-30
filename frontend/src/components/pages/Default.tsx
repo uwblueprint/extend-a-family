@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import SampleContext from "../../contexts/SampleContext";
-import Navbar from "../common/navbar/Navbar";
 
 const TeamInfoDisplay = () => {
   const { teamName, numTerms, members, isActive } = useContext(SampleContext);
@@ -23,7 +22,6 @@ const TeamInfoDisplay = () => {
 const Default = (): React.ReactElement => {
   return (
     <div style={{ textAlign: "center" }}>
-      <Navbar />
       <h1>Default Page</h1>
       <div style={{ height: "2rem" }} />
 

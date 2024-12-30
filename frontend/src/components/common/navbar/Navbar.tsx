@@ -84,7 +84,7 @@ export default function Navbar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
-        position="static"
+        position="sticky"
         sx={{
           bgcolor: theme.palette.Neutral[100],
           borderBottom: "2px solid #EEE",
