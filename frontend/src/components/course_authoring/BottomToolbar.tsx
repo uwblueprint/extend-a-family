@@ -36,14 +36,9 @@ const BottomToolbar = ({
       <Stack direction="row" spacing="12px">
         <StyledButton
           variant="contained"
+          color="Administrator"
           startIcon={<FileUploadIcon />}
           onClick={onBuilderEnter}
-          sx={{
-            bgcolor: theme.palette.Administrator.Default,
-            "&:hover": {
-              bgcolor: theme.palette.Administrator.Default,
-            },
-          }}
         >
           <Typography variant="labelLarge">Upload page</Typography>
         </StyledButton>
@@ -55,14 +50,14 @@ const BottomToolbar = ({
         >
           <Typography variant="labelLarge">Create activity</Typography>
         </StyledButton>
-        <Button
+        <StyledButton
           variant="outlined"
           sx={outlinedButtonStyle(theme)}
           startIcon={<RemoveRedEyeIcon />}
           onClick={onBuilderExit}
         >
           <Typography variant="labelLarge">Preview</Typography>
-        </Button>
+        </StyledButton>
       </Stack>
     </Box>
   );
