@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 
+import { Button } from "@mui/material";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import AuthContext from "../../contexts/AuthContext";
 
@@ -13,15 +14,7 @@ const ResetPassword = (): React.ReactElement => {
     await authAPIClient.resetPassword(authenticatedUser.email);
   };
 
-  return (
-    <button
-      type="button"
-      className="btn btn-primary"
-      onClick={onResetPasswordClick}
-    >
-      Reset Password
-    </button>
-  );
+  return <Button onClick={onResetPasswordClick}>Reset Password</Button>;
 };
 
 export default ResetPassword;
