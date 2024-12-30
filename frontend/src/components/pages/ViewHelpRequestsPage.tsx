@@ -15,7 +15,6 @@ import {
   Checkbox,
 } from "@mui/material";
 import TablePaginationActions from "@mui/material/TablePagination/TablePaginationActions";
-import Navbar from "../common/navbar/Navbar";
 import { useFacilitator } from "../../hooks/useUser";
 import HelpRequestAPIClient from "../../APIClients/HelpRequestAPIClient";
 import { HelpRequest } from "../../types/HelpRequestType";
@@ -71,7 +70,6 @@ const ViewHelpRequestsPage = (): React.ReactElement => {
 
   return (
     <div style={{ textAlign: "center", width: "100%", margin: "0px auto" }}>
-      <Navbar />
       <TableContainer component={Paper}>
         <Table aria-label="User grouped by role table">
           <TableHead>
