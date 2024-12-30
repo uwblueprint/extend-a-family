@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 
+import { Button } from "@mui/material";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import AuthContext from "../../contexts/AuthContext";
 
@@ -13,11 +14,7 @@ const Logout = (): React.ReactElement => {
     }
   };
 
-  return (
-    <button type="button" className="btn btn-primary" onClick={onLogOutClick}>
-      Log Out
-    </button>
-  );
+  return <Button onClick={onLogOutClick}>Log Out</Button>;
 };
 
 export default Logout;
