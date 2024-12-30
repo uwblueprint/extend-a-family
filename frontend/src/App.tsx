@@ -30,6 +30,7 @@ import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
+import CourseAuthoringPage from "./components/pages/CourseAuthoringPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -135,6 +136,12 @@ const App = (): React.ReactElement => {
                   path={Routes.COURSE_PAGE}
                   component={CourseViewingPage}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.COURSE_AUTHORING_PAGE}
+                  component={CourseAuthoringPage}
+                  allowedRoles={["Administrator"]}
                 />
                 <Route exact path="*" component={NotFound} />
               </Switch>
