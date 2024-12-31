@@ -39,23 +39,47 @@ export interface CoursePage extends Document {
   title: string;
   displayIndex: number;
   type: PageType;
+}
+
+export interface LessonPage extends CoursePage {
+  source: string;
+}
+
+export interface ActivityPage extends CoursePage {
   layout: [ElementSkeleton];
 }
 
-export const CoursePageSchema: Schema = new Schema({
-  title: {
+const baseOptions = {
+  discriminatorKey: "type",
+};
+
+export const CoursePageSchema: Schema = new Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    displayIndex: {
+      type: Number,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+      enum: ["Lesson", "Activity"],
+    },
+  },
+  baseOptions,
+);
+
+const LessonPageSchema: Schema = new Schema({
+  source: {
     type: String,
     required: true,
   },
-  displayIndex: {
-    type: Number,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-    enum: ["Lesson", "Activity"],
-  },
+});
+
+const ActivityPageSchema: Schema = new Schema({
   layout: {
     type: [ElementSkeletonSchema],
     required: true,
@@ -63,7 +87,7 @@ export const CoursePageSchema: Schema = new Schema({
 });
 
 /* eslint-disable no-param-reassign */
-CoursePageSchema.set("toJSON", {
+CoursePageSchema.set("toObject", {
   virtuals: true,
   versionKey: false,
   transform: (_doc: Document, ret: Record<string, unknown>) => {
@@ -72,4 +96,19 @@ CoursePageSchema.set("toJSON", {
   },
 });
 
-export default mongoose.model<CoursePage>("CoursePage", CoursePageSchema);
+const CoursePageModel = mongoose.model<CoursePage>(
+  "CoursePage",
+  CoursePageSchema,
+);
+
+const LessonPageModel = CoursePageModel.discriminator(
+  "Lesson",
+  LessonPageSchema,
+);
+const ActivityPageModel = CoursePageModel.discriminator(
+  "Activity",
+  ActivityPageSchema,
+);
+
+export { LessonPageModel, ActivityPageModel };
+export default CoursePageModel;
