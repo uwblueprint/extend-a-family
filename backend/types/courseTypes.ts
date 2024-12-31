@@ -17,6 +17,8 @@ export type CourseModuleDTO = {
 export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
 export type UpdateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
 
+export type PageType = "Lesson" | "Activity";
+
 export enum InteractiveElementType {
   TextInput = "TextInput",
   NumberInput = "NumberInput",
