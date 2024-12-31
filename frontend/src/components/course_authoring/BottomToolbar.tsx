@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Button, Stack, Theme, Typography, useTheme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import styled from "@emotion/styled";
+import { CoursePage, PageType } from "../../types/CourseTypes";
+import CourseAuthoringContext from "../../contexts/CourseAuthoringContext";
 
 const StyledButton = styled(Button)`
   height: 40px;
@@ -29,6 +31,18 @@ const BottomToolbar = ({
   onBuilderExit,
 }: BottomToolbarProps) => {
   const theme = useTheme();
+  const { setActivePage } = useContext(CourseAuthoringContext);
+
+  function createNewPage(pageType: PageType) {
+    // TODO: Call API to create page
+    const page: CoursePage = {
+      id: "abcd",
+      type: pageType,
+    };
+    setActivePage(page);
+    onBuilderEnter();
+  }
+
   return (
     <Box
       sx={{ padding: 0, height: "40px", display: "flex", flexDirection: "row" }}
@@ -38,7 +52,7 @@ const BottomToolbar = ({
           variant="contained"
           color="Administrator"
           startIcon={<FileUploadIcon />}
-          onClick={onBuilderEnter}
+          onClick={() => createNewPage("Lesson")}
         >
           <Typography variant="labelLarge">Upload page</Typography>
         </StyledButton>
@@ -46,7 +60,7 @@ const BottomToolbar = ({
           variant="outlined"
           sx={outlinedButtonStyle(theme)}
           startIcon={<AddIcon />}
-          onClick={onBuilderEnter}
+          onClick={() => createNewPage("Activity")}
         >
           <Typography variant="labelLarge">Create activity</Typography>
         </StyledButton>
