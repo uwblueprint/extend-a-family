@@ -24,8 +24,8 @@ import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { AuthenticatedUser } from "../../types/AuthTypes";
 import logo from "../assets/logoColoured.png";
-import { getSignUpPath, getSignUpPrompt } from "./Welcome";
-import Login from "../auth/Login";
+import { getSignUpPath, getSignUpPrompt } from "./WelcomePage";
+import Login from "./Login";
 
 const Signup = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
