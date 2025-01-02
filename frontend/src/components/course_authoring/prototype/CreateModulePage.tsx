@@ -4,11 +4,11 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import DraggableSource from "../common/grid/DraggableSource";
-import GridElement from "../common/grid/GridElement";
-import layoutReducer from "../common/grid/layoutReducer";
-import BaseModule from "../course_authoring/prototype/BaseModule";
-import ConfirmationModal from "../common/modals/ConfirmationModal";
+import DraggableSource from "../../common/grid/DraggableSource";
+import GridElement from "../../common/grid/GridElement";
+import layoutReducer from "../../common/grid/layoutReducer";
+import BaseModule from "./BaseModule";
+import ConfirmationModal from "../../common/modals/ConfirmationModal";
 
 const CreateModule = () => {
   const ref = useRef<HTMLDivElement | null>(null);

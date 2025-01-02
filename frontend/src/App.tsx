@@ -6,7 +6,7 @@ import Welcome from "./components/auth/WelcomePage";
 import Signup from "./components/auth/SignupPage";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import Default from "./components/pages/Default";
-import CreateModulePage from "./components/pages/CreateModulePage";
+import CreateModulePage from "./components/course_authoring/prototype/CreateModulePage";
 import NotFound from "./components/pages/NotFound";
 import NotAuthorized from "./components/pages/NotAuthorized";
 import MyAccount from "./components/pages/MyAccountPage";
@@ -30,7 +30,7 @@ import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
-import CourseAuthoringPage from "./components/pages/CourseAuthoringPage";
+import CourseAuthoringPage from "./components/course_authoring/CourseAuthoringPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
