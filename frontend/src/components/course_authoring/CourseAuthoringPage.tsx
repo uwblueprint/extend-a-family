@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Box } from "@mui/material";
-import LeftSidebar from "../course_authoring/LeftSidebar";
-import RightSidebar from "../course_authoring/RightSidebar";
-import MainArea from "../course_authoring/MainArea";
+import LeftSidebar from "./LeftSidebar";
+import RightSidebar from "./RightSidebar";
+import MainArea from "./MainArea";
 import CourseAuthoringContext from "../../contexts/CourseAuthoringContext";
 import { CourseElement, CoursePage } from "../../types/CourseTypes";
 
