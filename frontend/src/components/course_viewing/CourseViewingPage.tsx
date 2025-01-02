@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import UnitSidebar from "../../courses/UnitSidebar";
-import { CourseUnit } from "../../../types/CourseTypes";
-import CourseAPIClient from "../../../APIClients/CourseAPIClient";
+import UnitSidebar from "./UnitSidebar";
+import { CourseUnit } from "../../types/CourseTypes";
+import CourseAPIClient from "../../APIClients/CourseAPIClient";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();

@@ -18,7 +18,7 @@ import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import background from "../assets/backgroundImage.png";
 import logo from "../assets/logoWhite.png";
-import Login from "../auth/Login";
+import Login from "./Login";
 import { Role } from "../../types/AuthTypes";
 
 export const getSignUpPrompt = (role: Role): string | undefined => {
