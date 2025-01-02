@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 
+import { Button } from "@mui/material";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import AuthContext from "../../contexts/AuthContext";
 
@@ -13,11 +14,7 @@ const RefreshCredentials = (): React.ReactElement => {
     }
   };
 
-  return (
-    <button type="button" className="btn btn-primary" onClick={onRefreshClick}>
-      Refresh Credentials
-    </button>
-  );
+  return <Button onClick={onRefreshClick}>Refresh Credentials</Button>;
 };
 
 export default RefreshCredentials;
