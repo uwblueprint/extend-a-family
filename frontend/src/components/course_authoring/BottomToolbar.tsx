@@ -2,7 +2,8 @@ import React, { useContext } from "react";
 import { Box, Button, Stack, Theme, Typography, useTheme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneIcon from "@mui/icons-material/Done";
 import styled from "@emotion/styled";
 import { CoursePage, PageType } from "../../types/CourseTypes";
@@ -40,7 +41,9 @@ const BottomToolbar = ({
   onBuilderExit,
 }: BottomToolbarProps) => {
   const theme = useTheme();
-  const { activePage, setActivePage } = useContext(CourseAuthoringContext);
+  const { activePage, setActivePage, previewMode, setPreviewMode } = useContext(
+    CourseAuthoringContext,
+  );
 
   function createPage(pageType: PageType) {
     // TODO: Call API to create page
@@ -55,7 +58,12 @@ const BottomToolbar = ({
   function savePage() {
     // TODO: Call API to save page
     setActivePage(null);
+    setPreviewMode(false);
     onBuilderExit();
+  }
+
+  function togglePreview() {
+    setPreviewMode(!previewMode);
   }
 
   return (
@@ -75,9 +83,14 @@ const BottomToolbar = ({
           <StyledButton
             variant="outlined"
             sx={outlinedButtonStyle(theme)}
-            startIcon={<RemoveRedEyeIcon />}
+            startIcon={
+              previewMode ? <EditOutlinedIcon /> : <RemoveRedEyeOutlinedIcon />
+            }
+            onClick={() => togglePreview()}
           >
-            <Typography variant="labelLarge">Preview</Typography>
+            <Typography variant="labelLarge">
+              {previewMode ? "Edit" : "Preview"}
+            </Typography>
           </StyledButton>
         </Stack>
       ) : (

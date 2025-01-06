@@ -5,26 +5,31 @@ import { useTheme } from "@mui/material";
 import GridLayout from "react-grid-layout";
 import GridElement from "./grid/GridElement";
 import { ActivityContext } from "../../../contexts/ActivityContext";
+import CourseAuthoringContext from "../../../contexts/CourseAuthoringContext";
 
 type ActivityGridProps = {
   rows: number;
   cols: number;
 };
 const ActivityGrid = ({ rows, cols }: ActivityGridProps) => {
+  const { previewMode } = useContext(CourseAuthoringContext);
   const { layout, dispatchLayout, targetRef } = useContext(ActivityContext);
   const [activeComponent, setActiveComponent] = useState("10000"); // TODO
   const [componentData, setComponentData] = useState(new Map<string, object>()); // TODO
   const theme = useTheme();
-  return (
-    <GridLayout
-      className="layout"
-      style={{
+  const gridStyle = previewMode
+    ? { width: "100%", height: "100%" }
+    : {
         width: "100%",
         height: "100%",
         backgroundSize: `${100 / cols}% ${100 / rows}%`,
         backgroundImage: `linear-gradient(to right, ${theme.palette.Neutral[400]} 1px, transparent 1px), 
                           linear-gradient(to bottom, ${theme.palette.Neutral[400]} 1px, transparent 1px)`,
-      }}
+      };
+  return (
+    <GridLayout
+      className="layout"
+      style={gridStyle}
       layout={layout}
       onLayoutChange={(newLayout) =>
         dispatchLayout({ type: "newLayout", layout: newLayout })
@@ -41,25 +46,33 @@ const ActivityGrid = ({ rows, cols }: ActivityGridProps) => {
       containerPadding={[0, 0]}
       margin={[0, 0]}
       isDroppable
-      isDraggable
-      isResizable
+      isDraggable={!previewMode}
+      isResizable={!previewMode}
     >
       {layout.map((item) => (
         <div
           key={item.i}
           data-grid={item}
-          style={{
-            backgroundColor: "white",
-            boxSizing: "border-box",
-            borderTop:
-              item.i === activeComponent ? "1px solid blue" : "1px solid black",
-            borderLeft:
-              item.i === activeComponent ? "1px solid blue" : "1px solid black",
-            boxShadow:
-              item.i === activeComponent
-                ? "1px 1px 0 0 blue, 0 1px 0 0 blue"
-                : "1px 1px 0 0 black, 0 1px 0 0 black",
-          }}
+          style={
+            previewMode
+              ? {}
+              : {
+                  backgroundColor: "white",
+                  boxSizing: "border-box",
+                  borderTop:
+                    item.i === activeComponent
+                      ? "1px solid blue"
+                      : "1px solid black",
+                  borderLeft:
+                    item.i === activeComponent
+                      ? "1px solid blue"
+                      : "1px solid black",
+                  boxShadow:
+                    item.i === activeComponent
+                      ? "1px 1px 0 0 blue, 0 1px 0 0 blue"
+                      : "1px 1px 0 0 black, 0 1px 0 0 black",
+                }
+          }
         >
           <GridElement
             componentType={item.content}

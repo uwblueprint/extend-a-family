@@ -9,8 +9,11 @@ import { ActivityContextProvider } from "../../contexts/ActivityContext";
 
 const CourseAuthoringPage = () => {
   const [activePage, setActivePage] = useState<CoursePage | null>(null);
+  const [previewMode, setPreviewMode] = useState(false);
   return (
-    <CourseAuthoringContext.Provider value={{ activePage, setActivePage }}>
+    <CourseAuthoringContext.Provider
+      value={{ activePage, setActivePage, previewMode, setPreviewMode }}
+    >
       <Box height="100%" display="flex" flexDirection="column">
         <Box flexGrow={1} display="flex" flexDirection="row">
           <Box width="20%">

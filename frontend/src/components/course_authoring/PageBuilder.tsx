@@ -6,7 +6,7 @@ import { ActivityContext } from "../../contexts/ActivityContext";
 
 const PageBuilder = () => {
   const theme = useTheme();
-  const { activePage } = useContext(CourseAuthoringContext);
+  const { activePage, previewMode } = useContext(CourseAuthoringContext);
   const { targetRef } = useContext(ActivityContext);
 
   return (
@@ -14,10 +14,18 @@ const PageBuilder = () => {
       ref={targetRef}
       width="100%"
       height="100%"
-      border="1px dashed"
       borderRadius="8px"
-      borderColor={theme.palette.Administrator.Default}
-      bgcolor={theme.palette.Administrator.Light}
+      border={previewMode ? "1px solid" : "1px dashed"}
+      borderColor={
+        previewMode
+          ? theme.palette.Neutral[700]
+          : theme.palette.Administrator.Default
+      }
+      bgcolor={
+        previewMode
+          ? theme.palette.Neutral[100]
+          : theme.palette.Administrator.Light
+      }
     >
       {activePage &&
         (activePage.type === "Lesson" ? (
