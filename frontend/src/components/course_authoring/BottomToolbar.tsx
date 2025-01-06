@@ -2,7 +2,8 @@ import React, { useContext } from "react";
 import { Box, Button, Stack, Theme, Typography, useTheme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import DoneIcon from "@mui/icons-material/Done";
 import styled from "@emotion/styled";
 import { CoursePage, PageType } from "../../types/CourseTypes";
 import CourseAuthoringContext from "../../contexts/CourseAuthoringContext";
@@ -21,6 +22,14 @@ const outlinedButtonStyle = (theme: Theme) => ({
   },
 });
 
+const containedButtonStyle = (theme: Theme) => ({
+  color: theme.palette.Neutral[100],
+  bgcolor: theme.palette.Administrator.Default,
+  "&:hover": {
+    bgcolor: theme.palette.Administrator.Default,
+  },
+});
+
 type BottomToolbarProps = {
   onBuilderEnter: () => void;
   onBuilderExit: () => void;
@@ -31,48 +40,68 @@ const BottomToolbar = ({
   onBuilderExit,
 }: BottomToolbarProps) => {
   const theme = useTheme();
-  const { setActivePage } = useContext(CourseAuthoringContext);
+  const { activePage, setActivePage } = useContext(CourseAuthoringContext);
 
-  function createNewPage(pageType: PageType) {
+  function createPage(pageType: PageType) {
     // TODO: Call API to create page
     const page: CoursePage = {
-      id: "abcd",
+      id: "NEW_PAGE",
       type: pageType,
     };
     setActivePage(page);
     onBuilderEnter();
   }
 
+  function savePage() {
+    // TODO: Call API to save page
+    setActivePage(null);
+    onBuilderExit();
+  }
+
   return (
     <Box
       sx={{ padding: 0, height: "40px", display: "flex", flexDirection: "row" }}
     >
-      <Stack direction="row" spacing="12px">
-        <StyledButton
-          variant="contained"
-          color="Administrator"
-          startIcon={<FileUploadIcon />}
-          onClick={() => createNewPage("Lesson")}
-        >
-          <Typography variant="labelLarge">Upload page</Typography>
-        </StyledButton>
-        <StyledButton
-          variant="outlined"
-          sx={outlinedButtonStyle(theme)}
-          startIcon={<AddIcon />}
-          onClick={() => createNewPage("Activity")}
-        >
-          <Typography variant="labelLarge">Create activity</Typography>
-        </StyledButton>
-        <StyledButton
-          variant="outlined"
-          sx={outlinedButtonStyle(theme)}
-          startIcon={<RemoveRedEyeIcon />}
-          onClick={onBuilderExit}
-        >
-          <Typography variant="labelLarge">Preview</Typography>
-        </StyledButton>
-      </Stack>
+      {activePage ? (
+        <Stack direction="row" spacing="12px">
+          <StyledButton
+            variant="contained"
+            color="Administrator"
+            startIcon={<DoneIcon />}
+            onClick={() => savePage()}
+          >
+            <Typography variant="labelLarge">Save</Typography>
+          </StyledButton>
+          <StyledButton
+            variant="outlined"
+            sx={outlinedButtonStyle(theme)}
+            startIcon={<RemoveRedEyeIcon />}
+          >
+            <Typography variant="labelLarge">Preview</Typography>
+          </StyledButton>
+        </Stack>
+      ) : (
+        <Stack direction="row" spacing="12px">
+          <StyledButton
+            variant="contained"
+            sx={containedButtonStyle(theme)}
+            startIcon={<FileUploadIcon />}
+            onClick={() => createPage("Lesson")}
+            disabled={!!activePage}
+          >
+            <Typography variant="labelLarge">Upload page</Typography>
+          </StyledButton>
+          <StyledButton
+            variant="outlined"
+            sx={outlinedButtonStyle(theme)}
+            startIcon={<AddIcon />}
+            onClick={() => createPage("Activity")}
+            disabled={!!activePage}
+          >
+            <Typography variant="labelLarge">Create activity</Typography>
+          </StyledButton>
+        </Stack>
+      )}
     </Box>
   );
 };
