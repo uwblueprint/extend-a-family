@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import BaseModule from "../../prototype/BaseModule";
+import BaseElement from "../elements/BaseElement";
 
 interface MouseEventLike {
   clientX: number;
@@ -8,13 +8,9 @@ interface MouseEventLike {
 
 interface GridElementProps {
   temp?: boolean;
-  index: string;
-  componentType?: string;
+  id: string;
+  elementType?: string;
   mouseEvent?: MouseEventLike;
-  activeComponent: string;
-  data: Map<string, object>;
-  setData: (data: Map<string, object>) => void;
-  setActiveComponent: (index: string) => void;
   style?: React.CSSProperties;
   className?: string;
   onMouseDown?: React.MouseEventHandler<HTMLDivElement>;
@@ -59,13 +55,9 @@ const createDragStartEvent = (
 
 const GridElement: React.FC<GridElementProps> = ({
   temp,
-  index,
-  activeComponent,
-  setActiveComponent,
-  data,
-  setData,
+  id,
   mouseEvent,
-  componentType,
+  elementType,
   style,
   className,
   onMouseDown,
@@ -96,20 +88,15 @@ const GridElement: React.FC<GridElementProps> = ({
       style={{ height: "100%", ...style }}
       className={className}
       onMouseDown={(e) => {
-        setActiveComponent(activeComponent === index ? "10000" : index);
         if (onMouseDown) onMouseDown(e);
       }}
-      onMouseUp={onMouseUp}
+      onMouseUp={(e) => {
+        if (onMouseUp) onMouseUp(e);
+      }}
       onTouchEnd={onTouchEnd}
       onTouchStart={onTouchStart}
     >
-      <BaseModule
-        name={componentType || ""}
-        activeComponent={activeComponent}
-        index={index}
-        data={data}
-        setData={setData}
-      />
+      <BaseElement name={elementType ?? ""} id={id} />
     </div>
   );
 };

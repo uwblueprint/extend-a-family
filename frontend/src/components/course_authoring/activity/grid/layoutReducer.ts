@@ -1,4 +1,5 @@
 import { merge, keyBy } from "lodash";
+import { v4 as uuidv4 } from "uuid";
 
 interface MouseEventLike {
   clientX: number;
@@ -75,12 +76,10 @@ const layoutReducer = (
           y: Math.max(cellY, 0),
           h: 2,
           w: 3,
-          content: action.content
-            ? action.content
-            : String.fromCharCode(65 + state.length),
+          content: action.content,
           temp: true,
           mouseEvent: action.mouseEvent,
-          i: `${state.length}`, // Unique ID, but can cause future issues when deleting items
+          i: uuidv4(),
           resizeHandles: ["sw", "nw", "se", "ne"],
         },
       ];
@@ -97,16 +96,7 @@ const layoutReducer = (
       return Object.values(merged) as LayoutItem[];
     }
     case "deleteItem": {
-      const updatedState = state
-        .filter((item) => item.i !== action.i)
-        .map((item) => {
-          const itemId = parseInt(item.i, 10);
-          const actionId = parseInt(action.i || "0", 10);
-          if (itemId > actionId) {
-            return { ...item, i: `${itemId - 1}` };
-          }
-          return item;
-        });
+      const updatedState = state.filter((item) => item.i !== action.i);
       return updatedState;
     }
     default:

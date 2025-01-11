@@ -2,12 +2,12 @@ import React, { useContext } from "react";
 import { Box, useTheme } from "@mui/material";
 import CourseAuthoringContext from "../../contexts/CourseAuthoringContext";
 import ActivityGrid from "./activity/ActivityGrid";
-import { ActivityContext } from "../../contexts/ActivityContext";
+import { ActivityLayoutContext } from "../../contexts/ActivityLayoutContext";
 
 const PageBuilder = () => {
   const theme = useTheme();
   const { activePage, previewMode } = useContext(CourseAuthoringContext);
-  const { targetRef } = useContext(ActivityContext);
+  const { targetRef } = useContext(ActivityLayoutContext);
 
   return (
     <Box

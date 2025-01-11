@@ -1,5 +1,8 @@
-import React, { useState, ReactNode } from "react";
+import React, { useState, ReactNode, useContext } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
+import { ActivityLayoutContext } from "../../../../contexts/ActivityLayoutContext";
+import { DisplayElementType } from "../../../../types/CourseElementTypes";
+import { ActivityDataContext } from "../../../../contexts/ActivityDataContext";
 
 const elementIsInChain = (
   elementToTraverse: HTMLElement | null,
@@ -25,15 +28,7 @@ const getMouseEvent = (e: MouseEvent | TouchEvent) => {
   return null;
 };
 
-interface DispatchAction {
-  type: string;
-  mouseEvent?: { clientX: number; clientY: number };
-  content?: string;
-}
-
 interface DraggableSourceProps {
-  targetRef: React.RefObject<HTMLElement>;
-  dispatch: React.Dispatch<DispatchAction>;
   onDrag?: DraggableEventHandler;
   onStop?: DraggableEventHandler;
   componentType: string;
@@ -41,13 +36,16 @@ interface DraggableSourceProps {
 }
 
 const DraggableSource: React.FC<DraggableSourceProps> = ({
-  targetRef,
-  dispatch,
   onDrag,
   onStop,
   componentType,
   children,
 }) => {
+  const { targetRef, layout, dispatchLayout } = useContext(
+    ActivityLayoutContext,
+  );
+  const { elements, setElements, setActiveElementId } =
+    useContext(ActivityDataContext);
   const [inserted, setInserted] = useState(false);
 
   const onDragOverwrite: DraggableEventHandler = (e, data) => {
@@ -57,7 +55,7 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
       targetRef.current!,
     );
     if (!target && inserted) {
-      dispatch({ type: "clearTemp" });
+      dispatchLayout({ type: "clearTemp" });
       setInserted(false);
       const placeHolder = document.querySelector(
         ".react-grid-placeholder",
@@ -68,7 +66,7 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
     if (target && !inserted) {
       const mouseEvent = getMouseEvent(e as MouseEvent | TouchEvent);
       if (mouseEvent) {
-        dispatch({ type: "addTemp", mouseEvent, content: componentType });
+        dispatchLayout({ type: "addTemp", mouseEvent, content: componentType });
       }
       setInserted(true);
     }
@@ -77,10 +75,21 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
   const onStopOverwrite: DraggableEventHandler = (e, data) => {
     if (onStop) onStop(e, data);
     if (inserted) {
-      dispatch({ type: "finaliseTemporaryItem" });
+      dispatchLayout({ type: "finaliseTemporaryItem" });
       setInserted(false);
+      // Add new element to elements data object
+      const newLayoutItem = layout[layout.length - 1];
+      const newElement = {
+        type: DisplayElementType.Text,
+        text: DisplayElementType.Text,
+      };
+      const updatedElements = new Map(elements);
+      const newId = newLayoutItem.i;
+      updatedElements.set(newId, newElement);
+      setElements(updatedElements);
+      setActiveElementId(newId);
     } else {
-      dispatch({ type: "clearTemp" });
+      dispatchLayout({ type: "clearTemp" });
     }
   };
 

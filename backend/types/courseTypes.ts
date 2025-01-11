@@ -63,7 +63,7 @@ export enum HybridElementType {
 }
 
 export enum DisplayElementType {
-  RichText = "RichText",
+  Text = "Text",
   Image = "Image",
 }
 

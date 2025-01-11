@@ -5,7 +5,8 @@ import RightSidebar from "./RightSidebar";
 import MainArea from "./MainArea";
 import CourseAuthoringContext from "../../contexts/CourseAuthoringContext";
 import { CoursePage } from "../../types/CourseTypes";
-import { ActivityContextProvider } from "../../contexts/ActivityContext";
+import { ActivityDataContextProvider } from "../../contexts/ActivityDataContext";
+import { ActivityLayoutContextProvider } from "../../contexts/ActivityLayoutContext";
 
 const CourseAuthoringPage = () => {
   const [activePage, setActivePage] = useState<CoursePage | null>(null);
@@ -19,14 +20,16 @@ const CourseAuthoringPage = () => {
           <Box width="20%">
             <LeftSidebar />
           </Box>
-          <ActivityContextProvider>
-            <Box flexGrow={1}>
-              <MainArea />
-            </Box>
-            <Box width="20%">
-              <RightSidebar />
-            </Box>
-          </ActivityContextProvider>
+          <ActivityLayoutContextProvider>
+            <ActivityDataContextProvider>
+              <Box flexGrow={1}>
+                <MainArea />
+              </Box>
+              <Box width="20%">
+                <RightSidebar />
+              </Box>
+            </ActivityDataContextProvider>
+          </ActivityLayoutContextProvider>
         </Box>
       </Box>
     </CourseAuthoringContext.Provider>

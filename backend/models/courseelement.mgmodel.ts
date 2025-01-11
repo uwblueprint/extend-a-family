@@ -21,19 +21,19 @@ const CourseElementSchema: Schema = new Schema({
       "MultipleChoice",
       "Matching",
       "Table",
-      "RichText",
+      "Text",
       "Image",
     ],
   },
 });
 
-export interface RichTextElement extends CourseElement {
-  type: DisplayElementType.RichText;
+export interface TextElement extends CourseElement {
+  type: DisplayElementType.Text;
   content: string;
   backgroundColor?: string;
 }
 
-const RichTextElementSchema: Schema = new Schema({
+const TextElementSchema: Schema = new Schema({
   content: {
     type: String,
     required: true,
@@ -173,9 +173,9 @@ const CourseElementModel = mongoose.model<CourseElement>(
   CourseElementSchema,
 );
 
-export const RichTextElementModel = CourseElementModel.discriminator(
-  "RichTextElement",
-  RichTextElementSchema,
+export const TextElementModel = CourseElementModel.discriminator(
+  "TextElement",
+  TextElementSchema,
 );
 
 export const ImageElementModel = CourseElementModel.discriminator(

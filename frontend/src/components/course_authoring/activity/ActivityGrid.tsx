@@ -1,22 +1,26 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { useTheme } from "@mui/material";
 import GridLayout from "react-grid-layout";
 import GridElement from "./grid/GridElement";
-import { ActivityContext } from "../../../contexts/ActivityContext";
 import CourseAuthoringContext from "../../../contexts/CourseAuthoringContext";
+import { ActivityLayoutContext } from "../../../contexts/ActivityLayoutContext";
+import { ActivityDataContext } from "../../../contexts/ActivityDataContext";
 
 type ActivityGridProps = {
   rows: number;
   cols: number;
 };
+
 const ActivityGrid = ({ rows, cols }: ActivityGridProps) => {
   const { previewMode } = useContext(CourseAuthoringContext);
-  const { layout, dispatchLayout, targetRef } = useContext(ActivityContext);
-  const [activeComponent, setActiveComponent] = useState("10000"); // TODO
-  const [componentData, setComponentData] = useState(new Map<string, object>()); // TODO
+  const { layout, dispatchLayout, targetRef } = useContext(
+    ActivityLayoutContext,
+  );
+  const { activeElementId } = useContext(ActivityDataContext);
   const theme = useTheme();
+
   const gridStyle = previewMode
     ? { width: "100%", height: "100%" }
     : {
@@ -31,9 +35,9 @@ const ActivityGrid = ({ rows, cols }: ActivityGridProps) => {
       className="layout"
       style={gridStyle}
       layout={layout}
-      onLayoutChange={(newLayout) =>
-        dispatchLayout({ type: "newLayout", layout: newLayout })
-      }
+      onLayoutChange={(newLayout) => {
+        dispatchLayout({ type: "newLayout", layout: newLayout });
+      }}
       width={targetRef.current?.offsetWidth}
       maxRows={rows}
       cols={cols}
@@ -60,27 +64,23 @@ const ActivityGrid = ({ rows, cols }: ActivityGridProps) => {
                   backgroundColor: "white",
                   boxSizing: "border-box",
                   borderTop:
-                    item.i === activeComponent
+                    item.i === activeElementId
                       ? "1px solid blue"
                       : "1px solid black",
                   borderLeft:
-                    item.i === activeComponent
+                    item.i === activeElementId
                       ? "1px solid blue"
                       : "1px solid black",
                   boxShadow:
-                    item.i === activeComponent
+                    item.i === activeElementId
                       ? "1px 1px 0 0 blue, 0 1px 0 0 blue"
                       : "1px 1px 0 0 black, 0 1px 0 0 black",
                 }
           }
         >
           <GridElement
-            componentType={item.content}
-            index={item.i}
-            activeComponent={activeComponent}
-            setActiveComponent={setActiveComponent}
-            data={componentData}
-            setData={setComponentData}
+            elementType={item.content}
+            id={item.i}
             temp={item.temp}
             mouseEvent={item.mouseEvent}
             style={item.style}
