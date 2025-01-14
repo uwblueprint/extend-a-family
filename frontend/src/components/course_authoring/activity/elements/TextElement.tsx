@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Typography } from "@mui/material";
 import { TextElementData } from "../../../../types/CourseElementTypes";
 import { ActivityDataContext } from "../../../../contexts/ActivityDataContext";
+import CourseAuthoringContext from "../../../../contexts/CourseAuthoringContext";
 
 interface TextElementProps {
   id: string;
@@ -9,12 +10,12 @@ interface TextElementProps {
 }
 
 const TextElement: React.FC<TextElementProps> = ({ id, elementData }) => {
-  const { activeElementId, setActiveElementId } =
-    useContext(ActivityDataContext);
+  const { previewMode } = useContext(CourseAuthoringContext);
+  const { setActiveElementId } = useContext(ActivityDataContext);
   const { text, fontSize, fontWeight } = elementData;
   return (
     <div
-      onMouseDown={() => setActiveElementId(activeElementId === id ? null : id)}
+      onMouseDown={() => !previewMode && setActiveElementId(id)}
       className="drag-handle"
       style={{
         width: "100%",
@@ -26,7 +27,7 @@ const TextElement: React.FC<TextElementProps> = ({ id, elementData }) => {
       }}
     >
       <Typography
-        variant={`display${fontSize}`}
+        variant={`body${fontSize}`}
         style={{ margin: "0px", fontWeight, overflowWrap: "break-word" }}
       >
         {text}

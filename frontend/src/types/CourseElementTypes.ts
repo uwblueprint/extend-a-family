@@ -24,10 +24,26 @@ export interface CourseElementData {
   type: ElementType;
 }
 
+export type FontWeight = "Normal" | "Bold";
+export function isFontWeight(fontWeight: string): fontWeight is FontWeight {
+  return ["Normal", "Bold"].includes(fontWeight);
+}
+
+export type FontSize = "Large" | "Medium" | "Small";
+export function isFontSize(fontSize: string): fontSize is FontSize {
+  return ["Large", "Medium", "Small"].includes(fontSize);
+}
+
+export type TextAlign = "Left" | "Center" | "Right";
+export function isTextAlign(textAlign: string): textAlign is TextAlign {
+  return ["Left", "Center", "Right"].includes(textAlign);
+}
+
 export interface TextElementData extends CourseElementData {
   text: string;
-  fontWeight: "Normal" | "Bold";
-  fontSize: "Large" | "Medium" | "Small";
+  fontSize: FontSize;
+  fontWeight: FontWeight;
+  textAlign: TextAlign;
 }
 
 export function isTextElementData(

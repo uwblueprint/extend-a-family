@@ -1,8 +1,8 @@
 import React, { useState, ReactNode, useContext } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
 import { ActivityLayoutContext } from "../../../../contexts/ActivityLayoutContext";
-import { DisplayElementType } from "../../../../types/CourseElementTypes";
 import { ActivityDataContext } from "../../../../contexts/ActivityDataContext";
+import { defaultTextElement } from "../elements/defaultElements";
 
 const elementIsInChain = (
   elementToTraverse: HTMLElement | null,
@@ -79,13 +79,9 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
       setInserted(false);
       // Add new element to elements data object
       const newLayoutItem = layout[layout.length - 1];
-      const newElement = {
-        type: DisplayElementType.Text,
-        text: DisplayElementType.Text,
-      };
       const updatedElements = new Map(elements);
       const newId = newLayoutItem.i;
-      updatedElements.set(newId, newElement);
+      updatedElements.set(newId, defaultTextElement);
       setElements(updatedElements);
       setActiveElementId(newId);
     } else {

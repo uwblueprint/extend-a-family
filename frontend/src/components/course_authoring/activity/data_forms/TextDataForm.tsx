@@ -1,5 +1,24 @@
-import React, { useContext } from "react";
-import { DisplayElementType } from "../../../../types/CourseElementTypes";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import {
+  DisplayElementType,
+  FontSize,
+  FontWeight,
+  isFontSize,
+  isFontWeight,
+  isTextAlign,
+  isTextElementData,
+  TextAlign,
+} from "../../../../types/CourseElementTypes";
 import { ActivityDataContext } from "../../../../contexts/ActivityDataContext";
 
 interface TextDataFormProps {
@@ -7,103 +26,136 @@ interface TextDataFormProps {
 }
 
 const TextDataForm: React.FC<TextDataFormProps> = ({ id }) => {
-  const { elements, setElements } = useContext(ActivityDataContext);
+  const { elements, setElements, setActiveElementId } =
+    useContext(ActivityDataContext);
+  const [text, setText] = useState<string | null>(null);
+  const [fontSize, setFontSize] = useState<FontSize | null>(null);
+  const [fontWeight, setFontWeight] = useState<FontWeight | null>(null);
+  const [textAlign, setTextAlign] = useState<TextAlign | null>(null);
 
-  const handleChange = (field: string, value: string) => {
+  useEffect(() => {
+    const currentData = elements.get(id);
+    if (currentData && isTextElementData(currentData)) {
+      setText(currentData.text);
+      setFontSize(currentData.fontSize);
+      setFontWeight(currentData.fontWeight);
+      setTextAlign(currentData.textAlign);
+    }
+  }, [elements, id]);
+
+  const handleSubmit = () => {
     const updatedData = new Map(elements);
-    const currentData = updatedData.get(id) || {};
     const newData = {
-      ...currentData,
-      [field]: value,
       type: DisplayElementType.Text,
+      text,
+      fontSize,
+      fontWeight,
+      textAlign,
     };
     updatedData.set(id, newData);
     setElements(updatedData);
+    setActiveElementId(null);
   };
 
   return (
-    <div
+    <Box
       className="drag-handle"
       style={{
         width: "100%",
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
         alignContent: "center",
-        textAlign: "center",
       }}
     >
-      <div style={{ height: "30px" }} />
-      <b>Font Weight:</b>
-      <div>
-        <label htmlFor="bold">
-          <input
-            type="radio"
-            id="bold"
-            name="font_weight"
-            value="bold"
-            onChange={() => handleChange("fontWeight", "bold")}
+      <Stack spacing="12px" paddingBottom="12px">
+        <Typography variant="titleMedium">Text element</Typography>
+        <Typography variant="bodyMedium">
+          Customize the selected text element.
+        </Typography>
+      </Stack>
+      <Stack spacing="12px" paddingBottom="12px">
+        <Typography variant="labelLargeProminent">Content:</Typography>
+        <TextField
+          size="small"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+      </Stack>
+      <Stack spacing="12px" paddingBottom="12px">
+        <Typography variant="labelLargeProminent">Font size:</Typography>
+        <RadioGroup
+          value={fontSize}
+          onChange={(e) =>
+            isFontSize(e.target.value) && setFontSize(e.target.value)
+          }
+        >
+          <FormControlLabel
+            control={<Radio size="small" />}
+            label="Small"
+            value="Small"
           />
-          Bold
-        </label>
-      </div>
-      <div>
-        <label htmlFor="normal">
-          <input
-            type="radio"
-            id="normal"
-            name="font_weight"
-            value="bold"
-            onChange={() => handleChange("fontWeight", "normal")}
+          <FormControlLabel
+            control={<Radio size="small" />}
+            label="Medium"
+            value="Medium"
           />
-          Normal
-        </label>
-      </div>
-      <b>Vertical Align:</b>
-      <div>
-        <label htmlFor="flex-start-vertical">
-          <input
-            type="radio"
-            id="flex-start-vertical"
-            name="vertical_align"
-            value="flex-start"
-            onChange={() => handleChange("verticalAlign", "flex-start")}
+          <FormControlLabel
+            control={<Radio size="small" />}
+            label="Large"
+            value="Large"
           />
-          Top
-        </label>
-      </div>
-      <div>
-        <label htmlFor="center-vertical">
-          <input
-            type="radio"
-            id="center-vertical"
-            name="vertical_align"
-            value="center"
-            onChange={() => handleChange("verticalAlign", "center")}
+        </RadioGroup>
+      </Stack>
+      <Stack spacing="12px" paddingBottom="12px">
+        <Typography variant="labelLargeProminent">Font weight:</Typography>
+        <RadioGroup
+          value={fontWeight}
+          onChange={(e) =>
+            isFontWeight(e.target.value) && setFontWeight(e.target.value)
+          }
+        >
+          <FormControlLabel
+            control={<Radio size="small" />}
+            label="Normal"
+            value="Normal"
           />
-          Center
-        </label>
-      </div>
-      <div>
-        <label htmlFor="flex-end-vertical">
-          <input
-            type="radio"
-            id="flex-end-vertical"
-            name="vertical_align"
-            value="flex-end"
-            onChange={() => handleChange("verticalAlign", "flex-end")}
+          <FormControlLabel
+            control={<Radio size="small" />}
+            label="Bold"
+            value="Bold"
           />
-          Bottom
-        </label>
-      </div>
-
-      <input
-        type="text"
-        placeholder="Text Box Content"
-        onChange={(e) => handleChange("content", e.target.value)}
-      />
-    </div>
+        </RadioGroup>
+      </Stack>
+      <Stack spacing="12px" paddingBottom="12px">
+        <Typography variant="labelLargeProminent">Text alignment:</Typography>
+        <RadioGroup
+          value={textAlign}
+          onChange={(e) =>
+            isTextAlign(e.target.value) && setTextAlign(e.target.value)
+          }
+        >
+          <FormControlLabel
+            control={<Radio size="small" />}
+            label="Left"
+            value="Left"
+          />
+          <FormControlLabel
+            control={<Radio size="small" />}
+            label="Center"
+            value="Center"
+          />
+          <FormControlLabel
+            control={<Radio size="small" />}
+            label="Right"
+            value="Right"
+          />
+        </RadioGroup>
+      </Stack>
+      <Button variant="outlined" onClick={handleSubmit}>
+        Done
+      </Button>
+    </Box>
   );
 };
 

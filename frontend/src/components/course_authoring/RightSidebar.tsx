@@ -8,7 +8,7 @@ import { DisplayElementType } from "../../types/CourseElementTypes";
 
 const RightSidebar = () => {
   const theme = useTheme();
-  const { activePage } = useContext(CourseAuthoringContext);
+  const { activePage, previewMode } = useContext(CourseAuthoringContext);
   const { elements, activeElementId } = useContext(ActivityDataContext);
 
   const DataForm = () => {
@@ -29,8 +29,9 @@ const RightSidebar = () => {
   };
 
   return (
-    <Box height="100%" bgcolor={theme.palette.Neutral[200]} padding="24px">
-      {activePage &&
+    <Box height="100vh" padding="24px" bgcolor={theme.palette.Neutral[200]}>
+      {!previewMode &&
+        activePage &&
         (activePage.type === "Lesson" ? (
           <Box>alt text form</Box>
         ) : (
