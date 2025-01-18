@@ -3,10 +3,10 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { useTheme } from "@mui/material";
 import GridLayout from "react-grid-layout";
-import GridElement from "./grid/GridElement";
-import CourseAuthoringContext from "../../../contexts/CourseAuthoringContext";
-import { ActivityLayoutContext } from "../../../contexts/ActivityLayoutContext";
-import { ActivityDataContext } from "../../../contexts/ActivityDataContext";
+import GridElement from "./GridElement";
+import CourseAuthoringContext from "../../../../contexts/CourseAuthoringContext";
+import { ActivityLayoutContext } from "../../../../contexts/ActivityLayoutContext";
+import { ActivityDataContext } from "../../../../contexts/ActivityDataContext";
 
 type ActivityGridProps = {
   rows: number;

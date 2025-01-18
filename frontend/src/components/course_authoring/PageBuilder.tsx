@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Box, useTheme } from "@mui/material";
 import CourseAuthoringContext from "../../contexts/CourseAuthoringContext";
-import ActivityGrid from "./activity/ActivityGrid";
+import ActivityGrid from "./activity/grid/ActivityGrid";
 import { ActivityLayoutContext } from "../../contexts/ActivityLayoutContext";
 
 const PageBuilder = () => {

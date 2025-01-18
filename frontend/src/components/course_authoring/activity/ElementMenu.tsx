@@ -1,7 +1,20 @@
 import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
+import styled from "@emotion/styled";
 import DraggableSource from "./grid/DraggableSource";
 import { DisplayElementType } from "../../../types/CourseElementTypes";
+
+const ElementBox = styled(Box)`
+  width: 150px;
+  height: 40px;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 8px;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+`;
 
 const ElementMenu = () => {
   return (
@@ -13,19 +26,9 @@ const ElementMenu = () => {
         </Typography>
       </Stack>
       <DraggableSource key="1" componentType={DisplayElementType.Text}>
-        <Box
-          style={{
-            width: "70px",
-            height: "30px",
-            border: "1px solid black",
-            alignItems: "center",
-            textAlign: "center",
-            justifyContent: "center",
-            backgroundColor: "white",
-          }}
-        >
-          Text
-        </Box>
+        <ElementBox>
+          <Typography variant="labelMedium">Text</Typography>
+        </ElementBox>
       </DraggableSource>
     </Box>
   );

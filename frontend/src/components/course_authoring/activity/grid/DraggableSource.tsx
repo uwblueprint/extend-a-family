@@ -1,5 +1,6 @@
 import React, { useState, ReactNode, useContext } from "react";
 import Draggable, { DraggableEventHandler } from "react-draggable";
+import { Box } from "@mui/material";
 import { ActivityLayoutContext } from "../../../../contexts/ActivityLayoutContext";
 import { ActivityDataContext } from "../../../../contexts/ActivityDataContext";
 import { defaultTextElement } from "../elements/defaultElements";
@@ -90,7 +91,10 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
   };
 
   return (
-    <div style={{ visibility: inserted ? "hidden" : "visible" }}>
+    <Box
+      visibility={inserted ? "hidden" : "visible"}
+      sx={{ "&:hover": { cursor: "pointer" } }}
+    >
       <Draggable
         onDrag={onDragOverwrite}
         onStop={onStopOverwrite}
@@ -99,7 +103,7 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
       >
         {children}
       </Draggable>
-    </div>
+    </Box>
   );
 };
 
