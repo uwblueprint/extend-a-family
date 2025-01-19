@@ -42,9 +42,6 @@ export const coursePageDtoValidator = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!validatePrimitive(req.body.title, "string")) {
-    return res.status(400).send(getApiValidationError("title", "string"));
-  }
   if (!validatePrimitive(req.body.type, "string")) {
     return res.status(400).send(getApiValidationError("type", "string"));
   }
@@ -53,8 +50,8 @@ export const coursePageDtoValidator = async (
       return res.status(400).send(getApiValidationError("source", "string"));
     }
   } else if (req.body.type === "Activity") {
-    if (!req.body.layout) {
-      return res.status(400).send("Layout field missing for Activity Page");
+    if (!req.body.elements) {
+      return res.status(400).send("Elements field missing for Activity Page");
     }
   } else {
     return res.status(400).send(`Invalid page type "${req.body.type}"`);

@@ -1,5 +1,6 @@
 import { merge, keyBy } from "lodash";
 import { v4 as uuidv4 } from "uuid";
+import { ElementPosition } from "../../../../types/CourseElementTypes";
 
 interface MouseEventLike {
   clientX: number;
@@ -7,15 +8,11 @@ interface MouseEventLike {
 }
 
 type ResizeHandle = "sw" | "nw" | "se" | "ne" | "n" | "s" | "w" | "e";
-export interface LayoutItem {
-  x: number;
-  y: number;
-  h: number;
-  w: number;
-  content?: string;
+export interface LayoutItem extends ElementPosition {
+  i: string;
+  elementType?: string;
   temp?: boolean;
   mouseEvent?: MouseEventLike;
-  i: string;
   resizeHandles?: ResizeHandle[];
   style?: React.CSSProperties;
   className?: string;
@@ -29,7 +26,7 @@ export interface LayoutAction {
   type: string;
   h?: number;
   w?: number;
-  content?: string;
+  elementType?: string;
   mouseEvent?: MouseEventLike;
   layout?: LayoutItem[];
   i?: string;
@@ -76,7 +73,7 @@ const layoutReducer = (
           y: Math.max(cellY, 0),
           h: 2,
           w: 3,
-          content: action.content,
+          elementType: action.elementType ?? "",
           temp: true,
           mouseEvent: action.mouseEvent,
           i: uuidv4(),
@@ -98,6 +95,9 @@ const layoutReducer = (
     case "deleteItem": {
       const updatedState = state.filter((item) => item.i !== action.i);
       return updatedState;
+    }
+    case "reset": {
+      return [];
     }
     default:
       return state;

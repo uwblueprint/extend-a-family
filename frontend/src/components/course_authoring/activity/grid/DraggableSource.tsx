@@ -32,14 +32,14 @@ const getMouseEvent = (e: MouseEvent | TouchEvent) => {
 interface DraggableSourceProps {
   onDrag?: DraggableEventHandler;
   onStop?: DraggableEventHandler;
-  componentType: string;
+  elementType: string;
   children: ReactNode;
 }
 
 const DraggableSource: React.FC<DraggableSourceProps> = ({
   onDrag,
   onStop,
-  componentType,
+  elementType,
   children,
 }) => {
   const { targetRef, layout, dispatchLayout } = useContext(
@@ -67,7 +67,7 @@ const DraggableSource: React.FC<DraggableSourceProps> = ({
     if (target && !inserted) {
       const mouseEvent = getMouseEvent(e as MouseEvent | TouchEvent);
       if (mouseEvent) {
-        dispatchLayout({ type: "addTemp", mouseEvent, content: componentType });
+        dispatchLayout({ type: "addTemp", mouseEvent, elementType });
       }
       setInserted(true);
     }

@@ -1,3 +1,5 @@
+import { ElementData } from "./courseElementTypes";
+
 export type CourseUnitDTO = {
   id: string;
   displayIndex: number;
@@ -19,9 +21,9 @@ export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
 export type UpdateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
 
 export type PageType = "Lesson" | "Activity";
+
 export type CoursePageDTO = {
   id: string;
-  title: string;
   type: PageType;
 };
 
@@ -29,45 +31,23 @@ export type LessonPageDTO = CoursePageDTO & {
   source: string;
 };
 
-export type ElementSkeleton = {
-  id: string;
+export type Element = {
+  i: string;
   x: number;
   y: number;
   w: number;
   h: number;
-  content: string;
+  data: ElementData;
 };
 export type ActivityPageDTO = CoursePageDTO & {
-  layout: [ElementSkeleton];
+  elements: Element[];
 };
 
 export type CreateCoursePageDTO =
-  | Pick<CoursePageDTO, "title" | "type">
-  | Pick<LessonPageDTO, "title" | "type" | "source">
-  | Pick<ActivityPageDTO, "title" | "type" | "layout">;
+  | Pick<CoursePageDTO, "type">
+  | Pick<LessonPageDTO, "type" | "source">
+  | Pick<ActivityPageDTO, "type" | "elements">;
 export type UpdateCoursePageDTO =
-  | Pick<CoursePageDTO, "title" | "type">
-  | Pick<LessonPageDTO, "title" | "type" | "source">
-  | Pick<ActivityPageDTO, "title" | "type" | "layout">;
-
-export enum InteractiveElementType {
-  TextInput = "TextInput",
-  NumberInput = "NumberInput",
-  CheckboxInput = "CheckboxInput",
-  MultipleChoice = "MultipleChoice",
-  Matching = "Matching",
-}
-
-export enum HybridElementType {
-  Table = "Table",
-}
-
-export enum DisplayElementType {
-  Text = "Text",
-  Image = "Image",
-}
-
-export type ElementType =
-  | DisplayElementType
-  | InteractiveElementType
-  | HybridElementType;
+  | Pick<CoursePageDTO, "type">
+  | Pick<LessonPageDTO, "type" | "source">
+  | Pick<ActivityPageDTO, "type" | "elements">;

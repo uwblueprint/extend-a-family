@@ -28,4 +28,4 @@ export const FORGOT_PASSWORD_PAGE = "/forgot-password";
 
 export const COURSE_PAGE = "/course";
 
-export const COURSE_AUTHORING_PAGE = "/course-authoring";
+export const COURSE_AUTHORING_PAGE = "/course-authoring/:unitId/:moduleId";

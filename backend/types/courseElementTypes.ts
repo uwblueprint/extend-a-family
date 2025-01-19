@@ -31,6 +31,7 @@ export interface ElementData {
   type: ElementType;
 }
 
+// Text element
 export type FontSize = "Large" | "Medium" | "Small";
 export function isFontSize(fontSize: string): fontSize is FontSize {
   return ["Large", "Medium", "Small"].includes(fontSize);

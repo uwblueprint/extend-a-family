@@ -25,7 +25,7 @@ const ElementMenu = () => {
           Drag an element onto the page.
         </Typography>
       </Stack>
-      <DraggableSource key="1" componentType={DisplayElementType.Text}>
+      <DraggableSource key="1" elementType={DisplayElementType.Text}>
         <ElementBox>
           <Typography variant="labelMedium">Text</Typography>
         </ElementBox>

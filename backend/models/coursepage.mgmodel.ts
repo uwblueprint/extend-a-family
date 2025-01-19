@@ -1,34 +1,42 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { ObjectId } from "mongodb";
-import { ElementSkeleton, PageType } from "../types/courseTypes";
+import { Element, PageType } from "../types/courseTypes";
+import { validateElementData } from "../utilities/courseUtils";
 
-const ElementSkeletonSchema: Schema = new Schema({
-  x: {
-    type: Number,
-    required: true,
+const ElementSchema: Schema = new Schema(
+  {
+    x: {
+      type: Number,
+      required: true,
+    },
+    y: {
+      type: Number,
+      required: true,
+    },
+    w: {
+      type: Number,
+      required: true,
+    },
+    h: {
+      type: Number,
+      required: true,
+    },
+    data: {
+      type: Schema.Types.Mixed,
+      required: true,
+    },
   },
-  y: {
-    type: Number,
-    required: true,
-  },
-  w: {
-    type: Number,
-    required: true,
-  },
-  h: {
-    type: Number,
-    required: true,
-  },
-  content: {
-    type: ObjectId,
-    required: true,
-    ref: "CourseElement",
-  },
+  { _id: false },
+);
+
+ElementSchema.path("data").validate((value) => {
+  if (!value || !value.type) {
+    return false;
+  }
+  return validateElementData(value);
 });
 
 export interface CoursePage extends Document {
   id: string;
-  title: string;
   type: PageType;
 }
 
@@ -37,7 +45,7 @@ export interface LessonPage extends CoursePage {
 }
 
 export interface ActivityPage extends CoursePage {
-  layout: [ElementSkeleton];
+  elements: Element[];
 }
 
 const baseOptions = {
@@ -46,10 +54,6 @@ const baseOptions = {
 
 export const CoursePageSchema: Schema = new Schema(
   {
-    title: {
-      type: String,
-      required: true,
-    },
     type: {
       type: String,
       required: true,
@@ -67,8 +71,8 @@ const LessonPageSchema: Schema = new Schema({
 });
 
 const ActivityPageSchema: Schema = new Schema({
-  layout: {
-    type: [ElementSkeletonSchema],
+  elements: {
+    type: [ElementSchema],
     required: true,
   },
 });

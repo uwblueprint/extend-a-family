@@ -6,8 +6,17 @@ import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneIcon from "@mui/icons-material/Done";
 import styled from "@emotion/styled";
-import { CoursePage, PageType } from "../../types/CourseTypes";
+import { useParams } from "react-router-dom";
+import {
+  ActivityPage,
+  isActivityPage,
+  PageType,
+} from "../../types/CourseTypes";
 import CourseAuthoringContext from "../../contexts/CourseAuthoringContext";
+import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import { getErrorMessage } from "../../utils/ErrorUtils";
+import { ActivityDataContext } from "../../contexts/ActivityDataContext";
+import { ActivityLayoutContext } from "../../contexts/ActivityLayoutContext";
 
 const StyledButton = styled(Button)`
   height: 40px;
@@ -36,30 +45,60 @@ type BottomToolbarProps = {
   onBuilderExit: () => void;
 };
 
+type CourseAuthoringParams = {
+  unitId: string;
+  moduleId: string;
+};
+
 const BottomToolbar = ({
   onBuilderEnter,
   onBuilderExit,
 }: BottomToolbarProps) => {
-  const theme = useTheme();
+  const { unitId, moduleId } = useParams<CourseAuthoringParams>();
   const { activePage, setActivePage, previewMode, setPreviewMode } = useContext(
     CourseAuthoringContext,
   );
+  const { layout, dispatchLayout } = useContext(ActivityLayoutContext);
+  const { elements, setElements } = useContext(ActivityDataContext);
+  const theme = useTheme();
 
   function createPage(pageType: PageType) {
-    // TODO: Call API to create page
-    const page: CoursePage = {
-      id: "NEW_PAGE",
-      type: pageType,
-    };
-    setActivePage(page);
+    if (pageType === "Activity") {
+      const page: ActivityPage = {
+        id: "", // placeholder
+        type: pageType,
+        elements: [],
+      };
+      setActivePage(page);
+    }
+
     onBuilderEnter();
   }
 
-  function savePage() {
-    // TODO: Call API to save page
-    setActivePage(null);
-    setPreviewMode(false);
-    onBuilderExit();
+  async function savePage() {
+    if (!activePage) {
+      throw new Error("active page is null");
+    }
+
+    if (isActivityPage(activePage)) {
+      try {
+        await CourseAPIClient.saveActivityPage(
+          unitId,
+          moduleId,
+          activePage,
+          layout,
+          elements,
+        );
+        // Reset page, layout, elements
+        setActivePage(null);
+        dispatchLayout({ type: "reset" });
+        setElements(new Map());
+        setPreviewMode(false);
+        onBuilderExit();
+      } catch (e: unknown) {
+        alert(`Failed to save page: ${getErrorMessage(e)}`);
+      }
+    }
   }
 
   function togglePreview() {

@@ -79,7 +79,7 @@ const ActivityGrid = ({ rows, cols }: ActivityGridProps) => {
           }
         >
           <GridElement
-            elementType={item.content}
+            elementType={item.elementType}
             id={item.i}
             temp={item.temp}
             mouseEvent={item.mouseEvent}

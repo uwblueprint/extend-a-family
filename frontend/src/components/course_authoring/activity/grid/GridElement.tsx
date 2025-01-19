@@ -96,7 +96,7 @@ const GridElement: React.FC<GridElementProps> = ({
       onTouchEnd={onTouchEnd}
       onTouchStart={onTouchStart}
     >
-      <BaseElement name={elementType ?? ""} id={id} />
+      <BaseElement id={id} elementType={elementType ?? ""} />
     </div>
   );
 };
