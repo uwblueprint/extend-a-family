@@ -43,6 +43,7 @@ export interface CoursePage extends Document {
 
 export interface LessonPage extends CoursePage {
   source: string;
+  pageIndex: number;
 }
 
 export interface ActivityPage extends CoursePage {
@@ -75,6 +76,10 @@ export const CoursePageSchema: Schema = new Schema(
 const LessonPageSchema: Schema = new Schema({
   source: {
     type: String,
+    required: true,
+  },
+  pageIndex: {
+    type: Number,
     required: true,
   },
 });
