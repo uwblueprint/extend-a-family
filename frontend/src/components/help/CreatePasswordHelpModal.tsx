@@ -124,17 +124,28 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
                 borderRadius: "4px",
                 alignItems: "flex-start",
                 height: "100%",
-                paddingTop: "8px",
+                padding: "12px",
               },
             }}
             InputLabelProps={{
               sx: {
-                fontSize: "14px",
+                fontSize: "16px",
                 fontWeight: 500,
                 color: "var(--Neutral-700, #111)",
+                backgroundColor: "#FFF",
+                padding: "0 4px",
+                transform: "translate(14px, 10px) scale(1)",
+                "&.Mui-focused": {
+                  transform: "translate(14px, -8px) scale(0.75)",
+                },
+                "&.MuiInputLabel-shrink": {
+                  transform: "translate(14px, -8px) scale(0.75)",
+                },
               },
             }}
           />
+
+
         </DialogContent>
 
         {/* Bottom Buttons */}
