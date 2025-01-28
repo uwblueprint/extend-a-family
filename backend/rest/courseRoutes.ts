@@ -73,6 +73,23 @@ courseRouter.get(
 );
 
 courseRouter.get(
+  "/uploadLessons",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    try {
+      const { moduleId } = req.body;
+      const result = await courseModuleService.uploadLessons(
+        moduleId,
+        `uploads/pdf/course/module-${moduleId}.pdf`,
+      );
+      res.status(200).json(result);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.get(
   "/:unitId",
   isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
   async (req, res) => {

@@ -1,5 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { startSession } from "mongoose";
+import fs from "fs/promises";
+import { PDFDocument } from "pdf-lib";
 import {
   CourseModuleDTO,
   CreateCourseModuleDTO,
@@ -12,10 +14,20 @@ import MgCourseModule, {
   CourseModule,
 } from "../../models/coursemodule.mgmodel";
 import ICourseModuleService from "../interfaces/courseModuleService";
+import FileStorageService from "./fileStorageService";
+import { LessonPageModel } from "../../models/coursepage.mgmodel";
 
 const Logger = logger(__filename);
 
 class CourseModuleService implements ICourseModuleService {
+  private fileStorageService: FileStorageService;
+
+  constructor() {
+    this.fileStorageService = new FileStorageService(
+      process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
+    );
+  }
+
   async getCourseModules(
     courseUnitId: string,
   ): Promise<Array<CourseModuleDTO>> {
@@ -193,6 +205,88 @@ class CourseModuleService implements ICourseModuleService {
     }
 
     return deletedCourseModuleId;
+  }
+
+  async uploadLessons(
+    moduleId: string,
+    pdfPath: string,
+  ): Promise<CourseModuleDTO> {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+      // 1. Find the module
+      const courseModule = await MgCourseModule.findById(moduleId).session(
+        session,
+      );
+      if (!courseModule) {
+        throw new Error(`Course module with id ${moduleId} not found`);
+      }
+
+      // 2. Read and process the PDF
+      const pdfBytes = await fs.readFile(pdfPath);
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const numPages = pdfDoc.getPageCount();
+
+      // 3. Upload PDF to Firebase Storage
+      const pdfFileName = `course/pdfs/module-${moduleId}.pdf`;
+      await this.fileStorageService.createFile(
+        pdfFileName,
+        pdfPath,
+        "application/pdf",
+      );
+
+      // 4. Create lesson pages using LessonPageModel
+      const createdPages: Array<string> = [];
+      for (let i = 0; i < numPages; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        const newPage = await LessonPageModel.create(
+          [
+            {
+              // Note: Wrapped in array as per Mongoose v7+ requirements
+              title: `Page ${i + 1}`,
+              displayIndex: courseModule.pages.length + i + 1,
+              type: "Lesson",
+              source: pdfFileName,
+              pageIndex: i,
+            },
+          ],
+          { session },
+        );
+        createdPages.push(newPage[0].id); // Access first element and get _id
+      }
+
+      // 5. Update module with new pages
+      const updatedModule = await MgCourseModule.findByIdAndUpdate(
+        moduleId,
+        { $push: { pages: { $each: createdPages } } }, // createdPages is already array of IDs
+        { new: true, session },
+      );
+
+      if (!updatedModule) {
+        throw new Error(
+          `Course module with id ${moduleId} not found during update`,
+        );
+      }
+
+      await session.commitTransaction();
+
+      return {
+        id: updatedModule.id,
+        displayIndex: updatedModule.displayIndex,
+        title: updatedModule.title,
+      } as CourseModuleDTO;
+    } catch (error) {
+      await session.abortTransaction();
+      Logger.error(
+        `Failed to upload lessons for module ${moduleId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }
 
