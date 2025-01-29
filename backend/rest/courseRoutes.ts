@@ -8,10 +8,16 @@ import {
 } from "../middlewares/validators/courseValidators";
 import { isAuthorizedByRole } from "../middlewares/auth";
 import CourseModuleService from "../services/implementations/courseModuleService";
+import FileStorageService from "../services/implementations/fileStorageService";
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const courseRouter: Router = Router();
 const courseUnitService: CourseUnitService = new CourseUnitService();
 const courseModuleService: CourseModuleService = new CourseModuleService();
+const firebaseStorageService: FileStorageService = new FileStorageService("extendafamily-7613e.appspot.com");
 
 courseRouter.get(
   "/",
@@ -147,5 +153,32 @@ courseRouter.delete(
     }
   },
 );
+
+courseRouter.post(
+  "/:moduleId/uploadThumbnail",
+  upload.single("uploadedImage"),
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    if (!req.file) {
+      console.log("here")
+      return res.status(400).json({error: "image is missing"});
+    }
+    const { moduleId } = req.params;
+    const imageData = req.file?.buffer
+    const contentType: string = req.file.mimetype
+    const imageName = "course/thumbnails/" + moduleId 
+
+    try {
+      await firebaseStorageService.createFile(
+        imageName, imageData, contentType
+      )
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+    res.status(200).json(req.file);
+  },
+);
+
+
 
 export default courseRouter;

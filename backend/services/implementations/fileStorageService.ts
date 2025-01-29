@@ -39,7 +39,7 @@ class FileStorageService implements IFileStorageService {
 
   async createFile(
     fileName: string,
-    filePath: string,
+    fileData: any,
     contentType: string | null = null,
   ): Promise<void> {
     try {
@@ -48,8 +48,7 @@ class FileStorageService implements IFileStorageService {
       if ((await currentBlob.exists())[0]) {
         throw new Error(`File name ${fileName} already exists`);
       }
-      await bucket.upload(filePath, {
-        destination: fileName,
+      await bucket.file(fileName).save(fileData, {
         metadata: { contentType },
       });
     } catch (error: unknown) {
