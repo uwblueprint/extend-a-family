@@ -1,7 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { startSession } from "mongoose";
 import fs from "fs/promises";
-import { v4 as uuidv4 } from "uuid";
 import { PDFDocument } from "pdf-lib";
 import {
   CourseModuleDTO,
@@ -16,7 +15,7 @@ import MgCourseModule, {
 } from "../../models/coursemodule.mgmodel";
 import ICourseModuleService from "../interfaces/courseModuleService";
 import FileStorageService from "./fileStorageService";
-import { LessonPageModel, LessonPage } from "../../models/coursepage.mgmodel";
+import { LessonPageModel } from "../../models/coursepage.mgmodel";
 
 const Logger = logger(__filename);
 
@@ -208,7 +207,7 @@ class CourseModuleService implements ICourseModuleService {
       const numPages = pdfDoc.getPageCount();
 
       // 3. Upload PDF to Firebase Storage
-      const pdfFileName = `lessons/${moduleId}/${uuidv4()}.pdf`;
+      const pdfFileName = `course/pdfs/module-${moduleId}.pdf`;
       await this.fileStorageService.createFile(
         pdfFileName,
         pdfPath,
@@ -216,7 +215,7 @@ class CourseModuleService implements ICourseModuleService {
       );
 
       // 4. Create lesson pages using LessonPageModel
-      const createdPages: Array<LessonPage["_id"]> = [];
+      const createdPages: Array<string> = [];
       for (let i = 0; i < numPages; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         const newPage = await LessonPageModel.create(
