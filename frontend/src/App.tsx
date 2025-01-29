@@ -30,6 +30,7 @@ import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/pages/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 import CourseUnitsPage from "./components/pages/courses/CourseUnitsPage";
+import UploadThumbnailPage from "./components/courses/UploadThumbnailPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -76,7 +77,12 @@ const App = (): React.ReactElement => {
                   path={Routes.FORGOT_PASSWORD_PAGE}
                   component={ForgotPasswordPage}
                 />
-
+                <PrivateRoute
+                  exact
+                  path={Routes.UPLOAD_THUMBNAIL}
+                  component={UploadThumbnailPage}
+                  allowedRoles={["Administrator"]}
+                />
                 <PrivateRoute
                   exact
                   path={Routes.HOME_PAGE}
@@ -136,6 +142,7 @@ const App = (): React.ReactElement => {
                   component={CourseUnitsPage}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
+                
                 <Route exact path="*" component={NotFound} />
               </Switch>
             </Router>
