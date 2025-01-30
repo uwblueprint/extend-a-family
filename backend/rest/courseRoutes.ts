@@ -1,4 +1,6 @@
 import { Router } from "express";
+import multer from "multer";
+import fs from "fs";
 import CourseUnitService from "../services/implementations/courseUnitService";
 import { getErrorMessage } from "../utilities/errorUtils";
 import {
@@ -26,15 +28,29 @@ courseRouter.get(
   },
 );
 
-courseRouter.get(
+courseRouter.post(
   "/uploadLessons",
+  multer({ storage: multer.memoryStorage() }).single("lessonPdf"),
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
     try {
-      const { moduleId } = req.body;
+      const {
+        file: lessonPdf,
+        body: { moduleId },
+      } = req;
+      if (!lessonPdf) {
+        res.status(400).send("No lessonPdf file uploaded.");
+        return;
+      }
+      const uploadedLessonPath = `uploads/course/pdfs/module-${moduleId}.pdf`;
+      fs.writeFile(uploadedLessonPath, lessonPdf.buffer, (err) => {
+        if (err) {
+          res.status(500).send("Error saving file.");
+        }
+      });
       const result = await courseModuleService.uploadLessons(
         moduleId,
-        `uploads/pdf/course/module-${moduleId}.pdf`,
+        `uploads/course/pdfs/module-${moduleId}.pdf`,
       );
       res.status(200).json(result);
     } catch (e: unknown) {
