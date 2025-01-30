@@ -1,6 +1,7 @@
 **/node_modules
 **/.env
 **/build
+**/uploads
 **/venv
 **/__pycache__
 **/*.log

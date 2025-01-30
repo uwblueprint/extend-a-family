@@ -1,7 +1,7 @@
 import { Router } from "express";
+import fs from "fs";
 import multer from "multer";
-import CourseUnitService from "../services/implementations/courseUnitService";
-import { getErrorMessage } from "../utilities/errorUtils";
+import { isAuthorizedByRole } from "../middlewares/auth";
 import {
   coursePageDtoValidator,
   createCourseUnitDtoValidator,
@@ -10,11 +10,12 @@ import {
   pageBelongsToModuleValidator,
   updateCourseUnitDtoValidator,
 } from "../middlewares/validators/courseValidators";
-import { isAuthorizedByRole } from "../middlewares/auth";
 import CourseModuleService from "../services/implementations/courseModuleService";
 import CoursePageService from "../services/implementations/coursePageService";
+import CourseUnitService from "../services/implementations/courseUnitService";
 import FileStorageService from "../services/implementations/fileStorageService";
 import { CourseModuleDTO } from "../types/courseTypes";
+import { getErrorMessage } from "../utilities/errorUtils";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -72,15 +73,29 @@ courseRouter.get(
   },
 );
 
-courseRouter.get(
+courseRouter.post(
   "/uploadLessons",
+  multer({ storage: multer.memoryStorage() }).single("lessonPdf"),
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
     try {
-      const { moduleId } = req.body;
+      const {
+        file: lessonPdf,
+        body: { moduleId },
+      } = req;
+      if (!lessonPdf) {
+        res.status(400).send("No lessonPdf file uploaded.");
+        return;
+      }
+      const uploadedLessonPath = `uploads/course/pdfs/module-${moduleId}.pdf`;
+      fs.writeFile(uploadedLessonPath, lessonPdf.buffer, (err) => {
+        if (err) {
+          res.status(500).send("Error saving file.");
+        }
+      });
       const result = await courseModuleService.uploadLessons(
         moduleId,
-        `uploads/pdf/course/module-${moduleId}.pdf`,
+        `uploads/course/pdfs/module-${moduleId}.pdf`,
       );
       res.status(200).json(result);
     } catch (e: unknown) {
