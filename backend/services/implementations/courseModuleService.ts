@@ -234,6 +234,7 @@ class CourseModuleService implements ICourseModuleService {
         pdfFileName,
         pdfPath,
         "application/pdf",
+        true,
       );
 
       // 4. Create lesson pages using LessonPageModel
