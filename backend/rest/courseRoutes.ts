@@ -39,10 +39,12 @@ courseRouter.post(
         body: { moduleId },
       } = req;
       if (!lessonPdf) {
-        res.status(400).send("No lessonPdf file uploaded.");
-        return;
+        throw new Error("No lessonPdf file uploaded.");
       }
       const uploadedLessonPath = `uploads/course/pdfs/module-${moduleId}.pdf`;
+      if (!fs.existsSync(uploadedLessonPath)) {
+        fs.mkdirSync("uploads/course/pdfs", { recursive: true });
+      }
       fs.writeFile(uploadedLessonPath, lessonPdf.buffer, (err) => {
         if (err) {
           throw err;
@@ -50,7 +52,7 @@ courseRouter.post(
       });
       const result = await courseModuleService.uploadLessons(
         moduleId,
-        `uploads/course/pdfs/module-${moduleId}.pdf`,
+        uploadedLessonPath,
       );
       res.status(200).json(result);
     } catch (e: unknown) {
