@@ -90,7 +90,7 @@ courseRouter.post(
       const uploadedLessonPath = `uploads/course/pdfs/module-${moduleId}.pdf`;
       fs.writeFile(uploadedLessonPath, lessonPdf.buffer, (err) => {
         if (err) {
-          res.status(500).send("Error saving file.");
+          throw err;
         }
       });
       const result = await courseModuleService.uploadLessons(
