@@ -9,6 +9,15 @@ export interface User extends Document {
   authId: string;
   role: Role;
   status: Status;
+  email: string;
+}
+
+export interface Learner extends User {
+  facilitator: ObjectId;
+}
+
+export interface Facilitator extends User {
+  learners: Array<ObjectId>;
 }
 
 const baseOptions = {
@@ -39,6 +48,10 @@ export const UserSchema: Schema = new Schema(
       type: String,
       required: true,
       enum: ["Invited", "Active"],
+    },
+    email: {
+      type: String,
+      required: true,
     },
   },
   baseOptions,
@@ -75,12 +88,15 @@ const LearnerSchema = new Schema({
   },
 });
 
-const Administrator = UserModel.discriminator(
+const AdministratorModel = UserModel.discriminator(
   "Administrator",
   AdministratorSchema,
 );
-const Facilitator = UserModel.discriminator("Facilitator", FacilitatorSchema);
-const Learner = UserModel.discriminator("Learner", LearnerSchema);
+const FacilitatorModel = UserModel.discriminator<Facilitator>(
+  "Facilitator",
+  FacilitatorSchema,
+);
+const LearnerModel = UserModel.discriminator<Learner>("Learner", LearnerSchema);
 
-export { Administrator, Facilitator, Learner };
+export { AdministratorModel, FacilitatorModel, LearnerModel };
 export default UserModel;

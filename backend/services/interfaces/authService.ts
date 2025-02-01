@@ -53,6 +53,18 @@ interface IAuthService {
   sendAdminInvite(email: string, temporaryPassword: string): Promise<void>;
 
   /**
+   * Sends an email invitation to an invited learner with the temporary password specified
+   * @param email email of new learner invited
+   * @param temporaryPassword the new learner's temporary password
+   * @throws Error if unable to generate link or send email
+   */
+  sendLearnerInvite(
+    firstName: string,
+    email: string,
+    temporaryPassword: string,
+  ): Promise<void>;
+
+  /**
    * Changes a user's password
    * @param email the user's email address
    * @param newPassword new password chosen to replace the user's old password

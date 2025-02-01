@@ -44,7 +44,7 @@ export const signupRequestValidator = async (
   return next();
 };
 
-export const inviteAdminRequestValidator = async (
+export const inviteUserRequestValidator = async (
   req: Request,
   res: Response,
   next: NextFunction,

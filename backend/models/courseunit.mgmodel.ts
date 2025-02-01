@@ -25,7 +25,7 @@ const CourseUnitSchema: Schema = new Schema({
 });
 
 /* eslint-disable no-param-reassign */
-CourseUnitSchema.set("toJSON", {
+CourseUnitSchema.set("toObject", {
   virtuals: true,
   versionKey: false,
   transform: (_doc: Document, ret: Record<string, unknown>) => {

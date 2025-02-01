@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, useTheme, Snackbar, Box } from "@mui/material";
+import {
+  Container,
+  Typography,
+  useTheme,
+  Snackbar,
+  Box,
+  Button,
+} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import authAPIClient from "../../../APIClients/AuthAPIClient";
 
@@ -77,67 +84,57 @@ const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
           }}
         >
           <Typography
-            variant="h4"
+            variant="headlineLarge"
             gutterBottom
-            sx={{
-              color: "#000",
-              fontSize: "28px",
-              fontWeight: 600,
-              lineHeight: "120%",
-              marginBottom: 0,
-            }}
+            sx={{ marginBottom: 0 }}
           >
             Email sent
           </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: "#000",
-              fontSize: "16px",
-              fontWeight: 400,
-              lineHeight: "140%",
-              letterSpacing: "0.2px",
-            }}
-          >
+          <Typography variant="bodyMedium">
             Check your email ({email}) and open the link we sent to continue.
           </Typography>
         </Container>
-        <Typography
-          variant="bodySmall"
-          onClick={onBackToEmail}
-          sx={{
-            color: theme.palette.learner?.main,
-            fontSize: "12.5px",
-            fontWeight: 300,
-            lineHeight: "120%",
-            letterSpacing: "0.625px",
-            textTransform: "uppercase",
-            cursor: "pointer",
-            padding: 0,
-          }}
-        >
-          NOT YOUR EMAIL? Go back to change your email
-        </Typography>
-        <Typography
-          variant="bodySmall"
-          onClick={handleResendEmail}
-          sx={{
-            color: canResend
-              ? theme.palette.learner?.main
-              : theme.palette.text?.disabled,
-            fontSize: theme.typography.bodySmall,
-            fontWeight: 300,
-            lineHeight: "120%",
-            letterSpacing: "0.625px",
-            textTransform: "uppercase",
-            cursor: canResend ? "pointer" : "default",
-            padding: 0,
-          }}
-        >
-          {canResend
-            ? "Didn’t get the email? Send it again now."
-            : `Didn’t get the email? You can request a new one in ${seconds}s.`}
-        </Typography>
+        <Button variant="text" sx={{ padding: 0 }}>
+          <Typography
+            variant="labelSmall"
+            onClick={onBackToEmail}
+            sx={{
+              color: theme.palette.Learner.Default,
+              padding: 0,
+            }}
+          >
+            NOT YOUR EMAIL? Go back to change your email
+          </Typography>
+        </Button>
+        {canResend ? (
+          <Button variant="text" sx={{ padding: 0 }}>
+            <Typography
+              variant="labelSmall"
+              onClick={handleResendEmail}
+              sx={{
+                color: canResend
+                  ? theme.palette.Learner.Default
+                  : theme.palette.text?.disabled,
+                padding: 0,
+              }}
+            >
+              Didn’t get the email? Send it again now.
+            </Typography>
+          </Button>
+        ) : (
+          <Typography
+            variant="labelSmall"
+            onClick={handleResendEmail}
+            sx={{
+              color: canResend
+                ? theme.palette.Learner.Default
+                : theme.palette.text?.disabled,
+              padding: 0,
+            }}
+          >
+            Didn’t get the email? You can request a new one in {seconds}s.
+          </Typography>
+        )}
       </Container>
       <Snackbar
         open={showSnackbar}
@@ -179,15 +176,11 @@ const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
         >
           <SendIcon
             sx={{
-              color: "#6C7517",
+              color: theme.palette.Success.Default,
               marginRight: "16px",
             }}
           />
-          <Typography
-            sx={{
-              color: "#6C7517",
-            }}
-          >
+          <Typography sx={{ color: theme.palette.Success.Default }}>
             {`A new reset email has been sent. 
             Please check your inbox (and spam folder).`}
           </Typography>
