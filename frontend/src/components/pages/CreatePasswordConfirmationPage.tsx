@@ -9,14 +9,12 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useHistory } from "react-router-dom";
 
 import Logo from "../images/logo.svg";
-import { LOGIN_PAGE } from "../../constants/Routes";
+import { WELCOME_PAGE } from "../../constants/Routes";
 
 const CreatePasswordConfirmationPage = (): React.ReactElement => {
-  const history = useHistory();
-  // const theme = useTheme();
-  
+  const history = useHistory();  
   const handleBackToLogin = () => {
-    history.push(LOGIN_PAGE);
+    history.push(WELCOME_PAGE);
   };
 
   return (
@@ -37,7 +35,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
         sx={{
           width: "125.874px",
           height: "60px",
-          marginTop:"-168px",
+          marginTop:"-346px",
           marginBottom: "200px",
         }}
       />

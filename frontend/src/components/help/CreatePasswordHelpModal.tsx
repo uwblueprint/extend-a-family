@@ -26,17 +26,16 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
   const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
 
   const handleNext = () => {
-    setConfirmationModalOpen(true); // Open the second modal
+    setConfirmationModalOpen(true);
   };
 
   const handleConfirmationClose = () => {
-    setConfirmationModalOpen(false); // Close the second modal
-    onClose(); // Optionally close the first modal after confirmation
+    setConfirmationModalOpen(false);
+    onClose();
   };
 
   return (
     <>
-      {/* First Modal */}
       <Dialog
         open={open}
         onClose={onClose}
@@ -50,12 +49,11 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
             flexDirection: "column",
             gap: "16px",
             borderRadius: "8px",
-            backgroundColor: "var(--Neutral-100, #FFF)",
+            backgroundColor: theme.palette.Neutral[100],
             position: "relative",
           },
         }}
       >
-        {/* Title and Close Button */}
         <Box
           sx={{
             display: "flex",
@@ -67,7 +65,7 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
           <Typography
             id="help-modal-title"
             sx={{
-              color: "var(--Neutral-700, #111)",
+              color: theme.palette.Neutral[700],
               textAlign: "left",
               fontFamily: "Lexend Deca",
               fontSize: "26px",
@@ -91,22 +89,23 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
               borderRadius: "5000px",
               border: "1px solid var(--Neutral-500, #6F797B)",
               color: "black",
+              "&:hover": {
+                backgroundColor: "#f0f0f0",
+              },
             }}
           >
             <CloseIcon />
           </IconButton>
         </Box>
-
-        {/* Content */}
         <DialogContent
           sx={{
             display: "flex",
             flexDirection: "column",
             flex: "1",
             alignSelf: "stretch",
-            gap: "16px",
             paddingLeft: 0,
             paddingRight: 0,
+            paddingBottom: 0,
           }}
         >
           <TextField
@@ -124,7 +123,6 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
                 borderRadius: "4px",
                 alignItems: "flex-start",
                 height: "100%",
-                padding: "12px",
               },
             }}
             InputLabelProps={{
@@ -147,8 +145,6 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
 
 
         </DialogContent>
-
-        {/* Bottom Buttons */}
         <Box
           sx={{
             display: "flex",
@@ -157,27 +153,32 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
             width: "100%",
           }}
         >
-          <Typography
-            variant="bodySmall"
+          <Button
+            variant="text"
+            onClick={onClose}
             sx={{
-              color: theme.palette.learner.main,
+              color: theme.palette.Learner.Default,
               textAlign: "left",
-              fontSize: theme.typography.bodySmall?.fontSize,
+              fontSize: theme.typography.bodyMedium?.fontSize,
               fontWeight: theme.typography.bodySmall?.fontWeight,
               lineHeight: theme.typography.bodySmall?.lineHeight,
               letterSpacing: 0.625,
               textTransform: "uppercase",
               cursor: "pointer",
+              padding: 0,
+              minWidth: "auto",
+              "&:hover": {
+                textDecoration: "underline",
+                backgroundColor: "transparent",
+              },
             }}
-            onClick={onClose}
           >
             Exit
-          </Typography>
-
+          </Button>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleNext} // Open the second modal
+            onClick={handleNext}
             sx={{
               display: "flex",
               height: "45px",
@@ -191,13 +192,13 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
               fontFamily: "Lexend Deca",
               fontSize: "14px",
               fontStyle: "normal",
-              fontWeight: 300,
-              lineHeight: "120%",
-              letterSpacing: "0.7px",
+              fontWeight: theme.typography.labelLarge,
+              lineHeight: theme.typography.labelLarge,
+              letterSpacing: theme.typography.labelLarge,
               color: "white",
-              backgroundColor: theme.palette.learner.main,
+              backgroundColor: theme.palette.Learner.Default,
               "&:hover": {
-                backgroundColor: theme.palette.learner.main,
+                background: "var(--Learner-Hover, #005566)",
               },
             }}
           >
@@ -205,8 +206,6 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
           </Button>
         </Box>
       </Dialog>
-
-      {/* Second Modal */}
       <CreatePasswordHelpConfirmationModal
         open={isConfirmationModalOpen}
         onClose={handleConfirmationClose}

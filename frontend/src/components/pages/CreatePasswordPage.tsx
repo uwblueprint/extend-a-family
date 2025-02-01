@@ -65,11 +65,11 @@ const CreatePasswordPage = (): React.ReactElement => {
           }}
         >
           <Typography
-            variant="h5"
+            variant="headlineLarge"
             gutterBottom
             sx={{
-              fontWeight: "bold",
-              color: "#000",
+              fontWeight: theme.typography.headlineLarge?.fontWeight,
+              color: theme.palette.Neutral[700],
               textAlign: "center",
             }}
           >
@@ -92,11 +92,13 @@ const CreatePasswordPage = (): React.ReactElement => {
                 padding: "10px 24px",
                 width: "100%",
                 textTransform: "none",
-                backgroundColor: theme.palette.learner.main,
-                "&:hover": { backgroundColor: "#002A32" },
+                backgroundColor: theme.palette.Learner.Default,
+                "&:hover": {
+                  background: "var(--Learner-Hover, #005566)",  // make theme.ts variables for button hover values
+                },
                 "&.Mui-disabled": {
-                  backgroundColor: "#ccc",
-                  color: "#666",
+                  backgroundColor: theme.palette.Neutral[400],
+                  color: theme.palette.Neutral[600],
                 },
               }}
             >
@@ -106,8 +108,12 @@ const CreatePasswordPage = (): React.ReactElement => {
               sx={{
                 textAlign: "right",
                 marginTop: 2,
-                color: theme.palette.learner.main,
+                marginRight: "12px",
+                color: theme.palette.Learner.Default,
                 cursor: "pointer",
+                "&:hover": {
+                  textDecoration: "underline",
+                },
               }}
               onClick={handleOpenHelpModal}
             >

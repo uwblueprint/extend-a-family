@@ -59,6 +59,9 @@ const CreatePasswordHelpConfirmationModal: React.FC<
             borderRadius: "50%",
             border: "1px solid var(--Neutral-500, #6F797B)",
             color: "black",
+            "&:hover": {
+              backgroundColor: "#f0f0f0",
+            },
           }}
         >
           <CloseIcon />
@@ -107,7 +110,6 @@ const CreatePasswordHelpConfirmationModal: React.FC<
           }}
         >
           <Typography
-            id="confirmation-modal-title"
             sx={{
               color: "var(--Neutral-700, #111)",
               fontFamily: "Lexend Deca",
@@ -127,6 +129,7 @@ const CreatePasswordHelpConfirmationModal: React.FC<
               fontWeight: 400,
               lineHeight: "140%",
               textAlign: "center",
+              width: "455px",
             }}
           >
             They will reach out and help you soon. Hang tight!
@@ -158,9 +161,9 @@ const CreatePasswordHelpConfirmationModal: React.FC<
             lineHeight: "120%",
             letterSpacing: "0.7px",
             color: "white",
-            backgroundColor: theme.palette.learner.main,
+            backgroundColor: theme.palette.Learner.Default,
             "&:hover": {
-              backgroundColor: theme.palette.learner.main,
+              background: "var(--Learner-Hover, #005566)",
             },
           }}
         >

@@ -69,7 +69,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
     { text: "At least 1 uppercase letter", met: passwordCriteria.uppercase },
     { text: "At least 1 lowercase letter", met: passwordCriteria.lowercase },
     { text: "At least 1 special character (!, @, #, $, %, ^, &, or *)", met: passwordCriteria.specialChar },
-    { text: "Passwords must match", met: passwordCriteria.passwordsMatch }, // New requirement
+    { text: "Password and Confirm Password must be the same", met: passwordCriteria.passwordsMatch }, // New requirement
   ];
 
   return (
