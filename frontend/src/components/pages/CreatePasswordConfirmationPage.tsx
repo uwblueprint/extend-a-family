@@ -1,11 +1,5 @@
 import React from "react";
-import { 
-  Container, 
-  Typography, 
-  Button, 
-  Box, 
-  useTheme,
-} from "@mui/material";
+import { Container, Typography, Button, Box, useTheme } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useHistory } from "react-router-dom";
 
@@ -13,7 +7,7 @@ import Logo from "../images/logo.svg";
 import { WELCOME_PAGE } from "../../constants/Routes";
 
 const CreatePasswordConfirmationPage = (): React.ReactElement => {
-  const history = useHistory();  
+  const history = useHistory();
   const theme = useTheme();
   const handleBackToLogin = () => {
     history.push(WELCOME_PAGE);
@@ -37,7 +31,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
         sx={{
           width: "125.874px",
           height: "60px",
-          marginTop:"-346px",
+          marginTop: "-346px",
           marginBottom: "200px",
         }}
       />
@@ -84,7 +78,8 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
               letterSpacing: theme.typography.bodyMedium.letterSpacing,
             }}
           >
-            Thank you for creating your password! Please login to start learning.
+            Thank you for creating your password! Please login to start
+            learning.
           </Typography>
         </Container>
 
