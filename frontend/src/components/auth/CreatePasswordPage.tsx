@@ -3,7 +3,7 @@ import { Box, Container, Typography, Button, useTheme } from "@mui/material";
 import Logo from "../images/logo.svg";
 import CreatePasswordHelpModal from "../help/CreatePasswordHelpModal";
 import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
-import PasswordCheck from "../auth/PassowrdCheck";
+import PasswordCheck from "../auth/PasswordCheck";
 
 const CreatePasswordPage = (): React.ReactElement => {
   const [newPassword, setNewPassword] = useState("");

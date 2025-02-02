@@ -31,24 +31,23 @@ const CreatePasswordHelpConfirmationModal: React.FC<
           display: "flex",
           width: "677px",
           height: "400px",
-          padding: "32px",
+          padding: theme.spacing(4),
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
           borderRadius: "8px",
-          backgroundColor: "var(--Neutral-100, #FFF)",
+          backgroundColor: theme.palette.Neutral[100],
           position: "relative",
         },
       }}
     >
-      {/* Close Button */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "flex-end",
           position: "absolute",
-          top: "32px",
-          right: "32px",
+          top: theme.spacing(4),
+          right: theme.spacing(4),
         }}
       >
         <IconButton
@@ -57,21 +56,23 @@ const CreatePasswordHelpConfirmationModal: React.FC<
             width: "48px",
             height: "48px",
             borderRadius: "50%",
-            border: "1px solid var(--Neutral-500, #6F797B)",
+            border: `1px solid ${theme.palette.Neutral[500]}`,
             color: "black",
+            "&:hover": {
+              backgroundColor: theme.palette.Neutral[200],
+            },
           }}
         >
           <CloseIcon />
         </IconButton>
       </Box>
 
-      {/* Content */}
       <Container
         sx={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: "20px",
+          gap: theme.spacing(2.5),
           marginTop: "70px",
           width: "536px",
         }}
@@ -91,7 +92,7 @@ const CreatePasswordHelpConfirmationModal: React.FC<
               width: "60px",
               height: "60px",
               backgroundColor: "black",
-              color: "white",
+              color: theme.palette.Neutral[100],
               borderRadius: "50%",
             }}
           />
@@ -102,18 +103,17 @@ const CreatePasswordHelpConfirmationModal: React.FC<
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "4px",
+            gap: theme.spacing(0.5),
             width: "476px",
           }}
         >
           <Typography
             id="confirmation-modal-title"
             sx={{
-              color: "var(--Neutral-700, #111)",
-              fontFamily: "Lexend Deca",
-              fontSize: "26px",
-              fontWeight: 600,
-              lineHeight: "120%",
+              color: theme.palette.Neutral[700],
+              fontSize: theme.typography.headlineMedium.fontSize,
+              fontWeight: theme.typography.headlineMedium.fontWeight,
+              lineHeight: theme.typography.headlineMedium.lineHeight,
               textAlign: "center",
             }}
           >
@@ -121,11 +121,10 @@ const CreatePasswordHelpConfirmationModal: React.FC<
           </Typography>
           <Typography
             sx={{
-              color: "var(--Neutral-500, #6F797B)",
-              fontFamily: "Lexend Deca",
-              fontSize: "18px",
-              fontWeight: 400,
-              lineHeight: "140%",
+              color: theme.palette.Neutral[500],
+              fontSize: theme.typography.bodyLarge.fontSize,
+              fontWeight: theme.typography.bodyLarge.fontWeight,
+              lineHeight: theme.typography.bodyLarge.lineHeight,
               textAlign: "center",
             }}
           >
@@ -134,11 +133,10 @@ const CreatePasswordHelpConfirmationModal: React.FC<
         </Container>
       </Container>
 
-      {/* Done Button */}
       <Box
         sx={{
           display: "flex",
-          justifyContent: "flex-end", // Align to the right
+          justifyContent: "flex-end",
           width: "100%",
           marginTop: "auto",
         }}
@@ -150,17 +148,16 @@ const CreatePasswordHelpConfirmationModal: React.FC<
           sx={{
             height: "45px",
             borderRadius: "8px",
-            padding: "8px 16px",
+            padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
             textTransform: "uppercase",
-            fontFamily: "Lexend Deca",
-            fontSize: "14px",
-            fontWeight: 300,
-            lineHeight: "120%",
-            letterSpacing: "0.7px",
-            color: "white",
-            backgroundColor: theme.palette.learner.main,
+            fontSize: theme.typography.labelLarge.fontSize,
+            fontWeight: theme.typography.labelLarge.fontWeight,
+            lineHeight: theme.typography.labelLarge.lineHeight,
+            letterSpacing: theme.typography.labelLarge.letterSpacing,
+            color: theme.palette.Neutral[100],
+            backgroundColor: theme.palette.Learner.Default,
             "&:hover": {
-              backgroundColor: theme.palette.learner.main,
+              background: "var(--Learner-Hover, #005566)", // add to theme.ts
             },
           }}
         >
