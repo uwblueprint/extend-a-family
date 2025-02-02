@@ -18,6 +18,7 @@ const CreatePasswordPage = (): React.ReactElement => {
     if (isFormValid) {
       setIsPasswordConfirmed(true);
     } else {
+      // eslint-disable-next-line no-alert
       alert("Passwords do not match or do not meet the criteria.");
     }
   };
@@ -92,8 +93,10 @@ const CreatePasswordPage = (): React.ReactElement => {
                 padding: "10px 24px",
                 width: "100%",
                 textTransform: "none",
-                backgroundColor: theme.palette.learner.main,
-                "&:hover": { backgroundColor: "#002A32" },
+                backgroundColor: theme.palette.Learner.Default,
+                "&:hover": {
+                  background: "var(--Learner-Hover, #005566)", // make theme.ts variables for button hover values
+                },
                 "&.Mui-disabled": {
                   backgroundColor: "#ccc",
                   color: "#666",

@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, TextField, InputAdornment, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import PasswordIcon from "@mui/icons-material/Password";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
@@ -26,11 +32,11 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
     uppercase: false,
     lowercase: false,
     specialChar: false,
-    passwordsMatch: false, // New criteria for matching passwords
+    passwordsMatch: false,
   });
 
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State to toggle confirm password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validatePassword = (password: string) => {
     setPasswordCriteria((prev) => ({
@@ -47,8 +53,9 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
   }, [newPassword]);
 
   useEffect(() => {
-    // Check if passwords match and newPassword is not empty
-    const passwordsMatch = newPassword === confirmPassword && newPassword.trim() !== "";
+    const passwordsMatch =
+      newPassword === confirmPassword && newPassword.trim() !== "";
+
     setPasswordCriteria((prev) => ({
       ...prev,
       passwordsMatch,
@@ -62,14 +69,20 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
       passwordsMatch;
 
     onValidationChange(isValid);
-  }, [passwordCriteria, newPassword, confirmPassword, onValidationChange]);
+  }, [newPassword, confirmPassword, passwordCriteria, onValidationChange]);
 
   const passwordRequirements = [
     { text: "At least 8 characters", met: passwordCriteria.minLength },
     { text: "At least 1 uppercase letter", met: passwordCriteria.uppercase },
     { text: "At least 1 lowercase letter", met: passwordCriteria.lowercase },
-    { text: "At least 1 special character (!, @, #, $, %, ^, &, or *)", met: passwordCriteria.specialChar },
-    { text: "Passwords must match", met: passwordCriteria.passwordsMatch }, // New requirement
+    {
+      text: "At least 1 special character (!, @, #, $, %, ^, &, or *)",
+      met: passwordCriteria.specialChar,
+    },
+    {
+      text: "Password and Confirm Password must be the same",
+      met: passwordCriteria.passwordsMatch,
+    },
   ];
 
   return (
@@ -77,7 +90,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
       <TextField
         label="New password"
         variant="outlined"
-        type={showPassword ? "text" : "password"} // Toggle between text and password
+        type={showPassword ? "text" : "password"}
         fullWidth
         margin="normal"
         placeholder="Your new password"
@@ -91,10 +104,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
           ),
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton
-                onClick={() => setShowPassword(!showPassword)} // Toggle visibility
-                edge="end"
-              >
+              <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
@@ -104,7 +114,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
       <TextField
         label="Confirm password"
         variant="outlined"
-        type={showConfirmPassword ? "text" : "password"} // Toggle between text and password
+        type={showConfirmPassword ? "text" : "password"}
         fullWidth
         margin="normal"
         placeholder="Rewrite your new password"
@@ -119,7 +129,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)} // Toggle visibility
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 edge="end"
               >
                 {showConfirmPassword ? <VisibilityOff /> : <Visibility />}

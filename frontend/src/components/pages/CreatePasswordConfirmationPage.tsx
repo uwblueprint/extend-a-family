@@ -31,7 +31,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
         sx={{
           width: "125.874px",
           height: "60px",
-          marginTop: "-168px",
+          marginTop: "-346px",
           marginBottom: "200px",
         }}
       />
