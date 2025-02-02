@@ -45,9 +45,9 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
             display: "flex",
             width: "600px",
             height: "400px",
-            padding: "32px",
+            padding: theme.spacing(4),
             flexDirection: "column",
-            gap: "16px",
+            gap: theme.spacing(2),
             borderRadius: "8px",
             backgroundColor: theme.palette.Neutral[100],
             position: "relative",
@@ -67,11 +67,10 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
             sx={{
               color: theme.palette.Neutral[700],
               textAlign: "left",
-              fontFamily: "Lexend Deca",
-              fontSize: "26px",
+              fontSize: theme.typography.headlineMedium.fontSize,
               fontStyle: "normal",
-              fontWeight: 600,
-              lineHeight: "120%",
+              fontWeight: theme.typography.headlineMedium.fontWeight,
+              lineHeight: theme.typography.headlineMedium.lineHeight,
             }}
           >
             What problem are you facing?
@@ -85,12 +84,12 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              gap: "10px",
+              gap: theme.spacing(1.25),
               borderRadius: "5000px",
-              border: "1px solid var(--Neutral-500, #6F797B)",
+              border: `1px solid ${theme.palette.Neutral[500]}`,
               color: "black",
               "&:hover": {
-                backgroundColor: "#f0f0f0",
+                backgroundColor: theme.palette.Neutral[200],
               },
             }}
           >
@@ -127,11 +126,11 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
             }}
             InputLabelProps={{
               sx: {
-                fontSize: "16px",
+                fontSize: theme.typography.bodyMedium.fontSize,
                 fontWeight: 500,
-                color: "var(--Neutral-700, #111)",
-                backgroundColor: "#FFF",
-                padding: "0 4px",
+                color: theme.palette.Neutral[700],
+                backgroundColor: theme.palette.Neutral[100],
+                padding: `0 ${theme.spacing(0.5)}`,
                 transform: "translate(14px, 10px) scale(1)",
                 "&.Mui-focused": {
                   transform: "translate(14px, -8px) scale(0.75)",
@@ -142,8 +141,6 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
               },
             }}
           />
-
-
         </DialogContent>
         <Box
           sx={{
@@ -159,9 +156,9 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
             sx={{
               color: theme.palette.Learner.Default,
               textAlign: "left",
-              fontSize: theme.typography.bodyMedium?.fontSize,
-              fontWeight: theme.typography.bodySmall?.fontWeight,
-              lineHeight: theme.typography.bodySmall?.lineHeight,
+              fontSize: theme.typography.bodyMedium.fontSize,
+              fontWeight: theme.typography.bodySmall.fontWeight,
+              lineHeight: theme.typography.bodySmall.lineHeight,
               letterSpacing: 0.625,
               textTransform: "uppercase",
               cursor: "pointer",
@@ -185,20 +182,19 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              gap: "8px",
+              gap: theme.spacing(1),
               borderRadius: "8px",
-              padding: "8px 16px",
+              padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
               textTransform: "uppercase",
-              fontFamily: "Lexend Deca",
-              fontSize: "14px",
+              fontSize: theme.typography.labelLarge.fontSize,
               fontStyle: "normal",
-              fontWeight: theme.typography.labelLarge,
-              lineHeight: theme.typography.labelLarge,
-              letterSpacing: theme.typography.labelLarge,
-              color: "white",
+              fontWeight: theme.typography.labelLarge.fontWeight,
+              lineHeight: theme.typography.labelLarge.lineHeight,
+              letterSpacing: theme.typography.labelLarge.letterSpacing,
+              color: theme.palette.Neutral[100],
               backgroundColor: theme.palette.Learner.Default,
               "&:hover": {
-                background: "var(--Learner-Hover, #005566)",
+                background: "var(--Learner-Hover, #005566)",  // make theme.ts variables for button hover values
               },
             }}
           >

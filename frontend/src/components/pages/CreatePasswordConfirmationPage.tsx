@@ -4,6 +4,7 @@ import {
   Typography, 
   Button, 
   Box, 
+  useTheme,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useHistory } from "react-router-dom";
@@ -13,6 +14,7 @@ import { WELCOME_PAGE } from "../../constants/Routes";
 
 const CreatePasswordConfirmationPage = (): React.ReactElement => {
   const history = useHistory();  
+  const theme = useTheme();
   const handleBackToLogin = () => {
     history.push(WELCOME_PAGE);
   };
@@ -47,7 +49,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
           width: "500px",
           flexDirection: "column",
           alignItems: "center",
-          gap: "32px",
+          gap: theme.spacing(4),
         }}
       >
         {/* Icon and Text Container */}
@@ -57,7 +59,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            gap: "20px",
+            gap: theme.spacing(2.5),
             alignSelf: "stretch",
           }}
         >
@@ -73,14 +75,13 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
           <Typography
             sx={{
               alignSelf: "stretch",
-              color: "var(--Neutral-700, #111)",
+              color: theme.palette.Neutral[700],
               textAlign: "center",
-              fontFamily: "Lexend Deca",
-              fontSize: "16px",
+              fontSize: theme.typography.bodyMedium.fontSize,
               fontStyle: "normal",
-              fontWeight: "400",
-              lineHeight: "140%",
-              letterSpacing: "0.2px",
+              fontWeight: theme.typography.bodyMedium.fontWeight,
+              lineHeight: theme.typography.bodyMedium.lineHeight,
+              letterSpacing: theme.typography.bodyMedium.letterSpacing,
             }}
           >
             Thank you for creating your password! Please login to start learning.
@@ -96,20 +97,19 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            gap: "8px",
+            gap: theme.spacing(1),
             borderRadius: "4px",
-            background: "var(--Learner-Default, #006877)",
-            color: "var(--Neutral-100, #FFF)",
+            background: theme.palette.Learner.Default,
+            color: theme.palette.Neutral[100],
             textAlign: "center",
-            fontFamily: "Lexend Deca",
-            fontSize: "14px",
+            fontSize: theme.typography.labelLarge.fontSize,
             fontStyle: "normal",
-            fontWeight: "300",
-            lineHeight: "120%",
-            letterSpacing: "0.7px",
-            textTransform: "uppercase",
+            fontWeight: theme.typography.labelLarge.fontWeight,
+            lineHeight: theme.typography.labelLarge.lineHeight,
+            letterSpacing: theme.typography.labelLarge.letterSpacing,
+            textTransform: theme.typography.labelLarge.textTransform,
             "&:hover": {
-              background: "var(--Learner-Hover, #005566)",
+              background: "var(--Learner-Hover, #005566)", // add to theme.ts
             },
           }}
           onClick={handleBackToLogin}
