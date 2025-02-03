@@ -39,7 +39,7 @@ class FileStorageService implements IFileStorageService {
 
   async createFile(
     fileName: string,
-    fileData: Buffer,
+    filePath: string,
     contentType: string | null = null,
   ): Promise<void> {
     try {
@@ -48,7 +48,8 @@ class FileStorageService implements IFileStorageService {
       if ((await currentBlob.exists())[0]) {
         throw new Error(`File name ${fileName} already exists`);
       }
-      await bucket.file(fileName).save(fileData, {
+      await bucket.upload(filePath, {
+        destination: fileName,
         metadata: { contentType },
       });
     } catch (error: unknown) {
@@ -88,6 +89,26 @@ class FileStorageService implements IFileStorageService {
       await currentBlob.delete();
     } catch (error: unknown) {
       Logger.error(`Failed to delete file. Reason = ${getErrorMessage(error)}`);
+      throw error;
+    }
+  }
+
+  async uploadImage(
+    fileName: string,
+    fileData: Buffer,
+    contentType: string | null = null,
+  ): Promise<void> {
+    try {
+      const bucket = storage().bucket(this.bucketName);
+      const currentBlob = await bucket.file(fileName);
+      if ((await currentBlob.exists())[0]) {
+        throw new Error(`File name ${fileName} already exists`);
+      }
+      await bucket.file(fileName).save(fileData, {
+        metadata: { contentType },
+      });
+    } catch (error: unknown) {
+      Logger.error(`Failed to upload file. Reason = ${getErrorMessage(error)}`);
       throw error;
     }
   }
