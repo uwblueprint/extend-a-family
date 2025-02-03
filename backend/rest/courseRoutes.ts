@@ -160,7 +160,6 @@ courseRouter.post(
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
     if (!req.file) {
-      console.log("here")
       return res.status(400).json({error: "image is missing"});
     }
     const { moduleId } = req.params;

@@ -24,8 +24,7 @@ const UploadThumbnailPage = () => {
       const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
         const {files} = event.target;
         if (!files || files.length === 0) {
-            console.error('No file selected');
-            return;
+            throw new Error('no file selected')
         }
         const file = files[0]
         const formData = new FormData();
@@ -37,7 +36,7 @@ const UploadThumbnailPage = () => {
           })
 
         } catch (error) {
-          console.log(`Coulded Upload Image: ${error}`)
+          throw new Error(`Coulded Upload Image: ${error}`)
         }
       };
 
