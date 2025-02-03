@@ -18,20 +18,26 @@ const getUnits = async (): Promise<CourseUnit[]> => {
   }
 };
 
-const uploadThumbnail = async(moduleID: string, uploadedImage: FormData) => {
+const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
   )}`;
   try {
-    const { data } = await baseAPIClient.post(`course/${moduleID}/uploadThumbnail`, 
-       uploadedImage ,
-      { headers: { Authorization: bearerToken, contentType: "multipart/form-data" }},
-    )
-    return data
-  } catch(error: unknown) {
-    return null
+    const { data } = await baseAPIClient.post(
+      `course/${moduleID}/uploadThumbnail`,
+      uploadedImage,
+      {
+        headers: {
+          Authorization: bearerToken,
+          contentType: "multipart/form-data",
+        },
+      },
+    );
+    return data;
+  } catch (error: unknown) {
+    return null;
   }
-}
+};
 
 export default { getUnits, uploadThumbnail };

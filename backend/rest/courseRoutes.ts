@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 import CourseUnitService from "../services/implementations/courseUnitService";
 import { getErrorMessage } from "../utilities/errorUtils";
 import {
@@ -9,7 +10,6 @@ import {
 import { isAuthorizedByRole } from "../middlewares/auth";
 import CourseModuleService from "../services/implementations/courseModuleService";
 import FileStorageService from "../services/implementations/fileStorageService";
-import multer from "multer";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -17,7 +17,7 @@ const upload = multer({ storage: storage });
 const courseRouter: Router = Router();
 const courseUnitService: CourseUnitService = new CourseUnitService();
 const courseModuleService: CourseModuleService = new CourseModuleService();
-const firebaseStorageService: FileStorageService = new FileStorageService("extendafamily-7613e.appspot.com");
+const firebaseStorageService: FileStorageService = new FileStorageService(process.env.FIREBASE_PROJECT_ID + ".com");
 
 courseRouter.get(
   "/",
@@ -163,14 +163,14 @@ courseRouter.post(
       return res.status(400).json({error: "image is missing"});
     }
     const { moduleId } = req.params;
-    const imageData = req.file?.buffer
-    const contentType: string = req.file.mimetype
-    const imageName = "course/thumbnails/" + moduleId 
+    const imageData = req.file?.buffer;
+    const contentType: string = req.file.mimetype;
+    const imageName = "course/thumbnails/" + moduleId;
 
     try {
       await firebaseStorageService.createFile(
         imageName, imageData, contentType
-      )
+      );
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }

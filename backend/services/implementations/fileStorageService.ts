@@ -39,7 +39,7 @@ class FileStorageService implements IFileStorageService {
 
   async createFile(
     fileName: string,
-    fileData: any,
+    fileData: Buffer,
     contentType: string | null = null,
   ): Promise<void> {
     try {

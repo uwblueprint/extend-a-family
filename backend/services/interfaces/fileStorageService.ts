@@ -18,7 +18,7 @@ interface IFileStorageService {
    */
   createFile(
     fileName: string,
-    filePath: string,
+    filePath: Buffer,
     contentType?: string | null,
   ): Promise<void>;
 

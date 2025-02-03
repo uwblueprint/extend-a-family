@@ -142,7 +142,7 @@ const App = (): React.ReactElement => {
                   component={CourseUnitsPage}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
-                
+
                 <Route exact path="*" component={NotFound} />
               </Switch>
             </Router>

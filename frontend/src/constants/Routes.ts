@@ -28,4 +28,4 @@ export const FORGOT_PASSWORD_PAGE = "/forgot-password";
 
 export const COURSES_PAGE = "/course";
 
-export const UPLOAD_THUMBNAIL = "/module-thumbnail"
+export const UPLOAD_THUMBNAIL = "/module-thumbnail";
