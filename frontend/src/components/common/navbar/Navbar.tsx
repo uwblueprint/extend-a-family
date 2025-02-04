@@ -100,7 +100,7 @@ export default function Navbar() {
             />
           </Link>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+          <Box sx={{ display: "flex" }}>
             <IconButton
               size="large"
               aria-label="show new notifications"
