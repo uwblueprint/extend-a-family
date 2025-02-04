@@ -14,13 +14,13 @@ const palette: PaletteOptions = {
   },
   Administrator: {
     Light: "#FFF8F6",
-    Hover: "#FFD9CC",
+    Hover: "#753F2B",
     Default: "#8F4C34",
     Pressed: "#5C1900",
   },
   Facilitator: {
     Light: "#F9F5FF",
-    Hover: "#D6D6FF",
+    Hover: "#3C406D",
     Default: "#555A92",
     Pressed: "#1F257A",
   },
