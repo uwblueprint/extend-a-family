@@ -1,6 +1,6 @@
 import React from "react";
 import { AccountCircle } from "@mui/icons-material";
-import { Box, IconButton, Popover } from "@mui/material";
+import { Box, IconButton, Popover, useTheme } from "@mui/material";
 import RefreshCredentials from "../../auth/RefreshCredentials";
 import ResetPassword from "../../auth/ResetPassword";
 import Logout from "../../auth/Logout";
@@ -10,6 +10,7 @@ const UserButton = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
   );
+  const theme = useTheme();
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
@@ -27,8 +28,8 @@ const UserButton = () => {
         edge="end"
         aria-label="account of current user"
         aria-haspopup="true"
-        color="inherit"
         onClick={handleClick}
+        sx={{ color: theme.palette.Neutral[400] }}
       >
         <AccountCircle />
       </IconButton>

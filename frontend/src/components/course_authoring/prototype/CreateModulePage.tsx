@@ -4,11 +4,11 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import DraggableSource from "../common/grid/DraggableSource";
-import GridElement from "../common/grid/GridElement";
-import layoutReducer from "../common/grid/layoutReducer";
-import BaseModule from "../course_authoring/BaseModule";
-import ConfirmationModal from "../common/modals/ConfirmationModal";
+import DraggableSource from "./DraggableSource";
+import GridElement from "./GridElement";
+import layoutReducer from "./layoutReducer";
+import BaseModule from "./BaseModule";
+import ConfirmationModal from "../../common/modals/ConfirmationModal";
 
 const CreateModule = () => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -17,7 +17,6 @@ const CreateModule = () => {
   const [editMode, setEditMode] = useState(true);
   const [componentData, setComponentData] = useState(new Map<string, object>());
   const [isModalOpen, setModalOpen] = useState(false);
-
   const gridContainerStyle = {
     backgroundColor: "lightgray",
     borderRight: "1px solid black",

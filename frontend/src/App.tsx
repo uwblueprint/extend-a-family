@@ -2,14 +2,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { CssBaseline } from "@mui/material";
 import React, { useState, useReducer, useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Welcome from "./components/pages/Welcome";
-import Signup from "./components/pages/Signup";
+import Welcome from "./components/auth/WelcomePage";
+import Signup from "./components/auth/SignupPage";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import Default from "./components/pages/Default";
-import CreateModulePage from "./components/pages/CreateModulePage";
+import CreateModulePage from "./components/course_authoring/prototype/CreateModulePage";
 import NotFound from "./components/pages/NotFound";
 import NotAuthorized from "./components/pages/NotAuthorized";
-import MyAccount from "./components/pages/MyAccount";
+import MyAccount from "./components/pages/MyAccountPage";
 import AUTHENTICATED_USER_KEY from "./constants/AuthConstants";
 import AuthContext from "./contexts/AuthContext";
 import { getLocalStorageObj } from "./utils/LocalStorageUtils";
@@ -27,9 +27,10 @@ import ManageUserPage from "./components/pages/ManageUserPage";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
-import CreatePasswordPage from "./components/pages/CreatePasswordPage";
+import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
-import CourseUnitsPage from "./components/pages/courses/CourseUnitsPage";
+import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
+import CourseAuthoringPage from "./components/course_authoring/CourseAuthoringPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -132,9 +133,15 @@ const App = (): React.ReactElement => {
                 />
                 <PrivateRoute
                   exact
-                  path={Routes.COURSES_PAGE}
-                  component={CourseUnitsPage}
+                  path={Routes.COURSE_PAGE}
+                  component={CourseViewingPage}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.COURSE_AUTHORING_PAGE}
+                  component={CourseAuthoringPage}
+                  allowedRoles={["Administrator"]}
                 />
                 <Route exact path="*" component={NotFound} />
               </Switch>

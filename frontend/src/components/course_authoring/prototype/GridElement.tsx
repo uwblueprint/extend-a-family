@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import BaseModule from "../../course_authoring/BaseModule";
+import BaseModule from "./BaseModule";
 
 interface MouseEventLike {
   clientX: number;

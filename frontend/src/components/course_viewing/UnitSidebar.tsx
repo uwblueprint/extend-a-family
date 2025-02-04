@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { CourseUnit } from "../../types/CourseTypes";
+import { useUser } from "../../hooks/useUser";
 
 interface UnitSideBarProps {
   courseUnits: CourseUnit[];
@@ -20,6 +21,7 @@ interface UnitSideBarProps {
 
 export default function UnitSidebar(props: UnitSideBarProps) {
   const theme = useTheme();
+  const user = useUser();
   const { courseUnits, handleClose, open } = props;
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -35,10 +37,11 @@ export default function UnitSidebar(props: UnitSideBarProps) {
     <Drawer
       sx={{
         width: "20%",
+        height: "100%",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: "20%",
           boxSizing: "border-box",
+          position: "relative",
         },
         display: open ? "block" : "none",
       }}
@@ -46,7 +49,10 @@ export default function UnitSidebar(props: UnitSideBarProps) {
       anchor="left"
       open={open}
     >
-      <Box height="100%" sx={{ backgroundColor: theme.palette.Learner.Light }}>
+      <Box
+        height="100%"
+        sx={{ backgroundColor: theme.palette[user.role].Light }}
+      >
         <Box
           height="59px"
           display="flex"
@@ -93,10 +99,10 @@ export default function UnitSidebar(props: UnitSideBarProps) {
                     px: "32px",
                     backgroundColor:
                       selectedIndex === index
-                        ? theme.palette.Learner.Hover
+                        ? theme.palette[user.role].Hover
                         : "transparent",
                     "&:hover": {
-                      backgroundColor: theme.palette.Learner.Hover,
+                      backgroundColor: theme.palette[user.role].Hover,
                     },
                   }}
                   onClick={(event) => handleListItemClick(event, index)}

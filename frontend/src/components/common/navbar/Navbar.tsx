@@ -8,16 +8,21 @@ import Typography from "@mui/material/Typography";
 import Badge from "@mui/material/Badge";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import Button from "@mui/material/Button/Button";
+import { Link } from "react-router-dom";
+import { useTheme } from "@mui/material";
 import NotificationsList from "../../notification/NotificationsList";
 import NotificationAPIClient from "../../../APIClients/NotificationAPIClient";
 import { useUser } from "../../../hooks/useUser";
 import { Notification } from "../../../types/NotificationTypes";
 import { useSocket } from "../../../contexts/SocketContext";
 import UserButton from "./UserButton";
+import { HOME_PAGE } from "../../../constants/Routes";
+import eafLogo from "../../assets/logoColoured.png";
 
 export default function Navbar() {
   const user = useUser();
   const socket = useSocket();
+  const theme = useTheme();
 
   const NUMBER_OF_NOTIFICATIONS_TO_LOAD = 10;
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -78,23 +83,29 @@ export default function Navbar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ bgcolor: `${user.role}.Default` }}>
-        <Toolbar>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { xs: "none", sm: "block" } }}
-          >
-            Extend a family
-          </Typography>
+      <AppBar
+        position="sticky"
+        sx={{
+          bgcolor: theme.palette.Neutral[100],
+          borderBottom: "2px solid #EEE",
+          boxShadow: "none",
+        }}
+      >
+        <Toolbar sx={{ padding: 0, height: "40px" }}>
+          <Link to={HOME_PAGE}>
+            <img
+              src={eafLogo}
+              alt="Extend-A-Family logo"
+              style={{ height: "40px" }}
+            />
+          </Link>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <IconButton
               size="large"
               aria-label="show new notifications"
-              color="inherit"
               onClick={handleClick}
+              sx={{ color: theme.palette.Neutral[400] }}
             >
               <Badge badgeContent={numUnseenNotifications} color="error">
                 <NotificationsIcon />

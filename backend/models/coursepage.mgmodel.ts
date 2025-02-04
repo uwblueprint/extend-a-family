@@ -1,43 +1,42 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { Element, PageType } from "../types/courseTypes";
+import { validateElementData } from "../utilities/courseUtils";
 
-export type ElementSkeleton = {
-  id: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  content: string;
-};
+const ElementSchema: Schema = new Schema(
+  {
+    x: {
+      type: Number,
+      required: true,
+    },
+    y: {
+      type: Number,
+      required: true,
+    },
+    w: {
+      type: Number,
+      required: true,
+    },
+    h: {
+      type: Number,
+      required: true,
+    },
+    data: {
+      type: Schema.Types.Mixed,
+      required: true,
+    },
+  },
+  { _id: false },
+);
 
-const ElementSkeletonSchema: Schema = new Schema({
-  x: {
-    type: Number,
-    required: true,
-  },
-  y: {
-    type: Number,
-    required: true,
-  },
-  w: {
-    type: Number,
-    required: true,
-  },
-  h: {
-    type: Number,
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  },
+ElementSchema.path("data").validate((value) => {
+  if (!value || !value.type) {
+    return false;
+  }
+  return validateElementData(value);
 });
-
-export type PageType = "Lesson" | "Activity";
 
 export interface CoursePage extends Document {
   id: string;
-  title: string;
-  displayIndex: number;
   type: PageType;
 }
 
@@ -46,7 +45,7 @@ export interface LessonPage extends CoursePage {
 }
 
 export interface ActivityPage extends CoursePage {
-  layout: [ElementSkeleton];
+  elements: Element[];
 }
 
 const baseOptions = {
@@ -55,14 +54,6 @@ const baseOptions = {
 
 export const CoursePageSchema: Schema = new Schema(
   {
-    title: {
-      type: String,
-      required: true,
-    },
-    displayIndex: {
-      type: Number,
-      required: true,
-    },
     type: {
       type: String,
       required: true,
@@ -80,8 +71,8 @@ const LessonPageSchema: Schema = new Schema({
 });
 
 const ActivityPageSchema: Schema = new Schema({
-  layout: {
-    type: [ElementSkeletonSchema],
+  elements: {
+    type: [ElementSchema],
     required: true,
   },
 });
