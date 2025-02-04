@@ -104,7 +104,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             letterSpacing: theme.typography.labelLarge.letterSpacing,
             textTransform: theme.typography.labelLarge.textTransform,
             "&:hover": {
-              background: "var(--Learner-Hover, #005566)", // add to theme.ts
+              background: theme.palette.Learner.Hover,
             },
           }}
           onClick={handleBackToLogin}
