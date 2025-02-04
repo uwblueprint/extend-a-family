@@ -104,7 +104,10 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
           ),
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+              <IconButton
+                onClick={() => setShowPassword(!showPassword)}
+                edge="end"
+              >
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
@@ -140,7 +143,10 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
       />
       <Box sx={{ marginTop: 2 }}>
         {passwordRequirements.map((requirement, index) => (
-          <Box key={index} sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <Box
+            key={index}
+            sx={{ display: "flex", alignItems: "center", gap: "8px" }}
+          >
             {requirement.met ? (
               <CheckIcon sx={{ color: "green" }} />
             ) : (
