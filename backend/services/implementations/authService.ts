@@ -181,6 +181,45 @@ class AuthService implements IAuthService {
     }
   }
 
+  async sendLearnerInvite(
+    firstName: string,
+    email: string,
+    temporaryPassword: string,
+  ): Promise<void> {
+    if (!this.emailService) {
+      const errorMessage =
+        "Attempted to call sendLearnerInvite but this instance of AuthService does not have an EmailService instance";
+      Logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    const emailVerificationLink = await firebaseAdmin
+      .auth()
+      .generateEmailVerificationLink(email);
+
+    const emailBody = `Hello ${firstName},
+      <br><br>
+      Welcome to Smart Saving, Smart Spending!
+      <br><br>
+      Please click the link to confirm your account: <a href=${emailVerificationLink}>Confirm my account</a>
+      <br>
+      If the link has expired, ask your facilitator to invite you again.
+      <br><br>
+      To log in for the first time, use the following email and password:
+      <br><br>
+      Email: <strong>${email}</strong>
+      <br>
+      Password: <strong>${temporaryPassword}</strong>
+      <br><br>
+      Happy learning!`;
+
+    await this.emailService.sendEmail(
+      email,
+      "Welcome to Smart Saving, Smart Spending!",
+      emailBody,
+    );
+  }
+
   async isAuthorizedByRole(
     accessToken: string,
     roles: Set<Role>,

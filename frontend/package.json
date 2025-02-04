@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@fontsource/lexend-deca": "^5.1.0",
     "@fontsource/roboto": "^5.0.13",
     "@mui/icons-material": "^5.15.20",
     "@mui/material": "^5.15.20",
@@ -23,6 +24,7 @@
     "@types/react-table": "^7.0.29",
     "@types/react-window": "^1.8.8",
     "@types/react-window-infinite-loader": "^1.0.9",
+    "autoprefixer": "10.4.5",
     "axios": "^0.28.0",
     "bootstrap": "^5.0.0",
     "framer-motion": "^11.2.12",
@@ -79,9 +81,11 @@
   },
   "resolutions": {
     "@types/react": "^18.2.69",
-    "@types/react-dom": "^18.2.19"
+    "@types/react-dom": "^18.2.19",
+    "autoprefixer": "10.4.5"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/humps": "^2.0.0",
     "@types/jwt-decode": "^3.1.0",
     "@types/lodash": "^4.17.5",

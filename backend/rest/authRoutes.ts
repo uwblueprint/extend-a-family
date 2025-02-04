@@ -3,7 +3,6 @@ import { CookieOptions, Router } from "express";
 import { generate } from "generate-password";
 import {
   getAccessToken,
-  isAuthorizedByEmail,
   isAuthorizedByUserId,
   isAuthorizedByRole,
   isFirstTimeInvitedUser,
@@ -11,7 +10,7 @@ import {
 import {
   loginRequestValidator,
   signupRequestValidator,
-  inviteAdminRequestValidator,
+  inviteUserRequestValidator,
   forgotPasswordRequestValidator,
   updateTemporaryPasswordRequestValidator,
   updateUserStatusRequestValidator,
@@ -144,18 +143,14 @@ authRouter.post(
 );
 
 /* Emails a password reset link to the user with the specified email */
-authRouter.post(
-  "/resetPassword/:email",
-  isAuthorizedByEmail("email"),
-  async (req, res) => {
-    try {
-      await authService.resetPassword(req.params.email);
-      res.status(204).send();
-    } catch (error: unknown) {
-      res.status(500).json({ error: getErrorMessage(error) });
-    }
-  },
-);
+authRouter.post("/resetPassword/:email", async (req, res) => {
+  try {
+    await authService.resetPassword(req.params.email);
+    res.status(204).send();
+  } catch (error: unknown) {
+    res.status(500).json({ error: getErrorMessage(error) });
+  }
+});
 
 authRouter.post("/isUserVerified/:email", async (req, res) => {
   try {
@@ -178,7 +173,7 @@ authRouter.post("/isUserVerified/:email", async (req, res) => {
 
 authRouter.post(
   "/inviteAdmin",
-  inviteAdminRequestValidator,
+  inviteUserRequestValidator,
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
     try {
@@ -196,6 +191,39 @@ authRouter.post(
       });
       await authService.sendAdminInvite(req.body.email, temporaryPassword);
       res.status(200).json(invitedAdminUser);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+authRouter.post(
+  "/inviteLearner",
+  inviteUserRequestValidator,
+  isAuthorizedByRole(new Set(["Facilitator"])),
+  async (req, res) => {
+    try {
+      const temporaryPassword = generate({
+        length: 20,
+        numbers: true,
+      });
+      const invitedLearnerUser = await userService.createLearner(
+        {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          email: req.body.email,
+          role: "Learner",
+          password: temporaryPassword,
+          status: "Invited",
+        },
+        req.body.facilitatorId,
+      );
+      await authService.sendLearnerInvite(
+        req.body.firstName,
+        req.body.email,
+        temporaryPassword,
+      );
+      res.status(200).json(invitedLearnerUser);
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }

@@ -2,8 +2,6 @@ export const HOME_PAGE = "/";
 
 export const WELCOME_PAGE = "/welcome";
 
-export const LOGIN_PAGE = "/login";
-
 export const SIGNUP_PAGE = "/signup";
 
 export const CREATE_MODULE_PAGE = "/create-module";
@@ -25,3 +23,7 @@ export const MANAGE_USERS_PAGE = "/manage-users";
 export const MAKE_HELP_REQUEST_PAGE = "/ask-for-help";
 
 export const VIEW_HELP_REQUESTS_PAGE = "/help-requests";
+
+export const FORGOT_PASSWORD_PAGE = "/forgot-password";
+
+export const COURSES_PAGE = "/course";

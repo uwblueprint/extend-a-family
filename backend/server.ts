@@ -23,9 +23,9 @@ import feedbackRouter from "./rest/feedbackRoutes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
-  "https://uw-blueprint-starter-code.firebaseapp.com",
-  "https://uw-blueprint-starter-code.web.app",
-  /^https:\/\/uw-blueprint-starter-code--pr.*\.web\.app$/,
+  "https://extendafamily-7613e.firebaseapp.com",
+  "https://extendafamily-7613e.web.app",
+  /^https:\/\/extendafamily-7613e--pr.*\.web\.app$/,
 ];
 
 const CORS_OPTIONS: cors.CorsOptions = {

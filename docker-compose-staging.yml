@@ -1,0 +1,13 @@
+services:
+  backend:
+    container_name: eaf_backend
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-staging
+    ports:
+      - 0.0.0.0:58001:8080
+    dns:
+      - 8.8.8.8
+    env_file:
+      - ./.env

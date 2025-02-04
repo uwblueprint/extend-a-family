@@ -66,6 +66,15 @@ interface IUserService {
   createUser(user: CreateUserDTO, authId?: string): Promise<UserDTO>;
 
   /**
+   * Create a learner, link them to their facilitator, and add them to their facilitator's learner list
+   * @param user the user to be created
+   * @param facilitatorId the auth ID of the facilitator to link the new learner to
+   * @returns a UserDTO with the created learner's information
+   * @throws Error if user creation fails
+   */
+  createLearner(user: CreateUserDTO, facilitatorId: string): Promise<UserDTO>;
+
+  /**
    * Update a user.
    * Note: the password cannot be updated using this method, use IAuthService.resetPassword instead
    * @param userId user's id
