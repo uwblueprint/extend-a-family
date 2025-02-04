@@ -157,7 +157,7 @@ const CreatePasswordHelpConfirmationModal: React.FC<
             color: theme.palette.Neutral[100],
             backgroundColor: theme.palette.Learner.Default,
             "&:hover": {
-              background: "var(--Learner-Hover, #005566)", // add to theme.ts
+              background: theme.palette.Learner.Hover,
             },
           }}
         >

@@ -95,7 +95,7 @@ const CreatePasswordPage = (): React.ReactElement => {
                 textTransform: "none",
                 backgroundColor: theme.palette.Learner.Default,
                 "&:hover": {
-                  background: "var(--Learner-Hover, #005566)", // make theme.ts variables for button hover values
+                  background: theme.palette.Learner.Hover,
                 },
                 "&.Mui-disabled": {
                   backgroundColor: "#ccc",
