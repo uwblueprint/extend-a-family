@@ -4,8 +4,11 @@ import Logo from "../images/logo.svg";
 import CreatePasswordHelpModal from "../help/CreatePasswordHelpModal";
 import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
 import PasswordCheck from "../auth/PasswordCheck";
+import { useUser } from "../../hooks/useUser";
 
 const CreatePasswordPage = (): React.ReactElement => {
+  const user = useUser();
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
@@ -93,9 +96,9 @@ const CreatePasswordPage = (): React.ReactElement => {
                 padding: "10px 24px",
                 width: "100%",
                 textTransform: "none",
-                backgroundColor: theme.palette.Learner.Default,
+                backgroundColor: theme.palette[`${user.role}`].Default,
                 "&:hover": {
-                  background: theme.palette.Learner.Hover,
+                  background: theme.palette[`${user.role}`].Hover,
                 },
                 "&.Mui-disabled": {
                   backgroundColor: "#ccc",
@@ -105,17 +108,23 @@ const CreatePasswordPage = (): React.ReactElement => {
             >
               Create Password
             </Button>
-            <Typography
-              sx={{
-                textAlign: "right",
-                marginTop: 2,
-                color: theme.palette.learner.main,
-                cursor: "pointer",
-              }}
-              onClick={handleOpenHelpModal}
-            >
-              Help
-            </Typography>
+            {`${user.role}` !== "Administrator" && (
+              <Typography
+                sx={{
+                  textAlign: "right",
+                  marginTop: 2,
+                  marginRight: "12px",
+                  color: theme.palette.Learner.Default,
+                  cursor: "pointer",
+                  "&:hover": {
+                    textDecoration: "underline",
+                  },
+                }}
+                onClick={handleOpenHelpModal}
+              >
+                Help
+              </Typography>
+            )}
           </form>
         </Container>
       </Container>

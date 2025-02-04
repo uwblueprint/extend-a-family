@@ -5,8 +5,10 @@ import { useHistory } from "react-router-dom";
 
 import Logo from "../images/logo.svg";
 import { WELCOME_PAGE } from "../../constants/Routes";
+import { useUser } from "../../hooks/useUser";
 
 const CreatePasswordConfirmationPage = (): React.ReactElement => {
+  const user = useUser();
   const history = useHistory();
   const theme = useTheme();
   const handleBackToLogin = () => {
@@ -94,7 +96,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             alignItems: "center",
             gap: theme.spacing(1),
             borderRadius: "4px",
-            background: theme.palette.Learner.Default,
+            background: theme.palette[`${user.role}`].Default,
             color: theme.palette.Neutral[100],
             textAlign: "center",
             fontSize: theme.typography.labelLarge.fontSize,
@@ -104,7 +106,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             letterSpacing: theme.typography.labelLarge.letterSpacing,
             textTransform: theme.typography.labelLarge.textTransform,
             "&:hover": {
-              background: theme.palette.Learner.Hover,
+              background: theme.palette[`${user.role}`].Hover,
             },
           }}
           onClick={handleBackToLogin}
