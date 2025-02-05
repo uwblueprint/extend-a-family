@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Box, Container, Typography, Button, useTheme } from "@mui/material";
+import { Redirect } from "react-router-dom";
 import Logo from "../images/logo.svg";
 import CreatePasswordHelpModal from "../help/CreatePasswordHelpModal";
 import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
 import PasswordCheck from "../auth/PasswordCheck";
 import { useUser } from "../../hooks/useUser";
+import { HOME_PAGE } from "../../constants/Routes";
 
 const CreatePasswordPage = (): React.ReactElement => {
   const user = useUser();
@@ -28,6 +30,10 @@ const CreatePasswordPage = (): React.ReactElement => {
 
   const handleOpenHelpModal = () => setIsHelpModalOpen(true);
   const handleCloseHelpModal = () => setIsHelpModalOpen(false);
+
+  if (user.status !== "Invited") {
+    return <Redirect to={HOME_PAGE} />;
+  }
 
   if (isPasswordConfirmed) {
     return <CreatePasswordConfirmationPage />;
