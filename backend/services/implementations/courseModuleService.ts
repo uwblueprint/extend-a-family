@@ -51,14 +51,19 @@ class CourseModuleService implements ICourseModuleService {
 
   async getCourseModule(
     courseModuleId: string,
-  ): Promise<CourseModuleDTO | null> {
+  ): Promise<CourseModuleDTO & { lessonPdfUrl: string }> {
     try {
       const courseModule: CourseModule | null = await MgCourseModule.findById(
         courseModuleId,
-      );
+      )
+        .lean()
+        .exec();
       const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
         `course/pdfs/module-${courseModuleId}.pdf`,
       );
+      if (!courseModule) {
+        throw new Error(`Course module with id ${courseModuleId} not found.`);
+      }
       return {
         ...(courseModule as CourseModule),
         lessonPdfUrl,
