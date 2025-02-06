@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import { getApiValidationError, validatePrimitive } from "./util";
+import { NextFunction, Request, Response } from "express";
 import CourseUnitService from "../../services/implementations/courseUnitService";
+import { getErrorMessage } from "../../utilities/errorUtils";
+import { getApiValidationError, validatePrimitive } from "./util";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export const createCourseUnitDtoValidator = async (
@@ -41,18 +42,27 @@ export const moduleBelongsToUnitValidator = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { unitId, moduleId } = req.params;
+  try {
+    const { unitId, moduleId } = req.params;
+    console.log("unit module validator", req.params);
 
-  const courseUnitService: CourseUnitService = new CourseUnitService();
+    const courseUnitService: CourseUnitService = new CourseUnitService();
 
-  const courseUnit = await courseUnitService.getCourseUnit(unitId);
+    const courseUnit = await courseUnitService.getCourseUnit(unitId);
 
-  if (!courseUnit.modules.includes(moduleId)) {
+    if (!courseUnit.modules.includes(moduleId)) {
+      return res
+        .status(404)
+        .send(
+          `Module with ID ${moduleId} is not found in unit with ID ${unitId}`,
+        );
+    }
+    return next();
+  } catch (e: unknown) {
     return res
       .status(404)
       .send(
-        `Module with ID ${moduleId} is not found in unit with ID ${unitId}`,
+        `Unable to verify that module belongs to unit: ${getErrorMessage(e)}`,
       );
   }
-  return next();
 };

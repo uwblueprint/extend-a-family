@@ -57,7 +57,7 @@ class CourseModuleService implements ICourseModuleService {
         courseModuleId,
       );
       const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
-        `course/pdf/module-${courseModuleId}.pdf`,
+        `course/pdfs/module-${courseModuleId}.pdf`,
       );
       return {
         ...(courseModule as CourseModule),

@@ -27,6 +27,21 @@ courseRouter.get(
 );
 
 courseRouter.get(
+  "/module/:moduleId",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  async (req, res) => {
+    const { moduleId } = req.params;
+    try {
+      console.log("get module by id", req.params);
+      const courseModule = await courseModuleService.getCourseModule(moduleId);
+      res.status(200).json(courseModule);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.get(
   "/:unitId",
   isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
   async (req, res) => {
@@ -35,21 +50,6 @@ courseRouter.get(
         req.params.unitId,
       );
       res.status(200).json(courseModules);
-    } catch (e: unknown) {
-      res.status(500).send(getErrorMessage(e));
-    }
-  },
-);
-
-courseRouter.get(
-  "/module/:moduleId",
-  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
-  moduleBelongsToUnitValidator,
-  async (req, res) => {
-    const { moduleId } = req.params;
-    try {
-      const courseModule = await courseModuleService.getCourseModule(moduleId);
-      res.status(200).json(courseModule);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }

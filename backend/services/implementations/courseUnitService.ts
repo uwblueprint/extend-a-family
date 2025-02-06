@@ -1,13 +1,13 @@
 /* eslint-disable class-methods-use-this */
+import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import {
   CourseUnitDTO,
   CreateCourseUnitDTO,
   UpdateCourseUnitDTO,
 } from "../../types/courseTypes";
+import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ICourseUnitService from "../interfaces/courseUnitService";
-import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
-import { getErrorMessage } from "../../utilities/errorUtils";
 
 const Logger = logger(__filename);
 
@@ -31,26 +31,17 @@ class CourseUnitService implements ICourseUnitService {
   async getCourseUnit(
     unitId: string,
   ): Promise<CourseUnitDTO & { modules: string[] }> {
-    try {
-      const courseUnit: CourseUnit | null = await MgCourseUnit.findById(unitId);
+    const courseUnit: CourseUnit | null = await MgCourseUnit.findById(unitId);
 
-      if (!courseUnit) {
-        throw new Error(`Course unit with id ${unitId} not found.`);
-      }
-
-      const courseModuleIds = courseUnit.modules.map((id) => {
-        return id.toString();
-      });
-
-      return { ...(courseUnit as CourseUnitDTO), modules: courseModuleIds };
-    } catch (error) {
-      Logger.error(
-        `Failed to get course with id ${unitId}. Reason = ${getErrorMessage(
-          error,
-        )}`,
-      );
-      throw error;
+    if (!courseUnit) {
+      throw new Error(`Course unit with id ${unitId} not found.`);
     }
+
+    const courseModuleIds = courseUnit.modules.map((id) => {
+      return id.toString();
+    });
+
+    return { ...(courseUnit as CourseUnitDTO), modules: courseModuleIds };
   }
 
   async createCourseUnit(
