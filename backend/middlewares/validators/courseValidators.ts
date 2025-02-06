@@ -1,12 +1,13 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+import CourseModuleService from "../../services/implementations/courseModuleService";
+import CourseUnitService from "../../services/implementations/courseUnitService";
+import { getErrorMessage } from "../../utilities/errorUtils";
 import {
   getApiValidationError,
+  getFileTypeValidationError,
   validateFileType,
   validatePrimitive,
-  getFileTypeValidationError,
 } from "./util";
-import CourseUnitService from "../../services/implementations/courseUnitService";
-import CourseModuleService from "../../services/implementations/courseModuleService";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
@@ -103,20 +104,29 @@ export const moduleBelongsToUnitValidator = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { unitId, moduleId } = req.params;
+  try {
+    const { unitId, moduleId } = req.params;
+    console.log("unit module validator", req.params);
 
-  const courseUnitService: CourseUnitService = new CourseUnitService();
+    const courseUnitService: CourseUnitService = new CourseUnitService();
 
-  const courseUnit = await courseUnitService.getCourseUnit(unitId);
+    const courseUnit = await courseUnitService.getCourseUnit(unitId);
 
-  if (!courseUnit.modules.includes(moduleId)) {
+    if (!courseUnit.modules.includes(moduleId)) {
+      return res
+        .status(404)
+        .send(
+          `Module with ID ${moduleId} is not found in unit with ID ${unitId}`,
+        );
+    }
+    return next();
+  } catch (e: unknown) {
     return res
       .status(404)
       .send(
-        `Module with ID ${moduleId} is not found in unit with ID ${unitId}`,
+        `Unable to verify that module belongs to unit: ${getErrorMessage(e)}`,
       );
   }
-  return next();
 };
 
 export const pageBelongsToModuleValidator = async (
