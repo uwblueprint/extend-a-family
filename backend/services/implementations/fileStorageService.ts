@@ -97,7 +97,7 @@ class FileStorageService implements IFileStorageService {
     fileName: string,
     fileData: Buffer,
     contentType: string | null = null,
-  ): Promise<void> {
+  ): Promise<string> {
     try {
       const bucket = storage().bucket(this.bucketName);
       const currentBlob = await bucket.file(fileName);
@@ -107,6 +107,7 @@ class FileStorageService implements IFileStorageService {
       await bucket.file(fileName).save(fileData, {
         metadata: { contentType },
       });
+      return await this.getFile(fileName, 144000)
     } catch (error: unknown) {
       Logger.error(`Failed to upload file. Reason = ${getErrorMessage(error)}`);
       throw error;

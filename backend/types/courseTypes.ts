@@ -12,10 +12,12 @@ export type CourseModuleDTO = {
   id: string;
   displayIndex: number;
   title: string;
+  imageURL?: string;
+  expirationDate?: Date;
 };
 
 export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
-export type UpdateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
+export type UpdateCourseModuleDTO = Pick<CourseModuleDTO, "title" | "imageURL" | "expirationDate">;
 
 export enum InteractiveElementType {
   TextInput = "TextInput",

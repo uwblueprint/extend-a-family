@@ -1,3 +1,4 @@
+import axios from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { CourseUnit } from "../types/CourseTypes";
 import { getLocalStorageObjProperty } from "../utils/LocalStorageUtils";
@@ -24,8 +25,8 @@ const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
     "accessToken",
   )}`;
   try {
-    const { data } = await baseAPIClient.post(
-      `course/${moduleID}/uploadThumbnail`,
+    const { data } = await axios.post(
+      `http://localhost:8080/course/${moduleID}/uploadThumbnail`,
       uploadedImage,
       {
         headers: {
@@ -36,7 +37,8 @@ const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
     );
     return data;
   } catch (error: unknown) {
-    return null;
+    console.log(error)
+    return null
   }
 };
 
