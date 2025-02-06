@@ -13,15 +13,25 @@ import {
   Stack,
   Button,
   TextField,
-  IconButton,
   Menu,
   MenuItem,
+  InputAdornment,
+  Box,
+  Avatar,
+  Typography,
 } from "@mui/material";
-import { Search, FilterList, Add } from "@mui/icons-material";
-import TablePaginationActions from "@mui/material/TablePagination/TablePaginationActions";
+import { Search, FilterList, Add, Delete} from "@mui/icons-material";
+
 import { Role } from "../../types/AuthTypes";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import { User } from "../../types/UserTypes";
+import placeholderImage from "../assets/placeholder_profile.png";
+
+const roleColors: Record<string, string> = {
+  Administrator: "#FFE0CC",
+  Facilitator: "#E0D4FF",
+  Learner: "#D1F2EB",
+};
 
 const ManageUser = (): React.ReactElement => {
   const [role, setRole] = useState<Role>("Administrator");
@@ -30,7 +40,8 @@ const ManageUser = (): React.ReactElement => {
   const [usersPerPage, setUsersPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterAnchor, setFilterAnchor] = useState<null | HTMLElement>(null);
-
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [isFilterActive, setIsFilterActive] = useState(false);
   useEffect(() => {
     async function getUsers() {
       const fetchedUsers = await UserAPIClient.getUsersByRole(role);
@@ -46,6 +57,9 @@ const ManageUser = (): React.ReactElement => {
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
+
+  const handleSearchFocus = () => setIsSearchActive(true);
+  const handleSearchBlur = () => setIsSearchActive(false);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -68,84 +82,161 @@ const ManageUser = (): React.ReactElement => {
     setPage(0);
   };
 
-  const handleFilterClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleFilterClick = (event: React.MouseEvent<HTMLDivElement>) => {
     setFilterAnchor(event.currentTarget);
+    setIsFilterActive(true);
   };
 
   const handleFilterClose = () => {
     setFilterAnchor(null);
+    setIsFilterActive(false);
   };
 
   return (
     <Stack direction="column" spacing={2} margin="2rem">
       {/* Top Toolbar Section */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ width: "100%", height: "64px" }}
+      >
+        {/* Title Section */}
         <Stack direction="column">
-          <h2>User List</h2>
-          <p>View all the people using this platform</p>
+          <h2
+            style={{
+              fontFamily: "Lexend Deca, sans-serif",
+              fontSize: "28px",
+              fontWeight: 600,
+              lineHeight: "33.6px",
+              color: "#171D1E",
+              margin: 0,
+            }}
+          >
+            User List
+          </h2>
+          <p style={{ margin: 0, color: "#5F6368" }}>
+            View all the people using this platform
+          </p>
         </Stack>
 
+        {/* Controls Section */}
         <Stack direction="row" spacing={1} alignItems="center">
-          {/* Search Bar */}
+          {/* Search Bar with Floating Label */}
           <TextField
+            required
+            label="Search by name..."
             variant="outlined"
-            placeholder="Search by name..."
             size="small"
             value={searchQuery}
             onChange={handleSearch}
+            onFocus={handleSearchFocus}
+            onBlur={handleSearchBlur}
             InputProps={{
               startAdornment: (
-                <IconButton edge="start">
-                  <Search />
-                </IconButton>
+                <InputAdornment position="start">
+                  <Search
+                    sx={{ color: isSearchActive ? "#0056D2" : "#5F6368" }}
+                  />
+                </InputAdornment>
               ),
+            }}
+            sx={{
+              minWidth: "240px",
+              borderRadius: "8px",
+              "& label": {
+                color: isSearchActive ? "#0056D2" : "#5F6368",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: isSearchActive ? "#0056D2" : "#E0E0E0",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#0056D2",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#0056D2",
+                },
+              },
             }}
           />
 
-          {/* Filter Button (Replaces Role Dropdown) */}
-          <Button
+          {/* Filter Input with Floating Label */}
+          <TextField
+            required
+            label="Filter"
             variant="outlined"
-            startIcon={<FilterList />}
-            onClick={handleFilterClick}
-          >
-            Filter
-          </Button>
+            size="small"
+            onClick={handleFilterClick} // Use onClick to open dropdown
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={(event) => {
+                      event.preventDefault(); // Prevents input focus
+                      event.stopPropagation(); // Ensures only the icon triggers the dropdown
+                      handleFilterClick(event); // Opens the menu
+                    }}
+                  >
+                    <FilterList
+                      sx={{ color: isFilterActive ? "#0056D2" : "#5F6368" }}
+                    />
+                  </Box>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              minWidth: "180px",
+              borderRadius: "8px",
+              "& label": {
+                color: isFilterActive ? "#0056D2" : "#5F6368",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: isFilterActive ? "#0056D2" : "#E0E0E0",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#0056D2",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#0056D2",
+                },
+              },
+            }}
+          />
           <Menu
             anchorEl={filterAnchor}
             open={Boolean(filterAnchor)}
             onClose={handleFilterClose}
           >
-            <MenuItem
-              onClick={() => {
-                setRole("Administrator");
-                handleFilterClose();
-              }}
-            >
-              Administrator
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setRole("Facilitator");
-                handleFilterClose();
-              }}
-            >
-              Facilitator
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setRole("Learner");
-                handleFilterClose();
-              }}
-            >
-              Learner
-            </MenuItem>
+            {["Administrator", "Facilitator", "Learner"].map((roleOption) => (
+              <MenuItem
+                key={roleOption}
+                onClick={() => {
+                  setRole(roleOption as Role);
+                  handleFilterClose();
+                }}
+              >
+                {roleOption}
+              </MenuItem>
+            ))}
           </Menu>
 
           {/* Add New Admin Button */}
           <Button
             variant="contained"
             startIcon={<Add />}
-            sx={{ backgroundColor: "#8B4513", color: "white" }}
+            sx={{
+              backgroundColor: "#8B4513",
+              color: "white",
+              borderRadius: "8px",
+              "&:hover": { backgroundColor: "#6F3A10" },
+            }}
           >
             ADD NEW ADMIN
           </Button>
@@ -157,28 +248,43 @@ const ManageUser = (): React.ReactElement => {
         <Table aria-label="User List Table">
           <TableHead>
             <TableRow>
+              <TableCell>Profile</TableCell>
               <TableCell>Email</TableCell>
               <TableCell align="right">First Name</TableCell>
               <TableCell align="right">Last Name</TableCell>
+              <TableCell align="right">Role</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {(usersPerPage > 0
-              ? filteredUsers.slice(
-                  page * usersPerPage,
-                  page * usersPerPage + usersPerPage,
-                )
+              ? filteredUsers.slice(page * usersPerPage, page * usersPerPage + usersPerPage)
               : filteredUsers
             ).map((user) => (
-              <TableRow key={user.id} style={{ height: 53 }}>
-                <TableCell component="th" scope="row">
-                  {user.email}
+              <TableRow key={user.id}>
+                <TableCell>
+                  <Avatar src={placeholderImage} alt={user.firstName} />
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {user.firstName}
+                <TableCell>{user.email}</TableCell>
+                <TableCell align="right">{user.firstName}</TableCell>
+                <TableCell align="right">{user.lastName}</TableCell>
+                <TableCell align="right">
+                  <Typography
+                    sx={{
+                      backgroundColor: roleColors[role] || "#D1F2EB",
+                      padding: "4px 8px",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {role.toUpperCase()}
+                  </Typography>
                 </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {user.lastName}
+                <TableCell align="right">
+                  <Button variant="outlined" color="error" startIcon={<Delete />}>
+                    DELETE USER
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -192,21 +298,12 @@ const ManageUser = (): React.ReactElement => {
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                colSpan={3}
+                colSpan={6}
                 count={filteredUsers.length}
                 rowsPerPage={usersPerPage}
                 page={page}
-                slotProps={{
-                  select: {
-                    inputProps: {
-                      "aria-label": "users per page",
-                    },
-                    native: true,
-                  },
-                }}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
               />
             </TableRow>
           </TableFooter>
