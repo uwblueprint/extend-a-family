@@ -71,7 +71,7 @@ class CourseModuleService implements ICourseModuleService {
         throw new Error(`Course module with id ${courseModuleId} not found.`);
       }
       const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
-        `course/pdfs/module-${courseModuleId}.pdf`,
+        `course/pdf/module-${courseModuleId}.pdf`,
       );
       return {
         ...(courseModule as CourseModule),

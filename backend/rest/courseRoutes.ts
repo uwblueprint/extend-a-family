@@ -112,7 +112,6 @@ courseRouter.get(
   async (req, res) => {
     const { moduleId } = req.params;
     try {
-      console.log("get module by id", req.params);
       const courseModule = await courseModuleService.getCourseModule(moduleId);
       res.status(200).json(courseModule);
     } catch (e: unknown) {

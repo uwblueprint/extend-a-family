@@ -1,32 +1,22 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react/jsx-no-bind */
-import React, {
-  useState,
-  useRef,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-} from "react";
-import { pdfjs, Document, Page, Thumbnail } from "react-pdf";
-import type { PDFDocumentProxy } from "pdfjs-dist";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Grid,
-  Button,
-  Input,
-} from "@mui/material";
+/* eslint-disable react/react-in-jsx-scope */
+import { useEffect, useState } from "react";
+
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
-import { padNumber } from "../../utils/StringUtils";
-import "react-pdf/dist/Page/TextLayer.css";
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import { Box, Button, IconButton, Typography } from "@mui/material";
+import type { PDFDocumentProxy } from "pdfjs-dist";
+import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import useQuery from "../../hooks/useQuery";
+import { CourseModule } from "../../types/CourseTypes";
+import { padNumber } from "../../utils/StringUtils";
 import "./ViewModulePage.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -34,19 +24,30 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-type PDFFile = string | File | null;
-
 const options = {
   cMapUrl: "/cmaps/",
   standardFontDataUrl: "/standard_fonts/",
 };
 
 const ViewModulePage = () => {
-  const [file] = useState<PDFFile>("/test_lesson.pdf");
+  const searchParams = useQuery();
+  const moduleId = searchParams.get("moduleId") || "";
+
   const [numPages, setNumPages] = useState<number>();
   const [currentPage, setCurrentPage] = useState(1);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [bookMarkedPages, setBookMarkedPages] = useState(new Set<number>());
+  const [module, setModule] = useState<
+    (CourseModule & { lessonPdfUrl: string }) | null
+  >(null);
+
+  useEffect(() => {
+    async function fetchModule() {
+      const fetchedModule = await CourseAPIClient.getModuleById(moduleId);
+      setModule(fetchedModule);
+    }
+    fetchModule();
+  }, [moduleId]);
 
   const onDocumentLoadSuccess = ({
     numPages: nextNumPages,
@@ -68,7 +69,7 @@ const ViewModulePage = () => {
 
   return (
     <Document
-      file={file}
+      file={module?.lessonPdfUrl || null}
       onLoadSuccess={onDocumentLoadSuccess}
       options={options}
       className="document-override"
@@ -172,7 +173,7 @@ const ViewModulePage = () => {
                 >
                   <ArrowBackIosIcon sx={{ fontSize: "24px" }} />
                 </IconButton>
-                <Typography>Module 4.5 - Investing</Typography>
+                <Typography>{module?.title}</Typography>
               </Box>
               <Box display="inline-flex" alignItems="center" gap="20px">
                 <Button
