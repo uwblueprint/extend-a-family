@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { AlternateEmail, Password } from "@mui/icons-material";
 import InputAdornment from "@mui/material/InputAdornment";
-import { AuthenticatedUser, Role } from "../../types/AuthTypes";
+import { AuthenticatedUser, AuthError, Role } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { PresentableError } from "../../types/ErrorTypes";
 import { FORGOT_PASSWORD_PAGE } from "../../constants/Routes";
@@ -41,6 +41,8 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
   const [loginError, setLoginError] = useState<PresentableError>();
   const [emailError, setEmailError] = useState<PresentableError>();
   const [passwordError, setPasswordError] = useState<PresentableError>();
+  const [errorData, setErrorData] =
+    useState<[string | undefined, string | undefined]>();
 
   const theme = useTheme();
 
@@ -49,6 +51,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       setLoginError(undefined);
       setEmailError(undefined);
       setPasswordError(undefined);
+      setErrorData([undefined, undefined]);
       const user: AuthenticatedUser | null = await authAPIClient.login(
         email,
         password,
@@ -58,30 +61,28 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
       setAuthenticatedUser(user);
     } catch (e: unknown) {
-      if (e instanceof Error && e.message in authErrors) {
-        // eslint-disable-next-line no-alert
-        switch (e.message) {
-          case AuthErrorCodes.UNVERIFIED_EMAIL:
-            setLoginError(authErrors[AuthErrorCodes.UNVERIFIED_EMAIL]);
-            break;
-          case AuthErrorCodes.INVALID_LOGIN_CREDENTIALS:
-            setLoginError(authErrors[AuthErrorCodes.INVALID_LOGIN_CREDENTIALS]);
-            break;
-          case AuthErrorCodes.WRONG_USER_TYPE:
-            setLoginError(authErrors[AuthErrorCodes.WRONG_USER_TYPE]);
-            break;
-          case AuthErrorCodes.EMAIL_NOT_FOUND:
-            setEmailError(authErrors[AuthErrorCodes.EMAIL_NOT_FOUND]);
-            break;
-          case AuthErrorCodes.INCORRECT_PASSWORD:
-            setPasswordError(authErrors[AuthErrorCodes.INCORRECT_PASSWORD]);
-            break;
-          default:
-            setLoginError(defaultAuthError);
-        }
-      } else {
-        // eslint-disable-next-line no-alert
-        setLoginError(defaultAuthError);
+      const error = e as Error;
+      // eslint-disable-next-line no-alert
+      const errorCause = error.cause as AuthError;
+      switch (error.message) {
+        case AuthErrorCodes.UNVERIFIED_EMAIL:
+          setLoginError(authErrors[AuthErrorCodes.UNVERIFIED_EMAIL]);
+          break;
+        case AuthErrorCodes.INVALID_LOGIN_CREDENTIALS:
+          setLoginError(authErrors[AuthErrorCodes.INVALID_LOGIN_CREDENTIALS]);
+          break;
+        case AuthErrorCodes.WRONG_USER_TYPE:
+          setLoginError(authErrors[AuthErrorCodes.WRONG_USER_TYPE]);
+          setErrorData([errorCause.errorData?.[0], errorCause.errorData?.[1]]);
+          break;
+        case AuthErrorCodes.EMAIL_NOT_FOUND:
+          setEmailError(authErrors[AuthErrorCodes.EMAIL_NOT_FOUND]);
+          break;
+        case AuthErrorCodes.INCORRECT_PASSWORD:
+          setPasswordError(authErrors[AuthErrorCodes.INCORRECT_PASSWORD]);
+          break;
+        default:
+          setLoginError(defaultAuthError);
       }
     }
   };
@@ -98,6 +99,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
           width: "100%",
           maxHeight: "92px",
           height: "100%",
+          marginBottom: "20px",
         }}
       >
         <Alert
@@ -143,7 +145,11 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
         >
           <ErrorAlert
             title={loginError.title?.()}
-            message={loginError?.text()}
+            message={
+              errorData?.[0] && errorData?.[1]
+                ? loginError?.text(errorData[0], errorData[1])
+                : loginError?.text()
+            }
           />
         </Box>
       )}
