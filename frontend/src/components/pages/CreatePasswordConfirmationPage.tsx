@@ -4,15 +4,16 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useHistory } from "react-router-dom";
 
 import Logo from "../images/logo.svg";
-import { WELCOME_PAGE } from "../../constants/Routes";
+import { HOME_PAGE } from "../../constants/Routes";
 import { useUser } from "../../hooks/useUser";
 
 const CreatePasswordConfirmationPage = (): React.ReactElement => {
   const user = useUser();
   const history = useHistory();
   const theme = useTheme();
-  const handleBackToLogin = () => {
-    history.push(WELCOME_PAGE);
+  const handleBackToHome = () => {
+    user.status = "Active";
+    history.push(HOME_PAGE);
   };
 
   return (
@@ -109,7 +110,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
               background: theme.palette[`${user.role}`].Hover,
             },
           }}
-          onClick={handleBackToLogin}
+          onClick={handleBackToHome}
         >
           LOGIN
         </Button>
