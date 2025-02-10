@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -44,6 +44,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
   const [errorData, setErrorData] =
     useState<[string | undefined, string | undefined]>();
 
+  const alertRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
 
   const onLogInClick = async () => {
@@ -94,14 +95,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
 
   const ErrorAlert: React.FC<ErrorAlertProps> = ({ title, message }) => {
     return (
-      <Box
-        sx={{
-          width: "100%",
-          maxHeight: "92px",
-          height: "100%",
-          marginBottom: "20px",
-        }}
-      >
+      <Box ref={alertRef} sx={{ width: "100%" }}>
         <Alert
           icon={false}
           severity="error"
