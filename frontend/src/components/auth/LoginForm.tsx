@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -45,6 +45,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
     useState<[string | undefined, string | undefined]>();
 
   const theme = useTheme();
+  const alertRef = useRef<HTMLDivElement>(null);
 
   const onLogInClick = async () => {
     try {
@@ -62,7 +63,6 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       setAuthenticatedUser(user);
     } catch (e: unknown) {
       const error = e as Error;
-      // eslint-disable-next-line no-alert
       const errorCause = error.cause as AuthError;
       switch (error.message) {
         case AuthErrorCodes.UNVERIFIED_EMAIL:
@@ -94,21 +94,13 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
 
   const ErrorAlert: React.FC<ErrorAlertProps> = ({ title, message }) => {
     return (
-      <Box
-        sx={{
-          width: "100%",
-          maxHeight: "92px",
-          height: "100%",
-          marginBottom: "20px",
-        }}
-      >
+      <Box ref={alertRef} sx={{ width: "100%" }}>
         <Alert
           icon={false}
           severity="error"
           sx={{
             color: theme.palette.Error.Light,
             width: "100%",
-            height: "100%",
             borderRadius: "4px",
             border: "2px solid",
             borderColor: theme.palette.Error.Hover,
@@ -140,7 +132,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       {loginError && (
         <Box
           sx={{
-            marginBottom: "40px",
+            marginBottom: `40px`, // Dynamic margin based on alert height
           }}
         >
           <ErrorAlert
@@ -184,9 +176,6 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                 sx: {
                   fontSize: "16px",
                   fontWeight: 400,
-                  lineHeight: "22.4px",
-                  letterSpacing: "0.2px",
-                  fontFamily: "Lexend Deca, sans-serif",
                 },
                 startAdornment: (
                   <InputAdornment position="start">
@@ -199,16 +188,6 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
               onChange={(event) => setEmail(event.target.value)}
               variant="outlined"
               fullWidth
-              margin="none"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignSelf: "stretch",
-                maxHeight: "56px",
-                "& .MuiFormHelperText-root": {
-                  color: passwordError ? theme.palette.Error.Default : "red",
-                },
-              }}
             />
           </Box>
           <Box>
@@ -222,16 +201,6 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
               onChange={(event) => setPassword(event.target.value)}
               variant="outlined"
               fullWidth
-              margin="none"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignSelf: "stretch",
-                maxHeight: "56px",
-                "& .MuiFormHelperText-root": {
-                  color: passwordError ? theme.palette.Error.Default : "red",
-                },
-              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -263,23 +232,11 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
             style={{
               height: "60px",
               width: isDrawerLogin(userRole) ? "100%" : "27%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
               borderRadius: "4px",
               backgroundColor: theme.palette[userRole].Default,
-              boxShadow: "none",
             }}
           >
-            <Typography
-              variant={
-                isDrawerLogin(userRole)
-                  ? "labelLargeProminent"
-                  : "headlineSmall"
-              }
-              sx={{ color: "white" }}
-            >
+            <Typography variant="headlineSmall" sx={{ color: "white" }}>
               Login {isDrawerLogin(userRole) && `as ${userRole}`}
             </Typography>
           </Button>
