@@ -200,7 +200,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                 alignSelf: "stretch",
                 maxHeight: "56px",
                 "& .MuiFormHelperText-root": {
-                  color: passwordError ? theme.palette.Error.Default : "red",
+                  color: theme.palette.Error.Default,
                 },
               }}
             />
@@ -223,7 +223,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                 alignSelf: "stretch",
                 maxHeight: "56px",
                 "& .MuiFormHelperText-root": {
-                  color: passwordError ? theme.palette.Error.Default : "red",
+                  color: theme.palette.Error.Default,
                 },
               }}
               InputProps={{
