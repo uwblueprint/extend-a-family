@@ -37,8 +37,7 @@ const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
     );
     return data;
   } catch (error: unknown) {
-    console.log(error)
-    return null
+    return null;
   }
 };
 

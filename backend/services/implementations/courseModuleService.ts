@@ -16,10 +16,7 @@ import ICourseModuleService from "../interfaces/courseModuleService";
 const Logger = logger(__filename);
 
 class CourseModuleService implements ICourseModuleService {
-
-  async getCourseModule(
-    courseModuleId: string,
-  ): Promise<CourseModuleDTO> {
+  async getCourseModule(courseModuleId: string): Promise<CourseModuleDTO> {
     try {
       const courseModule: CourseModule | null = await MgCourseModule.findById(
         courseModuleId,
@@ -39,7 +36,6 @@ class CourseModuleService implements ICourseModuleService {
       throw error;
     }
   }
-
 
   async getCourseModules(
     courseUnitId: string,
@@ -131,7 +127,6 @@ class CourseModuleService implements ICourseModuleService {
         {
           title: courseModuleDTO.title,
           imageURL: courseModuleDTO.imageURL,
-          expirationDate: courseModuleDTO.expirationDate
         },
         { new: true, runValidators: true },
       );

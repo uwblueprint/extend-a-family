@@ -17,12 +17,12 @@ const UploadThumbnailPage = () => {
     formData.append("uploadedImage", file);
 
     try {
-      await CourseAPIClient.uploadThumbnail("6775be1afa8027fddf428b3f", formData).then(
-        (res) => {
-          console.log(res)
-          setThumbnail(res);
-        },
-      );
+      await CourseAPIClient.uploadThumbnail(
+        "6775be1afa8027fddf428b3f",
+        formData,
+      ).then((res) => {
+        setThumbnail(res);
+      });
     } catch (error) {
       throw new Error(`Coulded Upload Image: ${error}`);
     }

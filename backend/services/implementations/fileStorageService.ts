@@ -95,7 +95,7 @@ class FileStorageService implements IFileStorageService {
 
   async uploadImage(
     fileName: string,
-    fileData: Buffer,
+    fileData: Buffer | null = null,
     contentType: string | null = null,
   ): Promise<string> {
     try {
@@ -104,10 +104,12 @@ class FileStorageService implements IFileStorageService {
       if ((await currentBlob.exists())[0]) {
         throw new Error(`File name ${fileName} already exists`);
       }
-      await bucket.file(fileName).save(fileData, {
-        metadata: { contentType },
-      });
-      return await this.getFile(fileName, 144000)
+      if (fileData) {
+        await bucket.file(fileName).save(fileData, {
+          metadata: { contentType },
+        });
+      }
+      return await this.getFile(fileName, 5.26e7);
     } catch (error: unknown) {
       Logger.error(`Failed to upload file. Reason = ${getErrorMessage(error)}`);
       throw error;
