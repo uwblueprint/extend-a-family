@@ -67,18 +67,20 @@ const ViewModulePage = () => {
     });
   };
 
+  const boxHeight = "calc(100vh - 68px)";
+
   return (
     <Document
       file={module?.lessonPdfUrl || null}
       onLoadSuccess={onDocumentLoadSuccess}
       options={options}
-      className="document-override"
+      // className="document-override"
     >
-      <Box display="flex" flexDirection="row" height="100%">
+      <Box display="flex" flexDirection="row">
         {!isFullScreen && (
           <Box
             width="auto"
-            maxHeight="100vh"
+            maxHeight={boxHeight}
             padding="24px"
             borderRight="1px solid #ddd"
             sx={{
@@ -154,7 +156,7 @@ const ViewModulePage = () => {
           flexDirection="column"
           gap="24px"
           flexGrow="1"
-          height="100%"
+          height={boxHeight}
         >
           {!isFullScreen && (
             <Box
@@ -212,8 +214,13 @@ const ViewModulePage = () => {
             width="100%"
             flexGrow="1"
             sx={{ overflow: "hidden", position: "relative" }}
+            bgcolor={isFullScreen ? "black" : "white"}
           >
-            <Page pageNumber={currentPage} renderAnnotationLayer={false} />
+            <Page
+              pageNumber={currentPage}
+              renderAnnotationLayer={false}
+              scale={isFullScreen ? 1.24 : 1}
+            />
             {/* <Input
               sx={{
                 position: "absolute",
@@ -242,7 +249,7 @@ const ViewModulePage = () => {
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((curr) => curr - 1)}
                 sx={{
-                  border: "2px solid black",
+                  border: "1px solid black",
                   height: "48px",
                   width: "48px",
                   padding: "8px",
@@ -263,7 +270,7 @@ const ViewModulePage = () => {
                 disabled={currentPage === numPages}
                 onClick={() => setCurrentPage((curr) => curr + 1)}
                 sx={{
-                  border: "2px solid black",
+                  border: "1px solid black",
                   height: "48px",
                   width: "48px",
                   padding: "8px",
