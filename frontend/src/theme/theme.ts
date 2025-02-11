@@ -8,19 +8,19 @@ import "@fontsource/lexend-deca";
 const palette: PaletteOptions = {
   Learner: {
     Light: "#F5FDFF",
-    Hover: "#005566",
+    Hover: "#CCF5FF",
     Default: "#006877",
     Pressed: "#00363F",
   },
   Administrator: {
     Light: "#FFF8F6",
-    Hover: "#753F2B",
+    Hover: "#FFD9CC",
     Default: "#8F4C34",
     Pressed: "#5C1900",
   },
   Facilitator: {
     Light: "#F9F5FF",
-    Hover: "#3C406D",
+    Hover: "#D6D6FF",
     Default: "#555A92",
     Pressed: "#1F257A",
   },
