@@ -1,13 +1,13 @@
 import { Router } from "express";
-import CourseUnitService from "../services/implementations/courseUnitService";
-import { getErrorMessage } from "../utilities/errorUtils";
+import { isAuthorizedByRole } from "../middlewares/auth";
 import {
   createCourseUnitDtoValidator,
   moduleBelongsToUnitValidator,
   updateCourseUnitDtoValidator,
 } from "../middlewares/validators/courseValidators";
-import { isAuthorizedByRole } from "../middlewares/auth";
 import CourseModuleService from "../services/implementations/courseModuleService";
+import CourseUnitService from "../services/implementations/courseUnitService";
+import { getErrorMessage } from "../utilities/errorUtils";
 
 const courseRouter: Router = Router();
 const courseUnitService: CourseUnitService = new CourseUnitService();
@@ -20,6 +20,20 @@ courseRouter.get(
     try {
       const courses = await courseUnitService.getCourseUnits();
       res.status(200).json(courses);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.get(
+  "/module/:moduleId",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  async (req, res) => {
+    const { moduleId } = req.params;
+    try {
+      const courseModule = await courseModuleService.getCourseModule(moduleId);
+      res.status(200).json(courseModule);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }
