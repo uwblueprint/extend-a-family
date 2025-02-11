@@ -24,7 +24,7 @@ const UploadThumbnailPage = () => {
         setThumbnail(res);
       });
     } catch (error) {
-      throw new Error(`Coulded Upload Image: ${error}`);
+      throw new Error(`Couldn't Upload Image: ${error}`);
     }
   };
 

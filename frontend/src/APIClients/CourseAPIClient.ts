@@ -1,4 +1,3 @@
-import axios from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { CourseUnit } from "../types/CourseTypes";
 import { getLocalStorageObjProperty } from "../utils/LocalStorageUtils";
@@ -25,7 +24,7 @@ const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
     "accessToken",
   )}`;
   try {
-    const { data } = await axios.post(
+    const { data } = await baseAPIClient.post(
       `http://localhost:8080/course/${moduleID}/uploadThumbnail`,
       uploadedImage,
       {
