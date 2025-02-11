@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -38,38 +38,42 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const validatePassword = (password: string) => {
-    setPasswordCriteria((prev) => ({
-      ...prev,
+  const validatePassword = (password: string, confirmPwd: string) => {
+    const passwordCheckCriteria = {
       minLength: password.length >= 8,
       uppercase: /[A-Z]/.test(password),
       lowercase: /[a-z]/.test(password),
       specialChar: /[!@#$%^&*]/.test(password),
-    }));
-  };
+      passwordsMatch: password === confirmPwd && password.trim() !== "",
+    };
 
-  useEffect(() => {
-    validatePassword(newPassword);
-  }, [newPassword]);
-
-  useEffect(() => {
-    const passwordsMatch =
-      newPassword === confirmPassword && newPassword.trim() !== "";
-
-    setPasswordCriteria((prev) => ({
-      ...prev,
-      passwordsMatch,
-    }));
+    setPasswordCriteria(passwordCheckCriteria);
 
     const isValid =
-      passwordCriteria.minLength &&
-      passwordCriteria.uppercase &&
-      passwordCriteria.lowercase &&
-      passwordCriteria.specialChar &&
-      passwordsMatch;
+      passwordCheckCriteria.minLength &&
+      passwordCheckCriteria.uppercase &&
+      passwordCheckCriteria.lowercase &&
+      passwordCheckCriteria.specialChar &&
+      passwordCheckCriteria.passwordsMatch;
 
     onValidationChange(isValid);
-  }, [newPassword, confirmPassword, passwordCriteria, onValidationChange]);
+  };
+
+  const handleNewPasswordChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const newPwd = event.target.value;
+    setNewPassword(newPwd);
+    validatePassword(newPwd, confirmPassword);
+  };
+
+  const handleConfirmPasswordChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const confirmPwd = event.target.value;
+    setConfirmPassword(confirmPwd);
+    validatePassword(newPassword, confirmPwd);
+  };
 
   const passwordRequirements = [
     { text: "At least 8 characters", met: passwordCriteria.minLength },
@@ -95,7 +99,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
         margin="normal"
         placeholder="Your new password"
         value={newPassword}
-        onChange={(event) => setNewPassword(event.target.value)}
+        onChange={handleNewPasswordChange}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -122,7 +126,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
         margin="normal"
         placeholder="Rewrite your new password"
         value={confirmPassword}
-        onChange={(event) => setConfirmPassword(event.target.value)}
+        onChange={handleConfirmPasswordChange}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">

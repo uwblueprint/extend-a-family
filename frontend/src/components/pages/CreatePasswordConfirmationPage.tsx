@@ -2,8 +2,7 @@ import React from "react";
 import { Container, Typography, Button, Box, useTheme } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useHistory } from "react-router-dom";
-
-import Logo from "../images/logo.svg";
+import Logo from "../assets/logoColoured.png";
 import { HOME_PAGE } from "../../constants/Routes";
 import { useUser } from "../../hooks/useUser";
 
@@ -107,7 +106,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             letterSpacing: theme.typography.labelLarge.letterSpacing,
             textTransform: theme.typography.labelLarge.textTransform,
             "&:hover": {
-              background: theme.palette[`${user.role}`].Hover,
+              background: theme.palette[`${user.role}`].Pressed,
             },
           }}
           onClick={handleBackToHome}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Container, Typography, Button, useTheme } from "@mui/material";
 import { Redirect } from "react-router-dom";
-import Logo from "../images/logo.svg";
+import Logo from "../assets/logoColoured.png";
 import CreatePasswordHelpModal from "../help/CreatePasswordHelpModal";
 import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
 import PasswordCheck from "../auth/PasswordCheck";
@@ -78,8 +78,7 @@ const CreatePasswordPage = (): React.ReactElement => {
             variant="h5"
             gutterBottom
             sx={{
-              fontWeight: "bold",
-              color: "#000",
+              color: theme.palette.Neutral[700],
               textAlign: "center",
             }}
           >
@@ -104,7 +103,7 @@ const CreatePasswordPage = (): React.ReactElement => {
                 textTransform: "none",
                 backgroundColor: theme.palette[`${user.role}`].Default,
                 "&:hover": {
-                  background: theme.palette[`${user.role}`].Hover,
+                  background: theme.palette.Learner.Pressed,
                 },
                 "&.Mui-disabled": {
                   backgroundColor: "#ccc",

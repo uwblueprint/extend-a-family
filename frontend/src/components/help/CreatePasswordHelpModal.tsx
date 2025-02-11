@@ -66,13 +66,10 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
         >
           <Typography
             id="help-modal-title"
+            variant="headlineMedium"
             sx={{
               color: "var(--Neutral-700, #111)",
               textAlign: "left",
-              fontSize: theme.typography.headlineMedium.fontSize,
-              fontStyle: "normal",
-              fontWeight: theme.typography.headlineMedium.fontWeight,
-              lineHeight: theme.typography.headlineMedium.lineHeight,
             }}
           >
             What problem are you facing?
@@ -196,7 +193,7 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
               color: theme.palette.Neutral[100],
               backgroundColor: theme.palette.Learner.Default,
               "&:hover": {
-                background: theme.palette.Learner.Hover,
+                background: theme.palette.Learner.Pressed,
               },
             }}
           >
