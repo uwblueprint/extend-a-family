@@ -149,7 +149,15 @@ class UserService implements IUserService {
         throw mongoDbError;
       }
     } catch (error: unknown) {
-      Logger.error(`Failed to create user. Reason = ${getErrorMessage(error)}`);
+      const message = getErrorMessage(error);
+      Logger.error(`Failed to create user. Reason = ${message}`);
+      if (
+        message === "The email address is already in use by another account."
+      ) {
+        throw new Error(AuthErrorCodes.EMAIL_IN_USE);
+      } else if (message === "The email address is improperly formatted.") {
+        throw new Error(AuthErrorCodes.INVALID_EMAIL);
+      }
       throw error;
     }
 

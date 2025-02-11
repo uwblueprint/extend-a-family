@@ -6,6 +6,8 @@ export enum AuthErrorCodes {
   WRONG_USER_TYPE = "WRONG_USER_TYPE",
   EMAIL_NOT_FOUND = "EMAIL_NOT_FOUND",
   INCORRECT_PASSWORD = "INCORRECT_PASSWORD",
+  EMAIL_IN_USE = "EMAIL_IN_USE",
+  INVALID_EMAIL = "INVALID_EMAIL",
 }
 
 export const authErrors: Record<AuthErrorCodes, PresentableError> = {
@@ -28,6 +30,14 @@ export const authErrors: Record<AuthErrorCodes, PresentableError> = {
   },
   INCORRECT_PASSWORD: {
     text: () => "Incorrect password. Please try again.",
+  },
+  EMAIL_IN_USE: {
+    title: () => "Email in use",
+    text: () => "The email address is already in use by another account.",
+  },
+  INVALID_EMAIL: {
+    title: () => "Invalid email",
+    text: () => "The email address is improperly formatted.",
   },
 };
 
