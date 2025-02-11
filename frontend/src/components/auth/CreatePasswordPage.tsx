@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Box, Container, Typography, Button, useTheme } from "@mui/material";
 import { Redirect } from "react-router-dom";
 import Logo from "../assets/logoColoured.png";
@@ -7,10 +7,14 @@ import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
 import PasswordCheck from "../auth/PasswordCheck";
 import { useUser } from "../../hooks/useUser";
 import { HOME_PAGE } from "../../constants/Routes";
+import AuthAPIClient from "../../APIClients/AuthAPIClient";
+import AuthContext from "../../contexts/AuthContext";
+import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 
 const CreatePasswordPage = (): React.ReactElement => {
   const user = useUser();
 
+  const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
@@ -19,7 +23,40 @@ const CreatePasswordPage = (): React.ReactElement => {
 
   const theme = useTheme();
 
-  const onSubmitNewPasswordClick = () => {
+  const onSubmitNewPasswordClick = async () => {
+    if (!authenticatedUser) {
+      // eslint-disable-next-line no-alert
+      alert("User is not authenticated.");
+      return;
+    }
+
+    const changePasswordSuccess = await AuthAPIClient.updateTemporaryPassword(
+      authenticatedUser.email,
+      newPassword,
+      authenticatedUser.role,
+    );
+
+    if (!changePasswordSuccess) {
+      setAuthenticatedUser(null);
+      localStorage.removeItem(AUTHENTICATED_USER_KEY);
+      await AuthAPIClient.logout(authenticatedUser.id);
+      // eslint-disable-next-line no-alert
+      alert("Error occurred when changing your password. Please log in again.");
+      return;
+    }
+
+    const updateStatusSuccess = await AuthAPIClient.updateUserStatus("Active");
+    if (!updateStatusSuccess) {
+      // eslint-disable-next-line no-alert
+      alert('Failed to update user status to "Active"');
+      return;
+    }
+
+    setAuthenticatedUser({
+      ...authenticatedUser,
+      status: "Active",
+    });
+
     if (isFormValid) {
       setIsPasswordConfirmed(true);
     } else {
@@ -103,7 +140,7 @@ const CreatePasswordPage = (): React.ReactElement => {
                 textTransform: "none",
                 backgroundColor: theme.palette[`${user.role}`].Default,
                 "&:hover": {
-                  background: theme.palette.Learner.Pressed,
+                  background: theme.palette[`${user.role}`].Pressed,
                 },
                 "&.Mui-disabled": {
                   backgroundColor: "#ccc",
