@@ -1,4 +1,6 @@
 import { Router } from "express";
+import multer from "multer";
+import fs from "fs";
 import CourseUnitService from "../services/implementations/courseUnitService";
 import { getErrorMessage } from "../utilities/errorUtils";
 import {
@@ -20,6 +22,39 @@ courseRouter.get(
     try {
       const courses = await courseUnitService.getCourseUnits();
       res.status(200).json(courses);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.post(
+  "/uploadLessons",
+  multer({ storage: multer.memoryStorage() }).single("lessonPdf"),
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    try {
+      const {
+        file: lessonPdf,
+        body: { moduleId },
+      } = req;
+      if (!lessonPdf) {
+        throw new Error("No lessonPdf file uploaded.");
+      }
+      const uploadedLessonPath = `uploads/course/pdfs/module-${moduleId}.pdf`;
+      if (!fs.existsSync(uploadedLessonPath)) {
+        fs.mkdirSync("uploads/course/pdfs", { recursive: true });
+      }
+      fs.writeFile(uploadedLessonPath, lessonPdf.buffer, (err) => {
+        if (err) {
+          throw err;
+        }
+      });
+      const result = await courseModuleService.uploadLessons(
+        moduleId,
+        uploadedLessonPath,
+      );
+      res.status(200).json(result);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }
