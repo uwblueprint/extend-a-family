@@ -25,7 +25,7 @@ const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
   )}`;
   try {
     const { data } = await baseAPIClient.post(
-      `http://localhost:8080/course/${moduleID}/uploadThumbnail`,
+      `/course/${moduleID}/uploadThumbnail`,
       uploadedImage,
       {
         headers: {
