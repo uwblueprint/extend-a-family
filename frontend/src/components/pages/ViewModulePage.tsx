@@ -1,5 +1,5 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -40,6 +40,26 @@ const ViewModulePage = () => {
   const [module, setModule] = useState<
     (CourseModule & { lessonPdfUrl: string }) | null
   >(null);
+  const lessonPageRef = useRef<HTMLDivElement>(null);
+  const lessonPageContainerRef = useRef<HTMLDivElement>(null);
+  const [pageHeight, setPageHeight] = useState<number>(0);
+  const [containerHeight, setContainerHeight] = useState<number>(0);
+  const [pageWidth, setPageWidth] = useState<number>(0);
+  const [containerWidth, setContainerWidth] = useState<number>(0);
+
+  function getPageScale() {
+    if (
+      pageHeight === 0 ||
+      containerHeight === 0 ||
+      pageWidth === 0 ||
+      containerWidth === 0
+    ) {
+      return 1;
+    }
+    const scaleToHeight = containerHeight / pageHeight;
+    const scaleToWidth = containerWidth / pageWidth;
+    return Math.min(scaleToHeight, scaleToWidth);
+  }
 
   useEffect(() => {
     async function fetchModule() {
@@ -48,6 +68,23 @@ const ViewModulePage = () => {
     }
     fetchModule();
   }, [moduleId]);
+
+  const handleResize = useCallback(() => {
+    if (pageHeight === 0) {
+      setPageHeight(lessonPageRef.current?.clientHeight || 0);
+    }
+    if (pageWidth === 0) {
+      setPageWidth(lessonPageRef.current?.clientWidth || 0);
+    }
+    setContainerHeight(lessonPageContainerRef.current?.clientHeight || 0);
+    setContainerWidth(window.innerWidth);
+  }, [pageHeight, pageWidth]);
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleResize, isFullScreen, pageHeight]);
 
   const onDocumentLoadSuccess = ({
     numPages: nextNumPages,
@@ -215,11 +252,13 @@ const ViewModulePage = () => {
             flexGrow="1"
             sx={{ overflow: "hidden", position: "relative" }}
             bgcolor={isFullScreen ? "black" : "white"}
+            ref={lessonPageContainerRef}
           >
             <Page
               pageNumber={currentPage}
               renderAnnotationLayer={false}
-              scale={isFullScreen ? 1.24 : 1}
+              scale={isFullScreen ? getPageScale() : 1}
+              inputRef={lessonPageRef}
             />
             {/* <Input
               sx={{
