@@ -16,7 +16,7 @@ import {
   UserDTO,
 } from "../../types/userTypes";
 import { AuthErrorCodes } from "../../types/authTypes";
-import { getErrorMessage } from "../../utilities/errorUtils";
+import { getErrorCode, getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
 const Logger = logger(__filename);
@@ -149,16 +149,18 @@ class UserService implements IUserService {
         throw mongoDbError;
       }
     } catch (error: unknown) {
-      const message = getErrorMessage(error);
-      Logger.error(`Failed to create user. Reason = ${message}`);
-      if (
-        message === "The email address is already in use by another account."
-      ) {
-        throw new Error(AuthErrorCodes.EMAIL_IN_USE);
-      } else if (message === "The email address is improperly formatted.") {
-        throw new Error(AuthErrorCodes.INVALID_EMAIL);
+      const errorCode = getErrorCode(error);
+
+      Logger.error(`Failed to create user. Reason = ${getErrorMessage(error)}`);
+
+      switch (errorCode) {
+        case "auth/email-already-exists":
+          throw new Error(AuthErrorCodes.EMAIL_IN_USE);
+        case "auth/invalid-email":
+          throw new Error(AuthErrorCodes.INVALID_EMAIL);
+        default:
+          throw error;
       }
-      throw error;
     }
 
     return newUser.toObject();

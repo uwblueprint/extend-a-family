@@ -1,6 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Redirect } from "react-router-dom";
 import {
+  Alert,
+  AlertTitle,
   Box,
   Button,
   Container,
@@ -22,10 +24,55 @@ import {
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
-import { AuthenticatedUser } from "../../types/AuthTypes";
 import logo from "../assets/logoColoured.png";
 import { getSignUpPath, getSignUpPrompt } from "./WelcomePage";
 import Login from "./Login";
+import {
+  AuthErrorCodes,
+  authErrors,
+  defaultAuthError,
+} from "../../errors/AuthErrors";
+import { PresentableError } from "../../types/ErrorTypes";
+
+interface ErrorAlertProps {
+  title?: string;
+  message?: string;
+}
+
+const ErrorAlert: React.FC<ErrorAlertProps> = ({ title, message }) => {
+  const theme = useTheme();
+  const alertRef = useRef<HTMLDivElement>(null);
+  return (
+    <Box ref={alertRef} sx={{ width: "100%" }}>
+      <Alert
+        icon={false}
+        severity="error"
+        sx={{
+          color: theme.palette.Error.Light,
+          width: "100%",
+          height: "100%",
+          borderRadius: "4px",
+          border: "2px solid",
+          borderColor: theme.palette.Error.Hover,
+          padding: "20px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          "& .MuiAlert-message": { padding: 0 },
+        }}
+      >
+        <AlertTitle marginBottom="3px">
+          <Typography variant="titleMedium" color={theme.palette.Error.Default}>
+            {title || "Error"}
+          </Typography>
+        </AlertTitle>
+        <Typography variant="bodyMedium" color={theme.palette.Error.Pressed}>
+          {message || "An error has occurred."}
+        </Typography>
+      </Alert>
+    </Box>
+  );
+};
 
 const Signup = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
@@ -34,11 +81,11 @@ const Signup = (): React.ReactElement => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [errorData, setErrorData] = useState<PresentableError | null>(null);
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
 
   const onSignupClick = async () => {
-    const user: AuthenticatedUser | null = await authAPIClient.signup(
+    const response = await authAPIClient.signup(
       firstName,
       lastName,
       email,
@@ -46,15 +93,24 @@ const Signup = (): React.ReactElement => {
       "Facilitator",
     );
 
-    if (!user) {
-      // will need to change this for different errors
-      // eslint-disable-next-line no-alert
-      alert("Something went wrong with signup");
-      return;
-    }
+    switch (response) {
+      case AuthErrorCodes.EMAIL_IN_USE:
+        setErrorData(authErrors.EMAIL_IN_USE);
+        break;
 
-    // eslint-disable-next-line no-alert
-    alert("Signup successful, verification link was sent to your email.");
+      case AuthErrorCodes.INVALID_EMAIL:
+        setErrorData(authErrors.INVALID_EMAIL);
+        break;
+
+      default:
+        if (response != null) {
+          setErrorData(defaultAuthError);
+        } else {
+          setErrorData(null);
+        }
+        break;
+    }
+    return null;
   };
 
   if (authenticatedUser) {
@@ -107,6 +163,16 @@ const Signup = (): React.ReactElement => {
           <Typography variant="headlineLarge">
             Sign Up as a Facilitator
           </Typography>
+
+          {errorData && (
+            <Box>
+              <ErrorAlert
+                title={errorData.title?.()}
+                message={errorData.text?.()}
+              />
+            </Box>
+          )}
+
           <TextField
             required
             label="First Name"
