@@ -8,7 +8,6 @@ import {
   TableCell,
   TableFooter,
   TablePagination,
-  TableHead,
   Table,
   Stack,
   Button,
@@ -33,6 +32,7 @@ import {
   Delete,
   AlternateEmail,
   PersonOutlineOutlined,
+  ArrowDropDown,
 } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -41,11 +41,7 @@ import UserAPIClient from "../../APIClients/UserAPIClient";
 import { User } from "../../types/UserTypes";
 import placeholderImage from "../assets/placeholder_profile.png";
 
-const roleColors: Record<string, string> = {
-  Administrator: "#FFE0CC",
-  Facilitator: "#E0D4FF",
-  Learner: "#D1F2EB",
-};
+
 
 const ManageUser = (): React.ReactElement => {
   const [role, setRole] = useState<Role>("Administrator");
@@ -55,7 +51,7 @@ const ManageUser = (): React.ReactElement => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterAnchor, setFilterAnchor] = useState<null | HTMLElement>(null);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [isFilterActive, setIsFilterActive] = useState(false);
+  const [isFilterActive] = useState(false);
   const [openAddAdminModal, setOpenAddAdminModal] = useState(false);
   const [openDeleteUserModal, setOpenDeleteUserModal] = useState(false);
   const handleOpenAddAdminModal = () => setOpenAddAdminModal(true);
@@ -68,9 +64,10 @@ const ManageUser = (): React.ReactElement => {
   const handleCloseDeleteUserModal = () => setOpenDeleteUserModal(false);
   const theme = useTheme();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+
+  const [firstName, setFirstName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [lastName, setLastName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [email, setEmail] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
   useEffect(() => {
     async function getUsers() {
       const fetchedUsers = await UserAPIClient.getUsersByRole(role);
@@ -111,19 +108,45 @@ const ManageUser = (): React.ReactElement => {
     setPage(0);
   };
 
-  const handleFilterClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    setFilterAnchor(event.currentTarget);
-    setIsFilterActive(true);
-  };
+ 
 
-  const handleFilterClose = () => {
-    setFilterAnchor(null);
-    setIsFilterActive(false);
-  };
+const [selectedRole, setSelectedRole] = useState<string | null>(null); // No default role
+
+const handleFilterClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  setFilterAnchor(event.currentTarget);
+};
+
+const handleFilterClose = () => {
+  setFilterAnchor(null);
+};
+
+const handleRoleSelect = (role_curr: string | null) => {
+  setSelectedRole(role);
+  setRole(role_curr as Role); // now setRole is used
+  handleFilterClose();
+};
+
+// set the displayed value
+const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
+
 
   // TODO: IMPLEMENT
-  const handleDeleteUser = (userId: string) => {};
+  const handleDeleteUser = (userId: string) => {}; // eslint-disable-line @typescript-eslint/no-unused-vars
   const handleAddAdmin = async () => {};
+
+
+  const roleBackground: Record<string, string> = {
+    Administrator: theme.palette.Administrator.Light,
+    Facilitator: theme.palette.Facilitator.Light,
+    Learner: theme.palette.Learner.Light,
+  };
+
+  const roleColors: Record<string, string> = {
+    Administrator: theme.palette.Administrator.Default,
+    Facilitator: theme.palette.Facilitator.Default,
+    Learner: theme.palette.Learner.Default,
+  };
+
 
   const AddAdminModal = () => {
     return (
@@ -425,7 +448,11 @@ const ManageUser = (): React.ReactElement => {
   };
 
   return (
-    <Box>
+    <Box  sx={{
+      display: "flex",
+      flexDirection: "column", 
+      padding: "25px"
+      }}>
       <DeleteUserModal />
       <AddAdminModal />
       <Stack direction="column" spacing={2} margin="2rem">
@@ -439,19 +466,21 @@ const ManageUser = (): React.ReactElement => {
           {/* Title Section */}
           <Stack direction="column">
             <h2
-              style={{
-                fontFamily: "Lexend Deca, sans-serif",
-                fontSize: "28px",
-                fontWeight: 600,
-                lineHeight: "33.6px",
-                color: "#171D1E",
-                margin: 0,
-              }}
+              
             >
+              <Typography
+                variant="headlineMedium"
+                color={theme.palette.OnBackground}>
               User List
+              </Typography>
+              
             </h2>
             <p style={{ margin: 0, color: "#5F6368" }}>
+            <Typography
+                variant="bodyMedium"
+                color={theme.palette.OnBackground}>
               View all the people using this platform
+              </Typography>
             </p>
           </Stack>
 
@@ -462,7 +491,7 @@ const ManageUser = (): React.ReactElement => {
               required
               label="Search by name..."
               variant="outlined"
-              size="small"
+              // size="small"
               value={searchQuery}
               onChange={handleSearch}
               onFocus={handleSearchFocus}
@@ -471,7 +500,7 @@ const ManageUser = (): React.ReactElement => {
                 startAdornment: (
                   <InputAdornment position="start">
                     <Search
-                      sx={{ color: isSearchActive ? "#0056D2" : "#5F6368" }}
+                      sx={{ color: isSearchActive ? theme.palette.Learner.Default : "#5F6368" }}
                     />
                   </InputAdornment>
                 ),
@@ -480,32 +509,35 @@ const ManageUser = (): React.ReactElement => {
                 minWidth: "240px",
                 borderRadius: "8px",
                 "& label": {
-                  color: isSearchActive ? "#0056D2" : "#5F6368",
+                  color: isSearchActive ? "#066D75" : "#5F6368",
+                },
+                "& .MuiInputLabel-root": {
+                  color: isSearchActive ? "#066D75" : "#5F6368", // Default label color
                 },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": {
-                    borderColor: isSearchActive ? "#0056D2" : "#E0E0E0",
+                    borderColor: isSearchActive ? "#066D75" : "#E0E0E0",
                   },
                   "&:hover fieldset": {
-                    borderColor: "#0056D2",
+                    borderColor: "#066D75",
                   },
                   "&.Mui-focused fieldset": {
-                    borderColor: "#0056D2",
+                    borderColor: "#066D75",
                   },
                 },
               }}
             />
 
             {/* Filter Input with Floating Label */}
-            <TextField
-              required
-              label="Filter"
-              variant="outlined"
-              size="small"
-              onClick={handleFilterClick} // Use onClick to open dropdown
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
+            
+<TextField
+  variant="outlined"
+  value={filterLabel}
+  
+  onClick={handleFilterClick} // Opens dropdown on click
+  InputProps={{
+    startAdornment: (
+      <InputAdornment position="start">
                     <Box
                       sx={{
                         display: "flex",
@@ -519,100 +551,137 @@ const ManageUser = (): React.ReactElement => {
                       }}
                     >
                       <FilterList
-                        sx={{ color: isFilterActive ? "#0056D2" : "#5F6368" }}
+                        sx={{ color: isFilterActive ? "#6f797b" : "##6f797b" }}
                       />
                     </Box>
                   </InputAdornment>
-                ),
-              }}
-              sx={{
-                minWidth: "180px",
-                borderRadius: "8px",
-                "& label": {
-                  color: isFilterActive ? "#0056D2" : "#5F6368",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: isFilterActive ? "#0056D2" : "#E0E0E0",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#0056D2",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#0056D2",
-                  },
-                },
-              }}
-            />
-            <Menu
-              anchorEl={filterAnchor}
-              open={Boolean(filterAnchor)}
-              onClose={handleFilterClose}
-            >
-              {["Administrator", "Facilitator", "Learner"].map((roleOption) => (
-                <MenuItem
-                  key={roleOption}
-                  onClick={() => {
-                    setRole(roleOption as Role);
-                    handleFilterClose();
-                  }}
-                >
-                  {roleOption}
-                </MenuItem>
-              ))}
-            </Menu>
+    ),
+    endAdornment: (
+      <InputAdornment position="end">
+        <ArrowDropDown sx={{ color: "#6F797B" }} />
+      </InputAdornment>
+    ),
+  }}
+  sx={{
+    
+    textTransform: "uppercase",
+    textAlign: "left",
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#6F797B",
+      },
+      "&:hover fieldset": {
+        borderColor: "#6F797B",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#6F797B",
+      },
+    },
+    
+      "& label": {
+        color: isFilterActive ? "#066D75" : "#5F6368",
+      },
+      "& .MuiInputLabel-root": {
+        color: isSearchActive ? "#066D75" : "#5F6368", // Default label color
+      },
+  }}
+/>
+
+<Menu
+  anchorEl={filterAnchor}
+  open={Boolean(filterAnchor)}
+  onClose={handleFilterClose}
+  sx={{
+    "& .MuiPaper-root": {
+      borderRadius: "8px",
+      boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+      padding: "4px",
+    },
+  }}
+>
+  {/* role selection with Styled Badges */}
+  {["Administrator", "Facilitator", "Learner"].map((roleOption) => (
+    <MenuItem key={roleOption} onClick={() => handleRoleSelect(roleOption)}>
+      <Typography
+        sx={{
+          display: "inline-block",
+          backgroundColor: roleBackground[roleOption],
+          color: roleColors[roleOption],
+          padding: "4px 8px",
+          borderRadius: "8px",
+          fontSize: "14px",
+          fontWeight: 500,
+        }}
+      >
+        {roleOption.toUpperCase()}
+      </Typography>
+    </MenuItem>
+  ))}
+</Menu>
 
             {/* Add New Admin Button */}
             <Button
               variant="contained"
               startIcon={<Add />}
+              
               sx={{
-                backgroundColor: "#8B4513",
+                backgroundColor: theme.palette.Administrator.Default,
+                height: "56px",
                 color: "white",
-                borderRadius: "8px",
-                "&:hover": { backgroundColor: "#6F3A10" },
+                "&:hover": { backgroundColor: theme.palette.Administrator.Default},
               }}
               onClick={handleOpenAddAdminModal}
             >
-              ADD NEW ADMIN
+              <Typography
+                variant="labelLarge"
+                color={theme.palette.Neutral[100]}>
+                ADD NEW ADMIN              
+                </Typography>
             </Button>
           </Stack>
         </Stack>
 
         {/* User Table */}
-        <TableContainer component={Paper}>
-          <Table aria-label="User List Table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Profile</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell align="right">First Name</TableCell>
-                <TableCell align="right">Last Name</TableCell>
-                <TableCell align="right">Role</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
+        <TableContainer component={Paper} sx={{
+        display: "center",
+        justifyContent: "center", // Center horizontally
+        alignItems: "center", // Center vertically
+        height: "80%", // Full viewport height
+      border: "none"}}>
+          <Table aria-label="User List Table" sx={{
+            width: "100%", // Fills the container width
+            height: "100%", // Fills the container height
+          }}>
+         
             <TableBody>
               {(usersPerPage > 0
                 ? filteredUsers.slice(
-                    page * usersPerPage,
-                    page * usersPerPage + usersPerPage,
-                  )
+                    
+                  page * usersPerPage,
+                   
+                  page * usersPerPage + usersPerPage,
+                  
+                )
                 : filteredUsers
               ).map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
                     <Avatar src={placeholderImage} alt={user.firstName} />
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell align="right">{user.firstName}</TableCell>
-                  <TableCell align="right">{user.lastName}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align = "left"> 
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Typography variant = "bodyLarge">{user.firstName} {user.lastName}</Typography> 
+                    <Typography variant ="bodySmall" color="textSecondary">{user.email}</Typography> 
+                  </Box>
+                  </TableCell>
+                  <TableCell sx={{ textAlign: "right", paddingRight: "16px", width: "18%" }}>
                     <Typography
                       sx={{
-                        backgroundColor: roleColors[role] || "#D1F2EB",
+                        display: "inline-block",
+                        backgroundColor: roleBackground[role],
+                        color: roleColors[role],
                         padding: "4px 8px",
-                        borderRadius: "8px",
+                        borderRadius: "3px",
                         fontSize: "14px",
                         fontWeight: 500,
                       }}
@@ -620,14 +689,21 @@ const ManageUser = (): React.ReactElement => {
                       {role.toUpperCase()}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell sx={{ textAlign: "right", paddingRight: "16px", width: "18%" }}>
                     <Button
-                      variant="outlined"
-                      color="error"
-                      startIcon={<Delete />}
-                      onClick={() => handleOpenDeleteUserModal(user.id)}
-                    >
-                      DELETE USER
+                    variant="outlined"
+                    startIcon={<Delete />}
+                      
+                      sx={{
+                        height: "40px", // Match button height
+                        padding: "4px 16px", 
+                        borderRadius: "4px", 
+                        borderColor: "#6F797B", // grey outline
+                        color: theme.palette.Error.Default, }}
+                        onClick={() => handleOpenDeleteUserModal(user.id)}
+                  >
+                     <Typography variant = "labelLarge">
+                       DELETE USER</Typography>
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -657,5 +733,6 @@ const ManageUser = (): React.ReactElement => {
     </Box>
   );
 };
+
 
 export default ManageUser;
