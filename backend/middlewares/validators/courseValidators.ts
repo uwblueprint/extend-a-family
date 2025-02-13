@@ -106,7 +106,6 @@ export const moduleBelongsToUnitValidator = async (
 ) => {
   try {
     const { unitId, moduleId } = req.params;
-    console.log("unit module validator", req.params);
 
     const courseUnitService: CourseUnitService = new CourseUnitService();
 

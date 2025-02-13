@@ -37,7 +37,7 @@ class CourseUnitService implements ICourseUnitService {
       return id.toString();
     });
 
-    return { ...(courseUnit as CourseUnitDTO), modules: courseModuleIds };
+    return { ...courseUnit, modules: courseModuleIds };
   }
 
   async createCourseUnit(
