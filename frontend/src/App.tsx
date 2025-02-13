@@ -29,6 +29,7 @@ import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
+import UploadThumbnailPage from "./components/courses/UploadThumbnailPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
 
 const App = (): React.ReactElement => {
@@ -76,7 +77,12 @@ const App = (): React.ReactElement => {
                   path={Routes.FORGOT_PASSWORD_PAGE}
                   component={ForgotPasswordPage}
                 />
-
+                <PrivateRoute
+                  exact
+                  path={Routes.UPLOAD_THUMBNAIL}
+                  component={UploadThumbnailPage}
+                  allowedRoles={["Administrator"]}
+                />
                 <PrivateRoute
                   exact
                   path={Routes.HOME_PAGE}
@@ -136,6 +142,7 @@ const App = (): React.ReactElement => {
                   component={CourseViewingPage}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
+
                 <Route exact path="*" component={NotFound} />
               </Switch>
             </Router>

@@ -5,6 +5,7 @@ export interface CourseModule extends Document {
   displayIndex: number;
   title: string;
   pages: [ObjectId];
+  imageURL: string;
 }
 
 export const CourseModuleSchema: Schema = new Schema({
@@ -22,6 +23,9 @@ export const CourseModuleSchema: Schema = new Schema({
       ref: "CoursePage",
     },
   ],
+  imageURL: {
+    type: String,
+  },
 });
 
 /* eslint-disable no-param-reassign */
