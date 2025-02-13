@@ -29,7 +29,6 @@ import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
 import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
-import CourseUnitsPage from "./components/pages/courses/CourseUnitsPage";
 import UploadThumbnailPage from "./components/courses/UploadThumbnailPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
 
