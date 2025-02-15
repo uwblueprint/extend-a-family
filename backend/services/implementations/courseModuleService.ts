@@ -53,10 +53,31 @@ class CourseModuleService implements ICourseModuleService {
         _id: { $in: courseUnit.modules },
       });
 
-      return courseModules;
+      return courseModules.map((courseModule) => courseModule.toObject());
     } catch (error) {
       Logger.error(
         `Failed to get course modules for course unit with id: ${courseUnitId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async getCourseModule(courseModuleId: string): Promise<CourseModuleDTO> {
+    try {
+      const courseModule: CourseModule | null = await MgCourseModule.findById(
+        courseModuleId,
+      );
+
+      if (!courseModule) {
+        throw new Error(`id ${courseModuleId} not found.`);
+      }
+
+      return courseModule.toObject();
+    } catch (error) {
+      Logger.error(
+        `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
           error,
         )}`,
       );

@@ -44,7 +44,7 @@ export class HelpRequestService implements IHelpRequestService {
         .populate("learner", "firstName lastName")
         .populate("unit", "title displayIndex")
         .populate("module", "title displayIndex")
-        .populate("page", "title displayIndex")
+        .populate("page", "title")
         .sort({
           createdAt: -1,
         });
@@ -83,7 +83,7 @@ export class HelpRequestService implements IHelpRequestService {
         .populate("learner", "firstName lastName")
         .populate("unit", "title displayIndex")
         .populate("module", "title displayIndex")
-        .populate("page", "title displayIndex");
+        .populate("page", "title");
 
       if (!oldHelpRequest) {
         throw new Error(`Help Request with id ${requestId} not found.`);
