@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom";
 import Logo from "../assets/logoColoured.png";
 import CreatePasswordHelpModal from "../help/CreatePasswordHelpModal";
 import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
-import PasswordCheck from "../auth/PasswordCheck";
+import PasswordCheck from "./PasswordCheck";
 import { useUser } from "../../hooks/useUser";
 import { HOME_PAGE } from "../../constants/Routes";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";

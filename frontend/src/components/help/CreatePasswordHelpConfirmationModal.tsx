@@ -108,7 +108,6 @@ const CreatePasswordHelpConfirmationModal: React.FC<
           }}
         >
           <Typography
-            id="confirmation-modal-title"
             sx={{
               color: theme.palette.Neutral[700],
               fontSize: theme.typography.headlineMedium.fontSize,
@@ -126,6 +125,7 @@ const CreatePasswordHelpConfirmationModal: React.FC<
               fontWeight: theme.typography.bodyLarge.fontWeight,
               lineHeight: theme.typography.bodyLarge.lineHeight,
               textAlign: "center",
+              width: "455px",
             }}
           >
             They will reach out and help you soon. Hang tight!
