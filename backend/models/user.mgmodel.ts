@@ -10,6 +10,7 @@ export interface User extends Document {
   role: Role;
   status: Status;
   email: string;
+  profilePicture?: string;
 }
 
 export interface Learner extends User {
@@ -52,6 +53,9 @@ export const UserSchema: Schema = new Schema(
     email: {
       type: String,
       required: true,
+    },
+    profilePicture: {
+      type: String,
     },
   },
   baseOptions,
