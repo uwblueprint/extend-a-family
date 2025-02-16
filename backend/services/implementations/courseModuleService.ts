@@ -16,27 +16,6 @@ import ICourseModuleService from "../interfaces/courseModuleService";
 const Logger = logger(__filename);
 
 class CourseModuleService implements ICourseModuleService {
-  async getCourseModule(courseModuleId: string): Promise<CourseModuleDTO> {
-    try {
-      const courseModule: CourseModule | null = await MgCourseModule.findById(
-        courseModuleId,
-      );
-
-      if (!courseModule) {
-        throw new Error(`Course module with id ${courseModuleId} not found.`);
-      }
-
-      return courseModule;
-    } catch (error) {
-      Logger.error(
-        `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
-          error,
-        )}`,
-      );
-      throw error;
-    }
-  }
-
   async getCourseModules(
     courseUnitId: string,
   ): Promise<Array<CourseModuleDTO>> {
@@ -71,13 +50,13 @@ class CourseModuleService implements ICourseModuleService {
       );
 
       if (!courseModule) {
-        throw new Error(`id ${courseModuleId} not found.`);
+        throw new Error(`Course module with id ${courseModuleId} not found.`);
       }
 
       return courseModule.toObject();
     } catch (error) {
       Logger.error(
-        `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
+        `Failed to get course module with id ${courseModuleId}. Reason = ${getErrorMessage(
           error,
         )}`,
       );
