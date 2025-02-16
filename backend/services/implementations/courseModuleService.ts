@@ -16,27 +16,6 @@ import ICourseModuleService from "../interfaces/courseModuleService";
 const Logger = logger(__filename);
 
 class CourseModuleService implements ICourseModuleService {
-  async getCourseModule(courseModuleId: string): Promise<CourseModuleDTO> {
-    try {
-      const courseModule: CourseModule | null = await MgCourseModule.findById(
-        courseModuleId,
-      );
-
-      if (!courseModule) {
-        throw new Error(`Course module with id ${courseModuleId} not found.`);
-      }
-
-      return courseModule;
-    } catch (error) {
-      Logger.error(
-        `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
-          error,
-        )}`,
-      );
-      throw error;
-    }
-  }
-
   async getCourseModules(
     courseUnitId: string,
   ): Promise<Array<CourseModuleDTO>> {
@@ -53,10 +32,31 @@ class CourseModuleService implements ICourseModuleService {
         _id: { $in: courseUnit.modules },
       });
 
-      return courseModules;
+      return courseModules.map((courseModule) => courseModule.toObject());
     } catch (error) {
       Logger.error(
         `Failed to get course modules for course unit with id: ${courseUnitId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async getCourseModule(courseModuleId: string): Promise<CourseModuleDTO> {
+    try {
+      const courseModule: CourseModule | null = await MgCourseModule.findById(
+        courseModuleId,
+      );
+
+      if (!courseModule) {
+        throw new Error(`Course module with id ${courseModuleId} not found.`);
+      }
+
+      return courseModule.toObject();
+    } catch (error) {
+      Logger.error(
+        `Failed to get course module with id ${courseModuleId}. Reason = ${getErrorMessage(
           error,
         )}`,
       );

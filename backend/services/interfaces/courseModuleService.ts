@@ -13,6 +13,12 @@ interface ICourseModuleService {
   getCourseModules(courseUnitId: string): Promise<Array<CourseModuleDTO>>;
 
   /**
+   * Returns course module based on module id
+   * @throwsError if course module was not successfully fetched or not found
+   */
+  getCourseModule(courseModuleId: string): Promise<CourseModuleDTO>;
+
+  /**
    * Creates a course module
    * @param courseUnitId the id of the unit that we want to create the new module under
    * @param courseModuleDTO the info (currently just title) about the course module that we want to create
