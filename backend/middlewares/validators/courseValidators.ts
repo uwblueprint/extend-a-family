@@ -139,7 +139,7 @@ export const pageBelongsToModuleValidator = async (
 
   const courseModule = await courseModuleService.getCourseModule(moduleId);
 
-  if (!courseModule.pages.includes(pageId)) {
+  if (!courseModule?.pages.includes(pageId)) {
     return res
       .status(404)
       .send(

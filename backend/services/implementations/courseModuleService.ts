@@ -75,7 +75,6 @@ class CourseModuleService implements ICourseModuleService {
       );
       return {
         ...courseModule,
-        pages: courseModule.pages.map((page) => page.toString()),
         lessonPdfUrl,
         pages: courseModule.pages.map((page) => page.toString()),
       };

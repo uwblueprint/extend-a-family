@@ -47,6 +47,15 @@ const ViewModulePage = () => {
   const [pageWidth, setPageWidth] = useState<number>(0);
   const [containerWidth, setContainerWidth] = useState<number>(0);
 
+  const fetchModule = useCallback(async () => {
+    const fetchedModule = await CourseAPIClient.getModuleById(moduleId);
+    return fetchedModule;
+  }, [moduleId]);
+
+  useEffect(() => {
+    (async () => setModule(await fetchModule()))();
+  }, [fetchModule, moduleId]);
+
   function getPageScale() {
     if (
       pageHeight === 0 ||
@@ -61,14 +70,6 @@ const ViewModulePage = () => {
     return Math.min(scaleToHeight, scaleToWidth);
   }
 
-  useEffect(() => {
-    async function fetchModule() {
-      const fetchedModule = await CourseAPIClient.getModuleById(moduleId);
-      setModule(fetchedModule);
-    }
-    fetchModule();
-  }, [moduleId]);
-
   const handleResize = useCallback(() => {
     if (pageHeight === 0) {
       setPageHeight(lessonPageRef.current?.clientHeight || 0);
@@ -77,7 +78,12 @@ const ViewModulePage = () => {
       setPageWidth(lessonPageRef.current?.clientWidth || 0);
     }
     setContainerHeight(lessonPageContainerRef.current?.clientHeight || 0);
-    setContainerWidth(window.innerWidth);
+    setContainerWidth(
+      Math.min(
+        window.innerWidth,
+        lessonPageContainerRef.current?.clientWidth || 0,
+      ),
+    );
   }, [pageHeight, pageWidth]);
 
   useEffect(() => {
@@ -106,85 +112,86 @@ const ViewModulePage = () => {
 
   const boxHeight = "calc(100vh - 68px)";
 
+  const SideBar = () => (
+    <Box
+      width="auto"
+      minWidth="fit-content"
+      maxHeight={boxHeight}
+      padding="24px"
+      borderRight="1px solid #ddd"
+      sx={{
+        overflowY: "auto",
+        gapY: "24px",
+      }}
+      className="no-scrollbar"
+    >
+      {Array.from(new Array(numPages), (_, index) => (
+        <Box
+          key={`thumbnail_${index + 1}`}
+          sx={{
+            cursor: "pointer",
+            marginBottom: "10px",
+            borderRadius: "5px",
+            display: "flex",
+            justifyItems: "center",
+            flexDirection: "row",
+            gap: "8px",
+          }}
+          onClick={() => setCurrentPage(index + 1)}
+        >
+          <Box
+            sx={{
+              color: index + 1 === currentPage ? "#006877" : "black",
+            }}
+          >
+            <Typography
+              sx={{
+                lineHeight: "15px",
+                fontSize: "12.5px",
+                fontWeight: index + 1 === currentPage ? "700" : "300",
+              }}
+            >
+              {padNumber(index + 1)}
+            </Typography>
+            {index + 1 === currentPage && (
+              <BookmarkIcon sx={{ fontSize: "16px" }} />
+            )}
+          </Box>
+          <Box
+            sx={{
+              position: "relative",
+              border: currentPage === index + 1 ? "2px solid #006877" : "none",
+              borderRadius: "4px",
+              width: "fit-content",
+            }}
+          >
+            {currentPage === index + 1 && (
+              <PlayCircleOutlineIcon
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  fontSize: "60px",
+                  zIndex: "1",
+                }}
+              />
+            )}
+            <Thumbnail pageNumber={index + 1} height={130} scale={1.66} />
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
+
   return (
     <Document
       file={module?.lessonPdfUrl || null}
       onLoadSuccess={onDocumentLoadSuccess}
       options={options}
-      // className="document-override"
     >
       <Box display="flex" flexDirection="row">
-        {!isFullScreen && (
-          <Box
-            width="auto"
-            maxHeight={boxHeight}
-            padding="24px"
-            borderRight="1px solid #ddd"
-            sx={{
-              overflowY: "auto",
-              gapY: "24px",
-            }}
-            className="no-scrollbar"
-          >
-            {Array.from(new Array(numPages), (_, index) => (
-              <Box
-                key={`thumbnail_${index + 1}`}
-                sx={{
-                  cursor: "pointer",
-                  marginBottom: "10px",
-                  borderRadius: "5px",
-                  display: "flex",
-                  justifyItems: "center",
-                  flexDirection: "row",
-                  gap: "8px",
-                }}
-                onClick={() => setCurrentPage(index + 1)}
-              >
-                <Box
-                  sx={{
-                    color: index + 1 === currentPage ? "#006877" : "black",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      lineHeight: "15px",
-                      fontSize: "12.5px",
-                      fontWeight: index + 1 === currentPage ? "700" : "300",
-                    }}
-                  >
-                    {padNumber(index + 1)}
-                  </Typography>
-                  {index + 1 === currentPage && (
-                    <BookmarkIcon sx={{ fontSize: "16px" }} />
-                  )}
-                </Box>
-                <Box
-                  sx={{
-                    position: "relative",
-                    border:
-                      currentPage === index + 1 ? "2px solid #006877" : "none",
-                    borderRadius: "4px",
-                    width: "fit-content",
-                  }}
-                >
-                  {currentPage === index + 1 && (
-                    <PlayCircleOutlineIcon
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        fontSize: "60px",
-                        zIndex: "1",
-                      }}
-                    />
-                  )}
-                  <Thumbnail pageNumber={index + 1} height={130} scale={1.66} />
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        )}
+        {!isFullScreen && window.innerWidth >= 1000 && <SideBar />}
         <Box
           alignItems="center"
           justifyContent="center"
@@ -257,18 +264,9 @@ const ViewModulePage = () => {
             <Page
               pageNumber={currentPage}
               renderAnnotationLayer={false}
-              scale={isFullScreen ? getPageScale() : 1}
+              scale={getPageScale()}
               inputRef={lessonPageRef}
             />
-            {/* <Input
-              sx={{
-                position: "absolute",
-                zIndex: 999,
-                top: "50%", // customizable
-                left: "50%", // customizable
-                width: "50%", // customizable
-              }}
-            /> */}
           </Box>
           <Box
             height={isFullScreen ? "80px" : "48px"}
