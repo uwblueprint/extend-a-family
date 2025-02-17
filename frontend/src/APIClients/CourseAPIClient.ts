@@ -40,4 +40,27 @@ const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
   }
 };
 
-export default { getUnits, uploadThumbnail };
+const lessonUpload = async (
+  lesson: File,
+  moduleId: string,
+): Promise<string> => {
+  try {
+    const bearerToken = `Bearer ${getLocalStorageObjProperty(
+      AUTHENTICATED_USER_KEY,
+      "accessToken",
+    )}`;
+    const formData = new FormData();
+    formData.append("lessonPdf", lesson);
+    formData.append("moduleId", moduleId);
+    const { data } = await baseAPIClient.post(
+      "/course/uploadLessons",
+      formData,
+      { headers: { Authorization: bearerToken } },
+    );
+    return data;
+  } catch (error) {
+    return "";
+  }
+};
+
+export default { getUnits, uploadThumbnail, lessonUpload };

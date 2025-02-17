@@ -1,7 +1,7 @@
 import { Router } from "express";
+import fs from "fs";
 import multer from "multer";
-import CourseUnitService from "../services/implementations/courseUnitService";
-import { getErrorMessage } from "../utilities/errorUtils";
+import { isAuthorizedByRole } from "../middlewares/auth";
 import {
   coursePageDtoValidator,
   createCourseUnitDtoValidator,
@@ -10,11 +10,12 @@ import {
   pageBelongsToModuleValidator,
   updateCourseUnitDtoValidator,
 } from "../middlewares/validators/courseValidators";
-import { isAuthorizedByRole } from "../middlewares/auth";
 import CourseModuleService from "../services/implementations/courseModuleService";
 import CoursePageService from "../services/implementations/coursePageService";
+import CourseUnitService from "../services/implementations/courseUnitService";
 import FileStorageService from "../services/implementations/fileStorageService";
 import { CourseModuleDTO } from "../types/courseTypes";
+import { getErrorMessage } from "../utilities/errorUtils";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -66,6 +67,39 @@ courseRouter.get(
     try {
       const courses = await courseUnitService.getCourseUnits();
       res.status(200).json(courses);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.post(
+  "/uploadLessons",
+  multer({ storage: multer.memoryStorage() }).single("lessonPdf"),
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    try {
+      const {
+        file: lessonPdf,
+        body: { moduleId },
+      } = req;
+      if (!lessonPdf) {
+        throw new Error("No lessonPdf file uploaded.");
+      }
+      const uploadedLessonPath = `uploads/course/pdfs/module-${moduleId}.pdf`;
+      if (!fs.existsSync(uploadedLessonPath)) {
+        fs.mkdirSync("uploads/course/pdfs", { recursive: true });
+      }
+      fs.writeFile(uploadedLessonPath, lessonPdf.buffer, (err) => {
+        if (err) {
+          throw err;
+        }
+      });
+      const result = await courseModuleService.uploadLessons(
+        moduleId,
+        uploadedLessonPath,
+      );
+      res.status(200).json(result);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }
