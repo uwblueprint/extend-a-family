@@ -14,12 +14,8 @@ class FileStorageService implements IFileStorageService {
     this.bucketName = bucketName;
   }
 
-  async getFile(fileName: string, expirationTimeMinutes = 60): Promise<string> {
+  async getFile(fileName: string): Promise<string> {
     const bucket = storage().bucket(this.bucketName);
-    const expirationDate = new Date();
-    expirationDate.setMinutes(
-      expirationDate.getMinutes() + expirationTimeMinutes,
-    );
     try {
       const currentBlob = await bucket.file(fileName);
       if (!(await currentBlob.exists())[0]) {
@@ -104,7 +100,7 @@ class FileStorageService implements IFileStorageService {
           metadata: { contentType },
         });
       }
-      return await this.getFile(fileName, 5.26e7);
+      return await this.getFile(fileName);
     } catch (error: unknown) {
       Logger.error(`Failed to upload file. Reason = ${getErrorMessage(error)}`);
       throw error;

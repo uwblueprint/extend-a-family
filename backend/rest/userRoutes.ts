@@ -1,9 +1,10 @@
 import { Router } from "express";
-
+import multer from "multer";
 import { getAccessToken, isAuthorizedByRole } from "../middlewares/auth";
 import {
   createUserDtoValidator,
   updateUserDtoValidator,
+  uploadProfilePictureValidator,
 } from "../middlewares/validators/userValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
@@ -12,6 +13,7 @@ import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
+import FileStorageService from "../services/implementations/fileStorageService";
 import {
   UpdateUserDTO,
   UserDTO,
@@ -22,11 +24,46 @@ import { getErrorMessage } from "../utilities/errorUtils";
 import { sendResponseByMimeType } from "../utilities/responseUtil";
 import { capitalizeFirstLetter } from "../utilities/StringUtils";
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 const userRouter: Router = Router();
 
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
+const firebaseStorageService: FileStorageService = new FileStorageService(
+  process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
+);
+
+userRouter.post(
+  "/:userId/uploadProfilePicture",
+  upload.single("uploadedImage"),
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  uploadProfilePictureValidator,
+  async (req, res) => {
+    const { userId } = req.params;
+    const imageData = req.file?.buffer;
+    const contentType = req.file?.mimetype;
+    const imageName = `user/profilePicture/${userId}`;
+
+    try {
+      const imageURL: string = await firebaseStorageService.uploadImage(
+        imageName,
+        imageData,
+        contentType,
+      );
+      const userDTO: UserDTO = await userService.getUserById(userId);
+      await userService.updateUserById(userId, {
+        ...userDTO,
+        profilePicture: imageURL,
+      });
+      res.status(200).json(imageURL);
+    } catch (error: unknown) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
 
 /* Get all users, optionally filter by a userId or email query parameter to retrieve a single user */
 userRouter.get(

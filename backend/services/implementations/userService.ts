@@ -210,17 +210,9 @@ class UserService implements IUserService {
 
     try {
       // must explicitly specify runValidators when updating through findByIdAndUpdate
-      oldUser = await MgUser.findByIdAndUpdate(
-        userId,
-        {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          status: user.status,
-          email: user.email,
-        },
-        { runValidators: true },
-      );
+      oldUser = await MgUser.findByIdAndUpdate(userId, user, {
+        runValidators: true,
+      });
 
       if (!oldUser) {
         throw new Error(`userId ${userId} not found.`);
