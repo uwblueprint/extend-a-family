@@ -191,7 +191,7 @@ const ViewModulePage = () => {
       options={options}
     >
       <Box display="flex" flexDirection="row">
-        {!isFullScreen && window.innerWidth >= 1000 && <SideBar />}
+        {!isFullScreen && <SideBar />}
         <Box
           alignItems="center"
           justifyContent="center"
