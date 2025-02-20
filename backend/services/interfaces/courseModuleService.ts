@@ -13,10 +13,11 @@ interface ICourseModuleService {
   getCourseModules(courseUnitId: string): Promise<Array<CourseModuleDTO>>;
 
   /**
-   * Returns course module based on module id
-   * @throwsError if course module was not successfully fetched or not found
+   * Returns the course module specified by the module ID
+   * @param courseModuleId the id of the course module we want to fetch
+   * @throws Server HTTP 500 error if course module was not successfully fetched
    */
-  getCourseModule(courseModuleId: string): Promise<CourseModuleDTO>;
+  getCourseModule(courseModuleId: string): Promise<CourseModuleDTO | null>;
 
   /**
    * Creates a course module
