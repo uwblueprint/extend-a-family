@@ -86,6 +86,8 @@ const Signup = (): React.ReactElement => {
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
 
   const onSignupClick = async () => {
+    setEmailError(null);
+    setErrorData(null);
     const response = await authAPIClient.signup(
       firstName,
       lastName,
@@ -93,8 +95,6 @@ const Signup = (): React.ReactElement => {
       password,
       "Facilitator",
     );
-    setEmailError(null);
-    setErrorData(null);
 
     switch (response) {
       case AuthErrorCodes.EMAIL_IN_USE:
@@ -110,6 +110,7 @@ const Signup = (): React.ReactElement => {
           setErrorData(defaultAuthError);
         } else {
           setErrorData(null);
+          setEmailError(null);
         }
         break;
     }
