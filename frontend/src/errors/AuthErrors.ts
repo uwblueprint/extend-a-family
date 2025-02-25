@@ -37,7 +37,7 @@ export const authErrors: Record<AuthErrorCodes, PresentableError> = {
   },
   INVALID_EMAIL: {
     title: () => "Invalid email",
-    text: () => "The email address is improperly formatted.",
+    text: () => "Please enter a valid email (e.g. user@example.com).",
   },
 };
 

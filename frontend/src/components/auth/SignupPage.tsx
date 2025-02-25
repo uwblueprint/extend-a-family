@@ -82,6 +82,7 @@ const Signup = (): React.ReactElement => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorData, setErrorData] = useState<PresentableError | null>(null);
+  const [emailError, setEmailError] = useState<PresentableError | null>(null);
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
 
   const onSignupClick = async () => {
@@ -92,6 +93,8 @@ const Signup = (): React.ReactElement => {
       password,
       "Facilitator",
     );
+    setEmailError(null);
+    setErrorData(null);
 
     switch (response) {
       case AuthErrorCodes.EMAIL_IN_USE:
@@ -99,7 +102,7 @@ const Signup = (): React.ReactElement => {
         break;
 
       case AuthErrorCodes.INVALID_EMAIL:
-        setErrorData(authErrors.INVALID_EMAIL);
+        setEmailError(authErrors.INVALID_EMAIL);
         break;
 
       default:
@@ -219,6 +222,8 @@ const Signup = (): React.ReactElement => {
             required
             label="Email"
             type="email"
+            error={!!emailError}
+            helperText={emailError?.text()}
             placeholder="example@gmail.com"
             onChange={(event) => setEmail(event.target.value)}
             variant="outlined"
