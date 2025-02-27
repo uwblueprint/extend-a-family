@@ -33,6 +33,7 @@ import {
   defaultAuthError,
 } from "../../errors/AuthErrors";
 import { PresentableError } from "../../types/ErrorTypes";
+import { isAuthenticatedUser } from "../../types/AuthTypes";
 
 interface ErrorAlertProps {
   title?: string;
@@ -96,23 +97,20 @@ const Signup = (): React.ReactElement => {
       "Facilitator",
     );
 
-    switch (response) {
-      case AuthErrorCodes.EMAIL_IN_USE:
-        setErrorData(authErrors.EMAIL_IN_USE);
-        break;
+    if (!isAuthenticatedUser(response)) {
+      switch (response) {
+        case AuthErrorCodes.EMAIL_IN_USE:
+          setErrorData(authErrors.EMAIL_IN_USE);
+          break;
 
-      case AuthErrorCodes.INVALID_EMAIL:
-        setEmailError(authErrors.INVALID_EMAIL);
-        break;
+        case AuthErrorCodes.INVALID_EMAIL:
+          setEmailError(authErrors.INVALID_EMAIL);
+          break;
 
-      default:
-        if (response != null) {
+        default:
           setErrorData(defaultAuthError);
-        } else {
-          setErrorData(null);
-          setEmailError(null);
-        }
-        break;
+          break;
+      }
     }
     return null;
   };
