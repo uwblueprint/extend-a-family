@@ -39,11 +39,12 @@ class FileStorageService implements IFileStorageService {
     fileName: string,
     filePath: string,
     contentType: string | null = null,
+    allowOverwrite = false,
   ): Promise<void> {
     try {
       const bucket = storage().bucket(this.bucketName);
       const currentBlob = await bucket.file(fileName);
-      if ((await currentBlob.exists())[0]) {
+      if (!allowOverwrite && (await currentBlob.exists())[0]) {
         throw new Error(`File name ${fileName} already exists`);
       }
       await bucket.upload(filePath, {
