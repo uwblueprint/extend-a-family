@@ -18,4 +18,49 @@ const getUnits = async (): Promise<CourseUnit[]> => {
   }
 };
 
-export default { getUnits };
+const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(
+      `/course/${moduleID}/uploadThumbnail`,
+      uploadedImage,
+      {
+        headers: {
+          Authorization: bearerToken,
+          contentType: "multipart/form-data",
+        },
+      },
+    );
+    return data;
+  } catch (error: unknown) {
+    return null;
+  }
+};
+
+const lessonUpload = async (
+  lesson: File,
+  moduleId: string,
+): Promise<string> => {
+  try {
+    const bearerToken = `Bearer ${getLocalStorageObjProperty(
+      AUTHENTICATED_USER_KEY,
+      "accessToken",
+    )}`;
+    const formData = new FormData();
+    formData.append("lessonPdf", lesson);
+    formData.append("moduleId", moduleId);
+    const { data } = await baseAPIClient.post(
+      "/course/uploadLessons",
+      formData,
+      { headers: { Authorization: bearerToken } },
+    );
+    return data;
+  } catch (error) {
+    return "";
+  }
+};
+
+export default { getUnits, uploadThumbnail, lessonUpload };

@@ -27,3 +27,7 @@ export const VIEW_HELP_REQUESTS_PAGE = "/help-requests";
 export const FORGOT_PASSWORD_PAGE = "/forgot-password";
 
 export const COURSE_PAGE = "/course";
+
+export const UPLOAD_THUMBNAIL = "/module-thumbnail";
+
+export const LESSON_UPLOAD = "/lesson-upload";

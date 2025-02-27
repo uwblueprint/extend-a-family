@@ -6,6 +6,7 @@ const allowableContentTypes = new Set([
   "image/png",
   "image/jpeg",
   "image/gif",
+  "image/webp",
 ]);
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */

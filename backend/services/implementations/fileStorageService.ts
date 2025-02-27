@@ -1,4 +1,5 @@
 import { storage } from "firebase-admin";
+import { getDownloadURL } from "firebase-admin/storage";
 
 import IFileStorageService from "../interfaces/fileStorageService";
 import { getErrorMessage } from "../../utilities/errorUtils";
@@ -24,11 +25,8 @@ class FileStorageService implements IFileStorageService {
       if (!(await currentBlob.exists())[0]) {
         throw new Error(`File name ${fileName} does not exist`);
       }
-      const res = await currentBlob.getSignedUrl({
-        action: "read",
-        expires: expirationDate,
-      });
-      return res[0];
+      const url = await getDownloadURL(currentBlob);
+      return url;
     } catch (error: unknown) {
       Logger.error(
         `Failed to retrieve file. Reason = ${getErrorMessage(error)}`,
@@ -41,11 +39,12 @@ class FileStorageService implements IFileStorageService {
     fileName: string,
     filePath: string,
     contentType: string | null = null,
+    allowOverwrite = false,
   ): Promise<void> {
     try {
       const bucket = storage().bucket(this.bucketName);
       const currentBlob = await bucket.file(fileName);
-      if ((await currentBlob.exists())[0]) {
+      if (!allowOverwrite && (await currentBlob.exists())[0]) {
         throw new Error(`File name ${fileName} already exists`);
       }
       await bucket.upload(filePath, {
@@ -89,6 +88,25 @@ class FileStorageService implements IFileStorageService {
       await currentBlob.delete();
     } catch (error: unknown) {
       Logger.error(`Failed to delete file. Reason = ${getErrorMessage(error)}`);
+      throw error;
+    }
+  }
+
+  async uploadImage(
+    fileName: string,
+    fileData: Buffer | null = null,
+    contentType: string | null = null,
+  ): Promise<string> {
+    try {
+      const bucket = storage().bucket(this.bucketName);
+      if (fileData) {
+        await bucket.file(fileName).save(fileData, {
+          metadata: { contentType },
+        });
+      }
+      return await this.getFile(fileName, 5.26e7);
+    } catch (error: unknown) {
+      Logger.error(`Failed to upload file. Reason = ${getErrorMessage(error)}`);
       throw error;
     }
   }

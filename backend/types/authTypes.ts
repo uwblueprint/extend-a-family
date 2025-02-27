@@ -1,4 +1,4 @@
-import { UserDTO } from "./userTypes";
+import { Role, UserDTO } from "./userTypes";
 
 export type Token = {
   accessToken: string;
@@ -27,3 +27,8 @@ export enum AuthErrorCodes {
   EMAIL_IN_USE = "EMAIL_IN_USE",
   INVALID_EMAIL = "INVALID_EMAIL",
 }
+
+export type AuthError = {
+  error: AuthErrorCodes;
+  errorData?: [Role, Role];
+};

@@ -1,3 +1,5 @@
+import { AuthErrorCodes } from "../errors/AuthErrors";
+
 export type Role = "Administrator" | "Facilitator" | "Learner";
 
 export type Status = "Active" | "Invited";
@@ -10,6 +12,11 @@ export type AuthenticatedUser = {
   role: Role;
   accessToken: string;
   status: Status;
+};
+
+export type AuthError = {
+  error: AuthErrorCodes;
+  errorData?: [Role, Role];
 };
 
 export type AuthenticatedAdministrator = AuthenticatedUser;
