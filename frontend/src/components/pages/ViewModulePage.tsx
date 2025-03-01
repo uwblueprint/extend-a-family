@@ -1,5 +1,5 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -14,8 +14,13 @@ import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
-import useQuery from "../../hooks/useQuery";
-import { CourseModule } from "../../types/CourseTypes";
+import * as Routes from "../../constants/Routes";
+import useQueryParams from "../../hooks/useQueryParams";
+import {
+  CourseModule,
+  isActivityPage,
+  isLessonPage,
+} from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
 import "./ViewModulePage.css";
 
@@ -30,11 +35,12 @@ const options = {
 };
 
 const ViewModulePage = () => {
-  const searchParams = useQuery();
-  const moduleId = searchParams.get("moduleId") || "";
+  const { queryParams } = useQueryParams();
+  const requestedModuleId = queryParams.get("moduleId") || "";
+  const requestedPageId = queryParams.get("pageId") || "";
 
   const [numPages, setNumPages] = useState<number>();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [bookMarkedPages, setBookMarkedPages] = useState(new Set<number>());
   const [module, setModule] = useState<
@@ -47,17 +53,54 @@ const ViewModulePage = () => {
   const [pageWidth, setPageWidth] = useState<number>(0);
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const theme = useTheme();
+  const currentPageObject = module?.pages[currentPage];
+  const thumbnailRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const fetchModule = useCallback(async () => {
-    const fetchedModule = await CourseAPIClient.getModuleById(moduleId);
+    const fetchedModule = await CourseAPIClient.getModuleById(
+      requestedModuleId,
+    );
     return fetchedModule;
-  }, [moduleId]);
+  }, [requestedModuleId]);
+
+  const currentPageId = module?.pages[currentPage].id;
 
   useEffect(() => {
-    (async () => setModule(await fetchModule()))();
-  }, [fetchModule, moduleId]);
+    if (currentPageId) {
+      window.history.pushState(
+        { moduleId: module?.id, pageId: currentPageId },
+        "",
+        `${Routes.VIEW_PAGE}?${new URLSearchParams({
+          moduleId: requestedModuleId,
+          pageId: currentPageId,
+        }).toString()}`,
+      );
+    }
+  }, [currentPageId, module?.id, requestedModuleId]);
 
-  function getPageScale() {
+  useEffect(() => {
+    (async () => {
+      const currentModule = await fetchModule();
+      setModule(currentModule);
+      const defaultCurrentPage = currentModule?.pages.findIndex((page) => {
+        return page.id === requestedPageId;
+      });
+      if (defaultCurrentPage && defaultCurrentPage !== -1) {
+        setCurrentPage(defaultCurrentPage);
+      }
+    })();
+  }, [fetchModule, requestedPageId]);
+
+  useEffect(() => {
+    if (thumbnailRefs.current[currentPage]) {
+      thumbnailRefs.current[currentPage]?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  });
+
+  const getPageScale = () => {
     if (
       pageHeight === 0 ||
       containerHeight === 0 ||
@@ -69,7 +112,7 @@ const ViewModulePage = () => {
     const scaleToHeight = containerHeight / pageHeight;
     const scaleToWidth = containerWidth / pageWidth;
     return Math.min(scaleToHeight, scaleToWidth);
-  }
+  };
 
   const handleResize = useCallback(() => {
     if (pageHeight === 0) {
@@ -112,82 +155,106 @@ const ViewModulePage = () => {
 
   const boxHeight = "calc(100vh - 68px)";
 
-  const SideBar = () => (
-    <Box
-      width="auto"
-      minWidth="fit-content"
-      maxHeight={boxHeight}
-      padding="24px"
-      sx={{
-        backgroundColor: theme.palette.Neutral[200],
-        overflowY: "auto",
-        gapY: "24px",
-      }}
-      className="no-scrollbar"
-    >
-      {Array.from(new Array(numPages), (_, index) => (
-        <Box
-          key={`thumbnail_${index + 1}`}
-          sx={{
-            cursor: "pointer",
-            marginBottom: "10px",
-            borderRadius: "5px",
-            display: "flex",
-            justifyItems: "center",
-            flexDirection: "row",
-            gap: "8px",
-          }}
-          onClick={() => setCurrentPage(index + 1)}
-        >
+  const SideBar = useMemo(
+    () => (
+      <Box
+        width="auto"
+        minWidth="fit-content"
+        maxHeight={boxHeight}
+        padding="24px"
+        sx={{
+          backgroundColor: theme.palette.Neutral[200],
+          overflowY: "auto",
+          gapY: "24px",
+          ...(isFullScreen && { display: "none" }),
+        }}
+        className="no-scrollbar"
+      >
+        {module?.pages.map((page, index) => (
           <Box
+            key={`thumbnail_${index}`}
+            ref={(el: HTMLDivElement | null) => {
+              thumbnailRefs.current[index] = el;
+            }}
             sx={{
               color:
                 index + 1 === currentPage
                   ? theme.palette.Learner.Default
                   : "black",
+              cursor: "pointer",
+              marginBottom: "10px",
+              borderRadius: "5px",
+              display: "flex",
+              justifyItems: "center",
+              flexDirection: "row",
+              gap: "8px",
             }}
+            onClick={() => setCurrentPage(index)}
           >
-            <Typography
-              variant="labelSmall"
+            <Box
               sx={{
-                fontWeight: index + 1 === currentPage ? "700" : "300",
-                display: "block",
+                color:
+                  index === currentPage
+                    ? theme.palette.Learner.Default
+                    : "black",
               }}
             >
-              {padNumber(index + 1)}
-            </Typography>
-            {index + 1 === currentPage && (
-              <BookmarkIcon sx={{ fontSize: "16px" }} />
-            )}
-          </Box>
-          <Box
-            sx={{
-              position: "relative",
-              border:
-                currentPage === index + 1
-                  ? `2px solid ${theme.palette.Learner.Default}`
-                  : "none",
-              borderRadius: "4px",
-              width: "fit-content",
-            }}
-          >
-            {currentPage === index + 1 && (
-              <PlayCircleOutlineIcon
+              <Typography
+                variant="labelSmall"
                 sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  fontSize: "60px",
-                  zIndex: "1",
+                  fontWeight: index + 1 === currentPage ? "700" : "300",
+                  display: "block",
                 }}
-              />
-            )}
-            <Thumbnail pageNumber={index + 1} height={130} scale={1.66} />
+              >
+                {padNumber(index + 1)}
+              </Typography>
+              {index === currentPage && (
+                <BookmarkIcon sx={{ fontSize: "16px" }} />
+              )}
+            </Box>
+            <Box
+              sx={{
+                position: "relative",
+                border:
+                  currentPage === index
+                    ? `2px solid ${theme.palette.Learner.Default}`
+                    : "none",
+                borderRadius: "4px",
+                width: "fit-content",
+              }}
+            >
+              {isActivityPage(page) && (
+                <PlayCircleOutlineIcon
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    fontSize: "60px",
+                    zIndex: "1",
+                  }}
+                />
+              )}
+              {isLessonPage(page) && (
+                <Thumbnail
+                  pageNumber={page.pageIndex}
+                  height={130}
+                  scale={1.66}
+                />
+              )}
+              {isActivityPage(page) && (
+                <Thumbnail
+                  pageNumber={1} // Placeholder for activity page thumbnail
+                  renderMode="custom"
+                  customRenderer={() => <Box height={215} width={280} />}
+                />
+              )}
+            </Box>
           </Box>
-        </Box>
-      ))}
-    </Box>
+        ))}
+      </Box>
+    ),
+    [currentPage, isFullScreen, module?.pages],
   );
 
   return (
@@ -197,7 +264,7 @@ const ViewModulePage = () => {
       options={options}
     >
       <Box display="flex" flexDirection="row">
-        {!isFullScreen && <SideBar />}
+        {SideBar}
         <Box
           alignItems="center"
           justifyContent="center"
@@ -280,13 +347,28 @@ const ViewModulePage = () => {
             bgcolor={isFullScreen ? "black" : "white"}
             ref={lessonPageContainerRef}
           >
-            <Page
-              pageNumber={currentPage}
-              renderAnnotationLayer={false}
-              scale={getPageScale()}
-              onLoadSuccess={() => handleResize()}
-              inputRef={lessonPageRef}
-            />
+            {currentPageObject && isLessonPage(currentPageObject) && (
+              <Page
+                pageNumber={currentPageObject.pageIndex}
+                renderAnnotationLayer={false}
+                scale={getPageScale()}
+                onLoadSuccess={() => handleResize()}
+                inputRef={lessonPageRef}
+              />
+            )}
+            {currentPageObject && isActivityPage(currentPageObject) && (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="100%"
+                width="100%"
+              >
+                <Typography>
+                  Activity Page for {currentPageObject.title}
+                </Typography>
+              </Box>
+            )}
           </Box>
           <Box
             height={isFullScreen ? "80px" : "48px"}
@@ -304,7 +386,7 @@ const ViewModulePage = () => {
             <Box display="flex" gap="16px">
               <IconButton
                 disabled={currentPage === 1}
-                onClick={() => setCurrentPage((curr) => curr - 1)}
+                onClick={() => setCurrentPage(currentPage - 1)}
                 sx={{
                   border: "1px solid black",
                   height: "48px",
@@ -319,7 +401,7 @@ const ViewModulePage = () => {
               </Typography>
               <IconButton
                 disabled={currentPage === numPages}
-                onClick={() => setCurrentPage((curr) => curr + 1)}
+                onClick={() => setCurrentPage(currentPage + 1)}
                 sx={{
                   border: "1px solid black",
                   height: "48px",
