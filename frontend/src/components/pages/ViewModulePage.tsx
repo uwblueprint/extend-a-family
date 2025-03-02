@@ -9,7 +9,6 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import { Box, Button, IconButton, Typography } from "@mui/material";
-import type { PDFDocumentProxy } from "pdfjs-dist";
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -39,7 +38,6 @@ const ViewModulePage = () => {
   const requestedModuleId = queryParams.get("moduleId") || "";
   const requestedPageId = queryParams.get("pageId") || "";
 
-  const [numPages, setNumPages] = useState<number>();
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [bookMarkedPages, setBookMarkedPages] = useState(new Set<number>());
@@ -54,6 +52,7 @@ const ViewModulePage = () => {
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const currentPageObject = module?.pages[currentPage];
   const thumbnailRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const numPages = module?.pages.length || 0;
 
   const fetchModule = useCallback(async () => {
     const fetchedModule = await CourseAPIClient.getModuleById(
@@ -134,12 +133,6 @@ const ViewModulePage = () => {
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize, isFullScreen, pageHeight]);
-
-  const onDocumentLoadSuccess = ({
-    numPages: nextNumPages,
-  }: PDFDocumentProxy): void => {
-    setNumPages(nextNumPages);
-  };
 
   const toggleBookmark = (pageNumber: number) => {
     setBookMarkedPages((prev) => {
@@ -248,11 +241,7 @@ const ViewModulePage = () => {
   );
 
   return (
-    <Document
-      file={module?.lessonPdfUrl || null}
-      onLoadSuccess={onDocumentLoadSuccess}
-      options={options}
-    >
+    <Document file={module?.lessonPdfUrl || null} options={options}>
       <Box display="flex" flexDirection="row">
         {SideBar}
         <Box
@@ -361,7 +350,7 @@ const ViewModulePage = () => {
           >
             <Box display="flex" gap="16px">
               <IconButton
-                disabled={currentPage === 1}
+                disabled={currentPage <= 0}
                 onClick={() => setCurrentPage(currentPage - 1)}
                 sx={{
                   border: "1px solid black",
@@ -379,10 +368,10 @@ const ViewModulePage = () => {
                   fontWeight: "400",
                 }}
               >
-                {padNumber(currentPage)}
+                {padNumber(currentPage + 1)}
               </Typography>
               <IconButton
-                disabled={currentPage === numPages}
+                disabled={currentPage >= numPages - 1}
                 onClick={() => setCurrentPage(currentPage + 1)}
                 sx={{
                   border: "1px solid black",
