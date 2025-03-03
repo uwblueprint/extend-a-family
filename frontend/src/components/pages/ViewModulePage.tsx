@@ -89,7 +89,6 @@ const ViewModulePage = () => {
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
-    handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize, isFullScreen, pageHeight]);
 
@@ -285,6 +284,7 @@ const ViewModulePage = () => {
               pageNumber={currentPage}
               renderAnnotationLayer={false}
               scale={getPageScale()}
+              onLoadSuccess={() => handleResize()}
               inputRef={lessonPageRef}
             />
           </Box>
