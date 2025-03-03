@@ -8,7 +8,7 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -46,6 +46,7 @@ const ViewModulePage = () => {
   const [containerHeight, setContainerHeight] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState<number>(0);
   const [containerWidth, setContainerWidth] = useState<number>(0);
+  const theme = useTheme();
 
   const fetchModule = useCallback(async () => {
     const fetchedModule = await CourseAPIClient.getModuleById(moduleId);
@@ -118,8 +119,8 @@ const ViewModulePage = () => {
       minWidth="fit-content"
       maxHeight={boxHeight}
       padding="24px"
-      borderRight="1px solid #ddd"
       sx={{
+        backgroundColor: theme.palette.Neutral[200],
         overflowY: "auto",
         gapY: "24px",
       }}
@@ -141,14 +142,17 @@ const ViewModulePage = () => {
         >
           <Box
             sx={{
-              color: index + 1 === currentPage ? "#006877" : "black",
+              color:
+                index + 1 === currentPage
+                  ? theme.palette.Learner.Default
+                  : "black",
             }}
           >
             <Typography
+              variant="labelSmall"
               sx={{
-                lineHeight: "15px",
-                fontSize: "12.5px",
                 fontWeight: index + 1 === currentPage ? "700" : "300",
+                display: "block",
               }}
             >
               {padNumber(index + 1)}
@@ -160,7 +164,10 @@ const ViewModulePage = () => {
           <Box
             sx={{
               position: "relative",
-              border: currentPage === index + 1 ? "2px solid #006877" : "none",
+              border:
+                currentPage === index + 1
+                  ? `2px solid ${theme.palette.Learner.Default}`
+                  : "none",
               borderRadius: "4px",
               width: "fit-content",
             }}
@@ -219,21 +226,26 @@ const ViewModulePage = () => {
                 >
                   <ArrowBackIosIcon sx={{ fontSize: "24px" }} />
                 </IconButton>
-                <Typography>{module?.title}</Typography>
+                <Typography variant="headlineLarge">{module?.title}</Typography>
               </Box>
               <Box display="inline-flex" alignItems="center" gap="20px">
                 <Button
                   sx={{
                     paddingX: "12px",
                     paddingY: "10px",
-                    textTransform: "uppercase",
                   }}
                 >
-                  Need Help?
+                  <Typography
+                    color={theme.palette.Learner.Default}
+                    variant="labelLarge"
+                  >
+                    Need Help?
+                  </Typography>
                 </Button>
                 <IconButton
                   sx={{
-                    border: "1px solid #79747E",
+                    border: "1px solid",
+                    borderColor: theme.palette.Neutral[500],
                     height: "48px",
                     width: "48px",
                     padding: "8px",
@@ -241,10 +253,18 @@ const ViewModulePage = () => {
                   onClick={() => toggleBookmark(currentPage)}
                 >
                   {bookMarkedPages.has(currentPage) ? (
-                    <BookmarkIcon sx={{ fontSize: "24px", color: "#006877" }} />
+                    <BookmarkIcon
+                      sx={{
+                        fontSize: "24px",
+                        color: theme.palette.Learner.Default,
+                      }}
+                    />
                   ) : (
                     <BookmarkBorderIcon
-                      sx={{ fontSize: "24px", color: "#006877" }}
+                      sx={{
+                        fontSize: "24px",
+                        color: theme.palette.Learner.Default,
+                      }}
                     />
                   )}
                 </IconButton>
@@ -294,13 +314,7 @@ const ViewModulePage = () => {
               >
                 <ArrowBackIcon sx={{ fontSize: "16px" }} />
               </IconButton>
-              <Typography
-                sx={{
-                  alignSelf: "center",
-                  fontSize: "18px",
-                  fontWeight: "400",
-                }}
-              >
+              <Typography variant="titleMedium" sx={{ alignSelf: "center" }}>
                 {padNumber(currentPage)}
               </Typography>
               <IconButton
@@ -324,13 +338,15 @@ const ViewModulePage = () => {
                 paddingRight: "24px",
                 paddingY: "10px",
                 gap: "8px",
-                border: "1px #6F797B solid",
+                border: "1px solid",
+                borderColor: theme.palette.Neutral[500],
                 borderRadius: "4px",
+                color: theme.palette.Learner.Default,
               }}
               onClick={() => setIsFullScreen((prev) => !prev)}
             >
               <FullscreenIcon />
-              Fullscreen
+              <Typography variant="labelLarge">Fullscreen</Typography>
             </Button>
           </Box>
         </Box>
