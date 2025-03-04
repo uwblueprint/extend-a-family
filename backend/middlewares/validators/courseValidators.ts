@@ -1,13 +1,12 @@
-import { NextFunction, Request, Response } from "express";
-import CourseModuleService from "../../services/implementations/courseModuleService";
-import CourseUnitService from "../../services/implementations/courseUnitService";
-import { getErrorMessage } from "../../utilities/errorUtils";
+import { Request, Response, NextFunction } from "express";
 import {
   getApiValidationError,
-  getFileTypeValidationError,
   validateFileType,
   validatePrimitive,
+  getFileTypeValidationError,
 } from "./util";
+import CourseUnitService from "../../services/implementations/courseUnitService";
+import CourseModuleService from "../../services/implementations/courseModuleService";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
@@ -104,28 +103,20 @@ export const moduleBelongsToUnitValidator = async (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    const { unitId, moduleId } = req.params;
+  const { unitId, moduleId } = req.params;
 
-    const courseUnitService: CourseUnitService = new CourseUnitService();
+  const courseUnitService: CourseUnitService = new CourseUnitService();
 
-    const courseUnit = await courseUnitService.getCourseUnit(unitId);
+  const courseUnit = await courseUnitService.getCourseUnit(unitId);
 
-    if (!courseUnit.modules.includes(moduleId)) {
-      return res
-        .status(404)
-        .send(
-          `Module with ID ${moduleId} is not found in unit with ID ${unitId}`,
-        );
-    }
-    return next();
-  } catch (e: unknown) {
+  if (!courseUnit.modules.includes(moduleId)) {
     return res
       .status(404)
       .send(
-        `Unable to verify that module belongs to unit: ${getErrorMessage(e)}`,
+        `Module with ID ${moduleId} is not found in unit with ID ${unitId}`,
       );
   }
+  return next();
 };
 
 export const pageBelongsToModuleValidator = async (
@@ -139,7 +130,7 @@ export const pageBelongsToModuleValidator = async (
 
   const courseModule = await courseModuleService.getCourseModule(moduleId);
 
-  if (!courseModule?.pages.includes(pageId)) {
+  if (!courseModule.pages.includes(pageId)) {
     return res
       .status(404)
       .send(

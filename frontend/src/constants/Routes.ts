@@ -31,5 +31,3 @@ export const COURSE_PAGE = "/course";
 export const UPLOAD_THUMBNAIL = "/module-thumbnail";
 
 export const LESSON_UPLOAD = "/lesson-upload";
-
-export const VIEW_PAGE = "/view-page";

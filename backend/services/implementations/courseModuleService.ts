@@ -1,27 +1,22 @@
 /* eslint-disable class-methods-use-this */
-import fs from "fs/promises";
 import { startSession } from "mongoose";
+import fs from "fs/promises";
 import { PDFDocument } from "pdf-lib";
-import MgCourseModule, {
-  CourseModule,
-} from "../../models/coursemodule.mgmodel";
-import { LessonPageModel } from "../../models/coursepage.mgmodel";
-import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import {
   CourseModuleDTO,
   CreateCourseModuleDTO,
   UpdateCourseModuleDTO,
 } from "../../types/courseTypes";
-import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
+import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
+import { getErrorMessage } from "../../utilities/errorUtils";
+import MgCourseModule, {
+  CourseModule,
+} from "../../models/coursemodule.mgmodel";
 import ICourseModuleService from "../interfaces/courseModuleService";
-import IFileStorageService from "../interfaces/fileStorageService";
 import FileStorageService from "./fileStorageService";
+import { LessonPageModel } from "../../models/coursepage.mgmodel";
 
-const defaultBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
-const fileStorageService: IFileStorageService = new FileStorageService(
-  defaultBucket,
-);
 const Logger = logger(__filename);
 
 class CourseModuleService implements ICourseModuleService {
@@ -60,27 +55,20 @@ class CourseModuleService implements ICourseModuleService {
     }
   }
 
-  async getCourseModule(
-    courseModuleId: string,
-  ): Promise<CourseModuleDTO | null> {
+  async getCourseModule(courseModuleId: string): Promise<CourseModuleDTO> {
     try {
       const courseModule: CourseModule | null = await MgCourseModule.findById(
         courseModuleId,
       );
+
       if (!courseModule) {
         throw new Error(`Course module with id ${courseModuleId} not found.`);
       }
-      const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
-        `course/pdfs/module-${courseModuleId}.pdf`,
-      );
-      return {
-        ...courseModule.toObject(),
-        lessonPdfUrl,
-        pages: courseModule.pages.map((page) => page.toString()),
-      };
+
+      return courseModule.toObject();
     } catch (error) {
       Logger.error(
-        `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
+        `Failed to get course module with id ${courseModuleId}. Reason = ${getErrorMessage(
           error,
         )}`,
       );
