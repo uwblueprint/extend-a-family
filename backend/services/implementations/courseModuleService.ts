@@ -1,11 +1,13 @@
 /* eslint-disable class-methods-use-this */
 import fs from "fs/promises";
-import { startSession } from "mongoose";
+import { Schema, startSession } from "mongoose";
 import { PDFDocument } from "pdf-lib";
 import MgCourseModule, {
   CourseModule,
 } from "../../models/coursemodule.mgmodel";
-import { LessonPageModel } from "../../models/coursepage.mgmodel";
+import CoursePageModel, {
+  LessonPageModel,
+} from "../../models/coursepage.mgmodel";
 import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import {
   CourseModuleDTO,
@@ -66,17 +68,27 @@ class CourseModuleService implements ICourseModuleService {
     try {
       const courseModule: CourseModule | null = await MgCourseModule.findById(
         courseModuleId,
-      );
+      )
+        .lean()
+        .exec();
       if (!courseModule) {
         throw new Error(`Course module with id ${courseModuleId} not found.`);
       }
       const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
         `course/pdfs/module-${courseModuleId}.pdf`,
       );
+      const fetchPage = async (page: Schema.Types.ObjectId) => {
+        const pageObject = await CoursePageModel.findById(page).lean().exec();
+        if (!pageObject) {
+          throw new Error(`Page with id ${page} not found.`);
+        }
+        return pageObject;
+      };
+      const pageObjects = Promise.all(courseModule.pages.map(fetchPage));
       return {
         ...courseModule.toObject(),
         lessonPdfUrl,
-        pages: courseModule.pages.map((page) => page.toString()),
+        pages: await pageObjects,
       };
     } catch (error) {
       Logger.error(
