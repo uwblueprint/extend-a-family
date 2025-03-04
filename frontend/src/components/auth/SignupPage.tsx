@@ -32,7 +32,7 @@ import {
 } from "../../errors/AuthErrors";
 import { PresentableError } from "../../types/ErrorTypes";
 import { isAuthenticatedUser } from "../../types/AuthTypes";
-import ErrorAlert from "./ErrorAlert";
+import ErrorAlert from "../common/ErrorAlert";
 
 const Signup = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);

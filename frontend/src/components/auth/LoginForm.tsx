@@ -22,7 +22,7 @@ import {
   defaultAuthError,
 } from "../../errors/AuthErrors";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
-import ErrorAlert from "./ErrorAlert";
+import ErrorAlert from "../common/ErrorAlert";
 
 function isDrawerLogin(userRole: Role) {
   return userRole !== "Learner";
