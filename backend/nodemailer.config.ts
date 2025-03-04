@@ -9,6 +9,9 @@ const config: NodemailerConfig = {
     clientSecret: process.env.MAILER_CLIENT_SECRET ?? "",
     refreshToken: process.env.MAILER_REFRESH_TOKEN ?? "",
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
 };
 
 export default config;
