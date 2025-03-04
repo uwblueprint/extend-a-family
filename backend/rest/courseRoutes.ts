@@ -14,7 +14,6 @@ import CourseModuleService from "../services/implementations/courseModuleService
 import CoursePageService from "../services/implementations/coursePageService";
 import CourseUnitService from "../services/implementations/courseUnitService";
 import FileStorageService from "../services/implementations/fileStorageService";
-import { CourseModuleDTO } from "../types/courseTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
 
 const storage = multer.memoryStorage();
@@ -45,9 +44,12 @@ courseRouter.post(
         contentType,
       );
 
-      const module: CourseModuleDTO = await courseModuleService.getCourseModule(
-        moduleId,
-      );
+      const module = await courseModuleService.getCourseModule(moduleId);
+
+      if (!module) {
+        throw new Error(`Course module with id ${moduleId} not found.`);
+      }
+
       await courseModuleService.updateCourseModule(moduleId, {
         ...module,
         imageURL,
@@ -100,6 +102,20 @@ courseRouter.post(
         uploadedLessonPath,
       );
       res.status(200).json(result);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.get(
+  "/module/:moduleId",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  async (req, res) => {
+    const { moduleId } = req.params;
+    try {
+      const courseModule = await courseModuleService.getCourseModule(moduleId);
+      res.status(200).json(courseModule);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }

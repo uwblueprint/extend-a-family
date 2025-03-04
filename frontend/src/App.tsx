@@ -32,6 +32,7 @@ import LessonUpload from "./components/pages/LessonUpload";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ManageUserPage from "./components/pages/ManageUserPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
+import ViewModulePage from "./components/pages/ViewModulePage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -143,12 +144,17 @@ const App = (): React.ReactElement => {
                   component={CourseViewingPage}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
-
                 <PrivateRoute
                   exact
                   path={Routes.LESSON_UPLOAD}
                   component={LessonUpload}
                   allowedRoles={["Administrator"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={`${Routes.VIEW_PAGE}`}
+                  component={ViewModulePage}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
                 <Route exact path="*" component={NotFound} />
               </Switch>
