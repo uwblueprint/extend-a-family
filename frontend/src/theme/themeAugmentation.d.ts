@@ -28,6 +28,12 @@ declare module "@mui/material/styles" {
       600: string;
       700: string;
     };
+
+    OnBackground: string;
+    Light:{
+      Outline: string;
+      OnSurfaceVariant: string;
+    }
   }
 
   interface TypographyOptions {
