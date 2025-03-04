@@ -86,7 +86,7 @@ class CourseModuleService implements ICourseModuleService {
       };
       const pageObjects = Promise.all(courseModule.pages.map(fetchPage));
       return {
-        ...courseModule.toObject(),
+        ...courseModule,
         lessonPdfUrl,
         pages: await pageObjects,
       };

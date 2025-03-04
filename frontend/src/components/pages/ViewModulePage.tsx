@@ -8,7 +8,7 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -131,6 +131,7 @@ const ViewModulePage = () => {
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
+    handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize, isFullScreen, pageHeight]);
 
@@ -247,7 +248,13 @@ const ViewModulePage = () => {
         ))}
       </Box>
     ),
-    [currentPage, isFullScreen, module?.pages],
+    [
+      currentPage,
+      isFullScreen,
+      module?.pages,
+      theme.palette.Learner.Default,
+      theme.palette.Neutral,
+    ],
   );
 
   return (
