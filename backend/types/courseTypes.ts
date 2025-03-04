@@ -13,7 +13,7 @@ export type CourseModuleDTO = {
   displayIndex: number;
   title: string;
   imageURL?: string;
-  pages: CoursePageDTO[];
+  pages: string[];
   lessonPdfUrl?: string;
 };
 
