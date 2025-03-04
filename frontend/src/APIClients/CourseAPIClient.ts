@@ -1,5 +1,5 @@
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
-import { CourseModule, CourseUnit } from "../types/CourseTypes";
+import { CourseUnit } from "../types/CourseTypes";
 import { getLocalStorageObjProperty } from "../utils/LocalStorageUtils";
 import baseAPIClient from "./BaseAPIClient";
 
@@ -63,21 +63,4 @@ const lessonUpload = async (
   }
 };
 
-const getModuleById = async (
-  moduleId: string,
-): Promise<(CourseModule & { lessonPdfUrl: string }) | null> => {
-  const bearerToken = `Bearer ${getLocalStorageObjProperty(
-    AUTHENTICATED_USER_KEY,
-    "accessToken",
-  )}`;
-  try {
-    const { data } = await baseAPIClient.get(`/course/module/${moduleId}`, {
-      headers: { Authorization: bearerToken },
-    });
-    return data;
-  } catch (error) {
-    return null;
-  }
-};
-
-export default { getUnits, uploadThumbnail, lessonUpload, getModuleById };
+export default { getUnits, uploadThumbnail, lessonUpload };

@@ -1,4 +1,4 @@
-import mongoose, { Document, ObjectId, Schema } from "mongoose";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 export interface CourseModule extends Document {
   id: string;
