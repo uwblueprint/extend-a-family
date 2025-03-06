@@ -17,7 +17,9 @@ class FeedbackService implements IFeedbackService {
   /* eslint-disable class-methods-use-this */
   async getFeedbackById(feedbackId: string | ObjectId): Promise<FeedbackDTO> {
     try {
-      const feedback: FeedbackDTO | null = await MgFeedback.findById(feedbackId);
+      const feedback: FeedbackDTO | null = await MgFeedback.findById(
+        feedbackId,
+      );
       if (!feedback) {
         throw new Error(`Feedback with id ${feedbackId} not found`);
       }
