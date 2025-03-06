@@ -13,6 +13,7 @@ import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import {
+  BookmarkDTO,
   UpdateUserDTO,
   UserDTO,
   isFacilitator,
@@ -21,12 +22,43 @@ import {
 import { getErrorMessage } from "../utilities/errorUtils";
 import { sendResponseByMimeType } from "../utilities/responseUtil";
 import { capitalizeFirstLetter } from "../utilities/StringUtils";
+import ICoursePageService from "../services/interfaces/coursePageService";
+import CoursePageService from "../services/implementations/coursePageService";
 
 const userRouter: Router = Router();
 
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
+const coursePageService: ICoursePageService = new CoursePageService()
+
+userRouter.post(
+  "/addBookmark",
+  isAuthorizedByRole(new Set(["Learner", "Administrator", "Facilitator"])),
+  async(req,res) => {
+    const { unitId, moduleId, pageId} = req.body;
+    const accessToken = getAccessToken(req);
+
+    try {
+      const userId = await authService.getUserIdFromAccessToken(
+        accessToken!,
+      );
+
+      const user = await userService.getUserById(userId.toString())
+      const page = await coursePageService.getCoursePage(pageId)
+      const bookmark: BookmarkDTO = {
+        ...page,
+        unitId,
+        moduleId,
+        pageId,
+      }
+
+    } catch(error: any) {
+
+    }
+
+  }
+)
 
 /* Get all users, optionally filter by a userId or email query parameter to retrieve a single user */
 userRouter.get(

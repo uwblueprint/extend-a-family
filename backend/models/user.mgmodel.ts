@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 import { Role, Status } from "../types/userTypes";
+import { CoursePage } from "./coursepage.mgmodel";
 
 export interface User extends Document {
   id: ObjectId;
@@ -10,6 +11,13 @@ export interface User extends Document {
   role: Role;
   status: Status;
   email: string;
+  bookmarks: Bookmark[];
+}
+
+export interface Bookmark extends CoursePage {
+  unitId: ObjectId;
+  moduleId: ObjectId; 
+  pageId: ObjectId;
 }
 
 export interface Learner extends User {
@@ -24,6 +32,18 @@ const baseOptions = {
   discriminatorKey: "role",
   timestamps: true,
 };
+
+export const BookmarkSchema: Schema = new Schema(
+  {
+    id: { type: mongoose.Schema.Types.ObjectId }, 
+    title: { type: String },
+    type: { type: String },
+    source: { type: String },
+    pageIndex: { type: Number },
+    unitId: { type: mongoose.Schema.Types.ObjectId }, 
+    pageId: { type: mongoose.Schema.Types.ObjectId }, 
+    moduleId: { type: mongoose.Schema.Types.ObjectId }, 
+})
 
 export const UserSchema: Schema = new Schema(
   {
@@ -53,6 +73,11 @@ export const UserSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    bookmarks: {
+      type: [BookmarkSchema],
+      required: true,
+    }
+    
   },
   baseOptions,
 );
