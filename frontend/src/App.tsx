@@ -23,7 +23,7 @@ import authAPIClient from "./APIClients/AuthAPIClient";
 import * as Routes from "./constants/Routes";
 import { SocketProvider } from "./contexts/SocketContext";
 
-import ManageUserPage from "./components/pages/ManageUserPage";
+import ManageUserPage from "./components/user_management/ManageUserPage";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";

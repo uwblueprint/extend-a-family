@@ -36,14 +36,14 @@ import {
 } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { Role } from "../../types/AuthTypes";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import { User } from "../../types/UserTypes";
 import placeholderImage from "../assets/placeholder_profile.png";
 
 const ManageUser = (): React.ReactElement => {
-  const [role, setRole] = useState<string>("All"); // use string instead of Role
   const [users, setUsers] = useState<User[]>([]);
+  const [userData, setUserData] = useState<User[]>([]);
+
   const [page, setPage] = useState(1);
   const [usersPerPage, setUsersPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,26 +67,12 @@ const ManageUser = (): React.ReactElement => {
   const [email, setEmail] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
   useEffect(() => {
     async function getUsers() {
-      if (role === "All") {
-        // Fetch users of all roles and merge them
-        const adminUsers = await UserAPIClient.getUsersByRole("Administrator");
-        const facilitatorUsers = await UserAPIClient.getUsersByRole(
-          "Facilitator",
-        );
-        const learnerUsers = await UserAPIClient.getUsersByRole("Learner");
-
-        setUsers([...adminUsers, ...facilitatorUsers, ...learnerUsers]);
-      } else {
-        // Fetch only the selected role
-        const fetchedUsers = await UserAPIClient.getUsersByRole(role as Role);
-        setUsers(fetchedUsers);
-      }
-
-      setPage(0);
+      const allUsers = await UserAPIClient.getUsers();
+      setUserData(allUsers);
+      setUsers(allUsers);
     }
-
     getUsers();
-  }, [role]);
+  }, []);
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * usersPerPage - users.length) : 0;
@@ -100,10 +86,11 @@ const ManageUser = (): React.ReactElement => {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+      (user.firstName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.lastName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.email || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -130,8 +117,9 @@ const ManageUser = (): React.ReactElement => {
   };
 
   const handleRoleSelect = (role_curr: string) => {
+    setUsers(role_curr === "All" ? userData : userData.filter((item) => item.role === role_curr));
+    setPage(0);
     setSelectedRole(role_curr);
-    setRole(role_curr); // No type casting needed
     handleFilterClose();
   };
 
@@ -475,13 +463,13 @@ const ManageUser = (): React.ReactElement => {
           <Stack direction="column">
             <h2>
               <Typography
-                variant="headlineMedium"
+                variant="headlineLarge"
                 color={theme.palette.OnBackground}
               >
                 User List
               </Typography>
             </h2>
-            <p style={{ margin: 0, color: "#5F6368" }}>
+            <p style={{ margin: 0 }}>
               <Typography
                 variant="bodyMedium"
                 color={theme.palette.OnBackground}
@@ -494,11 +482,10 @@ const ManageUser = (): React.ReactElement => {
           {/* Controls Section */}
           <Stack direction="row" spacing={1} alignItems="center">
             {/* Search Bar with Floating Label */}
+            
             <TextField
-              required
-              label="Search by name..."
               variant="outlined"
-              // size="small"
+              placeholder="Search by name..."
               value={searchQuery}
               onChange={handleSearch}
               onFocus={handleSearchFocus}
@@ -506,45 +493,34 @@ const ManageUser = (): React.ReactElement => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Search
-                      sx={{
-                        color: isSearchActive
-                          ? theme.palette.Learner.Default
-                          : "#5F6368",
-                      }}
-                    />
+                    <Search sx={{ color: isSearchActive ? theme.palette.Neutral[600]: theme.palette.Neutral[500]}} />
                   </InputAdornment>
                 ),
               }}
               sx={{
-                minWidth: "240px",
+                minWidth: "400px",
                 borderRadius: "8px",
-                "& label": {
-                  color: isSearchActive ? "#066D75" : "#5F6368",
-                },
-                "& .MuiInputLabel-root": {
-                  color: isSearchActive ? "#066D75" : "#5F6368", // Default label color
-                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": {
-                    borderColor: isSearchActive ? "#066D75" : "#E0E0E0",
+                    borderColor: isSearchActive ? theme.palette.Learner.Default : theme.palette.Neutral[500],
                   },
                   "&:hover fieldset": {
-                    borderColor: "#066D75",
+                    borderColor: theme.palette.Neutral[600],
                   },
                   "&.Mui-focused fieldset": {
-                    borderColor: "#066D75",
+                    borderColor: theme.palette.Learner.Default,
                   },
                 },
               }}
             />
 
+
             {/* Filter Input with Floating Label */}
 
             <TextField
               variant="outlined"
+              placeholder="Filter"
               value={filterLabel}
-              label="Filter"
               onClick={handleFilterClick} // Opens dropdown on click
               InputProps={{
                 style: {
@@ -563,14 +539,12 @@ const ManageUser = (): React.ReactElement => {
                         cursor: "pointer",
                       }}
                       onClick={(event) => {
-                        event.preventDefault(); // Prevents input focus
-                        event.stopPropagation(); // Ensures only the icon triggers the dropdown
-                        handleFilterClick(event); // Opens the menu
+                        event.preventDefault();
+                        event.stopPropagation();
+                        handleFilterClick(event);
                       }}
                     >
-                      <FilterList
-                        sx={{ color: isFilterActive ? "#6f797b" : "##6f797b" }}
-                      />
+                      <FilterList sx={{ color: isFilterActive ? "#6f797b" : "#6f797b" }} />
                     </Box>
                   </InputAdornment>
                 ),
@@ -583,26 +557,20 @@ const ManageUser = (): React.ReactElement => {
               sx={{
                 textTransform: "uppercase",
                 textAlign: "left",
-
-                "& label": {
-                  color: isSearchActive ? "#066D75" : "#5F6368",
-                },
-                "& .MuiInputLabel-root": {
-                  color: isSearchActive ? "#066D75" : "#5F6368", // Default label color
-                },
-                "& .MuiOutlinedInput-root": {
+                "& .MuiOutlinedInput-root":  {
                   "& fieldset": {
-                    borderColor: isSearchActive ? "#066D75" : "#E0E0E0",
+                    borderColor: isSearchActive ? theme.palette.Learner.Default : theme.palette.Neutral[500],
                   },
                   "&:hover fieldset": {
-                    borderColor: "#066D75",
+                    borderColor: theme.palette.Neutral[600],
                   },
                   "&.Mui-focused fieldset": {
-                    borderColor: "#066D75",
+                    borderColor: theme.palette.Learner.Default,
                   },
                 },
               }}
             />
+
 
             <Menu
               anchorEl={filterAnchor}
@@ -623,14 +591,13 @@ const ManageUser = (): React.ReactElement => {
                     onClick={() => handleRoleSelect(roleOption)}
                   >
                     <Typography
+                      variant = "labelMedium"
                       sx={{
                         display: "inline-block",
                         backgroundColor: roleBackground[roleOption],
                         color: roleColors[roleOption],
                         padding: "4px 8px",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        fontWeight: 500,
+                        borderRadius: "8px"
                       }}
                     >
                       {roleOption.toUpperCase()}
@@ -714,14 +681,11 @@ const ManageUser = (): React.ReactElement => {
                     }}
                   >
                     <Typography
+                      variant="labelMedium"
                       sx={{
                         display: "inline-block",
-                        backgroundColor: roleBackground[user.role],
-                        color: roleColors[user.role],
-                        padding: "4px 8px",
-                        borderRadius: "3px",
-                        fontSize: "14px",
-                        fontWeight: 500,
+                        backgroundColor: theme.palette[user.role].Light,
+                        color: theme.palette[user.role].Default,
                       }}
                     >
                       {user.role.toUpperCase()}
@@ -730,7 +694,7 @@ const ManageUser = (): React.ReactElement => {
                   <TableCell
                     sx={{
                       textAlign: "right",
-                      paddingRight: "16px",
+                      paddingRight: "0px",
                       width: "18%",
                     }}
                   >
