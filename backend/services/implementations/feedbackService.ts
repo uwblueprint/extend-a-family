@@ -1,7 +1,7 @@
 import { ObjectId } from "mongoose";
 import IFeedbackService from "../interfaces/feedbackService";
 import MgFeedback from "../../models/feedback.mgmodel";
-import { Feedback, CreateFeedbackDTO } from "../../types/feedbackTypes";
+import { FeedbackDTO, CreateFeedbackDTO } from "../../types/feedbackTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
@@ -15,9 +15,9 @@ const Logger = logger(__filename);
 
 class FeedbackService implements IFeedbackService {
   /* eslint-disable class-methods-use-this */
-  async getFeedbackById(feedbackId: string | ObjectId): Promise<Feedback> {
+  async getFeedbackById(feedbackId: string | ObjectId): Promise<FeedbackDTO> {
     try {
-      const feedback: Feedback | null = await MgFeedback.findById(feedbackId);
+      const feedback: FeedbackDTO | null = await MgFeedback.findById(feedbackId);
       if (!feedback) {
         throw new Error(`Feedback with id ${feedbackId} not found`);
       }
@@ -28,34 +28,34 @@ class FeedbackService implements IFeedbackService {
     }
   }
 
-  async createFeedback(feedback: CreateFeedbackDTO): Promise<Feedback> {
-    let newFeedback: Feedback;
+  async createFeedback(feedback: CreateFeedbackDTO): Promise<FeedbackDTO> {
+    let newFeedback: FeedbackDTO;
 
     try {
-      const learnerObjectId: User | null = await MgUser.findById(
+      const learnerObject: User | null = await MgUser.findById(
         feedback.learnerId,
       );
-      const moduleObjectId: CourseModule | null = await MgCourseModule.findById(
+      const moduleObject: CourseModule | null = await MgCourseModule.findById(
         feedback.moduleId,
       );
-      const unitObjectId: CourseUnit | null = await MgCourseUnit.findById(
+      const unitObject: CourseUnit | null = await MgCourseUnit.findById(
         feedback.unitId,
       );
 
-      if (!learnerObjectId) {
+      if (!learnerObject) {
         throw new Error(`Learner with id ${feedback.learnerId} not found`);
       }
-      if (!moduleObjectId) {
+      if (!moduleObject) {
         throw new Error(`Module with id ${feedback.moduleId} not found`);
       }
-      if (!unitObjectId) {
+      if (!unitObject) {
         throw new Error(`Unit with id ${feedback.unitId} not found`);
       }
 
       newFeedback = await MgFeedback.create({
-        learnerId: learnerObjectId,
-        moduleId: moduleObjectId,
-        unitId: unitObjectId,
+        learnerId: learnerObject.id,
+        moduleId: moduleObject.id,
+        unitId: unitObject.id,
         isLiked: feedback.isLiked,
         difficulty: feedback.difficulty,
         message: feedback.message,

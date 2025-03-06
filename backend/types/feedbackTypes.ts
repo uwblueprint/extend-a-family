@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose";
 
-export type Feedback = {
+export type FeedbackDTO = {
   id: ObjectId;
   learnerId: ObjectId;
   moduleId: ObjectId;
@@ -10,4 +10,4 @@ export type Feedback = {
   message?: string;
 };
 
-export type CreateFeedbackDTO = Omit<Feedback, "id">;
+export type CreateFeedbackDTO = Omit<FeedbackDTO, "id">;

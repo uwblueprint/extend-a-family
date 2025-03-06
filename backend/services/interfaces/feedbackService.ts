@@ -1,4 +1,4 @@
-import { Feedback, CreateFeedbackDTO } from "../../types/feedbackTypes";
+import { FeedbackDTO, CreateFeedbackDTO } from "../../types/feedbackTypes";
 
 interface IFeedbackService {
   /**
@@ -7,7 +7,7 @@ interface IFeedbackService {
    * @returns feedback with feedback's information
    * @throws Error if feedback retrieval fails
    */
-  getFeedbackById(feedbackId: string): Promise<Feedback>;
+  getFeedbackById(feedbackId: string): Promise<FeedbackDTO>;
 
   /**
    * Create a feedback
@@ -15,7 +15,7 @@ interface IFeedbackService {
    * @returns the created feedback
    * @throws Error if feedback creation fails
    */
-  createFeedback(feedback: CreateFeedbackDTO): Promise<Feedback>;
+  createFeedback(feedback: CreateFeedbackDTO): Promise<FeedbackDTO>;
 }
 
 export default IFeedbackService;
