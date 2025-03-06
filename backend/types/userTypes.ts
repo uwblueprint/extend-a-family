@@ -1,3 +1,4 @@
+import { CoursePageDTO } from "./courseTypes";
 export type Role = "Administrator" | "Facilitator" | "Learner";
 
 export function isRole(role: string): role is Role {
@@ -8,6 +9,12 @@ export function isRole(role: string): role is Role {
 
 export type Status = "Invited" | "Active";
 
+export type BookmarkDTO = CoursePageDTO & {
+  unitId: string;
+  moduleId: string; 
+  pageId: string;
+}
+
 export type UserDTO = {
   id: string;
   firstName: string;
@@ -16,11 +23,12 @@ export type UserDTO = {
   role: Role;
   status: Status;
   profilePicture?: string;
+  bookmarks: BookmarkDTO[]
 };
 
-export type CreateUserDTO = Omit<UserDTO, "id"> & { password: string };
+export type CreateUserDTO = Omit<UserDTO, "id" | "bookmarks"> & { password: string };
 
-export type UpdateUserDTO = Omit<UserDTO, "id">;
+export type UpdateUserDTO = Omit<UserDTO, "id" | "bookmarks">;
 
 export type SignupUserDTO = Omit<CreateUserDTO, "role">;
 

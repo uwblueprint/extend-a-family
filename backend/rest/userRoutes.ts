@@ -8,13 +8,16 @@ import {
 } from "../middlewares/validators/userValidators";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
+import CoursePageService from "../services/implementations/coursePageService";
 import EmailService from "../services/implementations/emailService";
+import FileStorageService from "../services/implementations/fileStorageService";
 import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
+import ICoursePageService from "../services/interfaces/coursePageService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
-import FileStorageService from "../services/implementations/fileStorageService";
 import {
+  BookmarkDTO,
   UpdateUserDTO,
   UserDTO,
   isFacilitator,
@@ -32,6 +35,7 @@ const userRouter: Router = Router();
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
+const coursePageService: ICoursePageService = new CoursePageService()
 const firebaseStorageService: FileStorageService = new FileStorageService(
   process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
 );
@@ -64,6 +68,34 @@ userRouter.post(
     }
   },
 );
+
+userRouter.post(
+  "/addBookmark",
+  isAuthorizedByRole(new Set(["Learner", "Administrator", "Facilitator"])),
+  async(req,res) => {
+    const { unitId, moduleId, pageId} = req.body;
+    const accessToken = getAccessToken(req);
+
+    try {
+      const userId = await authService.getUserIdFromAccessToken(
+        accessToken!,
+      );
+
+      const user = await userService.getUserById(userId.toString())
+      const page = await coursePageService.getCoursePage(pageId)
+      const bookmark: BookmarkDTO = {
+        ...page,
+        unitId,
+        moduleId,
+        pageId,
+      }
+
+    } catch(error: any) {
+
+    }
+
+  }
+)
 
 /* Get all users, optionally filter by a userId or email query parameter to retrieve a single user */
 userRouter.get(
