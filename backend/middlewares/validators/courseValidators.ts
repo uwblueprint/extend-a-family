@@ -1,8 +1,44 @@
 import { Request, Response, NextFunction } from "express";
-import { getApiValidationError, validatePrimitive } from "./util";
+import {
+  getApiValidationError,
+  validateFileType,
+  validatePrimitive,
+  getFileTypeValidationError,
+} from "./util";
 import CourseUnitService from "../../services/implementations/courseUnitService";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
+export const moduleThumbnailValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.params.moduleId, "string")) {
+    return res.status(400).send(getApiValidationError("moduleId", "string"));
+  }
+
+  if (!req.file) {
+    return res.status(400).send("File has not been uploaded");
+  }
+
+  if (!req.file.buffer) {
+    return res.status(400).send("File missing buffer field");
+  }
+
+  if (!req.file.mimetype) {
+    return res.status(400).send("File is missing mimetype field");
+  }
+
+  if (!validateFileType(req.file.mimetype)) {
+    return res
+      .status(400)
+      .send(getFileTypeValidationError(req.body.file.mimetype));
+  }
+
+  return next();
+};
+
 export const createCourseUnitDtoValidator = async (
   req: Request,
   res: Response,

@@ -1,17 +1,59 @@
 import { Router } from "express";
+import multer from "multer";
 import CourseUnitService from "../services/implementations/courseUnitService";
 import { getErrorMessage } from "../utilities/errorUtils";
 import {
   createCourseUnitDtoValidator,
   moduleBelongsToUnitValidator,
+  moduleThumbnailValidator,
   updateCourseUnitDtoValidator,
 } from "../middlewares/validators/courseValidators";
 import { isAuthorizedByRole } from "../middlewares/auth";
 import CourseModuleService from "../services/implementations/courseModuleService";
+import FileStorageService from "../services/implementations/fileStorageService";
+import { CourseModuleDTO } from "../types/courseTypes";
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const courseRouter: Router = Router();
 const courseUnitService: CourseUnitService = new CourseUnitService();
 const courseModuleService: CourseModuleService = new CourseModuleService();
+const firebaseStorageService: FileStorageService = new FileStorageService(
+  process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
+);
+
+courseRouter.post(
+  "/:moduleId/uploadThumbnail",
+  upload.single("uploadedImage"),
+  moduleThumbnailValidator,
+  async (req, res) => {
+    const { moduleId } = req.params;
+    const imageData = req.file?.buffer;
+    const contentType = req.file?.mimetype;
+    const imageName: string = `course/thumbnails/${moduleId}`;
+
+    try {
+      const imageURL: string = await firebaseStorageService.uploadImage(
+        imageName,
+        imageData,
+        contentType,
+      );
+
+      const module: CourseModuleDTO = await courseModuleService.getCourseModule(
+        moduleId,
+      );
+      await courseModuleService.updateCourseModule(moduleId, {
+        ...module,
+        imageURL,
+      });
+
+      res.status(200).json(imageURL);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
 
 courseRouter.get(
   "/",

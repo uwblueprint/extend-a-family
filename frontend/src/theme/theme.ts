@@ -51,7 +51,6 @@ const palette: PaletteOptions = {
     600: "#404B4D",
     700: "#111111",
   },
-  OnBackground: "#171D1E",
   Light: {
     OnSurfaceVariant: "#3F484B",
     Outline: "#6F797B",

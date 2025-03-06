@@ -36,17 +36,16 @@ import {
 } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { Role } from "../../types/AuthTypes";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import { User } from "../../types/UserTypes";
 import placeholderImage from "../assets/placeholder_profile.png";
-
-
+import { Role } from "../../types/AuthTypes";
 
 const ManageUser = (): React.ReactElement => {
-  const [role, setRole] = useState<Role>("Administrator");
   const [users, setUsers] = useState<User[]>([]);
-  const [page, setPage] = useState(1);
+  const [userData, setUserData] = useState<User[]>([]);
+
+  const [page, setPage] = useState(0);
   const [usersPerPage, setUsersPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterAnchor, setFilterAnchor] = useState<null | HTMLElement>(null);
@@ -64,18 +63,17 @@ const ManageUser = (): React.ReactElement => {
   const handleCloseDeleteUserModal = () => setOpenDeleteUserModal(false);
   const theme = useTheme();
 
-
   const [firstName, setFirstName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [lastName, setLastName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [email, setEmail] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
   useEffect(() => {
     async function getUsers() {
-      const fetchedUsers = await UserAPIClient.getUsersByRole(role);
-      setUsers(fetchedUsers);
-      setPage(0);
+      const allUsers = await UserAPIClient.getUsers();
+      setUserData(allUsers);
+      setUsers(allUsers);
     }
     getUsers();
-  }, [role]);
+  }, []);
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * usersPerPage - users.length) : 0;
@@ -89,9 +87,11 @@ const ManageUser = (): React.ReactElement => {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+      (user.firstName || "")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      (user.lastName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.email || "").toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleChangePage = (
@@ -108,45 +108,33 @@ const ManageUser = (): React.ReactElement => {
     setPage(0);
   };
 
- 
+  const [selectedRole, setSelectedRole] = useState<string | null>(null); // No default role
 
-const [selectedRole, setSelectedRole] = useState<string | null>(null); // No default role
+  const handleFilterClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setFilterAnchor(event.currentTarget);
+  };
 
-const handleFilterClick = (event: React.MouseEvent<HTMLDivElement>) => {
-  setFilterAnchor(event.currentTarget);
-};
+  const handleFilterClose = () => {
+    setFilterAnchor(null);
+  };
 
-const handleFilterClose = () => {
-  setFilterAnchor(null);
-};
+  const handleRoleSelect = (role_curr: string) => {
+    setUsers(
+      role_curr === "All"
+        ? userData
+        : userData.filter((item) => item.role === role_curr),
+    );
+    setPage(0);
+    setSelectedRole(role_curr);
+    handleFilterClose();
+  };
 
-const handleRoleSelect = (role_curr: string | null) => {
-  setSelectedRole(role);
-  setRole(role_curr as Role); // now setRole is used
-  handleFilterClose();
-};
-
-// set the displayed value
-const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
-
+  // set the displayed value
+  const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
 
   // TODO: IMPLEMENT
   const handleDeleteUser = (userId: string) => {}; // eslint-disable-line @typescript-eslint/no-unused-vars
   const handleAddAdmin = async () => {};
-
-
-  const roleBackground: Record<string, string> = {
-    Administrator: theme.palette.Administrator.Light,
-    Facilitator: theme.palette.Facilitator.Light,
-    Learner: theme.palette.Learner.Light,
-  };
-
-  const roleColors: Record<string, string> = {
-    Administrator: theme.palette.Administrator.Default,
-    Facilitator: theme.palette.Facilitator.Default,
-    Learner: theme.palette.Learner.Default,
-  };
-
 
   const AddAdminModal = () => {
     return (
@@ -193,7 +181,7 @@ const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
             >
               <Typography
                 variant="headlineMedium"
-                color={theme.palette.OnBackground}
+                color={theme.palette.Neutral[700]}
               >
                 Add new admin{" "}
               </Typography>
@@ -375,7 +363,7 @@ const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
             >
               <Typography
                 variant="headlineMedium"
-                color={theme.palette.OnBackground}
+                color={theme.palette.Neutral[700]}
               >
                 Delete User?
               </Typography>
@@ -389,7 +377,7 @@ const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
               <DialogContentText>
                 <Typography
                   variant="bodyMedium"
-                  color={theme.palette.OnBackground}
+                  color={theme.palette.Neutral[700]}
                 >
                   This action can&apos;t be undone. A deleted user cannot be
                   recovered.
@@ -448,11 +436,13 @@ const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
   };
 
   return (
-    <Box  sx={{
-      display: "flex",
-      flexDirection: "column", 
-      padding: "25px"
-      }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        padding: "25px",
+      }}
+    >
       <DeleteUserModal />
       <AddAdminModal />
       <Stack direction="column" spacing={2} margin="2rem">
@@ -465,21 +455,20 @@ const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
         >
           {/* Title Section */}
           <Stack direction="column">
-            <h2
-              
-            >
+            <h2>
               <Typography
-                variant="headlineMedium"
-                color={theme.palette.OnBackground}>
-              User List
+                variant="headlineLarge"
+                color={theme.palette.Neutral[700]}
+              >
+                User List
               </Typography>
-              
             </h2>
-            <p style={{ margin: 0, color: "#5F6368" }}>
-            <Typography
+            <p style={{ margin: 0 }}>
+              <Typography
                 variant="bodyMedium"
-                color={theme.palette.OnBackground}>
-              View all the people using this platform
+                color={theme.palette.Neutral[700]}
+              >
+                View all the people using this platform
               </Typography>
             </p>
           </Stack>
@@ -487,11 +476,10 @@ const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
           {/* Controls Section */}
           <Stack direction="row" spacing={1} alignItems="center">
             {/* Search Bar with Floating Label */}
+
             <TextField
-              required
-              label="Search by name..."
               variant="outlined"
-              // size="small"
+              placeholder="Search by name..."
               value={searchQuery}
               onChange={handleSearch}
               onFocus={handleSearchFocus}
@@ -500,44 +488,51 @@ const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
                 startAdornment: (
                   <InputAdornment position="start">
                     <Search
-                      sx={{ color: isSearchActive ? theme.palette.Learner.Default : "#5F6368" }}
+                      sx={{
+                        color: isSearchActive
+                          ? theme.palette.Neutral[600]
+                          : theme.palette.Neutral[500],
+                      }}
                     />
                   </InputAdornment>
                 ),
               }}
               sx={{
-                minWidth: "240px",
+                minWidth: "400px",
                 borderRadius: "8px",
-                "& label": {
-                  color: isSearchActive ? "#066D75" : "#5F6368",
-                },
-                "& .MuiInputLabel-root": {
-                  color: isSearchActive ? "#066D75" : "#5F6368", // Default label color
-                },
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": {
-                    borderColor: isSearchActive ? "#066D75" : "#E0E0E0",
+                    borderColor: isSearchActive
+                      ? theme.palette.Learner.Default
+                      : theme.palette.Neutral[500],
                   },
                   "&:hover fieldset": {
-                    borderColor: "#066D75",
+                    borderColor: theme.palette.Neutral[600],
                   },
                   "&.Mui-focused fieldset": {
-                    borderColor: "#066D75",
+                    borderColor: theme.palette.Learner.Default,
                   },
                 },
               }}
             />
 
             {/* Filter Input with Floating Label */}
-            
-<TextField
-  variant="outlined"
-  value={filterLabel}
-  
-  onClick={handleFilterClick} // Opens dropdown on click
-  InputProps={{
-    startAdornment: (
-      <InputAdornment position="start">
+
+            <TextField
+              variant="outlined"
+              placeholder="Filter"
+              value={filterLabel}
+              onClick={handleFilterClick} // Opens dropdown on click
+              InputProps={{
+                style: {
+                  fontSize: "14px",
+                  fontWeight: 300,
+                  lineHeight: "120%",
+                  letterSpacing: "0.7px",
+                  textTransform: "uppercase",
+                },
+                startAdornment: (
+                  <InputAdornment position="start">
                     <Box
                       sx={{
                         display: "flex",
@@ -545,165 +540,182 @@ const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
                         cursor: "pointer",
                       }}
                       onClick={(event) => {
-                        event.preventDefault(); // Prevents input focus
-                        event.stopPropagation(); // Ensures only the icon triggers the dropdown
-                        handleFilterClick(event); // Opens the menu
+                        event.preventDefault();
+                        event.stopPropagation();
+                        handleFilterClick(event);
                       }}
                     >
                       <FilterList
-                        sx={{ color: isFilterActive ? "#6f797b" : "##6f797b" }}
+                        sx={{ color: isFilterActive ? "#6f797b" : "#6f797b" }}
                       />
                     </Box>
                   </InputAdornment>
-    ),
-    endAdornment: (
-      <InputAdornment position="end">
-        <ArrowDropDown sx={{ color: "#6F797B" }} />
-      </InputAdornment>
-    ),
-  }}
-  sx={{
-    
-    textTransform: "uppercase",
-    textAlign: "left",
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: "#6F797B",
-      },
-      "&:hover fieldset": {
-        borderColor: "#6F797B",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "#6F797B",
-      },
-    },
-    
-      "& label": {
-        color: isFilterActive ? "#066D75" : "#5F6368",
-      },
-      "& .MuiInputLabel-root": {
-        color: isSearchActive ? "#066D75" : "#5F6368", // Default label color
-      },
-  }}
-/>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <ArrowDropDown sx={{ color: "#6F797B" }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                textTransform: "uppercase",
+                textAlign: "left",
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: isSearchActive
+                      ? theme.palette.Learner.Default
+                      : theme.palette.Neutral[500],
+                  },
+                  "&:hover fieldset": {
+                    borderColor: theme.palette.Neutral[600],
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: theme.palette.Learner.Default,
+                  },
+                },
+              }}
+            />
 
-<Menu
-  anchorEl={filterAnchor}
-  open={Boolean(filterAnchor)}
-  onClose={handleFilterClose}
-  sx={{
-    "& .MuiPaper-root": {
-      borderRadius: "8px",
-      boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-      padding: "4px",
-    },
-  }}
->
-  {/* role selection with Styled Badges */}
-  {["Administrator", "Facilitator", "Learner"].map((roleOption) => (
-    <MenuItem key={roleOption} onClick={() => handleRoleSelect(roleOption)}>
-      <Typography
-        sx={{
-          display: "inline-block",
-          backgroundColor: roleBackground[roleOption],
-          color: roleColors[roleOption],
-          padding: "4px 8px",
-          borderRadius: "8px",
-          fontSize: "14px",
-          fontWeight: 500,
-        }}
-      >
-        {roleOption.toUpperCase()}
-      </Typography>
-    </MenuItem>
-  ))}
-</Menu>
+            <Menu
+              anchorEl={filterAnchor}
+              open={Boolean(filterAnchor)}
+              onClose={handleFilterClose}
+              sx={{
+                "& .MuiPaper-root": {
+                  borderRadius: "8px",
+                  padding: "4px",
+                },
+              }}
+            >
+              {/* role selection with Styled Badges */}
+              {["All", "Administrator", "Facilitator", "Learner"].map(
+                (roleOption) => (
+                  <MenuItem
+                    key={roleOption}
+                    onClick={() => handleRoleSelect(roleOption)}
+                  >
+                    <Typography
+                      variant="labelMedium"
+                      sx={{
+                        display: "inline-block",
+                        backgroundColor:
+                          theme.palette[roleOption as Role].Light,
+                        color: theme.palette[roleOption as Role].Default,
+                        padding: "4px 8px",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      {roleOption.toUpperCase()}
+                    </Typography>
+                  </MenuItem>
+                ),
+              )}
+            </Menu>
 
-            {/* Add New Admin Button */}
+            {/* admin button */}
             <Button
               variant="contained"
               startIcon={<Add />}
-              
               sx={{
                 backgroundColor: theme.palette.Administrator.Default,
                 height: "56px",
                 color: "white",
-                "&:hover": { backgroundColor: theme.palette.Administrator.Default},
+                "&:hover": {
+                  backgroundColor: theme.palette.Administrator.Default,
+                },
               }}
               onClick={handleOpenAddAdminModal}
             >
               <Typography
                 variant="labelLarge"
-                color={theme.palette.Neutral[100]}>
-                ADD NEW ADMIN              
-                </Typography>
+                color={theme.palette.Neutral[100]}
+              >
+                ADD NEW ADMIN
+              </Typography>
             </Button>
           </Stack>
         </Stack>
 
         {/* User Table */}
-        <TableContainer component={Paper} sx={{
-        display: "center",
-        justifyContent: "center", // Center horizontally
-        alignItems: "center", // Center vertically
-        height: "80%", // Full viewport height
-      border: "none"}}>
-          <Table aria-label="User List Table" sx={{
-            width: "100%", // Fills the container width
-            height: "100%", // Fills the container height
-          }}>
-         
+        <TableContainer
+          component={Paper}
+          sx={{
+            display: "center",
+            justifyContent: "center", // Center horizontally
+            alignItems: "center", // Center vertically
+            height: "80%", // Full viewport height
+            border: "none",
+            boxShadow: 0,
+          }}
+        >
+          <Table
+            aria-label="User List Table"
+            sx={{
+              width: "100%", // Fills the container width
+              height: "100%", // Fills the container height
+            }}
+          >
             <TableBody>
               {(usersPerPage > 0
                 ? filteredUsers.slice(
-                    
-                  page * usersPerPage,
-                   
-                  page * usersPerPage + usersPerPage,
-                  
-                )
+                    page * usersPerPage,
+
+                    page * usersPerPage + usersPerPage,
+                  )
                 : filteredUsers
               ).map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
                     <Avatar src={placeholderImage} alt={user.firstName} />
                   </TableCell>
-                  <TableCell align = "left"> 
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <Typography variant = "bodyLarge">{user.firstName} {user.lastName}</Typography> 
-                    <Typography variant ="bodySmall" color="textSecondary">{user.email}</Typography> 
-                  </Box>
+                  <TableCell align="left">
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <Typography variant="bodyLarge">
+                        {user.firstName} {user.lastName}
+                      </Typography>
+                      <Typography variant="bodySmall" color="textSecondary">
+                        {user.email}
+                      </Typography>
+                    </Box>
                   </TableCell>
-                  <TableCell sx={{ textAlign: "right", paddingRight: "16px", width: "18%" }}>
+                  <TableCell
+                    sx={{
+                      textAlign: "right",
+                      paddingRight: "16px",
+                      width: "18%",
+                    }}
+                  >
                     <Typography
+                      variant="labelMedium"
                       sx={{
                         display: "inline-block",
-                        backgroundColor: roleBackground[role],
-                        color: roleColors[role],
-                        padding: "4px 8px",
-                        borderRadius: "3px",
-                        fontSize: "14px",
-                        fontWeight: 500,
+                        backgroundColor: theme.palette[user.role].Light,
+                        color: theme.palette[user.role].Default,
                       }}
                     >
-                      {role.toUpperCase()}
+                      {user.role.toUpperCase()}
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ textAlign: "right", paddingRight: "16px", width: "18%" }}>
+                  <TableCell
+                    sx={{
+                      textAlign: "right",
+                      paddingRight: "0px",
+                      width: "18%",
+                    }}
+                  >
                     <Button
-                    variant="outlined"
-                    startIcon={<Delete />}
-                      
+                      variant="outlined"
+                      startIcon={<Delete />}
                       sx={{
                         height: "40px", // Match button height
-                        padding: "4px 16px", 
-                        borderRadius: "4px", 
+                        padding: "4px 16px",
+                        borderRadius: "4px",
                         borderColor: "#6F797B", // grey outline
-                        color: theme.palette.Error.Default, }}
-                        onClick={() => handleOpenDeleteUserModal(user.id)}
-                  >
-                     <Typography variant = "labelLarge">
-                       DELETE USER</Typography>
+                        color: theme.palette.Error.Default,
+                      }}
+                      onClick={() => handleOpenDeleteUserModal(user.id)}
+                    >
+                      <Typography variant="labelLarge">DELETE USER</Typography>
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -733,6 +745,5 @@ const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
     </Box>
   );
 };
-
 
 export default ManageUser;
