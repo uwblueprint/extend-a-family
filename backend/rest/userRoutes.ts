@@ -6,6 +6,7 @@ import {
   updateUserDtoValidator,
   uploadProfilePictureValidator,
 } from "../middlewares/validators/userValidators";
+import UserModel from "../models/user.mgmodel";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
 import CoursePageService from "../services/implementations/coursePageService";
@@ -16,6 +17,7 @@ import IAuthService from "../services/interfaces/authService";
 import ICoursePageService from "../services/interfaces/coursePageService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
+import { CoursePageDTO } from "../types/courseTypes";
 import {
   BookmarkDTO,
   UpdateUserDTO,
@@ -81,17 +83,24 @@ userRouter.post(
         accessToken!,
       );
 
-      const user = await userService.getUserById(userId.toString())
-      const page = await coursePageService.getCoursePage(pageId)
+      const user: UserDTO = await userService.getUserById(userId.toString());
+      const page: CoursePageDTO = await coursePageService.getCoursePage(pageId);
+
       const bookmark: BookmarkDTO = {
         ...page,
         unitId,
         moduleId,
         pageId,
-      }
+      };
+
+      await UserModel.findByIdAndUpdate(
+        userId,
+        { $push: { bookmarks: user.bookmarks.push(bookmark) } },
+        { runValidators: true },
+      );
 
     } catch(error: any) {
-
+      res.status(500).json({ error: getErrorMessage(error) });
     }
 
   }
