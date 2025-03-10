@@ -22,12 +22,12 @@ const ManageUserPage = (): React.ReactElement => {
   const [openAddAdminModal, setOpenAddAdminModal] = useState(false);
   const [openDeleteUserModal, setOpenDeleteUserModal] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState("");
-  
+
   // States for admin modal inputs
-  const [firstName, setFirstName] = useState("");// eslint-disable-line @typescript-eslint/no-unused-vars
-  const [lastName, setLastName] = useState("");// eslint-disable-line @typescript-eslint/no-unused-vars
-  const [email, setEmail] = useState("");// eslint-disable-line @typescript-eslint/no-unused-vars
-  
+  const [firstName, setFirstName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [lastName, setLastName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [email, setEmail] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
+
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const theme = useTheme();
 
@@ -57,24 +57,20 @@ const ManageUserPage = (): React.ReactElement => {
       (user.firstName || "")
         .toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
-      (user.lastName || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      (user.email || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
+      (user.lastName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.email || "").toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Pagination handlers
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setUsersPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -110,10 +106,10 @@ const ManageUserPage = (): React.ReactElement => {
   const handleCloseDeleteUserModal = () => setOpenDeleteUserModal(false);
 
   // TODO: Implement these actions as needed
-  const handleDeleteUser = (userId: string) => {// eslint-disable-line @typescript-eslint/no-unused-vars
+  const handleDeleteUser = (userId: string) => {
+    // eslint-disable-line @typescript-eslint/no-unused-vars
   };
-  const handleAddAdmin = async () => {
-  };
+  const handleAddAdmin = async () => {};
 
   // Define role colors from theme
   const roleBackground: Record<string, string> = {

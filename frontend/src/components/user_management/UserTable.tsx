@@ -25,10 +25,10 @@ interface UserTableProps {
   emptyRows: number;
   handleChangePage: (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => void;
   handleChangeRowsPerPage: (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
   handleOpenDeleteUserModal: (userId: string) => void;
 }
@@ -42,7 +42,7 @@ const UserTable: React.FC<UserTableProps> = ({
   handleChangeRowsPerPage,
   handleOpenDeleteUserModal,
 }) => {
-    const theme = useTheme();
+  const theme = useTheme();
   return (
     <TableContainer
       component={Paper}
@@ -55,12 +55,15 @@ const UserTable: React.FC<UserTableProps> = ({
         boxShadow: 0,
       }}
     >
-      <Table aria-label="User List Table" sx={{ width: "100%", height: "100%" }}>
+      <Table
+        aria-label="User List Table"
+        sx={{ width: "100%", height: "100%" }}
+      >
         <TableBody>
           {(usersPerPage > 0
             ? filteredUsers.slice(
                 page * usersPerPage,
-                page * usersPerPage + usersPerPage
+                page * usersPerPage + usersPerPage,
               )
             : filteredUsers
           ).map((user) => (

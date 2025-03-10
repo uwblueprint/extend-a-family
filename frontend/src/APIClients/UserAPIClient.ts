@@ -35,5 +35,6 @@ const getUsers = async (): Promise<User[]> => {
 };
 
 export default {
-  getUsersByRole, getUsers,
+  getUsersByRole,
+  getUsers,
 };
