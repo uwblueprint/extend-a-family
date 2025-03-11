@@ -256,7 +256,6 @@ userRouter.put(
       const updatedUser = await userService.updateUserById(req.params.userId, {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        email: req.body.email,
         role: req.body.role,
         status: "Active",
       });
@@ -413,7 +412,6 @@ userRouter.put(
       const updateLearnerPayload: UpdateUserDTO = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        email: req.body.email,
         role: req.body.role,
         status: "Active",
       };

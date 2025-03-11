@@ -1,11 +1,14 @@
 import { Role } from "./AuthTypes";
 
+export type Status = "Invited" | "Active";
+
 export type BaseUser = {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   role: Role;
+  status: Status;
 };
 
 export type Administrator = BaseUser;

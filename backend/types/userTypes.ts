@@ -31,7 +31,7 @@ export type CreateUserDTO = Omit<UserDTO, "id" | "bookmarks"> & {
   password: string;
 };
 
-export type UpdateUserDTO = Omit<UserDTO, "id" | "bookmarks">;
+export type UpdateUserDTO = Omit<UserDTO, "id" | "email" | "bookmarks">;
 
 export type SignupUserDTO = Omit<CreateUserDTO, "role">;
 

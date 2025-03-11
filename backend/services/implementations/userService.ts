@@ -221,42 +221,19 @@ class UserService implements IUserService {
 
     try {
       // must explicitly specify runValidators when updating through findByIdAndUpdate
-      oldUser = await MgUser.findByIdAndUpdate(userId, user, {
-        runValidators: true,
-      });
+      oldUser = await MgUser.findByIdAndUpdate(
+        userId,
+        {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          status: user.status,
+        },
+        { runValidators: true },
+      );
 
       if (!oldUser) {
         throw new Error(`userId ${userId} not found.`);
-      }
-
-      try {
-        await firebaseAdmin
-          .auth()
-          .updateUser(oldUser.authId, { email: user.email });
-      } catch (error) {
-        // rollback MongoDB user updates
-        try {
-          await MgUser.findByIdAndUpdate(
-            userId,
-            {
-              firstName: oldUser.firstName,
-              lastName: oldUser.lastName,
-              role: oldUser.role,
-              status: oldUser.status,
-            },
-            { runValidators: true },
-          );
-        } catch (mongoDbError: unknown) {
-          const errorMessage = [
-            "Failed to rollback MongoDB user update after Firebase user update failure. Reason =",
-            getErrorMessage(mongoDbError),
-            "MongoDB user id with possibly inconsistent data =",
-            oldUser.id,
-          ];
-          Logger.error(errorMessage.join(" "));
-        }
-
-        throw error;
       }
     } catch (error: unknown) {
       Logger.error(`Failed to update user. Reason = ${getErrorMessage(error)}`);
@@ -267,7 +244,6 @@ class UserService implements IUserService {
       ...oldUser.toObject(),
       firstName: user.firstName,
       lastName: user.lastName,
-      email: user.email,
       role: user.role,
       status: user.status,
     };
