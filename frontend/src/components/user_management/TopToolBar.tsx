@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  TextField,
-  InputAdornment,
-  Box,
-  Menu,
-  MenuItem,
-  Typography,
-  Button,
-  Stack,
-} from "@mui/material";
+import { Box, Menu, MenuItem, Typography, Button, Stack } from "@mui/material";
 import { Search, FilterList, ArrowDropDown, Add } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
@@ -21,6 +12,9 @@ interface TopToolBarProps {
   handleSearchBlur: () => void;
   filterLabel: string;
   handleFilterClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+  isFilterActive: boolean;
+  handleFilterFocus: () => void;
+  handleFilterBlur: () => void;
   filterAnchor: HTMLElement | null;
   handleFilterClose: () => void;
   handleRoleSelect: (role: string) => void;
@@ -37,6 +31,9 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
   handleSearchBlur,
   filterLabel,
   handleFilterClick,
+  isFilterActive,
+  handleFilterFocus,
+  handleFilterBlur,
   filterAnchor,
   handleFilterClose,
   handleRoleSelect,
@@ -95,57 +92,42 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
             },
           }}
         />
-        <TextField
+        <StartAdornedTextField
           variant="outlined"
-          placeholder="Filter"
+          label="Filter"
           value={filterLabel}
           onClick={handleFilterClick}
-          InputProps={{
-            style: {
-              fontSize: "14px",
-              fontWeight: 300,
-              lineHeight: "120%",
-              letterSpacing: "0.7px",
-              textTransform: "uppercase",
-            },
-            startAdornment: (
-              <InputAdornment position="start">
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    handleFilterClick(event);
-                  }}
-                >
-                  <FilterList sx={{ color: "#6f797b" }} />
-                </Box>
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <ArrowDropDown sx={{ color: "#6F797B" }} />
-              </InputAdornment>
-            ),
-          }}
+          onFocus={handleFilterFocus}
+          onBlur={handleFilterBlur}
+          adornment={
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleFilterClick(event);
+              }}
+            >
+              <FilterList sx={{ color: "#6f797b" }} />
+            </Box>
+          }
+          focusedBorderColor={theme.palette.Learner.Default}
+          adornmentEnd={<ArrowDropDown sx={{ color: "#6F797B" }} />}
           sx={{
             textTransform: "uppercase",
             textAlign: "left",
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
-                borderColor: isSearchActive
+                borderColor: isFilterActive
                   ? theme.palette.Learner.Default
                   : theme.palette.Neutral[500],
               },
               "&:hover fieldset": {
                 borderColor: theme.palette.Neutral[600],
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: theme.palette.Learner.Default,
               },
             },
           }}

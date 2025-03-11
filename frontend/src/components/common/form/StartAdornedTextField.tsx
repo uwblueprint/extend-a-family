@@ -3,7 +3,9 @@ import React, { useState } from "react";
 import { InputAdornment, TextField, TextFieldProps } from "@mui/material";
 
 type StartAdornedTextFieldProps = TextFieldProps & {
+  adornmentStyle?: React.CSSProperties;
   adornment: JSX.Element;
+  adornmentEnd?: JSX.Element;
   focusedBorderColor?: string;
 };
 
@@ -14,7 +16,9 @@ type StartAdornedTextFieldProps = TextFieldProps & {
  * @param focusedBorderColor (optional) color of border and label when text field is focused
  */
 const StartAdornedTextField: React.FC<StartAdornedTextFieldProps> = ({
+  adornmentStyle,
   adornment,
+  adornmentEnd,
   focusedBorderColor,
   onFocus,
   onBlur,
@@ -43,9 +47,13 @@ const StartAdornedTextField: React.FC<StartAdornedTextFieldProps> = ({
         },
         input: {
           ...slotProps?.input,
+          style: adornmentStyle || undefined,
           startAdornment: (
             <InputAdornment position="start">{adornment}</InputAdornment>
           ),
+          endAdornment: adornmentEnd ? (
+            <InputAdornment position="end">{adornmentEnd}</InputAdornment>
+          ) : null,
         },
       }}
       sx={{

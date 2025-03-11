@@ -54,13 +54,13 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
           },
         }}
       >
-        <IconButton
-          onClick={onClose}
-          sx={{ position: "absolute", top: 2, right: 2 }}
-        >
-          <CloseIcon sx={{ color: "black" }} />
-        </IconButton>
         <Box sx={{ position: "relative", width: "100%" }}>
+          <IconButton
+            onClick={onClose}
+            sx={{ position: "absolute", top: 8, right: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
           <DialogTitle sx={{ margin: 0, padding: 0, marginBottom: "12px" }}>
             <Typography
               variant="headlineMedium"
@@ -181,7 +181,6 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
               "&:hover": { bgcolor: theme.palette.Administrator.Default },
             }}
             onClick={handleAddAdmin}
-            disableElevation
           >
             <Typography variant="labelLarge">ADD ADMIN</Typography>
           </Button>

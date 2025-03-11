@@ -19,6 +19,7 @@ const ManageUserPage = (): React.ReactElement => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterAnchor, setFilterAnchor] = useState<null | HTMLElement>(null);
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [isFilterActive, setIsFilterActive] = useState(false);
   const [openAddAdminModal, setOpenAddAdminModal] = useState(false);
   const [openDeleteUserModal, setOpenDeleteUserModal] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState("");
@@ -83,6 +84,9 @@ const ManageUserPage = (): React.ReactElement => {
   const handleFilterClose = () => {
     setFilterAnchor(null);
   };
+
+  const handleFilterFocus = () => setIsFilterActive(true);
+  const handleFilterBlur = () => setIsFilterActive(false);
   const handleRoleSelect = (role_curr: string) => {
     if (role_curr === "All") {
       setUsers(userData);
@@ -148,6 +152,9 @@ const ManageUserPage = (): React.ReactElement => {
           handleSearchBlur={handleSearchBlur}
           filterLabel={filterLabel}
           handleFilterClick={handleFilterClick}
+          isFilterActive={isFilterActive}
+          handleFilterFocus={handleFilterFocus}
+          handleFilterBlur={handleFilterBlur}
           filterAnchor={filterAnchor}
           handleFilterClose={handleFilterClose}
           handleRoleSelect={handleRoleSelect}
