@@ -106,8 +106,8 @@ const ManageUserPage = (): React.ReactElement => {
   const handleCloseDeleteUserModal = () => setOpenDeleteUserModal(false);
 
   // TODO: Implement these actions as needed
-  const handleDeleteUser = (userId: string) => {
-    // eslint-disable-line @typescript-eslint/no-unused-vars
+  const handleDeleteUser = () => {
+    // userId: string
   };
   const handleAddAdmin = async () => {};
 

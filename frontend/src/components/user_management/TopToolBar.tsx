@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Search, FilterList, ArrowDropDown, Add } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+import StartAdornedTextField from "../common/form/StartAdornedTextField";
 
 interface TopToolBarProps {
   searchQuery: string;
@@ -62,26 +63,23 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
       </Stack>
       {/* Controls Section */}
       <Stack direction="row" spacing={1} alignItems="center">
-        <TextField
+        <StartAdornedTextField
           variant="outlined"
-          placeholder="Search by name..."
+          label="Search by name"
           value={searchQuery}
           onChange={handleSearch}
           onFocus={handleSearchFocus}
           onBlur={handleSearchBlur}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search
-                  sx={{
-                    color: isSearchActive
-                      ? theme.palette.Neutral[600]
-                      : theme.palette.Neutral[500],
-                  }}
-                />
-              </InputAdornment>
-            ),
-          }}
+          adornment={
+            <Search
+              sx={{
+                color: isSearchActive
+                  ? theme.palette.Neutral[600]
+                  : theme.palette.Neutral[500],
+              }}
+            />
+          }
+          focusedBorderColor={theme.palette.Learner.Default}
           sx={{
             minWidth: "400px",
             borderRadius: "8px",
@@ -93,9 +91,6 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
               },
               "&:hover fieldset": {
                 borderColor: theme.palette.Neutral[600],
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: theme.palette.Learner.Default,
               },
             },
           }}
