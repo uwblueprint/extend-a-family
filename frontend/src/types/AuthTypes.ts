@@ -1,3 +1,5 @@
+import { AuthErrorCodes } from "../errors/AuthErrors";
+
 export type Role = "Administrator" | "Facilitator" | "Learner";
 
 export type Status = "Active" | "Invited";
@@ -42,3 +44,8 @@ export function isAuthenticatedLearner(
 ): user is AuthenticatedLearner {
   return user.role === "Learner";
 }
+
+export type AuthError = {
+  error: AuthErrorCodes;
+  errorData?: [Role, Role];
+};

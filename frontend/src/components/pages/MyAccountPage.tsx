@@ -1,13 +1,113 @@
-import React from "react";
-import { Container, Typography, Avatar, Box, Button } from "@mui/material";
-import CachedIcon from '@mui/icons-material/Cached';
-import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
-import { isAuthenticatedFacilitator, isAuthenticatedLearner } from "../../types/AuthTypes";
+import React, { useState, useContext } from "react";
+import {
+  Container,
+  Typography,
+  Button,
+  useTheme,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import PasswordIcon from "@mui/icons-material/Password";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { useUser } from "../../hooks/useUser";
 import MainPageButton from "../common/MainPageButton";
+import ProfilePicture from "../profile/ProfileButton";
+import EditDetailsModal from "../profile/EditDetailsModal";
+import ChangePasswordModal from "../profile/ChangePasswordModal";
+import AuthContext from "../../contexts/AuthContext";
 
 const MyAccount = (): React.ReactElement => {
-  const authenticatedUser = useUser();
+  const userFromHook = useUser(); // Get the user object from the useUser hook
+  const [user, setUser] = useState(userFromHook); // Create a local state for user
+  const theme = useTheme();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+  const { setAuthenticatedUser, authenticatedUser } = useContext(AuthContext);
+
+  const handleSaveDetails = async (firstName: string, lastName: string) => {
+    try {
+      if (!user || !user.id) {
+        throw new Error("User information is not available.");
+      }
+
+      // Prepare the payload for the update
+      const updatePayload = {
+        firstName,
+        lastName,
+        email: user.email, // Keep the email unchanged
+        role: user.role,   // Keep the role unchanged
+        status: "Active",  // Keep the status unchanged
+      };
+
+      // Call the PUT endpoint directly using fetch
+      const response = await fetch(`/users/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Add authorization token if needed
+        },
+        body: JSON.stringify(updatePayload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update user details.");
+      }
+
+      const updatedUser = await response.json();
+
+      // Update the user object in the component state
+      setUser({
+        ...user,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+      });
+
+      // Update the authenticated user in context to reflect changes
+      if (authenticatedUser && user.id === authenticatedUser.id) {
+        setAuthenticatedUser({
+          ...authenticatedUser,
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+        });
+      }
+
+      // Show success message
+      setSnackbarMessage("Details updated successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+
+      // Close the modal
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error updating user details:", error);
+      setSnackbarMessage("Failed to update details. Please try again.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleSavePassword = async () => {
+    try {
+      // Call the API to update the password
+
+      // Show success message
+      setSnackbarMessage("Password updated successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error updating password:", error);
+      setSnackbarMessage("Failed to update password. Please try again.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
 
   return (
     <>
@@ -16,14 +116,14 @@ const MyAccount = (): React.ReactElement => {
         maxWidth={false}
         sx={{
           display: "flex",
-          padding: "48px", // This padding is customizable and can be adjusted
+          padding: "48px",
           flexDirection: "column",
           alignItems: "center",
           gap: "48px",
           flex: "1 0 0",
           alignSelf: "stretch",
           background: "#F8F9FA",
-          height: "92vh", // Ensures the container takes full height of the screen
+          height: "92vh",
         }}
       >
         <MainPageButton />
@@ -56,7 +156,7 @@ const MyAccount = (): React.ReactElement => {
                 fontSize: "28px",
                 fontStyle: "normal",
                 fontWeight: "600",
-                lineHeight: "120%", /* 33.6px */
+                lineHeight: "120%",
               }}
             >
               Your Account
@@ -69,42 +169,16 @@ const MyAccount = (): React.ReactElement => {
                 fontSize: "16px",
                 fontStyle: "normal",
                 fontWeight: 400,
-                lineHeight: "140%", // 22.4px
+                lineHeight: "140%",
                 letterSpacing: "0.2px",
               }}
             >
               View and edit your details
             </Typography>
           </Container>
-          <Box
-            sx={{
-              display: "flex",
-              width: "160px",
-              height: "160px",
-              padding: "26.667px",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "66.667px",
-              borderRadius: "5000px",
-              background: "#D5F7FF",
-            }}
-          >
-            <Avatar sx={{ width: "100%", height: "100%", bgcolor: "#D5F7FF" }}>
-              <Typography
-                sx={{
-                  color: "var(--Schemes-Primary, #006877)",
-                  fontFamily: "Lexend Deca",
-                  fontSize: "60px",
-                  fontStyle: "normal",
-                  fontWeight: 400,
-                  lineHeight: "140%", // 84px
-                  letterSpacing: "-3px",
-                }}
-              >
-                {`${authenticatedUser.firstName?.charAt(0)}${authenticatedUser.lastName?.charAt(0)}`}
-              </Typography>
-            </Avatar>
-          </Box>
+
+          <ProfilePicture firstName={user.firstName} lastName={user.lastName} />
+
           <Container
             sx={{
               display: "flex",
@@ -170,11 +244,11 @@ const MyAccount = (): React.ReactElement => {
                     fontSize: "16px",
                     fontStyle: "normal",
                     fontWeight: 400,
-                    lineHeight: "140%", // 22.4px
+                    lineHeight: "140%",
                     letterSpacing: "0.2px",
                   }}
                 >
-                  {authenticatedUser.firstName}
+                  {user.firstName}
                 </Typography>
               </Container>
               <Container
@@ -210,11 +284,11 @@ const MyAccount = (): React.ReactElement => {
                     fontSize: "16px",
                     fontStyle: "normal",
                     fontWeight: 400,
-                    lineHeight: "140%", // 22.4px
+                    lineHeight: "140%",
                     letterSpacing: "0.2px",
                   }}
                 >
-                  {authenticatedUser.lastName}
+                  {user.lastName}
                 </Typography>
               </Container>
               <Container
@@ -225,7 +299,6 @@ const MyAccount = (): React.ReactElement => {
                   gap: "8px",
                 }}
               >
-
                 <Typography
                   sx={{
                     color: "var(--Schemes-Outline, #6F797B)",
@@ -251,11 +324,11 @@ const MyAccount = (): React.ReactElement => {
                     fontSize: "16px",
                     fontStyle: "normal",
                     fontWeight: 400,
-                    lineHeight: "140%", // 22.4px
+                    lineHeight: "140%",
                     letterSpacing: "0.2px",
                   }}
                 >
-                  {authenticatedUser.email}
+                  {user.email}
                 </Typography>
               </Container>
             </Container>
@@ -270,6 +343,7 @@ const MyAccount = (): React.ReactElement => {
               }}
             >
               <Button
+                onClick={() => setIsEditModalOpen(true)}
                 sx={{
                   display: "flex",
                   height: "40px",
@@ -279,21 +353,25 @@ const MyAccount = (): React.ReactElement => {
                   gap: "8px",
                   alignSelf: "stretch",
                   borderRadius: "4px",
-                  background: "var(--M3-sys-light-primary, #006877)",
+                  backgroundColor: theme.palette[`${user.role}`].Default,
+                  "&:hover": {
+                    background: theme.palette[`${user.role}`].Pressed,
+                  },
                   padding: "10px 24px 10px 16px",
                   flex: "1 0 0",
-                }}
-              ><Container
-                sx={{
-                  display: "flex",
-                  padding: "10px 24px 10px 16px",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "8px",
-                  flex: "1 0 0",
-                  alignSelf: "stretch",
                 }}
               >
+                <Container
+                  sx={{
+                    display: "flex",
+                    padding: "10px 24px 10px 16px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "8px",
+                    flex: "1 0 0",
+                    alignSelf: "stretch",
+                  }}
+                >
                   <ModeEditOutlineOutlinedIcon sx={{ color: "#FFFFFF" }} />
                   <Typography
                     sx={{
@@ -313,6 +391,7 @@ const MyAccount = (): React.ReactElement => {
                 </Container>
               </Button>
               <Button
+                onClick={() => setIsChangePasswordModalOpen(true)}
                 sx={{
                   display: "flex",
                   height: "40px",
@@ -322,22 +401,26 @@ const MyAccount = (): React.ReactElement => {
                   gap: "8px",
                   alignSelf: "stretch",
                   borderRadius: "4px",
-                  background: "var(--Error-Light, #FFF2F0);",
+                  backgroundColor: theme.palette.Error.Light,
+                  "&:hover": {
+                    background: theme.palette.Error.Hover,
+                  },
                   padding: "10px 24px 10px 16px",
                   flex: "1 0 0",
-                }}
-              ><Container
-                sx={{
-                  display: "flex",
-                  padding: "10px 24px 10px 16px",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "8px",
-                  flex: "1 0 0",
-                  alignSelf: "stretch",
                 }}
               >
-                  <CachedIcon sx={{ color: "#BA1A1A" }} />
+                <Container
+                  sx={{
+                    display: "flex",
+                    padding: "10px 24px 10px 16px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "8px",
+                    flex: "1 0 0",
+                    alignSelf: "stretch",
+                  }}
+                >
+                  <PasswordIcon sx={{ color: "#BA1A1A" }} />
                   <Typography
                     sx={{
                       color: "var(--Error-Default, #BA1A1A)",
@@ -351,20 +434,39 @@ const MyAccount = (): React.ReactElement => {
                       textTransform: "uppercase",
                     }}
                   >
-                    Reset Password
+                    Change Password
                   </Typography>
                 </Container>
               </Button>
             </Container>
           </Container>
-          {isAuthenticatedFacilitator(authenticatedUser) && (
-            <Typography variant="body1">Learners: {authenticatedUser.learners}</Typography>
-          )}
-          {isAuthenticatedLearner(authenticatedUser) && (
-            <Typography variant="body1">Facilitator: {authenticatedUser.facilitator}</Typography>
-          )}
         </Container>
       </Container>
+      <EditDetailsModal
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        firstName={user.firstName}
+        lastName={user.lastName}
+        onSave={handleSaveDetails}
+      />
+      <ChangePasswordModal
+        open={isChangePasswordModalOpen}
+        onClose={() => setIsChangePasswordModalOpen(false)}
+        onSave={handleSavePassword}
+      />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

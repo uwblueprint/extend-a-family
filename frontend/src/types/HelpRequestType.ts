@@ -17,7 +17,6 @@ export interface HelpRequest {
   };
   page: {
     id: string;
-    displayIndex: number;
     title: string;
   };
   completed: boolean;

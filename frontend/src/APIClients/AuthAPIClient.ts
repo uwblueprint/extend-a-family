@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
-import { AuthenticatedUser, Role, Status } from "../types/AuthTypes";
+import { AuthenticatedUser, AuthError, Role, Status } from "../types/AuthTypes";
 import baseAPIClient from "./BaseAPIClient";
 import {
   getLocalStorageObjProperty,
@@ -21,7 +21,9 @@ const login = async (
     return data;
   } catch (error) {
     if (error instanceof AxiosError) {
-      throw new Error(error.response?.data.error);
+      throw new Error(error.response?.data.error, {
+        cause: error.response?.data as AuthError,
+      });
     }
     return null;
   }

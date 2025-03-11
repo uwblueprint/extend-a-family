@@ -23,7 +23,7 @@ import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import { getErrorMessage } from "../utilities/errorUtils";
-import { AuthErrorCodes } from "../types/authTypes";
+import { AuthError, AuthErrorCodes } from "../types/authTypes";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -73,14 +73,16 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
       (message === AuthErrorCodes.EMAIL_NOT_FOUND ||
         message === AuthErrorCodes.INCORRECT_PASSWORD)
     ) {
-      res.status(500).json({ error: AuthErrorCodes.INVALID_LOGIN_CREDENTIALS });
+      res
+        .status(500)
+        .json({ error: AuthErrorCodes.INVALID_LOGIN_CREDENTIALS } as AuthError);
     } else if (message === AuthErrorCodes.WRONG_USER_TYPE) {
       res.status(500).json({
         error: message,
         errorData: [requestedRole, correctRole],
-      });
+      } as AuthError);
     } else {
-      res.status(500).json({ error: message });
+      res.status(500).json({ error: message } as AuthError);
     }
   }
 });

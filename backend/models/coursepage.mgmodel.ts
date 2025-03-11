@@ -1,13 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
-
-export type ElementSkeleton = {
-  id: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  content: string;
-};
+import { ObjectId } from "mongodb";
+import { ElementSkeleton, PageType } from "../types/courseTypes";
 
 const ElementSkeletonSchema: Schema = new Schema({
   x: {
@@ -27,22 +20,21 @@ const ElementSkeletonSchema: Schema = new Schema({
     required: true,
   },
   content: {
-    type: String,
+    type: ObjectId,
     required: true,
+    ref: "CourseElement",
   },
 });
-
-export type PageType = "Lesson" | "Activity";
 
 export interface CoursePage extends Document {
   id: string;
   title: string;
-  displayIndex: number;
   type: PageType;
 }
 
 export interface LessonPage extends CoursePage {
   source: string;
+  pageIndex: number;
 }
 
 export interface ActivityPage extends CoursePage {
@@ -59,10 +51,6 @@ export const CoursePageSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    displayIndex: {
-      type: Number,
-      required: true,
-    },
     type: {
       type: String,
       required: true,
@@ -75,6 +63,10 @@ export const CoursePageSchema: Schema = new Schema(
 const LessonPageSchema: Schema = new Schema({
   source: {
     type: String,
+    required: true,
+  },
+  pageIndex: {
+    type: Number,
     required: true,
   },
 });
