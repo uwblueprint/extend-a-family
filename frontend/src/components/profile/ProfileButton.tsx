@@ -6,7 +6,10 @@ interface ProfilePictureProps {
   lastName?: string;
 }
 
-const ProfilePicture = ({ firstName = "", lastName = "" }: ProfilePictureProps): React.ReactElement => {
+const ProfilePicture = ({
+  firstName = "",
+  lastName = "",
+}: ProfilePictureProps): React.ReactElement => {
   return (
     <Box
       sx={{

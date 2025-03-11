@@ -40,10 +40,8 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
   }, [open, firstName, lastName]);
 
   const handleSave = () => {
-    // Add validation
     if (!editedFirstName.trim() || !editedLastName.trim()) {
-      // You could show an error message here
-      return;
+      return; // Add error handling if needed
     }
     onSave(editedFirstName, editedLastName);
   };
@@ -163,7 +161,7 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
           <Typography
             variant="labelLarge"
             sx={{
-              color: theme.palette[`${user.role}`].Default,
+              color: theme.palette[user.role].Default,
             }}
           >
             Cancel
@@ -179,14 +177,19 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
             alignItems: "center",
             gap: "8px",
             borderRadius: "4px",
-            backgroundColor: theme.palette[`${user.role}`].Default,
+            backgroundColor: theme.palette[user.role].Default,
             "&:hover": {
-              background: theme.palette[`${user.role}`].Pressed,
+              background: theme.palette[user.role].Pressed,
             },
             padding: "10px 24px",
           }}
         >
-          <Typography variant="labelLarge" sx={{ color: theme.palette.Neutral[100] }}>
+          <Typography
+            variant="labelLarge"
+            sx={{
+              color: theme.palette.Neutral[100],
+            }}
+          >
             Save Details
           </Typography>
         </Button>

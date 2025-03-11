@@ -1,10 +1,12 @@
 import React from "react";
 import { Typography } from "@mui/material";
-import { isAuthenticatedFacilitator, isAuthenticatedLearner } from "../../types/AuthTypes";
+import {
+  isAuthenticatedFacilitator,
+  isAuthenticatedLearner,
+} from "../../types/AuthTypes";
 import { useUser } from "../../hooks/useUser";
 
 const LearnerList = (): React.ReactElement => {
-
   const user = useUser();
 
   return (
