@@ -108,6 +108,36 @@ const updateTemporaryPassword = async (
   }
 };
 
+const changePassword = async (
+  email: string,
+  newPassword: string,
+  role: Role,
+): Promise<boolean> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    await baseAPIClient.put(
+      `/auth/changePassword`,
+      { newPassword },
+      { headers: { Authorization: bearerToken } },
+    );
+    const newAuthenticatedUser = await login(email, newPassword, role);
+    if (!newAuthenticatedUser) {
+      throw new Error("Unable to authenticate user after logging in.");
+    }
+    setLocalStorageObjProperty(
+      AUTHENTICATED_USER_KEY,
+      "accessToken",
+      newAuthenticatedUser.accessToken,
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
 const updateUserStatus = async (newStatus: Status): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -168,6 +198,7 @@ export default {
   signup,
   resetPassword,
   updateTemporaryPassword,
+  changePassword,
   updateUserStatus,
   refresh,
   isUserVerified,
