@@ -190,6 +190,7 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
             },
           }}
           onClick={handleOpenAddAdminModal}
+          disableElevation
         >
           <Typography variant="labelLarge" color={theme.palette.Neutral[100]}>
             ADD NEW ADMIN
