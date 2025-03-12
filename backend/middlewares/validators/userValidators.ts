@@ -1,5 +1,40 @@
 import { Request, Response, NextFunction } from "express";
-import { getApiValidationError, validatePrimitive } from "./util";
+import {
+  getApiValidationError,
+  validatePrimitive,
+  validateFileType,
+  getFileTypeValidationError,
+} from "./util";
+
+export const uploadProfilePictureValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.params.userId, "string")) {
+    return res.status(400).send(getApiValidationError("userId", "string"));
+  }
+
+  if (!req.file) {
+    return res.status(400).send("File has not been uploaded");
+  }
+
+  if (!req.file.buffer) {
+    return res.status(400).send("File missing buffer field");
+  }
+
+  if (!req.file.mimetype) {
+    return res.status(400).send("File is missing mimetype field");
+  }
+
+  if (!validateFileType(req.file.mimetype)) {
+    return res
+      .status(400)
+      .send(getFileTypeValidationError(req.body.file.mimetype));
+  }
+
+  return next();
+};
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export const createUserDtoValidator = async (

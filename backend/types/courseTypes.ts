@@ -13,7 +13,8 @@ export type CourseModuleDTO = {
   displayIndex: number;
   title: string;
   imageURL?: string;
-  pages: string[];
+  pages: CoursePageDTO[];
+  lessonPdfUrl?: string;
 };
 
 export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;

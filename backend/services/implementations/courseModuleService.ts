@@ -1,22 +1,29 @@
 /* eslint-disable class-methods-use-this */
-import { startSession } from "mongoose";
 import fs from "fs/promises";
+import { Schema, startSession } from "mongoose";
 import { PDFDocument } from "pdf-lib";
+import MgCourseModule, {
+  CourseModule,
+} from "../../models/coursemodule.mgmodel";
+import CoursePageModel, {
+  LessonPageModel,
+} from "../../models/coursepage.mgmodel";
+import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import {
   CourseModuleDTO,
   CreateCourseModuleDTO,
   UpdateCourseModuleDTO,
 } from "../../types/courseTypes";
-import logger from "../../utilities/logger";
-import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import { getErrorMessage } from "../../utilities/errorUtils";
-import MgCourseModule, {
-  CourseModule,
-} from "../../models/coursemodule.mgmodel";
+import logger from "../../utilities/logger";
 import ICourseModuleService from "../interfaces/courseModuleService";
+import IFileStorageService from "../interfaces/fileStorageService";
 import FileStorageService from "./fileStorageService";
-import { LessonPageModel } from "../../models/coursepage.mgmodel";
 
+const defaultBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
+const fileStorageService: IFileStorageService = new FileStorageService(
+  defaultBucket,
+);
 const Logger = logger(__filename);
 
 class CourseModuleService implements ICourseModuleService {
@@ -55,20 +62,37 @@ class CourseModuleService implements ICourseModuleService {
     }
   }
 
-  async getCourseModule(courseModuleId: string): Promise<CourseModuleDTO> {
+  async getCourseModule(
+    courseModuleId: string,
+  ): Promise<CourseModuleDTO | null> {
     try {
       const courseModule: CourseModule | null = await MgCourseModule.findById(
         courseModuleId,
-      );
-
+      )
+        .lean()
+        .exec();
       if (!courseModule) {
         throw new Error(`Course module with id ${courseModuleId} not found.`);
       }
-
-      return courseModule.toObject();
+      const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
+        `course/pdfs/module-${courseModuleId}.pdf`,
+      );
+      const fetchPage = async (page: Schema.Types.ObjectId) => {
+        const pageObject = await CoursePageModel.findById(page).lean().exec();
+        if (!pageObject) {
+          throw new Error(`Page with id ${page} not found.`);
+        }
+        return pageObject;
+      };
+      const pageObjects = Promise.all(courseModule.pages.map(fetchPage));
+      return {
+        ...courseModule,
+        lessonPdfUrl,
+        pages: await pageObjects,
+      };
     } catch (error) {
       Logger.error(
-        `Failed to get course module with id ${courseModuleId}. Reason = ${getErrorMessage(
+        `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
           error,
         )}`,
       );
