@@ -1,4 +1,5 @@
 import { Router } from "express";
+import mongoose from "mongoose";
 import multer from "multer";
 import { getAccessToken, isAuthorizedByRole } from "../middlewares/auth";
 import {
@@ -19,11 +20,10 @@ import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import { CoursePageDTO } from "../types/courseTypes";
 import {
-  BookmarkDTO,
   UpdateUserDTO,
   UserDTO,
   isFacilitator,
-  isRole,
+  isRole
 } from "../types/userTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
 import { sendResponseByMimeType } from "../utilities/responseUtil";
@@ -77,6 +77,50 @@ userRouter.post(
   async(req,res) => {
     const { unitId, moduleId, pageId} = req.body;
     const accessToken = getAccessToken(req);
+    try {
+      const userId = await authService.getUserIdFromAccessToken(
+        accessToken!,
+      );
+
+
+      const user: UserDTO = await userService.getUserById(userId.toString());
+      const page: CoursePageDTO = await coursePageService.getCoursePage(pageId);
+      let bookmark;
+
+      if (typeof unitId === "string" && typeof moduleId === "string" && typeof pageId === "string" ) {
+        bookmark = {
+          ...page,
+          unitId: new mongoose.Types.ObjectId(unitId),
+          moduleId: new mongoose.Types.ObjectId(moduleId),
+          pageId: new mongoose.Types.ObjectId(pageId),
+        };
+      }
+
+      console.log(bookmark)
+
+      const new_user = await UserModel.findByIdAndUpdate(
+        userId,
+        { $addToSet: { bookmarks: bookmark} },
+        { runValidators: true },
+      );
+      if (!new_user) {
+        throw new Error("Failed to add bookmark")
+      }
+      res.status(200).json(new_user.bookmarks);
+
+    } catch(error: any) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+
+  }
+)
+
+userRouter.post(
+  "/deleteBookmark",
+  isAuthorizedByRole(new Set(["Learner", "Administrator", "Facilitator"])),
+  async(req,res) => {
+    const { pageId } = req.body;
+    const accessToken = getAccessToken(req);
 
     try {
       const userId = await authService.getUserIdFromAccessToken(
@@ -84,20 +128,20 @@ userRouter.post(
       );
 
       const user: UserDTO = await userService.getUserById(userId.toString());
-      const page: CoursePageDTO = await coursePageService.getCoursePage(pageId);
 
-      const bookmark: BookmarkDTO = {
-        ...page,
-        unitId,
-        moduleId,
-        pageId,
-      };
 
-      await UserModel.findByIdAndUpdate(
+      const updated_user = await UserModel.findByIdAndUpdate(
         userId,
-        { $push: { bookmarks: user.bookmarks.push(bookmark) } },
+        { $pull: { bookmarks: { pageId } }},
         { runValidators: true },
       );
+
+      console.log(updated_user, user)
+
+      if (user.bookmarks.length === updated_user?.bookmarks.length) {
+        throw new Error("Failed to delete bookmark")
+      }
+      res.status(200).json(updated_user);
 
     } catch(error: any) {
       res.status(500).json({ error: getErrorMessage(error) });

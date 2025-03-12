@@ -16,9 +16,9 @@ export interface User extends Document {
 }
 
 export interface Bookmark extends CoursePage {
-  unitId: ObjectId;
-  moduleId: ObjectId; 
-  pageId: ObjectId;
+  unitId: mongoose.Types.ObjectId;
+  moduleId: mongoose.Types.ObjectId; 
+  pageId: mongoose.Types.ObjectId;
 }
 
 export interface Learner extends User {
@@ -41,9 +41,9 @@ export const BookmarkSchema: Schema = new Schema(
     type: { type: String },
     source: { type: String },
     pageIndex: { type: Number },
-    unitId: { type: mongoose.Schema.Types.ObjectId }, 
-    pageId: { type: mongoose.Schema.Types.ObjectId }, 
-    moduleId: { type: mongoose.Schema.Types.ObjectId }, 
+    unitId: { type: mongoose.Types.ObjectId }, 
+    pageId: { type: mongoose.Types.ObjectId }, 
+    moduleId: { type: mongoose.Types.ObjectId }, 
 })
 
 export const UserSchema: Schema = new Schema(
