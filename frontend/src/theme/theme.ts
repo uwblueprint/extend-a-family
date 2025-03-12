@@ -51,10 +51,6 @@ const palette: PaletteOptions = {
     600: "#404B4D",
     700: "#111111",
   },
-  Light: {
-    OnSurfaceVariant: "#3F484B",
-    Outline: "#6F797B",
-  },
 };
 
 const typography: TypographyOptions = {
@@ -147,8 +143,8 @@ const typography: TypographyOptions = {
     fontSize: "14px",
     fontWeight: 300,
     lineHeight: "120%",
+    letterSpacing: "0.7px",
     textTransform: "uppercase",
-    letterSpacing: "5%",
   },
   labelMediumProminent: {
     fontSize: "14px",

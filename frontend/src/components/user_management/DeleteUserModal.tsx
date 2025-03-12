@@ -81,7 +81,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             height: "40px",
             gap: "8px",
             "&:hover": { bgcolor: theme.palette.Administrator.Hover },
-            borderColor: theme.palette.Light.Outline,
+            borderColor: theme.palette.Neutral[500],
           }}
           onClick={onClose}
         >
