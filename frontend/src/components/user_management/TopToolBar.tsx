@@ -3,14 +3,13 @@ import { Box, MenuItem, Typography, Button, Stack } from "@mui/material";
 import { Search, FilterList, Add } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
+import { isRole } from "../../types/UserTypes";
 
 interface TopToolBarProps {
   searchQuery: string;
   handleSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
   filterLabel: string;
   handleRoleSelect: (role: string) => void;
-  roleBackground: Record<string, string>;
-  roleColors: Record<string, string>;
   handleOpenAddAdminModal: () => void;
 }
 
@@ -19,8 +18,6 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
   handleSearch,
   filterLabel,
   handleRoleSelect,
-  roleBackground,
-  roleColors,
   handleOpenAddAdminModal,
 }) => {
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -118,8 +115,12 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
                   variant="labelMedium"
                   sx={{
                     display: "inline-block",
-                    backgroundColor: roleBackground[roleOption],
-                    color: roleColors[roleOption],
+                    color: isRole(roleOption)
+                      ? theme.palette[roleOption].Default
+                      : undefined,
+                    backgroundColor: isRole(roleOption)
+                      ? theme.palette[roleOption].Light
+                      : undefined,
                     padding: "4px 8px",
                     borderRadius: "8px",
                   }}

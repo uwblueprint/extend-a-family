@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Box, Stack } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import { User } from "../../types/UserTypes";
@@ -27,7 +26,6 @@ const ManageUserPage = (): React.ReactElement => {
   const [email, setEmail] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   const [selectedRole, setSelectedRole] = useState<string>("");
-  const theme = useTheme();
 
   // Fetch all users on mount
   useEffect(() => {
@@ -98,18 +96,6 @@ const ManageUserPage = (): React.ReactElement => {
   };
   const handleAddAdmin = async () => {};
 
-  // Define role colors from theme
-  const roleBackground: Record<string, string> = {
-    Administrator: theme.palette.Administrator.Light,
-    Facilitator: theme.palette.Facilitator.Light,
-    Learner: theme.palette.Learner.Light,
-  };
-  const roleColors: Record<string, string> = {
-    Administrator: theme.palette.Administrator.Default,
-    Facilitator: theme.palette.Facilitator.Default,
-    Learner: theme.palette.Learner.Default,
-  };
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", padding: "25px" }}>
       <DeleteUserModal
@@ -132,8 +118,6 @@ const ManageUserPage = (): React.ReactElement => {
           handleSearch={handleSearch}
           filterLabel={selectedRole}
           handleRoleSelect={handleRoleSelect}
-          roleBackground={roleBackground}
-          roleColors={roleColors}
           handleOpenAddAdminModal={handleOpenAddAdminModal}
         />
         <UserTable
