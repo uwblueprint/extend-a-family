@@ -9,6 +9,7 @@ import EditDetailsModal from "../profile/EditDetailsModal";
 import ChangePasswordModal from "../profile/ChangePasswordModal";
 import AuthContext from "../../contexts/AuthContext";
 import userAPIClient from "../../APIClients/UserAPIClient";
+import authAPIClient from "../../APIClients/AuthAPIClient";
 
 const MyAccount = (): React.ReactElement => {
   const userFromHook = useUser();
@@ -52,10 +53,20 @@ const MyAccount = (): React.ReactElement => {
     }
   };
 
-  const handleSavePassword = async () => {
+  const handleSavePassword = async (newPassword: string) => {
     try {
-      // eslint-disable-next-line no-console
-      console.log("temporary console log this will change in the next ticket.");
+      if (!user || !user.email) {
+        throw new Error("User information is not available.");
+      }
+      const success = await authAPIClient.changePassword(
+        user.email,
+        newPassword,
+        user.role,
+      );
+
+      if (!success) {
+        throw new Error("Failed to update password");
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error updating password:", error);
