@@ -18,7 +18,6 @@ import IAuthService from "../services/interfaces/authService";
 import ICoursePageService from "../services/interfaces/coursePageService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
-import { CoursePageDTO } from "../types/courseTypes";
 import {
   UpdateUserDTO,
   UserDTO,
@@ -84,19 +83,19 @@ userRouter.post(
 
 
       const user: UserDTO = await userService.getUserById(userId.toString());
-      const page: CoursePageDTO = await coursePageService.getCoursePage(pageId);
-      let bookmark;
+      const page = await coursePageService.getCoursePage(pageId);
 
-      if (typeof unitId === "string" && typeof moduleId === "string" && typeof pageId === "string" ) {
-        bookmark = {
-          ...page,
-          unitId: new mongoose.Types.ObjectId(unitId),
-          moduleId: new mongoose.Types.ObjectId(moduleId),
-          pageId: new mongoose.Types.ObjectId(pageId),
-        };
+      if (typeof unitId !== "string" || typeof moduleId !== "string" || typeof pageId !== "string" ) {
+        throw new Error("Invalid unitId, moduleId, or pageId: should be strings")
       }
 
-      console.log(bookmark)
+      const bookmark = {
+        ...page,
+        id: new mongoose.Types.ObjectId(page.id),
+        unitId: new mongoose.Types.ObjectId(unitId),
+        moduleId: new mongoose.Types.ObjectId(moduleId),
+        pageId: new mongoose.Types.ObjectId(pageId),
+      };
 
       const new_user = await UserModel.findByIdAndUpdate(
         userId,
