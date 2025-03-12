@@ -4,6 +4,7 @@ import { Search, FilterList, Add } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
 import { isRole } from "../../types/UserTypes";
+import { useUser } from "../../hooks/useUser";
 
 interface TopToolBarProps {
   searchQuery: string;
@@ -20,6 +21,7 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
   handleRoleSelect,
   handleOpenAddAdminModal,
 }) => {
+  const { role } = useUser();
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   const theme = useTheme();
@@ -57,14 +59,14 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
               }}
             />
           }
-          focusedBorderColor={theme.palette.Learner.Default}
+          focusedBorderColor={theme.palette[role].Default}
           sx={{
             minWidth: "400px",
             borderRadius: "8px",
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
                 borderColor: isSearchActive
-                  ? theme.palette.Learner.Default
+                  ? theme.palette[role].Default
                   : theme.palette.Neutral[500],
               },
               "&:hover fieldset": {
@@ -86,10 +88,10 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
                 cursor: "pointer",
               }}
             >
-              <FilterList sx={{ color: "#6f797b" }} />
+              <FilterList sx={{ color: theme.palette.Neutral[500] }} />
             </Box>
           }
-          focusedBorderColor={theme.palette.Learner.Default}
+          focusedBorderColor={theme.palette[role].Default}
           sx={{
             width: "250px",
             textTransform: "uppercase",

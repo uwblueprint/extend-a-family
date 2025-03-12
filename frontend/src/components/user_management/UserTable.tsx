@@ -113,7 +113,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     height: "40px",
                     padding: "4px 16px",
                     borderRadius: "4px",
-                    borderColor: "#6F797B",
+                    borderColor: theme.palette.Neutral[500],
                     color: theme.palette.Error.Default,
                   }}
                   onClick={() => handleOpenDeleteUserModal(user.id)}
