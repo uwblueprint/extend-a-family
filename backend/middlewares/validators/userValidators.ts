@@ -72,9 +72,6 @@ export const updateUserDtoValidator = async (
   if (!validatePrimitive(req.body.lastName, "string")) {
     return res.status(400).send(getApiValidationError("lastName", "string"));
   }
-  if (!validatePrimitive(req.body.email, "string")) {
-    return res.status(400).send(getApiValidationError("email", "string"));
-  }
   if (!validatePrimitive(req.body.role, "string")) {
     return res.status(400).send(getApiValidationError("role", "string"));
   }

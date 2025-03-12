@@ -157,14 +157,13 @@ userRouter.post(
 /* Update the user with the specified userId */
 userRouter.put(
   "/:userId",
-  isAuthorizedByRole(new Set(["Administrator"])),
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
   updateUserDtoValidator,
   async (req, res) => {
     try {
       const updatedUser = await userService.updateUserById(req.params.userId, {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        email: req.body.email,
         role: req.body.role,
         status: "Active",
       });
@@ -321,7 +320,6 @@ userRouter.put(
       const updateLearnerPayload: UpdateUserDTO = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        email: req.body.email,
         role: req.body.role,
         status: "Active",
       };

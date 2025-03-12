@@ -20,7 +20,7 @@ export type UserDTO = {
 
 export type CreateUserDTO = Omit<UserDTO, "id"> & { password: string };
 
-export type UpdateUserDTO = Omit<UserDTO, "id">;
+export type UpdateUserDTO = Omit<UserDTO, "id" | "email">;
 
 export type SignupUserDTO = Omit<CreateUserDTO, "role">;
 
