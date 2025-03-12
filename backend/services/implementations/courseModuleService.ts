@@ -1,40 +1,38 @@
 /* eslint-disable class-methods-use-this */
-import { startSession } from "mongoose";
+import fs from "fs/promises";
+import { Schema, startSession } from "mongoose";
+import { PDFDocument } from "pdf-lib";
+import MgCourseModule, {
+  CourseModule,
+} from "../../models/coursemodule.mgmodel";
+import CoursePageModel, {
+  LessonPageModel,
+} from "../../models/coursepage.mgmodel";
+import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import {
   CourseModuleDTO,
   CreateCourseModuleDTO,
   UpdateCourseModuleDTO,
 } from "../../types/courseTypes";
-import logger from "../../utilities/logger";
-import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import { getErrorMessage } from "../../utilities/errorUtils";
-import MgCourseModule, {
-  CourseModule,
-} from "../../models/coursemodule.mgmodel";
+import logger from "../../utilities/logger";
 import ICourseModuleService from "../interfaces/courseModuleService";
+import IFileStorageService from "../interfaces/fileStorageService";
+import FileStorageService from "./fileStorageService";
 
+const defaultBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
+const fileStorageService: IFileStorageService = new FileStorageService(
+  defaultBucket,
+);
 const Logger = logger(__filename);
 
 class CourseModuleService implements ICourseModuleService {
-  async getCourseModule(courseModuleId: string): Promise<CourseModuleDTO> {
-    try {
-      const courseModule: CourseModule | null = await MgCourseModule.findById(
-        courseModuleId,
-      );
+  private fileStorageService: FileStorageService;
 
-      if (!courseModule) {
-        throw new Error(`Course module with id ${courseModuleId} not found.`);
-      }
-
-      return courseModule;
-    } catch (error) {
-      Logger.error(
-        `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
-          error,
-        )}`,
-      );
-      throw error;
-    }
+  constructor() {
+    this.fileStorageService = new FileStorageService(
+      process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
+    );
   }
 
   async getCourseModules(
@@ -53,10 +51,48 @@ class CourseModuleService implements ICourseModuleService {
         _id: { $in: courseUnit.modules },
       });
 
-      return courseModules;
+      return courseModules.map((courseModule) => courseModule.toObject());
     } catch (error) {
       Logger.error(
         `Failed to get course modules for course unit with id: ${courseUnitId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async getCourseModule(
+    courseModuleId: string,
+  ): Promise<CourseModuleDTO | null> {
+    try {
+      const courseModule: CourseModule | null = await MgCourseModule.findById(
+        courseModuleId,
+      )
+        .lean()
+        .exec();
+      if (!courseModule) {
+        throw new Error(`Course module with id ${courseModuleId} not found.`);
+      }
+      const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
+        `course/pdfs/module-${courseModuleId}.pdf`,
+      );
+      const fetchPage = async (page: Schema.Types.ObjectId) => {
+        const pageObject = await CoursePageModel.findById(page).lean().exec();
+        if (!pageObject) {
+          throw new Error(`Page with id ${page} not found.`);
+        }
+        return pageObject;
+      };
+      const pageObjects = Promise.all(courseModule.pages.map(fetchPage));
+      return {
+        ...courseModule,
+        lessonPdfUrl,
+        pages: await pageObjects,
+      };
+    } catch (error) {
+      Logger.error(
+        `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
           error,
         )}`,
       );
@@ -193,6 +229,89 @@ class CourseModuleService implements ICourseModuleService {
     }
 
     return deletedCourseModuleId;
+  }
+
+  async uploadLessons(
+    moduleId: string,
+    pdfPath: string,
+  ): Promise<CourseModuleDTO> {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+      // 1. Find the module
+      const courseModule = await MgCourseModule.findById(moduleId).session(
+        session,
+      );
+      if (!courseModule) {
+        throw new Error(`Course module with id ${moduleId} not found`);
+      }
+
+      // 2. Read and process the PDF
+      const pdfBytes = await fs.readFile(pdfPath);
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const numPages = pdfDoc.getPageCount();
+
+      // 3. Upload PDF to Firebase Storage
+      const pdfFileName = `course/pdfs/module-${moduleId}.pdf`;
+      await this.fileStorageService.createFile(
+        pdfFileName,
+        pdfPath,
+        "application/pdf",
+        true,
+      );
+
+      // 4. Create lesson pages using LessonPageModel
+      const createdPages: Array<string> = [];
+      for (let i = 0; i < numPages; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        const newPage = await LessonPageModel.create(
+          [
+            {
+              // Note: Wrapped in array as per Mongoose v7+ requirements
+              title: `Page ${i + 1}`,
+              displayIndex: courseModule.pages.length + i + 1,
+              type: "Lesson",
+              source: pdfFileName,
+              pageIndex: i,
+            },
+          ],
+          { session },
+        );
+        createdPages.push(newPage[0].id); // Access first element and get _id
+      }
+
+      // 5. Update module with new pages
+      const updatedModule = await MgCourseModule.findByIdAndUpdate(
+        moduleId,
+        { $push: { pages: { $each: createdPages } } }, // createdPages is already array of IDs
+        { new: true, session },
+      );
+
+      if (!updatedModule) {
+        throw new Error(
+          `Course module with id ${moduleId} not found during update`,
+        );
+      }
+
+      await session.commitTransaction();
+
+      return {
+        id: updatedModule.id,
+        displayIndex: updatedModule.displayIndex,
+        title: updatedModule.title,
+      } as CourseModuleDTO;
+    } catch (error) {
+      await session.abortTransaction();
+      Logger.error(
+        `Failed to upload lessons for module ${moduleId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }
 

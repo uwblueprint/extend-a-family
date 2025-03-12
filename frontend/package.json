@@ -42,6 +42,7 @@
     "react-grid-layout": "^1.4.4",
     "react-json-schema": "^1.2.2",
     "react-jsonschema-form": "^1.8.1",
+    "react-pdf": "^9.1.1",
     "react-resizable": "^3.0.5",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^5.0.1",
@@ -104,6 +105,7 @@
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "prettier": "^2.2.1",
-    "react-test-renderer": "^18.2.0"
+    "react-test-renderer": "^18.2.0",
+    "ts-node": "^10.9.2"
   }
 }

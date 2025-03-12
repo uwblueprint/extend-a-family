@@ -1,9 +1,9 @@
 import { storage } from "firebase-admin";
 import { getDownloadURL } from "firebase-admin/storage";
 
-import IFileStorageService from "../interfaces/fileStorageService";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
+import IFileStorageService from "../interfaces/fileStorageService";
 
 const Logger = logger(__filename);
 
@@ -14,12 +14,8 @@ class FileStorageService implements IFileStorageService {
     this.bucketName = bucketName;
   }
 
-  async getFile(fileName: string, expirationTimeMinutes = 60): Promise<string> {
+  async getFile(fileName: string): Promise<string> {
     const bucket = storage().bucket(this.bucketName);
-    const expirationDate = new Date();
-    expirationDate.setMinutes(
-      expirationDate.getMinutes() + expirationTimeMinutes,
-    );
     try {
       const currentBlob = await bucket.file(fileName);
       if (!(await currentBlob.exists())[0]) {
@@ -39,11 +35,12 @@ class FileStorageService implements IFileStorageService {
     fileName: string,
     filePath: string,
     contentType: string | null = null,
+    allowOverwrite = false,
   ): Promise<void> {
     try {
       const bucket = storage().bucket(this.bucketName);
       const currentBlob = await bucket.file(fileName);
-      if ((await currentBlob.exists())[0]) {
+      if (!allowOverwrite && (await currentBlob.exists())[0]) {
         throw new Error(`File name ${fileName} already exists`);
       }
       await bucket.upload(filePath, {
@@ -103,7 +100,7 @@ class FileStorageService implements IFileStorageService {
           metadata: { contentType },
         });
       }
-      return await this.getFile(fileName, 5.26e7);
+      return await this.getFile(fileName);
     } catch (error: unknown) {
       Logger.error(`Failed to upload file. Reason = ${getErrorMessage(error)}`);
       throw error;

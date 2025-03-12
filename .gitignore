@@ -1,6 +1,7 @@
 **/node_modules
 **/.env
 **/build
+**/uploads
 **/venv
 **/__pycache__
 **/*.log
@@ -9,3 +10,4 @@
 .vscode
 **/*.cache
 **/*.egg-info
+backend/uploads/

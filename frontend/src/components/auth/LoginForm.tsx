@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -7,16 +7,22 @@ import {
   TextField,
   Typography,
   useTheme,
+  Alert,
+  AlertTitle,
 } from "@mui/material";
 import { AlternateEmail, Password } from "@mui/icons-material";
 import InputAdornment from "@mui/material/InputAdornment";
-import { AuthenticatedUser, Role } from "../../types/AuthTypes";
+import { AuthenticatedUser, AuthError, Role } from "../../types/AuthTypes";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { PresentableError } from "../../types/ErrorTypes";
 import { FORGOT_PASSWORD_PAGE } from "../../constants/Routes";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 import AuthContext from "../../contexts/AuthContext";
-import { authErrors } from "../../errors/AuthErrors";
+import {
+  AuthErrorCodes,
+  authErrors,
+  defaultAuthError,
+} from "../../errors/AuthErrors";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
 function isDrawerLogin(userRole: Role) {
@@ -34,13 +40,19 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
 
   const [loginError, setLoginError] = useState<PresentableError>();
   const [emailError, setEmailError] = useState<PresentableError>();
+  const [passwordError, setPasswordError] = useState<PresentableError>();
+  const [errorData, setErrorData] =
+    useState<[string | undefined, string | undefined]>();
 
+  const alertRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
 
   const onLogInClick = async () => {
     try {
       setLoginError(undefined);
       setEmailError(undefined);
+      setPasswordError(undefined);
+      setErrorData([undefined, undefined]);
       const user: AuthenticatedUser | null = await authAPIClient.login(
         email,
         password,
@@ -50,18 +62,92 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       localStorage.setItem(AUTHENTICATED_USER_KEY, JSON.stringify(user));
       setAuthenticatedUser(user);
     } catch (e: unknown) {
-      if (e instanceof Error && e.message in authErrors) {
-        // eslint-disable-next-line no-alert
-        alert(e.message);
-      } else {
-        // eslint-disable-next-line no-alert
-        alert("bad!");
+      const error = e as Error;
+      // eslint-disable-next-line no-alert
+      const errorCause = error.cause as AuthError;
+      switch (error.message) {
+        case AuthErrorCodes.UNVERIFIED_EMAIL:
+          setLoginError(authErrors[AuthErrorCodes.UNVERIFIED_EMAIL]);
+          break;
+        case AuthErrorCodes.INVALID_LOGIN_CREDENTIALS:
+          setLoginError(authErrors[AuthErrorCodes.INVALID_LOGIN_CREDENTIALS]);
+          break;
+        case AuthErrorCodes.WRONG_USER_TYPE:
+          setLoginError(authErrors[AuthErrorCodes.WRONG_USER_TYPE]);
+          setErrorData([errorCause.errorData?.[0], errorCause.errorData?.[1]]);
+          break;
+        case AuthErrorCodes.EMAIL_NOT_FOUND:
+          setEmailError(authErrors[AuthErrorCodes.EMAIL_NOT_FOUND]);
+          break;
+        case AuthErrorCodes.INCORRECT_PASSWORD:
+          setPasswordError(authErrors[AuthErrorCodes.INCORRECT_PASSWORD]);
+          break;
+        default:
+          setLoginError(defaultAuthError);
       }
     }
   };
 
+  interface ErrorAlertProps {
+    title?: string;
+    message?: string;
+  }
+
+  const ErrorAlert: React.FC<ErrorAlertProps> = ({ title, message }) => {
+    return (
+      <Box ref={alertRef} sx={{ width: "100%" }}>
+        <Alert
+          icon={false}
+          severity="error"
+          sx={{
+            color: theme.palette.Error.Light,
+            width: "100%",
+            height: "100%",
+            borderRadius: "4px",
+            border: "2px solid",
+            borderColor: theme.palette.Error.Hover,
+            padding: "20px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            "& .MuiAlert-message": { padding: 0 },
+          }}
+        >
+          <AlertTitle marginBottom="3px">
+            <Typography
+              variant="titleMedium"
+              color={theme.palette.Error.Default}
+            >
+              {title || "Error"}
+            </Typography>
+          </AlertTitle>
+          <Typography variant="bodyMedium" color={theme.palette.Error.Pressed}>
+            {message || "An error has occurred."}
+          </Typography>
+        </Alert>
+      </Box>
+    );
+  };
+
   return (
     <Box>
+      {loginError && (
+        <Box
+          sx={{
+            marginBottom: "40px",
+          }}
+        >
+          <ErrorAlert
+            title={loginError.title?.()}
+            message={
+              errorData?.[0] && errorData?.[1]
+                ? loginError?.text(errorData[0], errorData[1])
+                : loginError?.text()
+            }
+          />
+        </Box>
+      )}
+
       <Typography
         variant="headlineLarge"
         sx={{
@@ -72,19 +158,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       >
         {capitalizeFirstLetter(userRole)} Login
       </Typography>
-      {loginError && (
-        <div
-          style={{
-            backgroundColor: "lavenderblush",
-            display: "inline-block",
-            textAlign: "center",
-          }}
-        >
-          <strong>{loginError.title?.()}</strong>
-          <br />
-          {loginError.text()}
-        </div>
-      )}
+
       <form>
         <Stack
           sx={{
@@ -97,6 +171,8 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
             <TextField
               required
               label="Email"
+              error={!!emailError}
+              helperText={emailError?.text()}
               type="email"
               InputProps={{
                 sx: {
@@ -123,13 +199,17 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                 flexDirection: "column",
                 alignSelf: "stretch",
                 maxHeight: "56px",
+                "& .MuiFormHelperText-root": {
+                  color: theme.palette.Error.Default,
+                },
               }}
             />
-            {emailError && <p style={{ color: "red" }}>{emailError.text()}</p>}
           </Box>
           <Box>
             <TextField
               required
+              error={!!passwordError}
+              helperText={passwordError?.text()}
               label="Password"
               type="password"
               value={password}
@@ -142,6 +222,9 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                 flexDirection: "column",
                 alignSelf: "stretch",
                 maxHeight: "56px",
+                "& .MuiFormHelperText-root": {
+                  color: theme.palette.Error.Default,
+                },
               }}
               InputProps={{
                 startAdornment: (
@@ -157,7 +240,9 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                 <Typography
                   variant="bodySmall"
                   style={{
-                    color: theme.palette[userRole].Default,
+                    color: passwordError
+                      ? theme.palette.Error.Default
+                      : theme.palette[userRole].Default,
                   }}
                 >
                   Forgot Password

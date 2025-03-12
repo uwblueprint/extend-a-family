@@ -13,6 +13,13 @@ interface ICourseModuleService {
   getCourseModules(courseUnitId: string): Promise<Array<CourseModuleDTO>>;
 
   /**
+   * Returns the course module specified by the module ID
+   * @param courseModuleId the id of the course module we want to fetch
+   * @throws Server HTTP 500 error if course module was not successfully fetched
+   */
+  getCourseModule(courseModuleId: string): Promise<CourseModuleDTO | null>;
+
+  /**
    * Creates a course module
    * @param courseUnitId the id of the unit that we want to create the new module under
    * @param courseModuleDTO the info (currently just title) about the course module that we want to create
@@ -45,6 +52,15 @@ interface ICourseModuleService {
     courseUnitId: string,
     courseModuleId: string,
   ): Promise<string>;
+
+  /**
+   * Uploads a PDF file and creates lesson pages for each page in the PDF
+   * @param moduleId the id of the module to add the lessons to
+   * @param pdfPath the path to the temporary uploaded PDF file
+   * @returns Updated course module
+   * @throws Error if upload fails or module not found
+   */
+  uploadLessons(moduleId: string, pdfPath: string): Promise<CourseModuleDTO>;
 }
 
 export default ICourseModuleService;
