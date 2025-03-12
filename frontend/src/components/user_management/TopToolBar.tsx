@@ -1,22 +1,13 @@
-import React from "react";
-import { Box, Menu, MenuItem, Typography, Button, Stack } from "@mui/material";
-import { Search, FilterList, ArrowDropDown, Add } from "@mui/icons-material";
+import React, { useState } from "react";
+import { Box, MenuItem, Typography, Button, Stack } from "@mui/material";
+import { Search, FilterList, Add } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
 
 interface TopToolBarProps {
   searchQuery: string;
   handleSearch: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  isSearchActive: boolean;
-  handleSearchFocus: () => void;
-  handleSearchBlur: () => void;
   filterLabel: string;
-  handleFilterClick: (event: React.MouseEvent<HTMLDivElement>) => void;
-  isFilterActive: boolean;
-  handleFilterFocus: () => void;
-  handleFilterBlur: () => void;
-  filterAnchor: HTMLElement | null;
-  handleFilterClose: () => void;
   handleRoleSelect: (role: string) => void;
   roleBackground: Record<string, string>;
   roleColors: Record<string, string>;
@@ -26,21 +17,14 @@ interface TopToolBarProps {
 const TopToolBar: React.FC<TopToolBarProps> = ({
   searchQuery,
   handleSearch,
-  isSearchActive,
-  handleSearchFocus,
-  handleSearchBlur,
   filterLabel,
-  handleFilterClick,
-  isFilterActive,
-  handleFilterFocus,
-  handleFilterBlur,
-  filterAnchor,
-  handleFilterClose,
   handleRoleSelect,
   roleBackground,
   roleColors,
   handleOpenAddAdminModal,
 }) => {
+  const [isSearchActive, setIsSearchActive] = useState(false);
+
   const theme = useTheme();
   return (
     <Stack
@@ -65,8 +49,8 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
           label="Search by name"
           value={searchQuery}
           onChange={handleSearch}
-          onFocus={handleSearchFocus}
-          onBlur={handleSearchBlur}
+          onFocus={() => setIsSearchActive(true)}
+          onBlur={() => setIsSearchActive(false)}
           adornment={
             <Search
               sx={{
@@ -93,12 +77,10 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
           }}
         />
         <StartAdornedTextField
+          select
           variant="outlined"
           label="Filter"
           value={filterLabel}
-          onClick={handleFilterClick}
-          onFocus={handleFilterFocus}
-          onBlur={handleFilterBlur}
           adornment={
             <Box
               sx={{
@@ -106,42 +88,30 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                handleFilterClick(event);
-              }}
             >
               <FilterList sx={{ color: "#6f797b" }} />
             </Box>
           }
           focusedBorderColor={theme.palette.Learner.Default}
-          adornmentEnd={<ArrowDropDown sx={{ color: "#6F797B" }} />}
           sx={{
+            width: "250px",
             textTransform: "uppercase",
             textAlign: "left",
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
-                borderColor: isFilterActive
-                  ? theme.palette.Learner.Default
-                  : theme.palette.Neutral[500],
+                borderColor: theme.palette.Neutral[600],
               },
               "&:hover fieldset": {
                 borderColor: theme.palette.Neutral[600],
               },
             },
           }}
-        />
-        <Menu
-          anchorEl={filterAnchor}
-          open={Boolean(filterAnchor)}
-          onClose={handleFilterClose}
-          sx={{ "& .MuiPaper-root": { borderRadius: "8px", padding: "4px" } }}
         >
           {["All", "Administrator", "Facilitator", "Learner"].map(
             (roleOption) => (
               <MenuItem
                 key={roleOption}
+                value={roleOption}
                 onClick={() => handleRoleSelect(roleOption)}
               >
                 <Typography
@@ -159,7 +129,7 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
               </MenuItem>
             ),
           )}
-        </Menu>
+        </StartAdornedTextField>
         <Button
           variant="contained"
           startIcon={<Add />}

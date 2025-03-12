@@ -14,12 +14,9 @@ const ManageUserPage = (): React.ReactElement => {
   // Main state
   const [users, setUsers] = useState<User[]>([]);
   const [userData, setUserData] = useState<User[]>([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [usersPerPage, setUsersPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterAnchor, setFilterAnchor] = useState<null | HTMLElement>(null);
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const [isFilterActive, setIsFilterActive] = useState(false);
   const [openAddAdminModal, setOpenAddAdminModal] = useState(false);
   const [openDeleteUserModal, setOpenDeleteUserModal] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState("");
@@ -29,7 +26,7 @@ const ManageUserPage = (): React.ReactElement => {
   const [lastName, setLastName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [email, setEmail] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
 
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string>("");
   const theme = useTheme();
 
   // Fetch all users on mount
@@ -49,8 +46,6 @@ const ManageUserPage = (): React.ReactElement => {
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
-  const handleSearchFocus = () => setIsSearchActive(true);
-  const handleSearchBlur = () => setIsSearchActive(false);
 
   // Filter users based on search query
   const filteredUsers = users.filter(
@@ -77,16 +72,6 @@ const ManageUserPage = (): React.ReactElement => {
     setPage(0);
   };
 
-  // Filter (role) handlers
-  const handleFilterClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    setFilterAnchor(event.currentTarget);
-  };
-  const handleFilterClose = () => {
-    setFilterAnchor(null);
-  };
-
-  const handleFilterFocus = () => setIsFilterActive(true);
-  const handleFilterBlur = () => setIsFilterActive(false);
   const handleRoleSelect = (role_curr: string) => {
     if (role_curr === "All") {
       setUsers(userData);
@@ -95,9 +80,7 @@ const ManageUserPage = (): React.ReactElement => {
     }
     setPage(0);
     setSelectedRole(role_curr);
-    handleFilterClose();
   };
-  const filterLabel = selectedRole ? selectedRole.toUpperCase() : "Filter";
 
   // Modal open/close handlers
   const handleOpenAddAdminModal = () => setOpenAddAdminModal(true);
@@ -147,16 +130,7 @@ const ManageUserPage = (): React.ReactElement => {
         <TopToolBar
           searchQuery={searchQuery}
           handleSearch={handleSearch}
-          isSearchActive={isSearchActive}
-          handleSearchFocus={handleSearchFocus}
-          handleSearchBlur={handleSearchBlur}
-          filterLabel={filterLabel}
-          handleFilterClick={handleFilterClick}
-          isFilterActive={isFilterActive}
-          handleFilterFocus={handleFilterFocus}
-          handleFilterBlur={handleFilterBlur}
-          filterAnchor={filterAnchor}
-          handleFilterClose={handleFilterClose}
+          filterLabel={selectedRole}
           handleRoleSelect={handleRoleSelect}
           roleBackground={roleBackground}
           roleColors={roleColors}
