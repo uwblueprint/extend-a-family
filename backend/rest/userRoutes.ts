@@ -3,11 +3,13 @@ import mongoose from "mongoose";
 import multer from "multer";
 import { getAccessToken, isAuthorizedByRole } from "../middlewares/auth";
 import {
+  addBookmarkValidator,
   createUserDtoValidator,
+  deleteBookmarkValidator,
   updateUserDtoValidator,
   uploadProfilePictureValidator,
 } from "../middlewares/validators/userValidators";
-import UserModel from "../models/user.mgmodel";
+import UserModel, { Bookmark } from "../models/user.mgmodel";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
 import CoursePageService from "../services/implementations/coursePageService";
@@ -22,7 +24,7 @@ import {
   UpdateUserDTO,
   UserDTO,
   isFacilitator,
-  isRole
+  isRole,
 } from "../types/userTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
 import { sendResponseByMimeType } from "../utilities/responseUtil";
@@ -36,7 +38,7 @@ const userRouter: Router = Router();
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
-const coursePageService: ICoursePageService = new CoursePageService()
+const coursePageService: ICoursePageService = new CoursePageService();
 const firebaseStorageService: FileStorageService = new FileStorageService(
   process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
 );
@@ -73,23 +75,26 @@ userRouter.post(
 userRouter.post(
   "/addBookmark",
   isAuthorizedByRole(new Set(["Learner", "Administrator", "Facilitator"])),
-  async(req,res) => {
-    const { unitId, moduleId, pageId} = req.body;
+  addBookmarkValidator,
+  async (req, res) => {
+    const { unitId, moduleId, pageId } = req.body;
     const accessToken = getAccessToken(req);
     try {
-      const userId = await authService.getUserIdFromAccessToken(
-        accessToken!,
-      );
+      const userId = await authService.getUserIdFromAccessToken(accessToken!);
 
+      const page = await coursePageService.getCoursePage(pageId, true);
 
-      const user: UserDTO = await userService.getUserById(userId.toString());
-      const page = await coursePageService.getCoursePage(pageId);
-
-      if (typeof unitId !== "string" || typeof moduleId !== "string" || typeof pageId !== "string" ) {
-        throw new Error("Invalid unitId, moduleId, or pageId: should be strings")
+      if (
+        typeof unitId !== "string" ||
+        typeof moduleId !== "string" ||
+        typeof pageId !== "string"
+      ) {
+        throw new Error(
+          "Invalid unitId, moduleId, or pageId: should be strings",
+        );
       }
 
-      const bookmark = {
+      const bookmark: Bookmark = {
         ...page,
         id: new mongoose.Types.ObjectId(page.id),
         unitId: new mongoose.Types.ObjectId(unitId),
@@ -97,57 +102,65 @@ userRouter.post(
         pageId: new mongoose.Types.ObjectId(pageId),
       };
 
-      const new_user = await UserModel.findByIdAndUpdate(
-        userId,
-        { $addToSet: { bookmarks: bookmark} },
-        { runValidators: true },
-      );
-      if (!new_user) {
-        throw new Error("Failed to add bookmark")
+      const existingBookmark = await UserModel.findOne({
+        _id: userId,
+        bookmarks: {
+          $elemMatch: {
+            unitId: bookmark.unitId,
+            moduleId: bookmark.moduleId,
+            pageId: bookmark.pageId,
+          },
+        },
+      });
+
+      if (existingBookmark) {
+        return res.status(400).json({ error: "Bookmark already exists" });
       }
-      res.status(200).json(new_user.bookmarks);
 
-    } catch(error: any) {
-      res.status(500).json({ error: getErrorMessage(error) });
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { $addToSet: { bookmarks: bookmark } },
+        { runValidators: true, new: true },
+      );
+      if (!updatedUser) {
+        throw new Error("Failed to add bookmark: user not found");
+      }
+      return res.status(200).json(updatedUser.bookmarks);
+    } catch (error: unknown) {
+      return res.status(500).json({ error: getErrorMessage(error) });
     }
-
-  }
-)
+  },
+);
 
 userRouter.post(
   "/deleteBookmark",
   isAuthorizedByRole(new Set(["Learner", "Administrator", "Facilitator"])),
-  async(req,res) => {
+  deleteBookmarkValidator,
+  async (req, res) => {
     const { pageId } = req.body;
     const accessToken = getAccessToken(req);
 
     try {
-      const userId = await authService.getUserIdFromAccessToken(
-        accessToken!,
-      );
+      const userId = await authService.getUserIdFromAccessToken(accessToken!);
 
-      const user: UserDTO = await userService.getUserById(userId.toString());
-
-
-      const updated_user = await UserModel.findByIdAndUpdate(
-        userId,
-        { $pull: { bookmarks: { pageId } }},
-        { runValidators: true },
-      );
-
-      console.log(updated_user, user)
-
-      if (user.bookmarks.length === updated_user?.bookmarks.length) {
-        throw new Error("Failed to delete bookmark")
+      if (typeof pageId !== "string") {
+        throw new Error("Invalid pageId: should be a string");
       }
-      res.status(200).json(updated_user);
 
-    } catch(error: any) {
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        {
+          $pull: { bookmarks: { pageId: new mongoose.Types.ObjectId(pageId) } },
+        },
+        { runValidators: true, new: true },
+      );
+
+      res.status(200).json(updatedUser?.bookmarks);
+    } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }
-
-  }
-)
+  },
+);
 
 /* Get all users, optionally filter by a userId or email query parameter to retrieve a single user */
 userRouter.get(

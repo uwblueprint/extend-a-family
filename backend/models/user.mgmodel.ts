@@ -1,7 +1,6 @@
 import mongoose, { Document, ObjectId, Schema } from "mongoose";
 
 import { Role, Status } from "../types/userTypes";
-import { CoursePage } from "./coursepage.mgmodel";
 
 export interface User extends Document {
   id: ObjectId;
@@ -15,9 +14,12 @@ export interface User extends Document {
   bookmarks: Bookmark[];
 }
 
-export interface Bookmark extends CoursePage {
+export interface Bookmark {
+  id: mongoose.Types.ObjectId;
+  title: string;
+  type: string;
   unitId: mongoose.Types.ObjectId;
-  moduleId: mongoose.Types.ObjectId; 
+  moduleId: mongoose.Types.ObjectId;
   pageId: mongoose.Types.ObjectId;
 }
 
@@ -34,17 +36,14 @@ const baseOptions = {
   timestamps: true,
 };
 
-export const BookmarkSchema: Schema = new Schema(
-  {
-    id: { type: mongoose.Schema.Types.ObjectId }, 
-    title: { type: String },
-    type: { type: String },
-    source: { type: String },
-    pageIndex: { type: Number },
-    unitId: { type: mongoose.Types.ObjectId }, 
-    pageId: { type: mongoose.Types.ObjectId }, 
-    moduleId: { type: mongoose.Types.ObjectId }, 
-})
+export const BookmarkSchema: Schema = new Schema({
+  id: { type: mongoose.Schema.Types.ObjectId },
+  title: { type: String },
+  type: { type: String },
+  unitId: { type: mongoose.Types.ObjectId },
+  pageId: { type: mongoose.Types.ObjectId },
+  moduleId: { type: mongoose.Types.ObjectId },
+});
 
 export const UserSchema: Schema = new Schema(
   {
@@ -79,8 +78,9 @@ export const UserSchema: Schema = new Schema(
     },
     bookmarks: {
       type: [BookmarkSchema],
+      default: [],
       required: true,
-    }
+    },
   },
   baseOptions,
 );
