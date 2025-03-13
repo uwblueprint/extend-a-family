@@ -1,17 +1,17 @@
 /* eslint-disable class-methods-use-this */
 import { startSession } from "mongoose";
+import MgCourseModule, {
+  CourseModule,
+} from "../../models/coursemodule.mgmodel";
+import MgCoursePage from "../../models/coursepage.mgmodel";
 import {
   CoursePageDTO,
   CreateCoursePageDTO,
   UpdateCoursePageDTO,
 } from "../../types/courseTypes";
+import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ICoursePageService from "../interfaces/coursePageService";
-import MgCourseModule, {
-  CourseModule,
-} from "../../models/coursemodule.mgmodel";
-import MgCoursePage from "../../models/coursepage.mgmodel";
-import { getErrorMessage } from "../../utilities/errorUtils";
 
 const Logger = logger(__filename);
 
@@ -45,9 +45,14 @@ class CoursePageService implements ICoursePageService {
     }
   }
 
-  async getCoursePage(coursePageId: string): Promise<CoursePageDTO> {
+  async getCoursePage(
+    coursePageId: string,
+    lean = false,
+  ): Promise<CoursePageDTO> {
     try {
-      const coursePage = await MgCoursePage.findById(coursePageId);
+      const coursePage = lean
+        ? await MgCoursePage.findById(coursePageId).lean().exec()
+        : await MgCoursePage.findById(coursePageId);
 
       if (!coursePage) {
         throw new Error(`id ${coursePageId} not found.`);
