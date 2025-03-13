@@ -5,13 +5,60 @@ import UnitSidebar from "./UnitSidebar";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import CourseModulesGrid from "./CourseModulesGrid";
+import CreateUnitModal from "./modals/CreateUnitModal";
+import DeleteUnitModal from "./modals/DeleteUnitModal";
+import EditUnitModal from "./modals/EditUnitModal";
+import UnpublishUnitModal from "./modals/UnpublishUnitModal";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
-
+  const [editUnitName, setEditUnitName] = useState("");
+  const [createUnitName, setCreateUnitName] = useState("");
+  const [deleteUnitId, setDeleteUnitId] = useState("");
+  const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
+  const [openEditUnitModal, setOpenEditUnitModal] = useState(true);
+  const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
+  const [openUnpublishUnitModal, setOpenUnpublishUnitModal] = useState(false);
   const [open, setOpen] = useState(true);
   const [selectedUnit, setSelectedUnit] = useState<CourseUnit | null>(null);
+
+  const handleOpenCreateUnitModal = () => {
+    setOpenCreateUnitModal(true);
+  };
+
+  const handleCloseCreateUnitModal = () => {
+    setOpenCreateUnitModal(false);
+  };
+
+  const handleCloseEditUnitModal = () => {
+    setOpenEditUnitModal(false);
+  };
+
+  const handleOpenEditUnitModal = () => {
+    setOpenEditUnitModal(true);
+  };
+
+  const handleCloseDeleteUnitModal = () => {
+    setOpenDeleteUnitModal(false);
+  };
+
+  const handleOpenDeleteUnitModal = () => {
+    setOpenDeleteUnitModal(true);
+  };
+
+  const handleCloseUnpublishUnitModal = () => {
+    setOpenUnpublishUnitModal(false);
+  };
+
+  const handleOpenUnpublishUnitModal = () => {
+    setOpenUnpublishUnitModal(true);
+  };
+
+  const createUnit = () => {};
+  const editUnit = () => {};
+  const deleteUnit = () => {};
+  const unpublishUnit = () => {};
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -40,9 +87,36 @@ export default function CourseUnitsPage() {
 
   return (
     <Box display="flex" width="100%" height="100%">
+      <CreateUnitModal
+        openCreateUnitModal={openCreateUnitModal}
+        handleCloseCreateUnitModal={handleCloseCreateUnitModal}
+        setCreateUnitName={setCreateUnitName}
+        createUnit={createUnit}
+      />
+      <EditUnitModal
+        openEditUnitModal={openEditUnitModal}
+        setEditUnitName={setEditUnitName}
+        handleCloseEditUnitModal={handleCloseEditUnitModal}
+        editUnit={editUnit}
+      />
+      <DeleteUnitModal
+        openDeleteUnitModal={openDeleteUnitModal}
+        handleCloseDeleteUnitModal={handleCloseDeleteUnitModal}
+        deleteUnit={deleteUnit}
+      />
+      <UnpublishUnitModal
+        openUnpublishUnitModal={openUnpublishUnitModal}
+        handleCloseUnpublishUnitModal={handleCloseUnpublishUnitModal}
+        unpublishUnit={unpublishUnit}
+      />
+
       <UnitSidebar
         courseUnits={courseUnits}
         handleClose={handleDrawerClose}
+        handleOpenCreateUnitModal={handleOpenCreateUnitModal}
+        handleOpenDeleteUnitModal={handleOpenDeleteUnitModal}
+        handleOpenEditUnitModal={handleOpenEditUnitModal}
+        handleOpenUnpublishUnitModal={handleOpenUnpublishUnitModal}
         open={open}
         onSelectUnit={handleSelectUnit}
       />
