@@ -97,7 +97,10 @@ const ManageUserPage = (): React.ReactElement => {
   const handleAddAdmin = async () => {};
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", padding: "25px" }}>
+    <Box
+      role="main"
+      sx={{ display: "flex", flexDirection: "column", padding: "25px" }}
+    >
       <DeleteUserModal
         open={openDeleteUserModal}
         onClose={handleCloseDeleteUserModal}

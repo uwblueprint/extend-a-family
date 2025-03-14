@@ -68,11 +68,21 @@ const UserTable: React.FC<UserTableProps> = ({
             : filteredUsers
           ).map((user) => (
             <TableRow key={user.id}>
-              <TableCell>
+              <TableCell
+                sx={{
+                  paddingLeft: "0px",
+                  display: "flex",
+                  flexDirection: "row",
+                }}
+              >
                 <Avatar src={placeholderImage} alt={user.firstName} />
-              </TableCell>
-              <TableCell align="left">
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Box
+                  sx={{
+                    marginLeft: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
                   <Typography variant="bodyLarge">
                     {user.firstName} {user.lastName}
                   </Typography>
@@ -81,16 +91,11 @@ const UserTable: React.FC<UserTableProps> = ({
                   </Typography>
                 </Box>
               </TableCell>
-              <TableCell
-                sx={{
-                  textAlign: "right",
-                  paddingRight: "16px",
-                  width: "18%",
-                }}
-              >
+              <TableCell sx={{ textAlign: "right", paddingRight: "0px" }}>
                 <Typography
                   variant="labelMedium"
                   sx={{
+                    marginRight: "16px",
                     display: "inline-block",
                     backgroundColor: theme.palette[user.role].Light,
                     color: theme.palette[user.role].Default,
@@ -98,14 +103,6 @@ const UserTable: React.FC<UserTableProps> = ({
                 >
                   {user.role.toUpperCase()}
                 </Typography>
-              </TableCell>
-              <TableCell
-                sx={{
-                  textAlign: "right",
-                  paddingRight: "0px",
-                  width: "18%",
-                }}
-              >
                 <Button
                   variant="outlined"
                   startIcon={<Delete />}
@@ -132,6 +129,12 @@ const UserTable: React.FC<UserTableProps> = ({
         <TableFooter>
           <TableRow>
             <TablePagination
+              sx={{
+                ".MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
+                  {
+                    margin: "auto",
+                  },
+              }}
               rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
               colSpan={6}
               count={filteredUsers.length}
