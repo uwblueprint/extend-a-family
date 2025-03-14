@@ -19,6 +19,22 @@ const getUsersByRole = async (role: Role): Promise<User[]> => {
   }
 };
 
+const getUsers = async (): Promise<User[]> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.get(`/users/`, {
+      headers: { Authorization: bearerToken },
+    });
+    return data;
+  } catch (error) {
+    return [];
+  }
+};
+
 export default {
   getUsersByRole,
+  getUsers,
 };
