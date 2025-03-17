@@ -36,13 +36,16 @@ feedbackRouter.post(
   createFeedbackDtoValidator,
   async (req, res) => {
     try {
+      const { learnerId, moduleId, unitId, isLiked, difficulty, message } =
+        req.body;
+
       const newFeedback = await feedbackService.createFeedback({
-        learnerId: req.body.learnerId,
-        moduleId: req.body.moduleId,
-        unitId: req.body.unitId,
-        isLiked: req.body.isLiked,
-        difficulty: req.body.difficulty,
-        message: req.body.message,
+        learnerId,
+        moduleId,
+        unitId,
+        isLiked,
+        difficulty,
+        message,
       });
       res.status(201).json(newFeedback);
     } catch (error) {
