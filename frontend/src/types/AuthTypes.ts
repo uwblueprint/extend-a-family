@@ -14,6 +14,11 @@ export type AuthenticatedUser = {
   status: Status;
 };
 
+export type AuthError = {
+  error: AuthErrorCodes;
+  errorData?: [Role, Role];
+};
+
 export type AuthenticatedAdministrator = AuthenticatedUser;
 export type AuthenticatedFacilitator = AuthenticatedUser & {
   learners: string[];
@@ -45,7 +50,12 @@ export function isAuthenticatedLearner(
   return user.role === "Learner";
 }
 
-export type AuthError = {
-  error: AuthErrorCodes;
-  errorData?: [Role, Role];
-};
+export function isAuthenticatedUser(obj: unknown): obj is AuthenticatedUser {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    "accessToken" in obj &&
+    "authId" in obj &&
+    "email" in obj
+  );
+}
