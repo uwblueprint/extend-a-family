@@ -100,6 +100,7 @@ export default function CreateUnitModal(props: DeleteUnitModalProps) {
         >
           <Button
             variant="outlined"
+            disableElevation
             sx={{
               display: "flex",
               height: "40px",

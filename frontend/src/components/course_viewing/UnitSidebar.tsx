@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
+  Divider,
   Drawer,
   IconButton,
   List,
@@ -11,21 +12,21 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  MenuList,
   Paper,
   Typography,
   useTheme,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import ModeEditOutlineIcon from "@mui/icons-material/ModeEditOutline";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import MoveDownIcon from "@mui/icons-material/MoveDown";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { CourseUnit } from "../../types/CourseTypes";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import AddIcon from "@mui/icons-material/Add";
+import { CourseUnit } from "../../types/CourseTypes";
 import { useUser } from "../../hooks/useUser";
+
 enum ModalType {
   Create = "Create",
   Delete = "Delete",
@@ -61,6 +62,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openContextMenu = Boolean(anchorEl);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleContextMenuOpen = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
@@ -89,52 +91,112 @@ export default function UnitSidebar(props: UnitSideBarProps) {
 
   const ContextMenu = () => {
     return (
-      <Paper sx={{ width: "250px", maxHeight: "243px", height: "100%" }}>
+      <Paper
+        sx={{
+          width: "250px",
+          maxHeight: "243px",
+          height: "100%",
+          borderRadius: "4px",
+          backgroundColor: theme.palette.Neutral[200],
+        }}
+      >
         <Menu
           anchorEl={anchorEl}
           open={openContextMenu}
           onClose={handleContextMenuClose}
+          sx={{
+            padding: "0px",
+            margin: "0px",
+            backgroundColor: theme.palette.Neutral[200],
+          }}
+          MenuListProps={{
+            sx: {
+              py: 0,
+              backgroundColor: theme.palette.Neutral[200],
+              paddingTop: "8px",
+              paddingBottom: "8px",
+            },
+          }}
         >
-          <MenuList>
-            <MenuItem>
-              <ListItemIcon>
-                <OpenInNewIcon fontSize="small" />
-              </ListItemIcon>
-              <Typography variant="bodyMedium">View Feedback</Typography>
-            </MenuItem>
-            <MenuItem>
-              <ListItemIcon>
-                <FileUploadOutlinedIcon fontSize="small" />
-              </ListItemIcon>
-              <Typography variant="bodyMedium">Upload Thumbnail</Typography>
-            </MenuItem>
-            <MenuItem>
-              <ListItemIcon>
-                <MoveDownIcon fontSize="small" />
-              </ListItemIcon>
-              <Typography variant="bodyMedium">Move</Typography>
-            </MenuItem>
-            <MenuItem onClick={() => handleOpenModal(ModalType.Unpublish)}>
-              <ListItemIcon>
-                <VisibilityOffIcon fontSize="small" />
-              </ListItemIcon>
-              <Typography variant="bodyMedium" noWrap>
-                Unpublish
-              </Typography>
-            </MenuItem>
-            <MenuItem onClick={() => handleOpenModal(ModalType.Delete)}>
-              <ListItemIcon>
-                <DeleteOutlineIcon fontSize="small" />
-              </ListItemIcon>
-              <Typography
-                variant="bodyMedium"
-                noWrap
-                color={theme.palette.Error.Default}
-              >
-                Delete
-              </Typography>
-            </MenuItem>
-          </MenuList>
+          <MenuItem
+            sx={{
+              height: "48px",
+            }}
+          >
+            <ListItemIcon>
+              <OpenInNewIcon
+                fontSize="small"
+                htmlColor={theme.palette.Neutral[700]}
+              />
+            </ListItemIcon>
+            <Typography variant="bodyMedium">View Feedback</Typography>
+          </MenuItem>
+          <Divider component="li" />
+          <MenuItem
+            sx={{
+              height: "48px",
+            }}
+          >
+            <ListItemIcon>
+              <FileUploadOutlinedIcon
+                fontSize="small"
+                htmlColor={theme.palette.Neutral[700]}
+              />
+            </ListItemIcon>
+            <Typography variant="bodyMedium">Upload Thumbnail</Typography>
+          </MenuItem>
+          <Divider component="li" />
+          <MenuItem
+            sx={{
+              height: "48px",
+            }}
+          >
+            <ListItemIcon>
+              <MoveDownIcon
+                fontSize="small"
+                htmlColor={theme.palette.Neutral[700]}
+              />
+            </ListItemIcon>
+            <Typography variant="bodyMedium">Move</Typography>
+          </MenuItem>
+          <Divider component="li" />
+          <MenuItem
+            sx={{
+              height: "48px",
+            }}
+            onClick={() => handleOpenModal(ModalType.Unpublish)}
+          >
+            <ListItemIcon>
+              <VisibilityOffIcon
+                fontSize="small"
+                htmlColor={theme.palette.Neutral[700]}
+              />
+            </ListItemIcon>
+            <Typography variant="bodyMedium" noWrap>
+              Unpublish
+            </Typography>
+          </MenuItem>
+          <Divider component="li" />
+          <MenuItem
+            onClick={() => handleOpenModal(ModalType.Delete)}
+            sx={{
+              height: "48px",
+            }}
+          >
+            <ListItemIcon>
+              <DeleteOutlineIcon
+                fontSize="small"
+                htmlColor={theme.palette.Neutral[700]}
+              />
+            </ListItemIcon>
+            <Typography
+              variant="bodyMedium"
+              noWrap
+              color={theme.palette.Error.Default}
+            >
+              Delete
+            </Typography>
+          </MenuItem>
         </Menu>
       </Paper>
     );
@@ -150,7 +212,8 @@ export default function UnitSidebar(props: UnitSideBarProps) {
   return (
     <Drawer
       sx={{
-        width: "20%",
+        maxWidth: "301px",
+        width: "100%",
         height: "100%",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
@@ -249,13 +312,18 @@ export default function UnitSidebar(props: UnitSideBarProps) {
         <Button
           variant="contained"
           onClick={handleOpenCreateUnitModal}
+          disableElevation
+          startIcon={<AddIcon />}
           sx={{
-            width: " 100%",
-            height: "100%",
+            width: "100%",
+            height: "40px",
             maxWidth: "236px",
-            maxHeight: "40px",
             backgroundColor: theme.palette.Administrator.Default,
             alignItems: "center",
+            marginTop: "24px",
+            marginBottom: "24px",
+            marginLeft: "32px",
+            marginRight: "32px",
           }}
         >
           <Typography
