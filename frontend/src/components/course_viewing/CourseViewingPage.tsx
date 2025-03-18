@@ -108,7 +108,6 @@ export default function CourseUnitsPage() {
         handleOpenUnpublishUnitModal={handleOpenUnpublishUnitModal}
         open={open}
       />
-      <Button />
       {!open && (
         <Button
           type="button"
