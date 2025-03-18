@@ -4,12 +4,57 @@ import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import UnitSidebar from "./UnitSidebar";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import CreateUnitModal from "./modals/CreateUnitModal";
+import DeleteUnitModal from "./modals/DeleteUnitModal";
+import UnpublishUnitModal from "./modals/UnpublishUnitModal";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
-
+  const [createUnitName, setCreateUnitName] = useState("");
+  const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
+  const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
+  const [openUnpublishUnitModal, setOpenUnpublishUnitModal] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState("");
   const [open, setOpen] = useState(true);
+
+  const handleOpenCreateUnitModal = () => {
+    setOpenCreateUnitModal(true);
+  };
+
+  const handleCloseCreateUnitModal = () => {
+    setOpenCreateUnitModal(false);
+  };
+
+  const handleCloseDeleteUnitModal = () => {
+    setOpenDeleteUnitModal(false);
+  };
+
+  const handleOpenDeleteUnitModal = () => {
+    setOpenDeleteUnitModal(true);
+  };
+
+  const handleCloseUnpublishUnitModal = () => {
+    setOpenUnpublishUnitModal(false);
+  };
+
+  const handleOpenUnpublishUnitModal = () => {
+    setOpenUnpublishUnitModal(true);
+  };
+
+  const createUnit = () => {
+    // dummy function
+    const unitName = createUnitName;
+    console.log("Unit name", unitName);
+  };
+  const deleteUnit = () => {
+    const courseId = selectedCourseId;
+    console.log("Delete course id:", courseId);
+  };
+  const unpublishUnit = () => {
+    const courseId = selectedCourseId;
+    console.log("Unpublish course id:", courseId);
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -29,9 +74,30 @@ export default function CourseUnitsPage() {
 
   return (
     <Box display="flex" width="100%" height="100%">
+      <CreateUnitModal
+        openCreateUnitModal={openCreateUnitModal}
+        handleCloseCreateUnitModal={handleCloseCreateUnitModal}
+        setCreateUnitName={setCreateUnitName}
+        createUnit={createUnit}
+      />
+      <DeleteUnitModal
+        openDeleteUnitModal={openDeleteUnitModal}
+        handleCloseDeleteUnitModal={handleCloseDeleteUnitModal}
+        deleteUnit={deleteUnit}
+      />
+      <UnpublishUnitModal
+        openUnpublishUnitModal={openUnpublishUnitModal}
+        handleCloseUnpublishUnitModal={handleCloseUnpublishUnitModal}
+        unpublishUnit={unpublishUnit}
+      />
+
       <UnitSidebar
         courseUnits={courseUnits}
         handleClose={handleDrawerClose}
+        handleOpenCreateUnitModal={handleOpenCreateUnitModal}
+        handleOpenDeleteUnitModal={handleOpenDeleteUnitModal}
+        handleOpenUnpublishUnitModal={handleOpenUnpublishUnitModal}
+        setSelectedCourseId={setSelectedCourseId}
         open={open}
       />
       {!open && (
