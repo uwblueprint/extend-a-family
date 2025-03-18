@@ -26,6 +26,7 @@ import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import { CourseUnit } from "../../types/CourseTypes";
 import { useUser } from "../../hooks/useUser";
+import { isAdministrator } from "../../types/UserTypes";
 
 enum ModalType {
   Create = "Create",
@@ -37,9 +38,9 @@ interface UnitSideBarProps {
   courseUnits: CourseUnit[];
   handleClose: () => void;
   handleOpenCreateUnitModal: () => void;
-  handleOpenEditUnitModal: () => void;
   handleOpenDeleteUnitModal: () => void;
   handleOpenUnpublishUnitModal: () => void;
+  setSelectedCourseId: (value: React.SetStateAction<string>) => void;
   open: boolean;
 }
 
@@ -51,18 +52,20 @@ export default function UnitSidebar(props: UnitSideBarProps) {
     handleClose,
     open,
     handleOpenCreateUnitModal,
-    handleOpenEditUnitModal,
     handleOpenDeleteUnitModal,
     handleOpenUnpublishUnitModal,
+    setSelectedCourseId,
   } = props;
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
+
   const openContextMenu = Boolean(anchorEl);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleContextMenuOpen = (event: any) => {
+  const handleContextMenuOpen = (event: any, courseId: string) => {
     setAnchorEl(event.currentTarget);
+    setSelectedCourseId(courseId);
   };
   const handleContextMenuClose = () => {
     setAnchorEl(null);
@@ -80,9 +83,6 @@ export default function UnitSidebar(props: UnitSideBarProps) {
       case ModalType.Unpublish:
         handleOpenUnpublishUnitModal();
         break;
-      case ModalType.Edit:
-        handleOpenEditUnitModal();
-        break;
       default:
     }
   };
@@ -95,7 +95,6 @@ export default function UnitSidebar(props: UnitSideBarProps) {
           maxHeight: "243px",
           height: "100%",
           borderRadius: "4px",
-          backgroundColor: theme.palette.Neutral[200],
         }}
       >
         <Menu
@@ -105,7 +104,6 @@ export default function UnitSidebar(props: UnitSideBarProps) {
           sx={{
             padding: "0px",
             margin: "0px",
-            backgroundColor: theme.palette.Neutral[200],
           }}
           MenuListProps={{
             sx: {
@@ -291,47 +289,51 @@ export default function UnitSidebar(props: UnitSideBarProps) {
                         : theme.typography.bodyLarge
                     }
                   />
-                  <IconButton
-                    edge="end"
-                    onClick={(event) => {
-                      event.stopPropagation(); // Prevent triggering the list item click
-                      handleContextMenuOpen(event); // Custom function to handle button click
-                    }}
-                    sx={{ marginLeft: "16px" }}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
+                  {isAdministrator(user) && (
+                    <IconButton
+                      edge="end"
+                      onClick={(event) => {
+                        event.stopPropagation(); // Prevent triggering the list item click
+                        handleContextMenuOpen(event, course.id); // Custom function to handle button click
+                      }}
+                      sx={{ marginLeft: "16px" }}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  )}
                 </ListItemButton>
               </ListItem>
             );
           })}
         </List>
-        <Button
-          variant="contained"
-          onClick={handleOpenCreateUnitModal}
-          disableElevation
-          startIcon={<AddIcon />}
-          sx={{
-            width: "100%",
-            height: "40px",
-            maxWidth: "236px",
-            backgroundColor: theme.palette.Administrator.Default,
-            alignItems: "center",
-            marginTop: "24px",
-            marginBottom: "24px",
-            marginLeft: "32px",
-            marginRight: "32px",
-          }}
-        >
-          <Typography
-            variant="labelLarge"
-            style={{
-              color: theme.palette.Neutral[100],
+        {isAdministrator(user) && (
+          <Button
+            variant="contained"
+            onClick={handleOpenCreateUnitModal}
+            disableElevation
+            startIcon={<AddIcon />}
+            sx={{
+              width: "100%",
+              height: "40px",
+              maxWidth: "236px",
+              backgroundColor: theme.palette[user.role].Default,
+              alignItems: "center",
+              marginTop: "24px",
+              marginBottom: "24px",
+              marginLeft: "32px",
+              marginRight: "32px",
             }}
           >
-            Create Unit
-          </Typography>
-        </Button>
+            <Typography
+              variant="labelLarge"
+              style={{
+                color: theme.palette.Neutral[100],
+              }}
+            >
+              Create Unit
+            </Typography>
+          </Button>
+        )}
       </Box>
     </Drawer>
   );

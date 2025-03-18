@@ -6,19 +6,16 @@ import { CourseUnit } from "../../types/CourseTypes";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import CreateUnitModal from "./modals/CreateUnitModal";
 import DeleteUnitModal from "./modals/DeleteUnitModal";
-import EditUnitModal from "./modals/EditUnitModal";
 import UnpublishUnitModal from "./modals/UnpublishUnitModal";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
-  const [editUnitName, setEditUnitName] = useState("");
   const [createUnitName, setCreateUnitName] = useState("");
-  const [deleteUnitId, setDeleteUnitId] = useState("");
   const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
-  const [openEditUnitModal, setOpenEditUnitModal] = useState(true);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
   const [openUnpublishUnitModal, setOpenUnpublishUnitModal] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState("");
   const [open, setOpen] = useState(true);
 
   const handleOpenCreateUnitModal = () => {
@@ -27,14 +24,6 @@ export default function CourseUnitsPage() {
 
   const handleCloseCreateUnitModal = () => {
     setOpenCreateUnitModal(false);
-  };
-
-  const handleCloseEditUnitModal = () => {
-    setOpenEditUnitModal(false);
-  };
-
-  const handleOpenEditUnitModal = () => {
-    setOpenEditUnitModal(true);
   };
 
   const handleCloseDeleteUnitModal = () => {
@@ -53,10 +42,19 @@ export default function CourseUnitsPage() {
     setOpenUnpublishUnitModal(true);
   };
 
-  const createUnit = () => {};
-  const editUnit = () => {};
-  const deleteUnit = () => {};
-  const unpublishUnit = () => {};
+  const createUnit = () => {
+    // dummy function
+    const unitName = createUnitName;
+    console.log("Unit name", unitName);
+  };
+  const deleteUnit = () => {
+    const courseId = selectedCourseId;
+    console.log("Delete course id:", courseId);
+  };
+  const unpublishUnit = () => {
+    const courseId = selectedCourseId;
+    console.log("Unpublish course id:", courseId);
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -82,12 +80,6 @@ export default function CourseUnitsPage() {
         setCreateUnitName={setCreateUnitName}
         createUnit={createUnit}
       />
-      <EditUnitModal
-        openEditUnitModal={openEditUnitModal}
-        setEditUnitName={setEditUnitName}
-        handleCloseEditUnitModal={handleCloseEditUnitModal}
-        editUnit={editUnit}
-      />
       <DeleteUnitModal
         openDeleteUnitModal={openDeleteUnitModal}
         handleCloseDeleteUnitModal={handleCloseDeleteUnitModal}
@@ -104,8 +96,8 @@ export default function CourseUnitsPage() {
         handleClose={handleDrawerClose}
         handleOpenCreateUnitModal={handleOpenCreateUnitModal}
         handleOpenDeleteUnitModal={handleOpenDeleteUnitModal}
-        handleOpenEditUnitModal={handleOpenEditUnitModal}
         handleOpenUnpublishUnitModal={handleOpenUnpublishUnitModal}
+        setSelectedCourseId={setSelectedCourseId}
         open={open}
       />
       {!open && (

@@ -11,6 +11,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { useUser } from "../../../hooks/useUser";
 
 interface DeleteUnitModalProps {
   openDeleteUnitModal: boolean;
@@ -22,6 +23,7 @@ export default function CreateUnitModal(props: DeleteUnitModalProps) {
   const { openDeleteUnitModal, handleCloseDeleteUnitModal, deleteUnit } = props;
 
   const theme = useTheme();
+  const user = useUser();
 
   return (
     <Box
@@ -106,15 +108,14 @@ export default function CreateUnitModal(props: DeleteUnitModalProps) {
               height: "40px",
               gap: "8px",
               "&:hover": {
-                bgcolor: theme.palette.Administrator.Hover,
+                bgcolor: theme.palette[user.role].Hover,
               },
-              borderColor: `${theme.palette.Light.Outline}`,
             }}
             onClick={handleCloseDeleteUnitModal}
           >
             <Typography
               variant="labelLarge"
-              color={theme.palette.Administrator.Default}
+              color={theme.palette[user.role].Default}
             >
               GO BACK
             </Typography>
