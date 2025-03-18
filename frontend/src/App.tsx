@@ -138,10 +138,11 @@ const App = (): React.ReactElement => {
                   component={HelpRequestPage}
                   allowedRoles={["Facilitator"]}
                 />
-                <Route
+                <PrivateRoute
                   exact
                   path={Routes.COURSE_PAGE}
                   component={CourseViewingPage}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
                 <PrivateRoute
                   exact
