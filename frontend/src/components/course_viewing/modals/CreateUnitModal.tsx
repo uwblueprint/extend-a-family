@@ -13,9 +13,10 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { useUser } from "../../../hooks/useUser";
 
 interface CreateUnitModalProps {
-  openCreateUnitModal: boolean
+  openCreateUnitModal: boolean;
   handleCloseCreateUnitModal: () => void;
   setCreateUnitName: (value: React.SetStateAction<string>) => void;
   createUnit: () => void;
@@ -30,6 +31,7 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
   } = props;
 
   const theme = useTheme();
+  const user = useUser();
 
   return (
     <Box
@@ -137,15 +139,14 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
               height: "40px",
               gap: "8px",
               "&:hover": {
-                bgcolor: theme.palette.Administrator.Hover,
+                bgcolor: theme.palette[user.role].Hover,
               },
-              borderColor: `${theme.palette.Light.Outline}`,
             }}
             onClick={handleCloseCreateUnitModal}
           >
             <Typography
               variant="labelLarge"
-              color={theme.palette.Administrator.Default}
+              color={theme.palette[user.role].Default}
             >
               CANCEL
             </Typography>
@@ -156,9 +157,9 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
               display: "flex",
               height: "40px",
               gap: "8px",
-              backgroundColor: theme.palette.Administrator.Default,
+              backgroundColor: theme.palette[user.role].Default,
               "&:hover": {
-                bgcolor: theme.palette.Administrator.Default,
+                bgcolor: theme.palette[user.role].Default,
               },
             }}
             onClick={createUnit}
