@@ -46,16 +46,16 @@ export default function CourseUnitsPage() {
 
   const createUnit = () => {
     // dummy function
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const unitName = createUnitName;
-    console.log("Unit name", unitName);
   };
   const deleteUnit = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const courseId = selectedCourseId;
-    console.log("Delete course id:", courseId);
   };
   const unpublishUnit = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const courseId = selectedCourseId;
-    console.log("Unpublish course id:", courseId);
   };
 
   const handleDrawerOpen = () => {
