@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { AuthenticatedUser, AuthError, Role, Status } from "../types/AuthTypes";
 import baseAPIClient from "./BaseAPIClient";
@@ -53,7 +53,7 @@ const signup = async (
   email: string,
   password: string,
   role: string,
-): Promise<AuthenticatedUser | string | null> => {
+): Promise<AuthenticatedUser | null> => {
   try {
     const { data } = await baseAPIClient.post(
       "/auth/signup",
@@ -62,8 +62,8 @@ const signup = async (
     );
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      return error.response.data?.error || null;
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.error);
     }
     return null;
   }

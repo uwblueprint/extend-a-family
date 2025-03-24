@@ -19,7 +19,7 @@ import {
   Password,
   Close,
 } from "@mui/icons-material";
-import authAPIClient from "../../APIClients/AuthAPIClient";
+import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import logo from "../assets/logoColoured.png";
@@ -31,7 +31,6 @@ import {
   defaultAuthError,
 } from "../../errors/AuthErrors";
 import { PresentableError } from "../../types/ErrorTypes";
-import { isAuthenticatedUser } from "../../types/AuthTypes";
 import ErrorAlert from "../common/ErrorAlert";
 
 const Signup = (): React.ReactElement => {
@@ -48,30 +47,34 @@ const Signup = (): React.ReactElement => {
   const onSignupClick = async () => {
     setEmailError(null);
     setErrorData(null);
-    const response = await authAPIClient.signup(
-      firstName,
-      lastName,
-      email,
-      password,
-      "Facilitator",
-    );
 
-    if (!isAuthenticatedUser(response)) {
-      switch (response) {
-        case AuthErrorCodes.EMAIL_IN_USE:
-          setErrorData(authErrors.EMAIL_IN_USE);
-          break;
+    try {
+      await AuthAPIClient.signup(
+        firstName,
+        lastName,
+        email,
+        password,
+        "Facilitator",
+      );
+      // eslint-disable-next-line no-alert
+      alert("Signup successful, verification link was sent to your email.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        switch (error.message) {
+          case AuthErrorCodes.EMAIL_IN_USE:
+            setErrorData(authErrors.EMAIL_IN_USE);
+            break;
 
-        case AuthErrorCodes.INVALID_EMAIL:
-          setEmailError(authErrors.INVALID_EMAIL);
-          break;
+          case AuthErrorCodes.INVALID_EMAIL:
+            setEmailError(authErrors.INVALID_EMAIL);
+            break;
 
-        default:
-          setErrorData(defaultAuthError);
-          break;
+          default:
+            setErrorData(defaultAuthError);
+            break;
+        }
       }
     }
-    return null;
   };
 
   if (authenticatedUser) {
@@ -126,7 +129,7 @@ const Signup = (): React.ReactElement => {
           </Typography>
 
           {errorData && (
-            <Box>
+            <Box width="100%">
               <ErrorAlert
                 title={errorData.title?.()}
                 message={errorData.text?.()}

@@ -49,13 +49,3 @@ export function isAuthenticatedLearner(
 ): user is AuthenticatedLearner {
   return user.role === "Learner";
 }
-
-export function isAuthenticatedUser(obj: unknown): obj is AuthenticatedUser {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "accessToken" in obj &&
-    "authId" in obj &&
-    "email" in obj
-  );
-}

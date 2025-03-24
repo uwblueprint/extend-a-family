@@ -61,7 +61,6 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
       setAuthenticatedUser(user);
     } catch (e: unknown) {
       const error = e as Error;
-      // eslint-disable-next-line no-alert
       const errorCause = error.cause as AuthError;
       switch (error.message) {
         case AuthErrorCodes.UNVERIFIED_EMAIL:
