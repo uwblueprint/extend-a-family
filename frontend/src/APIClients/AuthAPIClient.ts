@@ -52,16 +52,19 @@ const signup = async (
   lastName: string,
   email: string,
   password: string,
-  role: string, // Added role parameter
+  role: string,
 ): Promise<AuthenticatedUser | null> => {
   try {
     const { data } = await baseAPIClient.post(
       "/auth/signup",
-      { firstName, lastName, email, password, role }, // Added role to request body
+      { firstName, lastName, email, password, role },
       { withCredentials: true },
     );
     return data;
   } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.error);
+    }
     return null;
   }
 };

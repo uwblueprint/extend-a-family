@@ -14,6 +14,11 @@ export type AuthenticatedUser = {
   status: Status;
 };
 
+export type AuthError = {
+  error: AuthErrorCodes;
+  errorData?: [Role, Role];
+};
+
 export type AuthenticatedAdministrator = AuthenticatedUser;
 export type AuthenticatedFacilitator = AuthenticatedUser & {
   learners: string[];
@@ -44,8 +49,3 @@ export function isAuthenticatedLearner(
 ): user is AuthenticatedLearner {
   return user.role === "Learner";
 }
-
-export type AuthError = {
-  error: AuthErrorCodes;
-  errorData?: [Role, Role];
-};

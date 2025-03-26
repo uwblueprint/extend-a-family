@@ -19,13 +19,19 @@ import {
   Password,
   Close,
 } from "@mui/icons-material";
-import authAPIClient from "../../APIClients/AuthAPIClient";
+import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
-import { AuthenticatedUser } from "../../types/AuthTypes";
 import logo from "../assets/logoColoured.png";
 import { getSignUpPath, getSignUpPrompt } from "./WelcomePage";
 import Login from "./Login";
+import {
+  AuthErrorCodes,
+  authErrors,
+  defaultAuthError,
+} from "../../errors/AuthErrors";
+import { PresentableError } from "../../types/ErrorTypes";
+import ErrorAlert from "../common/ErrorAlert";
 
 const Signup = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
@@ -34,27 +40,41 @@ const Signup = (): React.ReactElement => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [errorData, setErrorData] = useState<PresentableError | null>(null);
+  const [emailError, setEmailError] = useState<PresentableError | null>(null);
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
 
   const onSignupClick = async () => {
-    const user: AuthenticatedUser | null = await authAPIClient.signup(
-      firstName,
-      lastName,
-      email,
-      password,
-      "Facilitator",
-    );
+    setEmailError(null);
+    setErrorData(null);
 
-    if (!user) {
-      // will need to change this for different errors
+    try {
+      await AuthAPIClient.signup(
+        firstName,
+        lastName,
+        email,
+        password,
+        "Facilitator",
+      );
       // eslint-disable-next-line no-alert
-      alert("Something went wrong with signup");
-      return;
-    }
+      alert("Signup successful, verification link was sent to your email.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        switch (error.message) {
+          case AuthErrorCodes.EMAIL_IN_USE:
+            setErrorData(authErrors.EMAIL_IN_USE);
+            break;
 
-    // eslint-disable-next-line no-alert
-    alert("Signup successful, verification link was sent to your email.");
+          case AuthErrorCodes.INVALID_EMAIL:
+            setEmailError(authErrors.INVALID_EMAIL);
+            break;
+
+          default:
+            setErrorData(defaultAuthError);
+            break;
+        }
+      }
+    }
   };
 
   if (authenticatedUser) {
@@ -107,6 +127,16 @@ const Signup = (): React.ReactElement => {
           <Typography variant="headlineLarge">
             Sign Up as a Facilitator
           </Typography>
+
+          {errorData && (
+            <Box width="100%">
+              <ErrorAlert
+                title={errorData.title?.()}
+                message={errorData.text?.()}
+              />
+            </Box>
+          )}
+
           <TextField
             required
             label="First Name"
@@ -153,6 +183,8 @@ const Signup = (): React.ReactElement => {
             required
             label="Email"
             type="email"
+            error={!!emailError}
+            helperText={emailError?.text()}
             placeholder="example@gmail.com"
             onChange={(event) => setEmail(event.target.value)}
             variant="outlined"
