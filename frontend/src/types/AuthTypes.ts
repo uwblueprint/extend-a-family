@@ -17,6 +17,7 @@ export type AuthenticatedUser = {
 export type AuthenticatedAdministrator = AuthenticatedUser;
 export type AuthenticatedFacilitator = AuthenticatedUser & {
   learners: string[];
+  bio?: string;
 };
 export type AuthenticatedLearner = AuthenticatedUser & {
   facilitator: string;
