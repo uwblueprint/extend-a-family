@@ -43,6 +43,7 @@ export function isAdministrator(user: UserDTO): user is AdminDTO {
 
 export type FacilitatorDTO = UserDTO & {
   learners: string[];
+  bio?: string;
 };
 
 export function isFacilitator(user: UserDTO): user is FacilitatorDTO {
