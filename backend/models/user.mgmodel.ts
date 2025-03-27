@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, ObjectId } from "mongoose";
+import mongoose, { Document, ObjectId, Schema } from "mongoose";
 
 import { Role, Status } from "../types/userTypes";
 
@@ -15,6 +15,7 @@ export interface User extends Document {
 
 export interface Learner extends User {
   facilitator: ObjectId;
+  activitiesCompleted: Map<string, Map<string, Array<ObjectId>>>;
 }
 
 export interface Facilitator extends User {
@@ -89,6 +90,11 @@ const LearnerSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
+  },
+  activitiesCompleted: {
+    type: Map,
+    of: [{ type: Map, of: [{ type: mongoose.Schema.Types.ObjectId, ref: "Activity" }] }],
+    default: {},
   },
 });
 
