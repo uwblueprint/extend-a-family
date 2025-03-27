@@ -13,7 +13,8 @@ import authAPIClient from "../../APIClients/AuthAPIClient";
 const MyAccount = (): React.ReactElement => {
   const theme = useTheme();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
+    useState(false);
 
   const { setAuthenticatedUser, authenticatedUser } = useContext(AuthContext);
 
@@ -115,7 +116,10 @@ const MyAccount = (): React.ReactElement => {
             </Typography>
           </Container>
 
-          <ProfilePicture firstName={authenticatedUser.firstName} lastName={authenticatedUser.lastName} />
+          <ProfilePicture
+            firstName={authenticatedUser.firstName}
+            lastName={authenticatedUser.lastName}
+          />
 
           <Container
             sx={{
@@ -222,7 +226,8 @@ const MyAccount = (): React.ReactElement => {
                   gap: "8px",
                   alignSelf: "stretch",
                   borderRadius: "4px",
-                  backgroundColor: theme.palette[authenticatedUser.role].Default,
+                  backgroundColor:
+                    theme.palette[authenticatedUser.role].Default,
                   "&:hover": {
                     background: theme.palette[authenticatedUser.role].Pressed,
                   },
