@@ -126,5 +126,14 @@ interface IUserService {
    * @returns the number of completed modules
    */
   getNumCompletedModules(learner: LearnerDTO): Promise<number>;
+
+  /**
+   * Delete an activity from every learner's progress
+   * @param unitId the unit id of the activity to delete
+   * @param moduleId the module id of the activity to delete
+   * @param activityId the activity id of the activity to delete
+   * @returns the number of learners that were updated
+   */
+  deleteActivityFromProgress(unitId: string, moduleId: string, activityId: string): Promise<number>;
 }
 export default IUserService;
