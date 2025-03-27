@@ -2,9 +2,8 @@ import React, { useState, useContext } from "react";
 import { Container, Typography, Button, useTheme } from "@mui/material";
 import PasswordIcon from "@mui/icons-material/Password";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import { useUser } from "../../hooks/useUser";
 import MainPageButton from "../common/MainPageButton";
-import ProfilePicture from "../profile/ProfileButton";
+import ProfilePicture from "../profile/ProfilePicture";
 import EditDetailsModal from "../profile/EditDetailsModal";
 import ChangePasswordModal from "../profile/ChangePasswordModal";
 import AuthContext from "../../contexts/AuthContext";
@@ -12,41 +11,35 @@ import userAPIClient from "../../APIClients/UserAPIClient";
 import authAPIClient from "../../APIClients/AuthAPIClient";
 
 const MyAccount = (): React.ReactElement => {
-  const userFromHook = useUser();
-  const [user, setUser] = useState(userFromHook);
   const theme = useTheme();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
-    useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
   const { setAuthenticatedUser, authenticatedUser } = useContext(AuthContext);
 
+  if (!authenticatedUser) {
+    return <Typography>Please log in to view your account.</Typography>;
+  }
+
   const handleSaveDetails = async (firstName: string, lastName: string) => {
     try {
-      if (!user || !user.id) {
+      if (!authenticatedUser || !authenticatedUser.id) {
         throw new Error("User information is not available.");
       }
 
       const updatedUser = await userAPIClient.updateUserDetails(
-        user.id,
+        authenticatedUser.id,
         firstName,
         lastName,
-        user.role,
+        authenticatedUser.role,
+        authenticatedUser.status,
       );
 
-      setUser({
-        ...user,
+      setAuthenticatedUser({
+        ...authenticatedUser,
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
       });
-
-      if (authenticatedUser && user.id === authenticatedUser.id) {
-        setAuthenticatedUser({
-          ...authenticatedUser,
-          firstName: updatedUser.firstName,
-          lastName: updatedUser.lastName,
-        });
-      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error updating user details:", error);
@@ -55,13 +48,13 @@ const MyAccount = (): React.ReactElement => {
 
   const handleSavePassword = async (newPassword: string) => {
     try {
-      if (!user || !user.email) {
+      if (!authenticatedUser || !authenticatedUser.email) {
         throw new Error("User information is not available.");
       }
       const success = await authAPIClient.changePassword(
-        user.email,
+        authenticatedUser.email,
         newPassword,
-        user.role,
+        authenticatedUser.role,
       );
 
       if (!success) {
@@ -122,7 +115,7 @@ const MyAccount = (): React.ReactElement => {
             </Typography>
           </Container>
 
-          <ProfilePicture firstName={user.firstName} lastName={user.lastName} />
+          <ProfilePicture firstName={authenticatedUser.firstName} lastName={authenticatedUser.lastName} />
 
           <Container
             sx={{
@@ -162,7 +155,7 @@ const MyAccount = (): React.ReactElement => {
                   variant="bodyMedium"
                   sx={{ color: theme.palette.Neutral[700] }}
                 >
-                  {user.firstName}
+                  {authenticatedUser.firstName}
                 </Typography>
               </Container>
               <Container
@@ -183,7 +176,7 @@ const MyAccount = (): React.ReactElement => {
                   variant="bodyMedium"
                   sx={{ color: theme.palette.Neutral[700] }}
                 >
-                  {user.lastName}
+                  {authenticatedUser.lastName}
                 </Typography>
               </Container>
               <Container
@@ -204,7 +197,7 @@ const MyAccount = (): React.ReactElement => {
                   variant="bodyMedium"
                   sx={{ color: theme.palette.Neutral[700] }}
                 >
-                  {user.email}
+                  {authenticatedUser.email}
                 </Typography>
               </Container>
             </Container>
@@ -229,9 +222,9 @@ const MyAccount = (): React.ReactElement => {
                   gap: "8px",
                   alignSelf: "stretch",
                   borderRadius: "4px",
-                  backgroundColor: theme.palette[user.role].Default,
+                  backgroundColor: theme.palette[authenticatedUser.role].Default,
                   "&:hover": {
-                    background: theme.palette[user.role].Pressed,
+                    background: theme.palette[authenticatedUser.role].Pressed,
                   },
                   padding: "10px 24px 10px 16px",
                   flex: "1 0 0",
@@ -306,8 +299,8 @@ const MyAccount = (): React.ReactElement => {
       <EditDetailsModal
         open={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        firstName={user.firstName}
-        lastName={user.lastName}
+        firstName={authenticatedUser.firstName}
+        lastName={authenticatedUser.lastName}
         onSave={handleSaveDetails}
       />
       <ChangePasswordModal

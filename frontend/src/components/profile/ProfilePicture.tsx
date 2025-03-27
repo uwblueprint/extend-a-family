@@ -1,5 +1,7 @@
 import React from "react";
 import { Box, Typography, Avatar } from "@mui/material";
+import { useTheme } from "styled-components";
+import { useUser } from "../../hooks/useUser";
 
 interface ProfilePictureProps {
   firstName?: string;
@@ -10,13 +12,16 @@ const ProfilePicture = ({
   firstName = "",
   lastName = "",
 }: ProfilePictureProps): React.ReactElement => {
+
+  const theme = useTheme();
+  const user = useUser();
+
   return (
     <Box
       sx={{
         display: "flex",
         width: "160px",
         height: "160px",
-        padding: "26.667px",
         justifyContent: "center",
         alignItems: "center",
         gap: "66.667px",
@@ -27,12 +32,10 @@ const ProfilePicture = ({
       <Avatar sx={{ width: "100%", height: "100%", bgcolor: "#D5F7FF" }}>
         <Typography
           sx={{
-            color: "var(--Schemes-Primary, #006877)",
-            fontFamily: "Lexend Deca",
+            color: theme.palette[user.role].Default,
             fontSize: "60px",
-            fontStyle: "normal",
             fontWeight: 400,
-            lineHeight: "140%", // 84px
+            lineHeight: "140%",
             letterSpacing: "-3px",
           }}
         >

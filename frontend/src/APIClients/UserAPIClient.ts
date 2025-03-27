@@ -1,4 +1,3 @@
-import axios from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { Role } from "../types/AuthTypes";
 import { User } from "../types/UserTypes";
@@ -39,52 +38,29 @@ const updateUserDetails = async (
   userId: string,
   firstName: string,
   lastName: string,
-  role: Role,
+  role: string,
+  status: string,
 ): Promise<User> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
   try {
-    const accessToken = getLocalStorageObjProperty(
-      AUTHENTICATED_USER_KEY,
-      "accessToken",
-    );
-
-    if (!accessToken) {
-      throw new Error("Authentication token not found. Please log in again.");
-    }
-
-    const updatePayload = {
-      firstName,
-      lastName,
-      role,
-      status: "Active",
-    };
-
-    const bearerToken = `Bearer ${accessToken}`;
-
-    const { data } = await baseAPIClient.put(
-      `/users/${userId}`,
-      updatePayload,
+    const response = await baseAPIClient.put(
+      `/users/updateMyAccount/${userId}`,
+      {
+        firstName,
+        lastName,
+        role,
+        status,
+      },
       {
         headers: { Authorization: bearerToken },
       },
     );
-
-    return data;
+    return response.data;
   } catch (error) {
-    // Using a conditional to satisfy no-console rule
-    if (process.env.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
-      console.error("Error updating user details:", error);
-    }
-
-    if (axios.isAxiosError(error) && error.response) {
-      if (error.response.data && error.response.data.error) {
-        throw new Error(error.response.data.error);
-      } else {
-        throw new Error(`Request failed with status ${error.response.status}`);
-      }
-    }
-
-    throw error;
+    throw new Error("Failed to update user details");
   }
 };
 

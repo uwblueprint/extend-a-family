@@ -230,8 +230,8 @@ class UserService implements IUserService {
           status: user.status,
         },
         { runValidators: true },
-      );
-
+      );      
+      
       if (!oldUser) {
         throw new Error(`userId ${userId} not found.`);
       }

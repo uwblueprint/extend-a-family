@@ -41,7 +41,7 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
 
   const handleSave = () => {
     if (!editedFirstName.trim() || !editedLastName.trim()) {
-      return; // Add error handling if needed
+      return;
     }
     onSave(editedFirstName, editedLastName);
   };
@@ -67,7 +67,6 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
           gap: "32px",
         }}
       >
@@ -148,8 +147,6 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
           sx={{
             display: "flex",
             height: "40px",
-            justifyContent: "center",
-            alignItems: "center",
             gap: "8px",
             borderRadius: "4px",
             border: `1px solid ${theme.palette.Neutral[500]}`,
