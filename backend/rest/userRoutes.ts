@@ -17,6 +17,7 @@ import FileStorageService from "../services/implementations/fileStorageService";
 import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import ICourseModuleService from "../services/interfaces/courseModuleService";
+import ICourseUnitService from "../services/interfaces/courseUnitService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import {
@@ -38,6 +39,7 @@ const userRouter: Router = Router();
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
+const courseUnitService: ICourseUnitService = new CourseUnitService();
 const courseModuleService: ICourseModuleService = new CourseModuleService();
 const firebaseStorageService: FileStorageService = new FileStorageService(
   process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
@@ -359,9 +361,7 @@ userRouter.put(
         return res.status(403).send("Forbidden: User is not a learner.");
       }
 
-      const unitId = req.body.unitId;
-      const moduleId = req.body.moduleId;
-      const activityId = req.body.activityId;
+      const { unitId, moduleId, activityId } = req.body;
 
       // Check that everything exists
       const courseUnitService = new CourseUnitService();
@@ -372,13 +372,13 @@ userRouter.put(
       }
 
       if (!courseUnit.modules.includes(moduleId)) {
-        return res.status(400).send("The module provided does not exist.");
+        return res.status(400).send(`The module provided does not exist on unit ${unitId}.`);
       }
 
       const courseModule = (await courseModuleService.getCourseModule(moduleId))!;
 
       if (!courseModule.pages.includes(activityId)) {
-        return res.status(400).send("The activity provided does not exist.");
+        return res.status(400).send(`The activity provided does not exist on module ${moduleId}.`);
       }
 
       const updatedUser = await UserModel.findByIdAndUpdate(learnerId, {
@@ -387,7 +387,7 @@ userRouter.put(
         },
       }, { new: true });
 
-      res.status(200).send(updatedUser);
+      res.status(200).json(updatedUser);
     } catch (error) {
       res.status(500).send(getErrorMessage(error));
     }
@@ -395,7 +395,7 @@ userRouter.put(
 );
 
 userRouter.get(
-  "/learner/getCompletedActivities",
+  "/learner/progress",
   isAuthorizedByRole(new Set(["Learner"])),
   async (req, res) => {
     const accessToken = getAccessToken(req)!;
@@ -408,8 +408,14 @@ userRouter.get(
       }
 
       const numCompletedModules = await userService.getNumCompletedModules(learner);
+      const allUnits = await courseUnitService.getCourseUnits();
+      const numModules = allUnits.reduce((acc, unit) => acc + unit.modules.length, 0);
 
-      res.status(200).send(numCompletedModules);
+      res.status(200).send({
+        numCompletedModules,
+        numModules,
+        progressPercentage: (numCompletedModules / numModules) * 100,
+      });
     } catch (error) {
       res.status(500).send(getErrorMessage(error));
     }
