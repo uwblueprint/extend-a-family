@@ -91,15 +91,16 @@ export default function UnitSidebar(props: UnitSideBarProps) {
         anchorEl={anchorEl}
         open={openContextMenu}
         onClose={handleContextMenuClose}
+        sx={{
+          padding: "0px",
+          margin: "0px",
+        }}
         MenuListProps={{
           sx: {
             py: 0,
             backgroundColor: theme.palette.Neutral[200],
             paddingTop: "8px",
             paddingBottom: "8px",
-            margin: "0px",
-            width: "250px",
-            borderRadius: "4px",
           },
         }}
       >
