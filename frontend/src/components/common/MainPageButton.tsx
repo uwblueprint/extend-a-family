@@ -8,7 +8,7 @@ import { useUser } from "../../hooks/useUser";
 const MainPageButton = (): React.ReactElement => {
   const history = useHistory();
   const theme = useTheme();
-  const user = useUser()
+  const user = useUser();
 
   const navigateTo = () => history.push(HOME_PAGE);
   return (
@@ -16,7 +16,9 @@ const MainPageButton = (): React.ReactElement => {
       <Button
         variant="text"
         onClick={navigateTo}
-        startIcon={<ChevronLeftIcon sx={{ color: theme.palette[user.role].Default }} />}
+        startIcon={
+          <ChevronLeftIcon sx={{ color: theme.palette[user.role].Default }} />
+        }
         sx={{
           display: "flex",
           padding: "10px 16px 10px 12px",
@@ -32,7 +34,7 @@ const MainPageButton = (): React.ReactElement => {
         }}
       >
         <Typography
-        variant="labelLarge"
+          variant="labelLarge"
           sx={{
             color: theme.palette[user.role].Default,
           }}

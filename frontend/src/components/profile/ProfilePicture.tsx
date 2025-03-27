@@ -12,7 +12,7 @@ const ProfilePicture = ({
   firstName = "",
   lastName = "",
 }: ProfilePictureProps): React.ReactElement => {
-
+  
   const theme = useTheme();
   const user = useUser();
 
