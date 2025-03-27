@@ -1,6 +1,7 @@
 import { ObjectId } from "mongoose";
 import {
   CreateUserDTO,
+  LearnerDTO,
   Role,
   Status,
   UpdateUserDTO,
@@ -118,6 +119,12 @@ interface IUserService {
    * @param newStatus status to update to
    */
   changeUserStatus(accessToken: string, newStatus: Status): Promise<void>;
-}
 
+  /**
+   * Get the number of completed modules for a learner
+   * @param learner the learner to get the number of completed modules for
+   * @returns the number of completed modules
+   */
+  getNumCompletedModules(learner: LearnerDTO): Promise<number>;
+}
 export default IUserService;

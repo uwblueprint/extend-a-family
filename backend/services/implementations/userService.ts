@@ -1,11 +1,10 @@
 import * as firebaseAdmin from "firebase-admin";
 import { Model, ObjectId } from "mongoose";
-import IUserService from "../interfaces/userService";
 import MgUser, {
-  Learner,
-  User,
-  LearnerModel,
   FacilitatorModel,
+  Learner,
+  LearnerModel,
+  User,
 } from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
@@ -18,8 +17,11 @@ import {
 import { AuthErrorCodes } from "../../types/authTypes";
 import { getErrorCode, getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
+import IUserService from "../interfaces/userService";
+import CourseModuleService from "./courseModuleService";
 
 const Logger = logger(__filename);
+const courseModuleService = new CourseModuleService();
 
 const getMongoUserByAuthId = async (authId: string): Promise<User> => {
   const user: User | null = await MgUser.findOne({ authId });
@@ -359,6 +361,22 @@ class UserService implements IUserService {
       );
       throw error;
     }
+  }
+
+  async getNumCompletedModules(learner: LearnerDTO): Promise<number> {
+    const numCompletedModules = Array.from(
+      learner.activitiesCompleted.values(),
+    ).reduce((acc, curr) => {
+      const completedModules = Array.from(curr.entries()).filter(
+        async ([moduleId, activitiesCompletedInModule]) => {
+          const module = await courseModuleService.getCourseModule(moduleId);
+          return activitiesCompletedInModule.length === module?.pages.length;
+        },
+      );
+      return acc + completedModules.length;
+    }, 0);
+
+    return numCompletedModules;
   }
 }
 

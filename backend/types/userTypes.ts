@@ -56,6 +56,7 @@ export function isFacilitator(user: UserDTO): user is FacilitatorDTO {
 
 export type LearnerDTO = UserDTO & {
   facilitator: string;
+  activitiesCompleted: Map<string, Map<string, string[]>>;
 };
 
 export function isLearner(user: UserDTO): user is LearnerDTO {

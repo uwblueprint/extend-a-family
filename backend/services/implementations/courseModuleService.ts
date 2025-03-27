@@ -6,6 +6,7 @@ import MgCourseModule, {
   CourseModule,
 } from "../../models/coursemodule.mgmodel";
 import CoursePageModel, {
+  CoursePage,
   LessonPageModel,
 } from "../../models/coursepage.mgmodel";
 import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
@@ -101,7 +102,7 @@ class CourseModuleService implements ICourseModuleService {
       const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
         `course/pdfs/module-${courseModuleId}.pdf`,
       );
-      const fetchPage = async (page: Schema.Types.ObjectId) => {
+      const fetchPage = async (page: Schema.Types.ObjectId): Promise<CoursePage> => {
         const pageObject = await CoursePageModel.findById(page).lean().exec();
         if (!pageObject) {
           throw new Error(`Page with id ${page} not found.`);

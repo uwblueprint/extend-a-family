@@ -4,6 +4,7 @@ import multer from "multer";
 import { getAccessToken, isAuthorizedByRole } from "../middlewares/auth";
 import {
   addBookmarkValidator,
+  completeActivityValidator,
   createUserDtoValidator,
   deleteBookmarkValidator,
   updateUserAccountValidator,
@@ -14,17 +15,21 @@ import UserModel, { Bookmark } from "../models/user.mgmodel";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
 import CoursePageService from "../services/implementations/coursePageService";
+import CourseModuleService from "../services/implementations/courseModuleService";
+import CourseUnitService from "../services/implementations/courseUnitService";
 import EmailService from "../services/implementations/emailService";
 import FileStorageService from "../services/implementations/fileStorageService";
 import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import ICoursePageService from "../services/interfaces/coursePageService";
+import ICourseModuleService from "../services/interfaces/courseModuleService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import {
   UpdateUserDTO,
   UserDTO,
   isFacilitator,
+  isLearner,
   isRole,
 } from "../types/userTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
@@ -40,6 +45,7 @@ const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
 const coursePageService: ICoursePageService = new CoursePageService();
+const courseModuleService: ICourseModuleService = new CourseModuleService();
 const firebaseStorageService: FileStorageService = new FileStorageService(
   process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
 );
@@ -474,6 +480,77 @@ userRouter.put(
       res.status(500).send(getErrorMessage(error));
     }
   },
+);
+
+userRouter.put(
+  "/learner/markActivityAsCompleted",
+  isAuthorizedByRole(new Set(["Learner"])),
+  completeActivityValidator,
+  async (req, res) => {
+    const accessToken = getAccessToken(req)!;
+    try {
+      const learnerId = await authService.getUserIdFromAccessToken(accessToken);
+      const learner = await userService.getUserById(learnerId.toString());
+
+      if (!isLearner(learner)) {
+        return res.status(403).send("Forbidden: User is not a learner.");
+      }
+
+      const unitId = req.body.unitId;
+      const moduleId = req.body.moduleId;
+      const activityId = req.body.activityId;
+
+      // Check that everything exists
+      const courseUnitService = new CourseUnitService();
+      const courseUnit = await courseUnitService.getCourseUnit(unitId);
+
+      if (!courseUnit) {
+        return res.status(400).send("The unit provided does not exist.");
+      }
+
+      if (!courseUnit.modules.includes(moduleId)) {
+        return res.status(400).send("The module provided does not exist.");
+      }
+
+      const courseModule = (await courseModuleService.getCourseModule(moduleId))!;
+
+      if (!courseModule.pages.includes(activityId)) {
+        return res.status(400).send("The activity provided does not exist.");
+      }
+
+      const updatedUser = await UserModel.findByIdAndUpdate(learnerId, {
+        $addToSet: {
+          [`activitiesCompleted.${unitId}.${moduleId}`]: activityId,
+        },
+      }, { new: true });
+
+      res.status(200).send(updatedUser);
+    } catch (error) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  }
+);
+
+userRouter.get(
+  "/learner/getCompletedActivities",
+  isAuthorizedByRole(new Set(["Learner"])),
+  async (req, res) => {
+    const accessToken = getAccessToken(req)!;
+    try {
+      const learnerId = await authService.getUserIdFromAccessToken(accessToken);
+      const learner = await userService.getUserById(learnerId.toString());
+
+      if (!isLearner(learner)) {
+        return res.status(403).send("Forbidden: User is not a learner.");
+      }
+
+      const numCompletedModules = await userService.getNumCompletedModules(learner);
+
+      res.status(200).send(numCompletedModules);
+    } catch (error) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  }
 );
 
 export default userRouter;
