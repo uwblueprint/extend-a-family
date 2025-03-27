@@ -378,6 +378,16 @@ class UserService implements IUserService {
 
     return numCompletedModules;
   }
+
+  async deleteActivityFromProgress(unitId: string, moduleId: string, activityId: string): Promise<number> {
+    const { modifiedCount } = await LearnerModel.updateMany(
+      {},
+      {
+        $pull: { [`activitiesCompleted.${unitId}.${moduleId}`]: activityId }
+      }
+    )
+    return modifiedCount;
+  }
 }
 
 export default UserService;
