@@ -12,7 +12,6 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Paper,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -89,112 +88,103 @@ export default function UnitSidebar(props: UnitSideBarProps) {
 
   const ContextMenu = () => {
     return (
-      <Paper
+      <Menu
+        anchorEl={anchorEl}
+        open={openContextMenu}
+        onClose={handleContextMenuClose}
         sx={{
-          width: "250px",
-          maxHeight: "243px",
-          height: "100%",
-          borderRadius: "4px",
+          padding: "0px",
+          margin: "0px",
+        }}
+        MenuListProps={{
+          sx: {
+            py: 0,
+            backgroundColor: theme.palette.Neutral[200],
+            paddingTop: "8px",
+            paddingBottom: "8px",
+          },
         }}
       >
-        <Menu
-          anchorEl={anchorEl}
-          open={openContextMenu}
-          onClose={handleContextMenuClose}
+        <MenuItem
           sx={{
-            padding: "0px",
-            margin: "0px",
-          }}
-          MenuListProps={{
-            sx: {
-              py: 0,
-              backgroundColor: theme.palette.Neutral[200],
-              paddingTop: "8px",
-              paddingBottom: "8px",
-            },
+            height: "48px",
           }}
         >
-          <MenuItem
-            sx={{
-              height: "48px",
-            }}
+          <ListItemIcon>
+            <OpenInNewIcon
+              fontSize="small"
+              htmlColor={theme.palette.Neutral[700]}
+            />
+          </ListItemIcon>
+          <Typography variant="bodyMedium">View Feedback</Typography>
+        </MenuItem>
+        <Divider component="li" />
+        <MenuItem
+          sx={{
+            height: "48px",
+          }}
+        >
+          <ListItemIcon>
+            <FileUploadOutlinedIcon
+              fontSize="small"
+              htmlColor={theme.palette.Neutral[700]}
+            />
+          </ListItemIcon>
+          <Typography variant="bodyMedium">Upload Thumbnail</Typography>
+        </MenuItem>
+        <Divider component="li" />
+        <MenuItem
+          sx={{
+            height: "48px",
+          }}
+        >
+          <ListItemIcon>
+            <MoveDownIcon
+              fontSize="small"
+              htmlColor={theme.palette.Neutral[700]}
+            />
+          </ListItemIcon>
+          <Typography variant="bodyMedium">Move</Typography>
+        </MenuItem>
+        <Divider component="li" />
+        <MenuItem
+          sx={{
+            height: "48px",
+          }}
+          onClick={() => handleOpenModal(ModalType.Unpublish)}
+        >
+          <ListItemIcon>
+            <VisibilityOffIcon
+              fontSize="small"
+              htmlColor={theme.palette.Neutral[700]}
+            />
+          </ListItemIcon>
+          <Typography variant="bodyMedium" noWrap>
+            Unpublish
+          </Typography>
+        </MenuItem>
+        <Divider component="li" />
+        <MenuItem
+          onClick={() => handleOpenModal(ModalType.Delete)}
+          sx={{
+            height: "48px",
+          }}
+        >
+          <ListItemIcon>
+            <DeleteOutlineIcon
+              fontSize="small"
+              htmlColor={theme.palette.Neutral[700]}
+            />
+          </ListItemIcon>
+          <Typography
+            variant="bodyMedium"
+            noWrap
+            color={theme.palette.Error.Default}
           >
-            <ListItemIcon>
-              <OpenInNewIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography variant="bodyMedium">View Feedback</Typography>
-          </MenuItem>
-          <Divider component="li" />
-          <MenuItem
-            sx={{
-              height: "48px",
-            }}
-          >
-            <ListItemIcon>
-              <FileUploadOutlinedIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography variant="bodyMedium">Upload Thumbnail</Typography>
-          </MenuItem>
-          <Divider component="li" />
-          <MenuItem
-            sx={{
-              height: "48px",
-            }}
-          >
-            <ListItemIcon>
-              <MoveDownIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography variant="bodyMedium">Move</Typography>
-          </MenuItem>
-          <Divider component="li" />
-          <MenuItem
-            sx={{
-              height: "48px",
-            }}
-            onClick={() => handleOpenModal(ModalType.Unpublish)}
-          >
-            <ListItemIcon>
-              <VisibilityOffIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography variant="bodyMedium" noWrap>
-              Unpublish
-            </Typography>
-          </MenuItem>
-          <Divider component="li" />
-          <MenuItem
-            onClick={() => handleOpenModal(ModalType.Delete)}
-            sx={{
-              height: "48px",
-            }}
-          >
-            <ListItemIcon>
-              <DeleteOutlineIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography
-              variant="bodyMedium"
-              noWrap
-              color={theme.palette.Error.Default}
-            >
-              Delete
-            </Typography>
-          </MenuItem>
-        </Menu>
-      </Paper>
+            Delete
+          </Typography>
+        </MenuItem>
+      </Menu>
     );
   };
   const handleListItemClick = (
