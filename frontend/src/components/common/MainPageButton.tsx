@@ -1,18 +1,22 @@
 import React from "react";
-import { Typography, Button } from "@mui/material";
+import { Typography, Button, useTheme } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { useHistory } from "react-router-dom";
 import { HOME_PAGE } from "../../constants/Routes";
+import { useUser } from "../../hooks/useUser";
 
 const MainPageButton = (): React.ReactElement => {
   const history = useHistory();
+  const theme = useTheme();
+  const user = useUser()
+
   const navigateTo = () => history.push(HOME_PAGE);
   return (
     <>
       <Button
         variant="text"
         onClick={navigateTo}
-        startIcon={<ChevronLeftIcon sx={{ color: "#555A92" }} />}
+        startIcon={<ChevronLeftIcon sx={{ color: theme.palette[user.role].Default }} />}
         sx={{
           display: "flex",
           padding: "10px 16px 10px 12px",
@@ -28,15 +32,9 @@ const MainPageButton = (): React.ReactElement => {
         }}
       >
         <Typography
+        variant="labelLarge"
           sx={{
-            color: "var(--Schemes-Tertiary, #555A92)",
-            textAlign: "center",
-            fontSize: "14px",
-            fontStyle: "normal",
-            fontWeight: 300,
-            lineHeight: "120%",
-            letterSpacing: "0.7px",
-            textTransform: "uppercase",
+            color: theme.palette[user.role].Default,
           }}
         >
           Back
