@@ -4,12 +4,59 @@ import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import UnitSidebar from "./UnitSidebar";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import CreateUnitModal from "./modals/CreateUnitModal";
+import DeleteUnitModal from "./modals/DeleteUnitModal";
+import EditUnitModal from "./modals/EditUnitModals";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
-
+  const [createUnitName, setCreateUnitName] = useState("");
+  const [editUnitName, setEditUnitName] = useState("");
+  const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
+  const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
+  const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState("");
   const [open, setOpen] = useState(true);
+
+  const handleOpenCreateUnitModal = () => {
+    setOpenCreateUnitModal(true);
+  };
+
+  const handleCloseCreateUnitModal = () => {
+    setOpenCreateUnitModal(false);
+  };
+
+  const handleCloseDeleteUnitModal = () => {
+    setOpenDeleteUnitModal(false);
+  };
+
+  const handleCloseEditUnitModal = () => {
+    setOpenEditUnitModal(false);
+  };
+
+  const handleOpenDeleteUnitModal = () => {
+    setOpenDeleteUnitModal(true);
+  };
+
+  const handleOpenEditUnitModal = () => {
+    setOpenEditUnitModal(true);
+  };
+
+  const createUnit = () => {
+    // dummy function
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const unitName = createUnitName;
+  };
+  const deleteUnit = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const courseId = selectedCourseId;
+  };
+
+  const editUnit = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const courseId = editUnitName;
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -29,9 +76,32 @@ export default function CourseUnitsPage() {
 
   return (
     <Box display="flex" width="100%" height="100%">
+      <CreateUnitModal
+        openCreateUnitModal={openCreateUnitModal}
+        handleCloseCreateUnitModal={handleCloseCreateUnitModal}
+        setCreateUnitName={setCreateUnitName}
+        createUnit={createUnit}
+      />
+      <DeleteUnitModal
+        openDeleteUnitModal={openDeleteUnitModal}
+        handleCloseDeleteUnitModal={handleCloseDeleteUnitModal}
+        deleteUnit={deleteUnit}
+      />
+
+      <EditUnitModal
+        openEditUnitModal={openEditUnitModal}
+        handleCloseEditUnitModal={handleCloseEditUnitModal}
+        setEditUnitName={setEditUnitName}
+        editUnit={editUnit}
+      />
+
       <UnitSidebar
         courseUnits={courseUnits}
         handleClose={handleDrawerClose}
+        handleOpenCreateUnitModal={handleOpenCreateUnitModal}
+        handleOpenDeleteUnitModal={handleOpenDeleteUnitModal}
+        handleOpenEditUnitModal={handleOpenEditUnitModal}
+        setSelectedCourseId={setSelectedCourseId}
         open={open}
       />
       {!open && (
