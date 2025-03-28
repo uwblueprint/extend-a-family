@@ -364,17 +364,20 @@ class UserService implements IUserService {
   }
 
   async getNumCompletedModules(learner: LearnerDTO): Promise<number> {
-    const numCompletedModules = Array.from(
-      learner.activitiesCompleted.values(),
-    ).reduce((acc, curr) => {
-      const completedModules = Array.from(curr.entries()).filter(
-        async ([moduleId, activitiesCompletedInModule]) => {
+    let numCompletedModules = 0;
+  
+    for (const unitsMap of learner.activitiesCompleted.values()) {
+      for (const [moduleId, activitiesCompletedInModule] of unitsMap.entries()) {
+        try {
           const module = await courseModuleService.getCourseModule(moduleId);
-          return activitiesCompletedInModule.length === module?.pages.length;
-        },
-      );
-      return acc + completedModules.length;
-    }, 0);
+          if (module && activitiesCompletedInModule.length === module.pages.length) {
+            numCompletedModules += 1;
+          }
+        } catch (error) {
+          console.error(`Error finding module ${moduleId}:`, error);
+        }
+      }
+    }
 
     return numCompletedModules;
   }
