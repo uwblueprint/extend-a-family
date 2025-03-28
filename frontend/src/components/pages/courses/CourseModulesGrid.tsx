@@ -48,7 +48,7 @@ export default function CourseModulesGrid({
               }}
             >
               <Typography variant="body2" color="textSecondary">
-                Module {module.displayIndex}
+                MODULE {module.displayIndex}
               </Typography>
               <Typography
                 variant="h6"

@@ -16,7 +16,7 @@ import {
   UserDTO,
 } from "../../types/userTypes";
 import { AuthErrorCodes } from "../../types/authTypes";
-import { getErrorMessage } from "../../utilities/errorUtils";
+import { getErrorCode, getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
 const Logger = logger(__filename);
@@ -149,8 +149,18 @@ class UserService implements IUserService {
         throw mongoDbError;
       }
     } catch (error: unknown) {
+      const errorCode = getErrorCode(error);
+
       Logger.error(`Failed to create user. Reason = ${getErrorMessage(error)}`);
-      throw error;
+
+      switch (errorCode) {
+        case "auth/email-already-exists":
+          throw new Error(AuthErrorCodes.EMAIL_IN_USE);
+        case "auth/invalid-email":
+          throw new Error(AuthErrorCodes.INVALID_EMAIL);
+        default:
+          throw error;
+      }
     }
 
     return newUser.toObject();
@@ -210,17 +220,9 @@ class UserService implements IUserService {
 
     try {
       // must explicitly specify runValidators when updating through findByIdAndUpdate
-      oldUser = await MgUser.findByIdAndUpdate(
-        userId,
-        {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          status: user.status,
-          email: user.email,
-        },
-        { runValidators: true },
-      );
+      oldUser = await MgUser.findByIdAndUpdate(userId, user, {
+        runValidators: true,
+      });
 
       if (!oldUser) {
         throw new Error(`userId ${userId} not found.`);

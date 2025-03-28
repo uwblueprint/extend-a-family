@@ -15,6 +15,7 @@ export type UserDTO = {
   email: string;
   role: Role;
   status: Status;
+  profilePicture?: string;
 };
 
 export type CreateUserDTO = Omit<UserDTO, "id"> & { password: string };

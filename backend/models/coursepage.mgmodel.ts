@@ -1,5 +1,6 @@
-import mongoose, { Schema, Document } from "mongoose";
 import { ObjectId } from "mongodb";
+import mongoose, { Document, Schema } from "mongoose";
+import mongooseLeanId from "mongoose-lean-id";
 import { ElementSkeleton, PageType } from "../types/courseTypes";
 
 const ElementSkeletonSchema: Schema = new Schema({
@@ -88,6 +89,8 @@ CoursePageSchema.set("toObject", {
   },
 });
 
+CoursePageSchema.plugin(mongooseLeanId);
+
 const CoursePageModel = mongoose.model<CoursePage>(
   "CoursePage",
   CoursePageSchema,
@@ -102,5 +105,5 @@ const ActivityPageModel = CoursePageModel.discriminator(
   ActivityPageSchema,
 );
 
-export { LessonPageModel, ActivityPageModel };
+export { ActivityPageModel, LessonPageModel };
 export default CoursePageModel;

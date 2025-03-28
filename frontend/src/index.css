@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 html, body, #app, #app>div {
   height: 100%
 }

@@ -1,4 +1,5 @@
 import mongoose, { Document, ObjectId, Schema } from "mongoose";
+import mongooseLeanId from "mongoose-lean-id";
 
 export interface CourseModule extends Document {
   id: string;
@@ -27,6 +28,8 @@ export const CourseModuleSchema: Schema = new Schema({
     type: String,
   },
 });
+
+CourseModuleSchema.plugin(mongooseLeanId);
 
 /* eslint-disable no-param-reassign */
 CourseModuleSchema.set("toObject", {

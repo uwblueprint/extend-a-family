@@ -30,7 +30,7 @@ import UploadThumbnailPage from "./components/courses/UploadThumbnailPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
 import LessonUpload from "./components/pages/LessonUpload";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
-import ManageUserPage from "./components/pages/ManageUserPage";
+import ManageUserPage from "./components/user_management/ManageUserPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import ViewModulePage from "./components/pages/ViewModulePage";
 
@@ -118,7 +118,7 @@ const App = (): React.ReactElement => {
                   exact
                   path={Routes.MANAGE_USERS_PAGE}
                   component={ManageUserPage}
-                  allowedRoles={["Administrator"]}
+                  allowedRoles={["Administrator", "Facilitator"]}
                 />
                 <PrivateRoute
                   exact
