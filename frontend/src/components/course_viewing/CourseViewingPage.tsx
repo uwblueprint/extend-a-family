@@ -6,15 +6,16 @@ import { CourseUnit } from "../../types/CourseTypes";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import CreateUnitModal from "./modals/CreateUnitModal";
 import DeleteUnitModal from "./modals/DeleteUnitModal";
-import UnpublishUnitModal from "./modals/UnpublishUnitModal";
+import EditUnitModal from "./modals/EditUnitModals";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
   const [createUnitName, setCreateUnitName] = useState("");
+  const [editUnitName, setEditUnitName] = useState("");
   const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
-  const [openUnpublishUnitModal, setOpenUnpublishUnitModal] = useState(false);
+  const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [open, setOpen] = useState(true);
 
@@ -30,16 +31,16 @@ export default function CourseUnitsPage() {
     setOpenDeleteUnitModal(false);
   };
 
+  const handleCloseEditUnitModal = () => {
+    setOpenEditUnitModal(false);
+  };
+
   const handleOpenDeleteUnitModal = () => {
     setOpenDeleteUnitModal(true);
   };
 
-  const handleCloseUnpublishUnitModal = () => {
-    setOpenUnpublishUnitModal(false);
-  };
-
-  const handleOpenUnpublishUnitModal = () => {
-    setOpenUnpublishUnitModal(true);
+  const handleOpenEditUnitModal = () => {
+    setOpenEditUnitModal(true);
   };
 
   const createUnit = () => {
@@ -51,9 +52,10 @@ export default function CourseUnitsPage() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const courseId = selectedCourseId;
   };
-  const unpublishUnit = () => {
+
+  const editUnit = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const courseId = selectedCourseId;
+    const courseId = editUnitName;
   };
 
   const handleDrawerOpen = () => {
@@ -85,10 +87,12 @@ export default function CourseUnitsPage() {
         handleCloseDeleteUnitModal={handleCloseDeleteUnitModal}
         deleteUnit={deleteUnit}
       />
-      <UnpublishUnitModal
-        openUnpublishUnitModal={openUnpublishUnitModal}
-        handleCloseUnpublishUnitModal={handleCloseUnpublishUnitModal}
-        unpublishUnit={unpublishUnit}
+
+      <EditUnitModal
+        openEditUnitModal={openEditUnitModal}
+        handleCloseEditUnitModal={handleCloseEditUnitModal}
+        setEditUnitName={setEditUnitName}
+        editUnit={editUnit}
       />
 
       <UnitSidebar
@@ -96,7 +100,7 @@ export default function CourseUnitsPage() {
         handleClose={handleDrawerClose}
         handleOpenCreateUnitModal={handleOpenCreateUnitModal}
         handleOpenDeleteUnitModal={handleOpenDeleteUnitModal}
-        handleOpenUnpublishUnitModal={handleOpenUnpublishUnitModal}
+        handleOpenEditUnitModal={handleOpenEditUnitModal}
         setSelectedCourseId={setSelectedCourseId}
         open={open}
       />

@@ -85,7 +85,7 @@ export default function CreateUnitModal(props: DeleteUnitModalProps) {
                 variant="bodyMedium"
                 color={theme.palette.Neutral[700]}
               >
-                This action can&apos;t be undone. A deleted user cannot be
+                This action can&apos;t be undone. A deleted unit cannot be
                 recovered.
               </Typography>
             </DialogContentText>
