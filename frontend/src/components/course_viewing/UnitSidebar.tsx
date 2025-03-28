@@ -12,17 +12,14 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Paper,
   Typography,
   useTheme,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import MoveDownIcon from "@mui/icons-material/MoveDown";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import { CourseUnit } from "../../types/CourseTypes";
 import { useUser } from "../../hooks/useUser";
@@ -31,7 +28,6 @@ import { isAdministrator } from "../../types/UserTypes";
 enum ModalType {
   Create = "Create",
   Delete = "Delete",
-  Unpublish = "Unpublish",
   Edit = "Edit",
 }
 interface UnitSideBarProps {
@@ -39,7 +35,7 @@ interface UnitSideBarProps {
   handleClose: () => void;
   handleOpenCreateUnitModal: () => void;
   handleOpenDeleteUnitModal: () => void;
-  handleOpenUnpublishUnitModal: () => void;
+  handleOpenEditUnitModal: () => void;
   setSelectedCourseId: (value: React.SetStateAction<string>) => void;
   open: boolean;
   onSelectUnit: (unit: CourseUnit) => void;
@@ -55,7 +51,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
     onSelectUnit,
     handleOpenCreateUnitModal,
     handleOpenDeleteUnitModal,
-    handleOpenUnpublishUnitModal,
+    handleOpenEditUnitModal,
     setSelectedCourseId,
   } = props;
 
@@ -82,8 +78,8 @@ export default function UnitSidebar(props: UnitSideBarProps) {
       case ModalType.Delete:
         handleOpenDeleteUnitModal();
         break;
-      case ModalType.Unpublish:
-        handleOpenUnpublishUnitModal();
+      case ModalType.Edit:
+        handleOpenEditUnitModal();
         break;
       default:
     }
@@ -91,112 +87,72 @@ export default function UnitSidebar(props: UnitSideBarProps) {
 
   const ContextMenu = () => {
     return (
-      <Paper
-        sx={{
-          width: "250px",
-          maxHeight: "243px",
-          height: "100%",
-          borderRadius: "4px",
+      <Menu
+        anchorEl={anchorEl}
+        open={openContextMenu}
+        onClose={handleContextMenuClose}
+        MenuListProps={{
+          sx: {
+            py: 0,
+            backgroundColor: theme.palette.Neutral[200],
+            paddingTop: "8px",
+            paddingBottom: "8px",
+            margin: "0px",
+            width: "250px",
+            borderRadius: "4px",
+          },
         }}
       >
-        <Menu
-          anchorEl={anchorEl}
-          open={openContextMenu}
-          onClose={handleContextMenuClose}
+        <MenuItem
           sx={{
-            padding: "0px",
-            margin: "0px",
+            height: "48px",
           }}
-          MenuListProps={{
-            sx: {
-              py: 0,
-              backgroundColor: theme.palette.Neutral[200],
-              paddingTop: "8px",
-              paddingBottom: "8px",
-            },
+          onClick={() => handleOpenModal(ModalType.Edit)}
+        >
+          <ListItemIcon>
+            <EditOutlinedIcon
+              fontSize="small"
+              htmlColor={theme.palette.Neutral[700]}
+            />
+          </ListItemIcon>
+          <Typography variant="bodyMedium">Edit unit title</Typography>
+        </MenuItem>
+        <Divider component="li" />
+        <MenuItem
+          sx={{
+            height: "48px",
           }}
         >
-          <MenuItem
-            sx={{
-              height: "48px",
-            }}
+          <ListItemIcon>
+            <MoveDownIcon
+              fontSize="small"
+              htmlColor={theme.palette.Neutral[700]}
+            />
+          </ListItemIcon>
+          <Typography variant="bodyMedium">Move</Typography>
+        </MenuItem>
+        <Divider component="li" />
+        <MenuItem
+          onClick={() => handleOpenModal(ModalType.Delete)}
+          sx={{
+            height: "48px",
+          }}
+        >
+          <ListItemIcon>
+            <DeleteOutlineIcon
+              fontSize="small"
+              htmlColor={theme.palette.Error.Default}
+            />
+          </ListItemIcon>
+          <Typography
+            variant="bodyMedium"
+            noWrap
+            color={theme.palette.Error.Default}
           >
-            <ListItemIcon>
-              <OpenInNewIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography variant="bodyMedium">View Feedback</Typography>
-          </MenuItem>
-          <Divider component="li" />
-          <MenuItem
-            sx={{
-              height: "48px",
-            }}
-          >
-            <ListItemIcon>
-              <FileUploadOutlinedIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography variant="bodyMedium">Upload Thumbnail</Typography>
-          </MenuItem>
-          <Divider component="li" />
-          <MenuItem
-            sx={{
-              height: "48px",
-            }}
-          >
-            <ListItemIcon>
-              <MoveDownIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography variant="bodyMedium">Move</Typography>
-          </MenuItem>
-          <Divider component="li" />
-          <MenuItem
-            sx={{
-              height: "48px",
-            }}
-            onClick={() => handleOpenModal(ModalType.Unpublish)}
-          >
-            <ListItemIcon>
-              <VisibilityOffIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography variant="bodyMedium" noWrap>
-              Unpublish
-            </Typography>
-          </MenuItem>
-          <Divider component="li" />
-          <MenuItem
-            onClick={() => handleOpenModal(ModalType.Delete)}
-            sx={{
-              height: "48px",
-            }}
-          >
-            <ListItemIcon>
-              <DeleteOutlineIcon
-                fontSize="small"
-                htmlColor={theme.palette.Neutral[700]}
-              />
-            </ListItemIcon>
-            <Typography
-              variant="bodyMedium"
-              noWrap
-              color={theme.palette.Error.Default}
-            >
-              Delete
-            </Typography>
-          </MenuItem>
-        </Menu>
-      </Paper>
+            Delete
+          </Typography>
+        </MenuItem>
+      </Menu>
     );
   };
   const handleListItemClick = (

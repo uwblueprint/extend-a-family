@@ -1,29 +1,33 @@
 import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import { PersonOutlineOutlined } from "@mui/icons-material";
 import {
   Box,
   Button,
   Dialog,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   IconButton,
+  InputAdornment,
+  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
 import { useUser } from "../../../hooks/useUser";
 
-interface CreateUnitModalProps {
-  openUnpublishUnitModal: boolean;
-  handleCloseUnpublishUnitModal: () => void;
-  unpublishUnit: () => void;
+interface EditUnitModalProps {
+  openEditUnitModal: boolean;
+  handleCloseEditUnitModal: () => void;
+  setEditUnitName: (value: React.SetStateAction<string>) => void;
+  editUnit: () => void;
 }
 
-export default function CreateUnitModal(props: CreateUnitModalProps) {
+export default function EditUnitModal(props: EditUnitModalProps) {
   const {
-    openUnpublishUnitModal,
-    handleCloseUnpublishUnitModal,
-    unpublishUnit,
+    openEditUnitModal,
+    handleCloseEditUnitModal,
+    setEditUnitName,
+    editUnit,
   } = props;
 
   const theme = useTheme();
@@ -37,8 +41,8 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
       }}
     >
       <Dialog
-        open={openUnpublishUnitModal}
-        onClose={handleCloseUnpublishUnitModal}
+        open={openEditUnitModal}
+        onClose={handleCloseEditUnitModal}
         PaperProps={{
           sx: {
             display: "flex",
@@ -54,7 +58,7 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
         <Box>
           <Box>
             <IconButton
-              onClick={handleCloseUnpublishUnitModal}
+              onClick={handleCloseEditUnitModal}
               sx={{
                 position: "absolute",
                 top: 8,
@@ -75,24 +79,47 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
               variant="headlineMedium"
               color={theme.palette.Neutral[700]}
             >
-              Unpublish Unit?
+              Edit unit
             </Typography>
           </DialogTitle>
+        </Box>
+        <Box>
           <DialogContent
             sx={{
               margin: "0px",
               padding: "0px",
             }}
           >
-            <DialogContentText>
-              <Typography
-                variant="bodyMedium"
-                color={theme.palette.Neutral[700]}
-              >
-                Learners will not be able see the unit until you choose to
-                publish it again. This action can be redone.
-              </Typography>
-            </DialogContentText>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                width: "336px",
+                gap: "24px",
+              }}
+            >
+              <TextField
+                required
+                type="text"
+                placeholder="Unit Title"
+                onChange={(event) => setEditUnitName(event.target.value)}
+                variant="outlined"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignSelf: "stretch",
+                  height: "56px",
+                  width: "100%",
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonOutlineOutlined />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
           </DialogContent>
         </Box>
         <Box
@@ -106,6 +133,7 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
         >
           <Button
             variant="outlined"
+            disableElevation
             sx={{
               display: "flex",
               height: "40px",
@@ -114,13 +142,13 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
                 bgcolor: theme.palette[user.role].Hover,
               },
             }}
-            onClick={handleCloseUnpublishUnitModal}
+            onClick={handleCloseEditUnitModal}
           >
             <Typography
               variant="labelLarge"
               color={theme.palette[user.role].Default}
             >
-              GO BACK
+              CANCEL
             </Typography>
           </Button>
           <Button
@@ -134,10 +162,10 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
                 bgcolor: theme.palette[user.role].Default,
               },
             }}
-            onClick={() => unpublishUnit()}
+            onClick={editUnit}
             disableElevation
           >
-            <Typography variant="labelLarge">UNPUBLISH</Typography>
+            <Typography variant="labelLarge">SAVE EDIT</Typography>
           </Button>
         </Box>
       </Dialog>
