@@ -191,7 +191,19 @@ class CourseModuleService implements ICourseModuleService {
     const session = await startSession();
     session.startTransaction();
     try {
-      // first update the course units module reference
+      // Find the module to get its pages
+      const courseModule = await MgCourseModule.findById(
+        courseModuleId,
+      ).session(session);
+      if (!courseModule) {
+        throw new Error(`Course module with id ${courseModuleId} not found.`);
+      }
+      // Delete all pages within the module
+      await CoursePageModel.deleteMany({
+        _id: { $in: courseModule.pages },
+      }).session(session);
+
+      // Remove the module reference from the unit
       const courseUnit = await MgCourseUnit.findByIdAndUpdate(
         courseUnitId,
         {

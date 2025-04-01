@@ -36,7 +36,9 @@ export type CourseModule = {
   id: string;
   displayIndex: number;
   title: string;
-  pages: [CoursePage];
+  imageURL?: string;
+  pages: string[];
+  lessonPdfUrl?: string;
 };
 
 export enum InteractiveElementType {
