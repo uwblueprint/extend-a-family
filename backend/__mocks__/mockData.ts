@@ -80,11 +80,12 @@ export const testLearners = [
     status: "Active" as Status,
     role: "Learner" as Role,
     facilitator: testFacilitators[0]._id,
-    activitiesCompleted: new Map([
-      [testCourseUnits[0]._id.toString(), new Map([
-        [testCourseModules[0]._id.toString(), testCourseModules[0].pages.map(page => page.toString())],
-      ])]
-    ]),
+    activitiesCompleted: {
+      [testCourseUnits[0]._id.toString()]: {
+        [testCourseModules[0]._id.toString()]: [],
+          // testCourseModules[0].pages.map(page => page.toString())
+      }
+    }
   },
 ];
 

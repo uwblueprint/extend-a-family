@@ -117,7 +117,7 @@ const LearnerSchema = new Schema({
   },
   activitiesCompleted: {
     type: Map,
-    of: [{ type: Map, of: [{ type: mongoose.Schema.Types.ObjectId, ref: "Activity" }] }],
+    of: { type: Map, of: [{ type: mongoose.Schema.Types.ObjectId }] },
     default: {},
   },
 });
