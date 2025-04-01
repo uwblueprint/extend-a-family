@@ -11,7 +11,7 @@ import {
   updateUserDtoValidator,
   uploadProfilePictureValidator,
 } from "../middlewares/validators/userValidators";
-import UserModel, { Bookmark } from "../models/user.mgmodel";
+import UserModel, { Bookmark, LearnerModel } from "../models/user.mgmodel";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
 import CoursePageService from "../services/implementations/coursePageService";
@@ -485,7 +485,7 @@ userRouter.put(
 );
 
 userRouter.put(
-  "/learner/markActivityAsCompleted",
+  "/learner/markActivityCompleted",
   isAuthorizedByRole(new Set(["Learner"])),
   completeActivityValidator,
   async (req, res) => {
@@ -514,14 +514,14 @@ userRouter.put(
 
       const courseModule = (await courseModuleService.getCourseModule(moduleId))!;
 
-      if (!courseModule.pages.includes(activityId)) {
+      if (!courseModule.pages.some(page => page.id === activityId)) {
         return res.status(400).send(`The activity provided does not exist on module ${moduleId}.`);
       }
 
-      const updatedUser = await UserModel.findByIdAndUpdate(learnerId, {
+      const updatedUser = await LearnerModel.findByIdAndUpdate(learnerId, {
         $addToSet: {
           [`activitiesCompleted.${unitId}.${moduleId}`]: activityId,
-        },
+        }
       }, { new: true });
 
       res.status(200).json(updatedUser);
