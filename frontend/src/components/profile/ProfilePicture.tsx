@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, Avatar } from "@mui/material";
-import { useTheme } from "styled-components";
+import { useTheme } from "@mui/material/styles";
 import { useUser } from "../../hooks/useUser";
 
 interface ProfilePictureProps {
@@ -12,7 +12,6 @@ const ProfilePicture = ({
   firstName = "",
   lastName = "",
 }: ProfilePictureProps): React.ReactElement => {
-  
   const theme = useTheme();
   const user = useUser();
 
