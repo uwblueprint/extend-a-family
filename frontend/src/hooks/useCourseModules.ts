@@ -12,15 +12,10 @@ const useCourseModules = (unitId: string) => {
 
     const fetchCourseModules = async () => {
       try {
-        console.log("hi");
-
         setLoading(true);
         setError(null);
 
         const data = await CourseAPIClient.getModules(unitId);
-
-        console.log(data);
-        // const data: CourseModuleDTO[] = await response.json();
         setCourseModules(data);
       } catch (err: unknown) {
         if (err instanceof Error) {

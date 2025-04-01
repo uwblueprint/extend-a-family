@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import UnitSidebar from "./UnitSidebar";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
-import CourseModulesGrid from "../pages/courses/CourseModulesGrid";
+import CourseModulesGrid from "./CourseModulesGrid";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
@@ -38,9 +38,6 @@ export default function CourseUnitsPage() {
     setSelectedUnit(unit);
   };
 
-  // have a state be the selected unit based on what is selected on the sidebar ()
-  // create a new component for module grid (receives unitID, does the fetching))
-
   return (
     <Box display="flex" width="100%" height="100%">
       <UnitSidebar
@@ -49,34 +46,42 @@ export default function CourseUnitsPage() {
         open={open}
         onSelectUnit={handleSelectUnit}
       />
-      {!open && (
-        <Button
-          type="button"
-          sx={{
-            color: theme.palette.Neutral[700],
-            backgroundColor: theme.palette.Neutral[200],
-            borderRadius: "4px",
-            width: "34px",
-            minWidth: "34px",
-            height: "34px",
-            padding: 0,
-          }}
-          onClick={handleDrawerOpen}
-        >
-          <MenuOpenIcon
-            sx={{
-              fontSize: "18px",
-              transform: "scaleX(-1)",
-            }}
-          />
-        </Button>
-      )}
 
-      <Box sx={{ flexGrow: 1, p: 2 }}>
+      <Box sx={{ flexGrow: 1, p: "48px" }}>
         {selectedUnit ? (
-          <CourseModulesGrid unitId={selectedUnit.id} isSidebarOpen={open} />
+          <Stack spacing="14px">
+            <Box display="flex" alignItems="center" paddingLeft="10px">
+              {!open && (
+                <Button
+                  type="button"
+                  sx={{
+                    color: theme.palette.Neutral[700],
+                    backgroundColor: theme.palette.Neutral[200],
+                    borderRadius: "4px",
+                    width: "34px",
+                    minWidth: "34px",
+                    height: "34px",
+                    padding: 0,
+                    marginRight: "12px",
+                  }}
+                  onClick={handleDrawerOpen}
+                >
+                  <MenuOpenIcon
+                    sx={{
+                      fontSize: "18px",
+                      transform: "scaleX(-1)",
+                    }}
+                  />
+                </Button>
+              )}
+              <Typography variant="headlineLarge" display="inline">
+                Unit {selectedUnit.displayIndex}: {selectedUnit.title}
+              </Typography>
+            </Box>
+            <CourseModulesGrid unitId={selectedUnit.id} isSidebarOpen={open} />
+          </Stack>
         ) : (
-          <Typography>Select a unit to view modules.</Typography>
+          <Typography>Loading units...</Typography>
         )}
       </Box>
     </Box>
