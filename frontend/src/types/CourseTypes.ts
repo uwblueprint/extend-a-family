@@ -36,6 +36,7 @@ export type CourseModule = {
   id: string;
   displayIndex: number;
   title: string;
+  imageURL?: string;
   pages: [CoursePage];
 };
 

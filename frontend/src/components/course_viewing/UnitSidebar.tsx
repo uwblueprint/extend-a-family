@@ -17,12 +17,13 @@ interface UnitSideBarProps {
   courseUnits: CourseUnit[];
   handleClose: () => void;
   open: boolean;
+  onSelectUnit: (unit: CourseUnit) => void;
 }
 
 export default function UnitSidebar(props: UnitSideBarProps) {
   const theme = useTheme();
   const user = useUser();
-  const { courseUnits, handleClose, open } = props;
+  const { courseUnits, handleClose, open, onSelectUnit } = props;
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -31,6 +32,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
     index: number,
   ) => {
     setSelectedIndex(index);
+    onSelectUnit(courseUnits[index]);
   };
 
   return (

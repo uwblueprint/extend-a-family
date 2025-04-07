@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import UnitSidebar from "./UnitSidebar";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import CourseModulesGrid from "./CourseModulesGrid";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
 
   const [open, setOpen] = useState(true);
+  const [selectedUnit, setSelectedUnit] = useState<CourseUnit | null>(null);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -23,9 +25,18 @@ export default function CourseUnitsPage() {
     const getCouseUnits = async () => {
       const data = await CourseAPIClient.getUnits();
       setCourseUnits(data);
+
+      // Set selectedUnit to the first unit if data is not empty
+      if (data.length > 0) {
+        setSelectedUnit(data[0]);
+      }
     };
     getCouseUnits();
   }, []);
+
+  const handleSelectUnit = (unit: CourseUnit) => {
+    setSelectedUnit(unit);
+  };
 
   return (
     <Box display="flex" width="100%" height="100%">
@@ -33,46 +44,45 @@ export default function CourseUnitsPage() {
         courseUnits={courseUnits}
         handleClose={handleDrawerClose}
         open={open}
+        onSelectUnit={handleSelectUnit}
       />
-      {!open && (
-        <Button
-          type="button"
-          sx={{
-            color: theme.palette.Neutral[700],
-            backgroundColor: theme.palette.Neutral[200],
-            borderRadius: "4px",
-            width: "34px",
-            minWidth: "34px",
-            height: "34px",
-            padding: 0,
-          }}
-          onClick={handleDrawerOpen}
-        >
-          <MenuOpenIcon
-            sx={{
-              fontSize: "18px",
-              transform: "scaleX(-1)",
-            }}
-          />
-        </Button>
-      )}
 
-      <Box sx={{ flexGrow: 1 }}>
-        <Typography paragraph>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Rhoncus
-          dolor purus non enim praesent elementum facilisis leo vel. Risus at
-          ultrices mi tempus imperdiet. Semper risus in hendrerit gravida rutrum
-          quisque non tellus. Convallis convallis tellus id interdum velit
-          laoreet id donec ultrices. Odio morbi quis commodo odio aenean sed
-          adipiscing. Amet nisl suscipit adipiscing bibendum est ultricies
-          integer quis. Cursus euismod quis viverra nibh cras. Metus vulputate
-          eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo
-          quis imperdiet massa tincidunt. Cras tincidunt lobortis feugiat
-          vivamus at augue. At augue eget arcu dictum varius duis at consectetur
-          lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa sapien
-          faucibus et molestie ac.
-        </Typography>
+      <Box sx={{ flexGrow: 1, p: "48px" }}>
+        {selectedUnit ? (
+          <Stack spacing="14px">
+            <Box display="flex" alignItems="center" paddingLeft="10px">
+              {!open && (
+                <Button
+                  type="button"
+                  sx={{
+                    color: theme.palette.Neutral[700],
+                    backgroundColor: theme.palette.Neutral[200],
+                    borderRadius: "4px",
+                    width: "34px",
+                    minWidth: "34px",
+                    height: "34px",
+                    padding: 0,
+                    marginRight: "12px",
+                  }}
+                  onClick={handleDrawerOpen}
+                >
+                  <MenuOpenIcon
+                    sx={{
+                      fontSize: "18px",
+                      transform: "scaleX(-1)",
+                    }}
+                  />
+                </Button>
+              )}
+              <Typography variant="headlineLarge" display="inline">
+                Unit {selectedUnit.displayIndex}: {selectedUnit.title}
+              </Typography>
+            </Box>
+            <CourseModulesGrid unitId={selectedUnit.id} isSidebarOpen={open} />
+          </Stack>
+        ) : (
+          <Typography>Loading units...</Typography>
+        )}
       </Box>
     </Box>
   );
