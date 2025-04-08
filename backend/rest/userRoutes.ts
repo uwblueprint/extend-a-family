@@ -1,19 +1,25 @@
 import { Router } from "express";
+import mongoose from "mongoose";
 import multer from "multer";
 import { getAccessToken, isAuthorizedByRole } from "../middlewares/auth";
 import {
+  addBookmarkValidator,
   createUserDtoValidator,
+  deleteBookmarkValidator,
   updateUserDtoValidator,
   uploadProfilePictureValidator,
 } from "../middlewares/validators/userValidators";
+import UserModel, { Bookmark } from "../models/user.mgmodel";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
+import CoursePageService from "../services/implementations/coursePageService";
 import EmailService from "../services/implementations/emailService";
+import FileStorageService from "../services/implementations/fileStorageService";
 import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
+import ICoursePageService from "../services/interfaces/coursePageService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
-import FileStorageService from "../services/implementations/fileStorageService";
 import {
   UpdateUserDTO,
   UserDTO,
@@ -32,6 +38,7 @@ const userRouter: Router = Router();
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
+const coursePageService: ICoursePageService = new CoursePageService();
 const firebaseStorageService: FileStorageService = new FileStorageService(
   process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
 );
@@ -61,6 +68,91 @@ userRouter.post(
       res.status(200).json(imageURL);
     } catch (error: unknown) {
       res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
+userRouter.post(
+  "/addBookmark",
+  isAuthorizedByRole(new Set(["Learner", "Administrator", "Facilitator"])),
+  addBookmarkValidator,
+  async (req, res) => {
+    const { unitId, moduleId, pageId } = req.body;
+    const accessToken = getAccessToken(req);
+    try {
+      const userId = await authService.getUserIdFromAccessToken(accessToken!);
+
+      const page = await coursePageService.getCoursePage(pageId, true);
+
+      const bookmark: Bookmark = {
+        ...page,
+        id: new mongoose.Types.ObjectId(page.id),
+        unitId: new mongoose.Types.ObjectId(unitId as string),
+        moduleId: new mongoose.Types.ObjectId(moduleId as string),
+        pageId: new mongoose.Types.ObjectId(pageId as string),
+      };
+
+      const existingBookmark = await UserModel.findOne({
+        _id: userId,
+        bookmarks: {
+          $elemMatch: {
+            unitId: bookmark.unitId,
+            moduleId: bookmark.moduleId,
+            pageId: bookmark.pageId,
+          },
+        },
+      });
+
+      if (existingBookmark) {
+        return res.status(400).json({ error: "Bookmark already exists" });
+      }
+
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { $addToSet: { bookmarks: bookmark } },
+        { runValidators: true, new: true },
+      );
+      if (!updatedUser) {
+        throw new Error("Failed to add bookmark: user not found");
+      }
+      return res.status(200).json(updatedUser.bookmarks);
+    } catch (error: unknown) {
+      return res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+userRouter.post(
+  "/deleteBookmark",
+  isAuthorizedByRole(new Set(["Learner", "Administrator", "Facilitator"])),
+  deleteBookmarkValidator,
+  async (req, res) => {
+    const { pageId } = req.body;
+    const accessToken = getAccessToken(req);
+    if (!accessToken) {
+      throw new Error("Unauthorized: No access token provided");
+    }
+
+    try {
+      const userId = await authService.getUserIdFromAccessToken(accessToken);
+
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        {
+          $pull: {
+            bookmarks: {
+              pageId: new mongoose.Types.ObjectId(pageId as string),
+            },
+          },
+        },
+        { runValidators: true, new: true },
+      );
+      if (!updatedUser) {
+        throw new Error("Failed to add bookmark: user not found");
+      }
+      res.status(200).json(updatedUser.bookmarks);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
     }
   },
 );

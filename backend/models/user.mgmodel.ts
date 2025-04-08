@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, ObjectId } from "mongoose";
+import mongoose, { Document, ObjectId, Schema } from "mongoose";
 
 import { Role, Status } from "../types/userTypes";
 
@@ -11,6 +11,16 @@ export interface User extends Document {
   status: Status;
   email: string;
   profilePicture?: string;
+  bookmarks: Bookmark[];
+}
+
+export interface Bookmark {
+  id: mongoose.Types.ObjectId;
+  title: string;
+  type: string;
+  unitId: mongoose.Types.ObjectId;
+  moduleId: mongoose.Types.ObjectId;
+  pageId: mongoose.Types.ObjectId;
 }
 
 export interface Learner extends User {
@@ -25,6 +35,15 @@ const baseOptions = {
   discriminatorKey: "role",
   timestamps: true,
 };
+
+export const BookmarkSchema: Schema = new Schema({
+  id: { type: mongoose.Schema.Types.ObjectId },
+  title: { type: String },
+  type: { type: String },
+  unitId: { type: mongoose.Types.ObjectId },
+  pageId: { type: mongoose.Types.ObjectId },
+  moduleId: { type: mongoose.Types.ObjectId },
+});
 
 export const UserSchema: Schema = new Schema(
   {
@@ -56,6 +75,11 @@ export const UserSchema: Schema = new Schema(
     },
     profilePicture: {
       type: String,
+    },
+    bookmarks: {
+      type: [BookmarkSchema],
+      default: [],
+      required: true,
     },
   },
   baseOptions,

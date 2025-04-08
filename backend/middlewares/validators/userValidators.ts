@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import {
   getApiValidationError,
-  validatePrimitive,
-  validateFileType,
   getFileTypeValidationError,
+  validateFileType,
+  validatePrimitive,
 } from "./util";
 
 export const uploadProfilePictureValidator = async (
@@ -77,6 +77,34 @@ export const updateUserDtoValidator = async (
   }
   if (!validatePrimitive(req.body.role, "string")) {
     return res.status(400).send(getApiValidationError("role", "string"));
+  }
+  return next();
+};
+
+export const addBookmarkValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.unitId, "string")) {
+    return res.status(400).send(getApiValidationError("unitId", "string"));
+  }
+  if (!validatePrimitive(req.body.moduleId, "string")) {
+    return res.status(400).send(getApiValidationError("moduleId", "string"));
+  }
+  if (!validatePrimitive(req.body.pageId, "string")) {
+    return res.status(400).send(getApiValidationError("pageId", "string"));
+  }
+  return next();
+};
+
+export const deleteBookmarkValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.pageId, "string")) {
+    return res.status(400).send(getApiValidationError("pageId", "string"));
   }
   return next();
 };
