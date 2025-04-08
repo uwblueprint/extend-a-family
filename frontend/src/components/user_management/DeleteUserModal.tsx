@@ -16,13 +16,21 @@ interface DeleteUserModalProps {
   open: boolean;
   onClose: () => void;
   deleteUserId: string;
-  handleDeleteUser: (userId: string) => void;
+  deleteFirstName: string;
+  deleteLastName: string;
+  handleDeleteUser: (
+    userId: string,
+    firstName: string,
+    lastName: string,
+  ) => void;
 }
 
 const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   open,
   onClose,
   deleteUserId,
+  deleteFirstName,
+  deleteLastName,
   handleDeleteUser,
 }) => {
   const theme = useTheme();
@@ -101,7 +109,9 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             backgroundColor: theme.palette.Error.Default,
             "&:hover": { bgcolor: theme.palette.Error.Default },
           }}
-          onClick={() => handleDeleteUser(deleteUserId)}
+          onClick={() =>
+            handleDeleteUser(deleteUserId, deleteFirstName, deleteLastName)
+          }
           disableElevation
         >
           <Typography variant="labelLarge">DELETE</Typography>

@@ -30,7 +30,11 @@ interface UserTableProps {
   handleChangeRowsPerPage: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
-  handleOpenDeleteUserModal: (userId: string) => void;
+  handleOpenDeleteUserModal: (
+    userId: string,
+    firstName: string,
+    deleteName: string,
+  ) => void;
 }
 
 const UserTable: React.FC<UserTableProps> = ({
@@ -113,7 +117,13 @@ const UserTable: React.FC<UserTableProps> = ({
                     borderColor: theme.palette.Neutral[500],
                     color: theme.palette.Error.Default,
                   }}
-                  onClick={() => handleOpenDeleteUserModal(user.id)}
+                  onClick={() =>
+                    handleOpenDeleteUserModal(
+                      user.id,
+                      user.firstName,
+                      user.lastName,
+                    )
+                  }
                 >
                   <Typography variant="labelLarge">DELETE USER</Typography>
                 </Button>
