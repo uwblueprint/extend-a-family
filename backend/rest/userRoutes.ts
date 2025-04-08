@@ -84,22 +84,12 @@ userRouter.post(
 
       const page = await coursePageService.getCoursePage(pageId, true);
 
-      if (
-        typeof unitId !== "string" ||
-        typeof moduleId !== "string" ||
-        typeof pageId !== "string"
-      ) {
-        throw new Error(
-          "Invalid unitId, moduleId, or pageId: should be strings",
-        );
-      }
-
       const bookmark: Bookmark = {
         ...page,
         id: new mongoose.Types.ObjectId(page.id),
-        unitId: new mongoose.Types.ObjectId(unitId),
-        moduleId: new mongoose.Types.ObjectId(moduleId),
-        pageId: new mongoose.Types.ObjectId(pageId),
+        unitId: new mongoose.Types.ObjectId(unitId as string),
+        moduleId: new mongoose.Types.ObjectId(moduleId as string),
+        pageId: new mongoose.Types.ObjectId(pageId as string),
       };
 
       const existingBookmark = await UserModel.findOne({
@@ -139,23 +129,28 @@ userRouter.post(
   async (req, res) => {
     const { pageId } = req.body;
     const accessToken = getAccessToken(req);
+    if (!accessToken) {
+      throw new Error("Unauthorized: No access token provided");
+    }
 
     try {
-      const userId = await authService.getUserIdFromAccessToken(accessToken!);
-
-      if (typeof pageId !== "string") {
-        throw new Error("Invalid pageId: should be a string");
-      }
+      const userId = await authService.getUserIdFromAccessToken(accessToken);
 
       const updatedUser = await UserModel.findByIdAndUpdate(
         userId,
         {
-          $pull: { bookmarks: { pageId: new mongoose.Types.ObjectId(pageId) } },
+          $pull: {
+            bookmarks: {
+              pageId: new mongoose.Types.ObjectId(pageId as string),
+            },
+          },
         },
         { runValidators: true, new: true },
       );
-
-      res.status(200).json(updatedUser?.bookmarks);
+      if (!updatedUser) {
+        throw new Error("Failed to add bookmark: user not found");
+      }
+      res.status(200).json(updatedUser.bookmarks);
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
     }
