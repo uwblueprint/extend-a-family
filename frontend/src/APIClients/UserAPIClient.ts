@@ -1,7 +1,10 @@
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { Role } from "../types/AuthTypes";
 import { User } from "../types/UserTypes";
-import { getLocalStorageObjProperty } from "../utils/LocalStorageUtils";
+import {
+  getLocalStorageObjProperty,
+  setLocalStorageObjProperty,
+} from "../utils/LocalStorageUtils";
 import baseAPIClient from "./BaseAPIClient";
 
 const getUsersByRole = async (role: Role): Promise<User[]> => {
@@ -58,6 +61,8 @@ const updateUserDetails = async (
         headers: { Authorization: bearerToken },
       },
     );
+    setLocalStorageObjProperty(AUTHENTICATED_USER_KEY, "firstName", firstName);
+    setLocalStorageObjProperty(AUTHENTICATED_USER_KEY, "lastName", lastName);
     return response.data;
   } catch (error) {
     throw new Error("Failed to update user details");
