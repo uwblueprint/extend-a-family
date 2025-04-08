@@ -27,20 +27,24 @@ const ElementSkeletonSchema: Schema = new Schema({
   },
 });
 
-export interface CoursePage extends Document {
+interface CoursePageBase extends Document {
   id: string;
   title: string;
   type: PageType;
 }
 
-export interface LessonPage extends CoursePage {
+export interface LessonPage extends CoursePageBase {
+  type: "Lesson";
   source: string;
   pageIndex: number;
 }
 
-export interface ActivityPage extends CoursePage {
+export interface ActivityPage extends CoursePageBase {
+  type: "Activity";
   layout: [ElementSkeleton];
 }
+
+export type CoursePage = LessonPage | ActivityPage;
 
 const baseOptions = {
   discriminatorKey: "type",
