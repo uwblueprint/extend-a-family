@@ -17,6 +17,7 @@ import TopToolBar from "./TopToolBar";
 import UserTable from "./UserTable";
 import AddAdminModal from "./AddAdminModal";
 import DeleteUserModal from "./DeleteUserModal";
+import AuthAPIClient from "../../APIClients/AuthAPIClient";
 
 const ManageUserPage = (): React.ReactElement => {
   // Main state
@@ -31,8 +32,10 @@ const ManageUserPage = (): React.ReactElement => {
   const [openAddUserSnackbar, setOpenAddUserSnackbar] = useState(false);
   const [openDeleteUserSnackbar, setOpenDeleteUserSnackbar] = useState(true);
   const [addSnackbarName, setAddSnackbarName] = useState("Jane Doe");
-  const [deleteSnackbarName, setDeleteSnackbarName] = useState("Jane Doe 22222");
+  const [deleteSnackbarName, setDeleteSnackbarName] = useState("");
   // States for admin modal inputs
+  const [deleteFirstName, setDeleteFirstName] = useState("");
+  const [deleteLastName, setDeleteLastName] = useState("");
   const [firstName, setFirstName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [lastName, setLastName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [email, setEmail] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -100,18 +103,40 @@ const ManageUserPage = (): React.ReactElement => {
   const handleCloseAddAdminSnackbar = () => setOpenAddUserSnackbar(false);
   const handleCloseDeleteUserSnackbar = () => setOpenDeleteUserSnackbar(false);
 
-  const handleOpenDeleteUserModal = (userId: string) => {
+  const handleOpenDeleteUserModal = (
+    userId: string,
+    dFirstName: string,
+    dLastName: string,
+  ) => {
     setDeleteUserId(userId);
+    setDeleteFirstName(dFirstName);
+    setDeleteLastName(dLastName);
     setOpenDeleteUserModal(true);
   };
   const handleCloseDeleteUserModal = () => setOpenDeleteUserModal(false);
 
   // TODO: Implement these actions as needed
-  const handleDeleteUser = () => {
-    setDeleteSnackbarName("Jane Doe2");
+  const handleDeleteUser = async (
+    userId: string,
+    dFirstName: string,
+    dLastName: string,
+  ) => {
+    const deletedUser = await UserAPIClient.deleteUsers(userId);
+    if (deletedUser) {
+      handleCloseDeleteUserModal();
+      setDeleteSnackbarName(`${dFirstName} ${dLastName}`);
+      setOpenDeleteUserSnackbar(true);
+    }
   };
+
   const handleAddAdmin = async () => {
-    setAddSnackbarName("Jane Doe1");
+    const admin = await AuthAPIClient.inviteAdmin(firstName, lastName, email);
+    if (admin) {
+      // upon successful API call
+      setAddSnackbarName(`${admin.firstName} ${admin.lastName}`);
+      handleCloseAddAdminModal();
+      setOpenAddUserSnackbar(true);
+    }
   };
   const addAction = (
     <>
@@ -250,6 +275,8 @@ const ManageUserPage = (): React.ReactElement => {
         open={openDeleteUserModal}
         onClose={handleCloseDeleteUserModal}
         deleteUserId={deleteUserId}
+        deleteFirstName={deleteFirstName}
+        deleteLastName={deleteLastName}
         handleDeleteUser={handleDeleteUser}
       />
       <AddAdminModal
