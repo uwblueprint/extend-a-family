@@ -44,13 +44,15 @@ const ManageUserPage = (): React.ReactElement => {
 
   const theme = useTheme();
 
+  // Add this outside of useEffect so it can be reused
+  const getUsers = async () => {
+    const allUsers = await UserAPIClient.getUsers();
+    setUserData(allUsers);
+    setUsers(allUsers);
+  };
+
   // Fetch all users on mount
   useEffect(() => {
-    async function getUsers() {
-      const allUsers = await UserAPIClient.getUsers();
-      setUserData(allUsers);
-      setUsers(allUsers);
-    }
     getUsers();
   }, []);
 
@@ -126,18 +128,20 @@ const ManageUserPage = (): React.ReactElement => {
       handleCloseDeleteUserModal();
       setDeleteSnackbarName(`${dFirstName} ${dLastName}`);
       setOpenDeleteUserSnackbar(true);
+      await getUsers(); // Refresh user list
     }
   };
 
   const handleAddAdmin = async () => {
     const admin = await AuthAPIClient.inviteAdmin(firstName, lastName, email);
     if (admin) {
-      // upon successful API call
       setAddSnackbarName(`${admin.firstName} ${admin.lastName}`);
       handleCloseAddAdminModal();
       setOpenAddUserSnackbar(true);
+      await getUsers();
     }
   };
+
   const addAction = (
     <>
       <Button
