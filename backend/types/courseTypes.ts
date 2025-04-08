@@ -29,13 +29,14 @@ export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
 export type UpdateCourseModuleDTO = Pick<CourseModuleDTO, "title" | "imageURL">;
 
 export type PageType = "Lesson" | "Activity";
-export type CoursePageDTO = {
+export type CoursePageDTOBase = {
   id: string;
   title: string;
   type: PageType;
 };
 
-export type LessonPageDTO = CoursePageDTO & {
+export type LessonPageDTO = CoursePageDTOBase & {
+  type: "Lesson";
   source: string;
 };
 
@@ -47,9 +48,13 @@ export type ElementSkeleton = {
   h: number;
   content: string;
 };
-export type ActivityPageDTO = CoursePageDTO & {
+
+export type ActivityPageDTO = CoursePageDTOBase & {
+  type: "Activity";
   layout: [ElementSkeleton];
 };
+
+export type CoursePageDTO = LessonPageDTO | ActivityPageDTO;
 
 export type CreateCoursePageDTO =
   | Pick<CoursePageDTO, "title" | "type">

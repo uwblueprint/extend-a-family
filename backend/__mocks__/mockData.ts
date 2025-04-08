@@ -31,8 +31,14 @@ export const testCourseModules = [
   {
     _id: "67e60622fb8fbc9c9bbb6d84",
     displayIndex: 0,
-    title: "Test Course Module",
-    pages: testActivities.map(activity => activity._id),
+    title: "Test Course Module 1",
+    pages: [testActivities[0]._id],
+  },
+  {
+    _id: "67e60623fb8fbc9c9bbb6d85",
+    displayIndex: 1,
+    title: "Test Course Module 2",
+    pages: [testActivities[1]._id],
   },
 ];
 
@@ -41,7 +47,7 @@ export const testCourseUnits = [
     _id: "67e6062cfb8fbc9c9bbb6d85",
     displayIndex: 0,
     title: "Test Course Unit",
-    modules: testCourseModules.map(module => module._id),
+    modules: testCourseModules.map((module) => module._id),
   },
 ];
 
@@ -82,10 +88,10 @@ export const testLearners = [
     facilitator: testFacilitators[0]._id,
     activitiesCompleted: {
       [testCourseUnits[0]._id.toString()]: {
-        [testCourseModules[0]._id.toString()]: [],
-          // testCourseModules[0].pages.map(page => page.toString())
-      }
-    }
+        [testCourseModules[0]._id.toString()]: [testActivities[0]._id],
+        // testCourseModules[0].pages.map(page => page.toString())
+      },
+    },
   },
 ];
 
@@ -99,9 +105,12 @@ export const testLearnersDTO: LearnerDTO[] = [
     role: "Learner" as Role,
     facilitator: testFacilitators[0]._id,
     activitiesCompleted: new Map([
-      [testCourseUnits[0]._id.toString(), new Map([
-        [testCourseModules[0]._id.toString(), testCourseModules[0].pages.map(page => page.toString())],
-      ])]
+      [
+        testCourseUnits[0]._id.toString(),
+        new Map([
+          [testCourseModules[0]._id.toString(), [testActivities[0]._id]],
+        ]),
+      ],
     ]),
   },
 ];

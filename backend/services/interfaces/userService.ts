@@ -1,4 +1,5 @@
 import { ObjectId } from "mongoose";
+import { Learner } from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
   LearnerDTO,
@@ -121,11 +122,26 @@ interface IUserService {
   changeUserStatus(accessToken: string, newStatus: Status): Promise<void>;
 
   /**
-   * Get the number of completed modules for a learner
-   * @param learner the learner to get the number of completed modules for
-   * @returns the number of completed modules
+   * Add an activity to a learner's progress
+   * @param learnerId the id of the learner to add the activity to
+   * @param unitId the id of the unit to add the activity to
+   * @param moduleId the id of the module to add the activity to
+   * @param activityId the id of the activity to add to the learner's progress
+   * @returns the updated learner
    */
-  getNumCompletedModules(learner: LearnerDTO): Promise<number>;
+  addActivityToProgress(
+    learnerId: string,
+    unitId: string,
+    moduleId: string,
+    activityId: string,
+  ): Promise<Learner | null>;
+
+  /**
+   * Get the set of completed modules for a learner
+   * @param learner the learner to get the set of completed modules for
+   * @returns the set of completed modules
+   */
+  getCompletedModules(learner: LearnerDTO): Promise<Set<string>>;
 
   /**
    * Delete an activity from every learner's progress
@@ -134,6 +150,10 @@ interface IUserService {
    * @param activityId the activity id of the activity to delete
    * @returns the number of learners that were updated
    */
-  deleteActivityFromProgress(unitId: string, moduleId: string, activityId: string): Promise<number>;
+  deleteActivityFromProgress(
+    unitId: string,
+    moduleId: string,
+    activityId: string,
+  ): Promise<number>;
 }
 export default IUserService;

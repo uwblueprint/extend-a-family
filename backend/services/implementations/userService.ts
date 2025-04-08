@@ -363,15 +363,39 @@ class UserService implements IUserService {
     }
   }
 
-  async getNumCompletedModules(learner: LearnerDTO): Promise<number> {
-    let numCompletedModules = 0;
-  
+  async addActivityToProgress(
+    learnerId: string,
+    unitId: string,
+    moduleId: string,
+    activityId: string,
+  ): Promise<Learner | null> {
+    const updatedUser = await LearnerModel.findByIdAndUpdate(
+      learnerId,
+      {
+        $addToSet: {
+          [`activitiesCompleted.${unitId}.${moduleId}`]: activityId,
+        },
+      },
+      { new: true },
+    );
+    return updatedUser;
+  }
+
+  async getCompletedModules(learner: LearnerDTO): Promise<Set<string>> {
+    let completedModules = new Set<string>();
+
     for (const unitsMap of learner.activitiesCompleted.values()) {
-      for (const [moduleId, activitiesCompletedInModule] of unitsMap.entries()) {
+      for (const [
+        moduleId,
+        activitiesCompletedInModule,
+      ] of unitsMap.entries()) {
         try {
           const module = await courseModuleService.getCourseModule(moduleId);
-          if (module && activitiesCompletedInModule.length === module.pages.length) {
-            numCompletedModules += 1;
+          const moduleActivities = module.pages.filter(
+            (page) => page.type === "Activity",
+          );
+          if (activitiesCompletedInModule.length === moduleActivities.length) {
+            completedModules.add(moduleId);
           }
         } catch (error) {
           console.error(`Error finding module ${moduleId}:`, error);
@@ -379,16 +403,20 @@ class UserService implements IUserService {
       }
     }
 
-    return numCompletedModules;
+    return completedModules;
   }
 
-  async deleteActivityFromProgress(unitId: string, moduleId: string, activityId: string): Promise<number> {
+  async deleteActivityFromProgress(
+    unitId: string,
+    moduleId: string,
+    activityId: string,
+  ): Promise<number> {
     const { modifiedCount } = await LearnerModel.updateMany(
       {},
       {
-        $pull: { [`activitiesCompleted.${unitId}.${moduleId}`]: activityId }
-      }
-    )
+        $pull: { [`activitiesCompleted.${unitId}.${moduleId}`]: activityId },
+      },
+    );
     return modifiedCount;
   }
 }

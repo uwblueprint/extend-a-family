@@ -1,20 +1,34 @@
-import MgUser, { LearnerModel } from "../../../models/user.mgmodel";
+import MgUser, { Learner, LearnerModel } from "../../../models/user.mgmodel";
 import UserService from "../userService";
 
 import { LearnerDTO, UserDTO } from "../../../types/userTypes";
 
 import mongoose from "mongoose";
-import { testActivities, testCourseModules, testCourseUnits, testLearnersDTO, testLessons, testUsers } from "../../../__mocks__/mockData";
+import {
+  testActivities,
+  testCourseModules,
+  testCourseUnits,
+  testLearners,
+  testLessons,
+  testUsers,
+} from "../../../__mocks__/mockData";
 import coursemoduleMgmodel from "../../../models/coursemodule.mgmodel";
 import coursepageMgmodel from "../../../models/coursepage.mgmodel";
 import courseunitMgmodel from "../../../models/courseunit.mgmodel";
 import db from "../../../testUtils/testDb";
 
+const getLearnerById = async (id: string): Promise<LearnerDTO> => {
+  const testUser: Learner | null = await LearnerModel.findById(id);
+  expect(testUser).not.toBeNull();
+  const testUserDTO: LearnerDTO = testUser!.toObject();
+  return testUserDTO;
+};
+
 jest.mock("firebase-admin", () => {
   const auth = jest.fn().mockReturnValue({
     getUser: jest.fn().mockReturnValue({ email: "test@test.com" }),
   });
-  
+
   const storage = jest.fn().mockReturnValue({
     bucket: jest.fn().mockReturnValue({
       file: jest.fn().mockReturnValue({
@@ -25,13 +39,13 @@ jest.mock("firebase-admin", () => {
       upload: jest.fn(),
     }),
   });
-  
+
   return { auth, storage };
 });
 
 jest.mock("firebase-admin/storage", () => {
-  return { 
-    getDownloadURL: jest.fn().mockReturnValue("https://test.com/image.jpg")
+  return {
+    getDownloadURL: jest.fn().mockReturnValue("https://test.com/image.jpg"),
   };
 });
 
@@ -69,20 +83,36 @@ describe("mongo userService", (): void => {
   });
 
   it("getNumCompletedModules", async () => {
-    const testUser = testLearnersDTO[0];
-    const res = await userService.getNumCompletedModules(testUser);
+    let testUserDTO = await getLearnerById(testLearners[0]._id);
+    const res1 = await userService.getCompletedModules(testUserDTO);
 
-    expect(res).toEqual(1);
+    expect(res1).toEqual(new Set([testCourseModules[0]._id]));
+
+    await userService.addActivityToProgress(
+      testLearners[0]._id,
+      testCourseUnits[0]._id,
+      testCourseModules[1]._id,
+      testCourseModules[1].pages[0],
+    );
+
+    testUserDTO = await getLearnerById(testLearners[0]._id);
+    const res2 = await userService.getCompletedModules(testUserDTO);
+    expect(res2).toEqual(
+      new Set([testCourseModules[0]._id, testCourseModules[1]._id]),
+    );
   });
 
   it("markActivityCompleted", async () => {
-    const updatedLearner: LearnerDTO | null = 
-      await LearnerModel.findByIdAndUpdate("67e60671fb8fbc9c9bbb6d8a", {
-        $addToSet: {
-          [`activitiesCompleted.${testCourseUnits[0]._id.toString()}.${testCourseModules[0]._id.toString()}`]: testCourseModules[0].pages[0].toString(),
-        },
-      }, { new: true });
-
-    expect(updatedLearner?.activitiesCompleted.get(testCourseUnits[0]._id.toString())?.get(testCourseModules[0]._id.toString())).toEqual([new mongoose.Types.ObjectId(testCourseModules[0].pages[0])]);
+    const updatedLearner = await userService.addActivityToProgress(
+      testLearners[0]._id,
+      testCourseUnits[0]._id,
+      testCourseModules[0]._id,
+      testCourseModules[0].pages[0],
+    );
+    expect(
+      updatedLearner?.activitiesCompleted
+        .get(testCourseUnits[0]._id.toString())
+        ?.get(testCourseModules[0]._id.toString()),
+    ).toEqual([new mongoose.Types.ObjectId(testCourseModules[0].pages[0])]);
   });
 });

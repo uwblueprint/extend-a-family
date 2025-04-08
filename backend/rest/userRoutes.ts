@@ -509,26 +509,38 @@ userRouter.put(
       }
 
       if (!courseUnit.modules.includes(moduleId)) {
-        return res.status(400).send(`The module provided does not exist on unit ${unitId}.`);
+        return res
+          .status(400)
+          .send(`The module provided does not exist on unit ${unitId}.`);
       }
 
-      const courseModule = (await courseModuleService.getCourseModule(moduleId))!;
+      const courseModule = (await courseModuleService.getCourseModule(
+        moduleId,
+      ))!;
 
-      if (!courseModule.pages.some(page => page.id === activityId)) {
-        return res.status(400).send(`The activity provided does not exist on module ${moduleId}.`);
+      if (
+        !courseModule.pages.some(
+          (page) => page.id === activityId && page.type === "Activity",
+        )
+      ) {
+        return res
+          .status(400)
+          .send(
+            `The activity provided does not exist on module ${moduleId} or is not an activity.`,
+          );
       }
 
-      const updatedUser = await LearnerModel.findByIdAndUpdate(learnerId, {
-        $addToSet: {
-          [`activitiesCompleted.${unitId}.${moduleId}`]: activityId,
-        }
-      }, { new: true });
-
+      const updatedUser = (await userService.addActivityToProgress(
+        learnerId.toString(),
+        unitId,
+        moduleId,
+        activityId,
+      ))!;
       res.status(200).json(updatedUser);
     } catch (error) {
       res.status(500).send(getErrorMessage(error));
     }
-  }
+  },
 );
 
 userRouter.get(
@@ -544,19 +556,21 @@ userRouter.get(
         return res.status(403).send("Forbidden: User is not a learner.");
       }
 
-      const numCompletedModules = await userService.getNumCompletedModules(learner);
+      const completedModules = await userService.getCompletedModules(learner);
       const allUnits = await courseUnitService.getCourseUnits();
-      const numModules = allUnits.reduce((acc, unit) => acc + unit.modules.length, 0);
+      const numModules = allUnits.reduce(
+        (acc, unit) => acc + unit.modules.length,
+        0,
+      );
 
       res.status(200).send({
-        numCompletedModules,
+        completedModules,
         numModules,
-        progressPercentage: (numCompletedModules / numModules) * 100,
       });
     } catch (error) {
       res.status(500).send(getErrorMessage(error));
     }
-  }
+  },
 );
 
 export default userRouter;

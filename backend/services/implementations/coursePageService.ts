@@ -6,6 +6,7 @@ import MgCourseModule, {
 import MgCoursePage from "../../models/coursepage.mgmodel";
 import {
   CoursePageDTO,
+  CoursePageDTOBase,
   CreateCoursePageDTO,
   UpdateCoursePageDTO,
 } from "../../types/courseTypes";
@@ -16,7 +17,9 @@ import ICoursePageService from "../interfaces/coursePageService";
 const Logger = logger(__filename);
 
 class CoursePageService implements ICoursePageService {
-  async getCoursePages(courseModuleId: string): Promise<Array<CoursePageDTO>> {
+  async getCoursePages(
+    courseModuleId: string,
+  ): Promise<Array<CoursePageDTOBase>> {
     try {
       const courseModule: CourseModule | null = await MgCourseModule.findById(
         courseModuleId,
@@ -72,7 +75,7 @@ class CoursePageService implements ICoursePageService {
   async createCoursePage(
     courseModuleId: string,
     coursePageDTO: CreateCoursePageDTO,
-  ): Promise<CoursePageDTO> {
+  ): Promise<CoursePageDTOBase> {
     const session = await startSession();
     session.startTransaction();
     try {
@@ -103,7 +106,7 @@ class CoursePageService implements ICoursePageService {
   async updateCoursePage(
     coursePageId: string,
     coursePageDTO: UpdateCoursePageDTO,
-  ): Promise<CoursePageDTO> {
+  ): Promise<CoursePageDTOBase> {
     try {
       const updatedCoursePage = await MgCoursePage.findByIdAndUpdate(
         coursePageId,
