@@ -34,7 +34,26 @@ const getUsers = async (): Promise<User[]> => {
   }
 };
 
+const deleteUsers = async (userId: string): Promise<boolean> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    await baseAPIClient.delete(`/users/`, {
+      headers: { Authorization: bearerToken },
+      params: {
+        userId,
+      },
+    });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
 export default {
   getUsersByRole,
   getUsers,
+  deleteUsers,
 };
