@@ -61,6 +61,7 @@ export const testAdmins = [
     email: "peter.pan@example.com",
     status: "Active" as Status,
     role: "Administrator" as Role,
+    bookmarks: [],
   },
 ];
 
@@ -74,6 +75,7 @@ export const testFacilitators = [
     status: "Active" as Status,
     role: "Facilitator" as Role,
     learners: ["67e60671fb8fbc9c9bbb6d8a"],
+    bookmarks: [],
   },
 ];
 
@@ -93,6 +95,7 @@ export const testLearners = [
         // testCourseModules[0].pages.map(page => page.toString())
       },
     },
+    bookmarks: [],
   },
 ];
 
@@ -113,6 +116,7 @@ export const testLearnersDTO: LearnerDTO[] = [
         ]),
       ],
     ]),
+    bookmarks: [],
   },
 ];
 

@@ -11,7 +11,7 @@ import {
   updateUserDtoValidator,
   uploadProfilePictureValidator,
 } from "../middlewares/validators/userValidators";
-import UserModel, { Bookmark, LearnerModel } from "../models/user.mgmodel";
+import UserModel, { Bookmark } from "../models/user.mgmodel";
 import nodemailerConfig from "../nodemailer.config";
 import AuthService from "../services/implementations/authService";
 import CoursePageService from "../services/implementations/coursePageService";
