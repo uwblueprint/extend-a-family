@@ -17,7 +17,10 @@ interface ICoursePageService {
    * @param coursePageId the id of the page we want to fetch
    * @throwsError if course page was not successfully fetched or not found
    */
-  getCoursePage(coursePageId: string, lean?: boolean): Promise<CoursePageDTO>;
+  getCoursePage(
+    coursePageId: string,
+    lean?: boolean,
+  ): Promise<CoursePageDTOBase>;
 
   /**
    * Creates a course page, appended as the last page in the module (for now)
