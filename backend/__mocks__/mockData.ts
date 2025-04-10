@@ -26,6 +26,20 @@ export const testActivities = [
     layout: [],
     pageIndex: 1,
   },
+  {
+    _id: "67e60618fb8fbc9c9bbb6d84",
+    title: "Test Activity 3",
+    type: "Activity",
+    layout: [],
+    pageIndex: 2,
+  },
+  {
+    _id: "67e60619fb8fbc9c9bbb6d85",
+    title: "Test Activity 4",
+    type: "Activity",
+    layout: [],
+    pageIndex: 3,
+  },
 ];
 
 export const testCourseModules = [
@@ -41,14 +55,26 @@ export const testCourseModules = [
     title: "Test Course Module 2",
     pages: [testActivities[1]._id],
   },
+  {
+    _id: "67e60624fb8fbc9c9bbb6d86",
+    displayIndex: 2,
+    title: "Test Course Module 3",
+    pages: [testActivities[2]._id, testActivities[3]._id],
+  },
 ];
 
 export const testCourseUnits = [
   {
     _id: "67e6062cfb8fbc9c9bbb6d85",
     displayIndex: 0,
-    title: "Test Course Unit",
-    modules: testCourseModules.map((module) => module._id),
+    title: "Test Course Unit 1",
+    modules: [testCourseModules[0]._id, testCourseModules[1]._id],
+  },
+  {
+    _id: "67e6062dfb8fbc9c9bbb6d86",
+    displayIndex: 1,
+    title: "Test Course Unit 2",
+    modules: [testCourseModules[2]._id],
   },
 ];
 
@@ -92,7 +118,6 @@ export const testLearners = [
     activitiesCompleted: {
       [testCourseUnits[0]._id.toString()]: {
         [testCourseModules[0]._id.toString()]: [testActivities[0]._id],
-        // testCourseModules[0].pages.map(page => page.toString())
       },
     },
     bookmarks: [],

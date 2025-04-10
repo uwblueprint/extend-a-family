@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
+import mongooseLeanId from "mongoose-lean-id";
 
 export interface CourseUnit extends Document {
   id: string;
@@ -34,5 +35,7 @@ CourseUnitSchema.set("toObject", {
     delete ret._id;
   },
 });
+
+CourseUnitSchema.plugin(mongooseLeanId);
 
 export default mongoose.model<CourseUnit>("CourseUnit", CourseUnitSchema);

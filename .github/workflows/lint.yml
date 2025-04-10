@@ -1,4 +1,4 @@
-name: Lint codebase
+name: Lint and test codebase
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
+
       - name: Filter changed files
         uses: dorny/paths-filter@v2
         id: changes
@@ -34,7 +34,7 @@ jobs:
               - "backend/**"
             python-backend:
               - "backend/python/**"
-      
+
       - name: Set up Node.js
         if: steps.changes.outputs.frontend == 'true' || steps.changes.outputs.typescript-backend == 'true'
         uses: actions/setup-node@v4
@@ -58,7 +58,12 @@ jobs:
         if: steps.changes.outputs.typescript-backend == 'true'
         working-directory: ./backend
         run: yarn lint
-      
+
+      - name: Run backend unit tests
+        if: steps.changes.outputs.typescript-backend == 'true'
+        working-directory: ./backend
+        run: yarn test
+
       - name: Lint Python backend
         if: steps.changes.outputs.python-backend == 'true'
         working-directory: ./backend/python
