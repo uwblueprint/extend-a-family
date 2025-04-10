@@ -115,4 +115,12 @@ describe("mongo userService", (): void => {
         ?.get(testCourseModules[0]._id.toString()),
     ).toEqual([new mongoose.Types.ObjectId(testCourseModules[0].pages[0])]);
   });
+
+  it("updateNextPage", async () => {
+    const updatedLearner = await userService.updateNextPage(
+      testLearners[0]._id,
+      { unitId: testCourseUnits[0]._id, moduleId: testCourseModules[0]._id, pageId: testCourseModules[0].pages[0] },
+    );
+    expect(updatedLearner?.nextPage?.toString()).toEqual(testCourseModules[1].pages[0].toString());
+  });
 });

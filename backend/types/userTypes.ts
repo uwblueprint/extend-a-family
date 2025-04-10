@@ -25,6 +25,7 @@ export type UserDTO = {
   status: Status;
   profilePicture?: string;
   bookmarks: BookmarkDTO[];
+  nextPage?: string;
 };
 
 export type CreateUserDTO = Omit<UserDTO, "id" | "bookmarks"> & {
