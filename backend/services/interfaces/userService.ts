@@ -162,6 +162,9 @@ interface IUserService {
    * @param justViewed information about the page that the learner just viewed
    * @returns the updated learner
    */
-  updateNextPage(learnerId: string, justViewed: {unitId: string, moduleId: string, pageId: string}): Promise<Learner | null>;
+  updateNextPage(
+    learnerId: string,
+    justViewed: { unitId: string; moduleId: string; pageId: string },
+  ): Promise<Learner | null>;
 }
 export default IUserService;

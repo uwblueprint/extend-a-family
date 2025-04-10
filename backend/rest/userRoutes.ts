@@ -501,7 +501,6 @@ userRouter.put(
       const { unitId, moduleId, activityId } = req.body;
 
       // Check that everything exists
-      const courseUnitService = new CourseUnitService();
       const courseUnit = await courseUnitService.getCourseUnit(unitId);
 
       if (!courseUnit) {
@@ -536,9 +535,9 @@ userRouter.put(
         moduleId,
         activityId,
       ))!;
-      res.status(200).json(updatedUser);
+      return res.status(200).json(updatedUser);
     } catch (error) {
-      res.status(500).send(getErrorMessage(error));
+      return res.status(500).send(getErrorMessage(error));
     }
   },
 );
@@ -563,12 +562,12 @@ userRouter.get(
         0,
       );
 
-      res.status(200).send({
+      return res.status(200).send({
         completedModules,
         numModules,
       });
     } catch (error) {
-      res.status(500).send(getErrorMessage(error));
+      return res.status(500).send(getErrorMessage(error));
     }
   },
 );
@@ -588,15 +587,18 @@ userRouter.put(
 
       const { unitId, moduleId, pageId } = req.body;
 
-      const updatedUser = await userService.updateNextPage(learnerId.toString(), {
-        unitId,
-        moduleId,
-        pageId,
-      });
+      const updatedUser = await userService.updateNextPage(
+        learnerId.toString(),
+        {
+          unitId,
+          moduleId,
+          pageId,
+        },
+      );
 
-      res.status(200).json(updatedUser);
+      return res.status(200).json(updatedUser);
     } catch (error) {
-      res.status(500).send(getErrorMessage(error));
+      return res.status(500).send(getErrorMessage(error));
     }
   },
 );

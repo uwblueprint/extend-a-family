@@ -1,9 +1,10 @@
+/* eslint-disable no-underscore-dangle */
+import mongoose from "mongoose";
 import MgUser, { Learner, LearnerModel } from "../../../models/user.mgmodel";
 import UserService from "../userService";
 
 import { LearnerDTO, UserDTO } from "../../../types/userTypes";
 
-import mongoose from "mongoose";
 import {
   testActivities,
   testCourseModules,
@@ -119,8 +120,14 @@ describe("mongo userService", (): void => {
   it("updateNextPage", async () => {
     const updatedLearner = await userService.updateNextPage(
       testLearners[0]._id,
-      { unitId: testCourseUnits[0]._id, moduleId: testCourseModules[0]._id, pageId: testCourseModules[0].pages[0] },
+      {
+        unitId: testCourseUnits[0]._id,
+        moduleId: testCourseModules[0]._id,
+        pageId: testCourseModules[0].pages[0],
+      },
     );
-    expect(updatedLearner?.nextPage?.toString()).toEqual(testCourseModules[1].pages[0].toString());
+    expect(updatedLearner?.nextPage?.toString()).toEqual(
+      testCourseModules[1].pages[0].toString(),
+    );
   });
 });
