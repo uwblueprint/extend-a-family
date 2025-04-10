@@ -117,7 +117,21 @@ describe("mongo userService", (): void => {
     ).toEqual([new mongoose.Types.ObjectId(testCourseModules[0].pages[0])]);
   });
 
-  it("updateNextPage", async () => {
+  it("updateNextPage (next page is in the same module)", async () => {
+    const updatedLearner = await userService.updateNextPage(
+      testLearners[0]._id,
+      {
+        unitId: testCourseUnits[1]._id,
+        moduleId: testCourseModules[2]._id,
+        pageId: testCourseModules[2].pages[0],
+      },
+    );
+    expect(updatedLearner?.nextPage?.toString()).toEqual(
+      testCourseModules[2].pages[1].toString(),
+    );
+  });
+
+  it("updateNextPage (next page is in the next module)", async () => {
     const updatedLearner = await userService.updateNextPage(
       testLearners[0]._id,
       {
@@ -128,6 +142,20 @@ describe("mongo userService", (): void => {
     );
     expect(updatedLearner?.nextPage?.toString()).toEqual(
       testCourseModules[1].pages[0].toString(),
+    );
+  });
+
+  it("updateNextPage (next page is in the next unit)", async () => {
+    const updatedLearner = await userService.updateNextPage(
+      testLearners[0]._id,
+      {
+        unitId: testCourseUnits[0]._id,
+        moduleId: testCourseModules[1]._id,
+        pageId: testCourseModules[1].pages[0],
+      },
+    );
+    expect(updatedLearner?.nextPage?.toString()).toEqual(
+      testCourseModules[2].pages[0].toString(),
     );
   });
 });
