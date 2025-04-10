@@ -573,4 +573,32 @@ userRouter.get(
   },
 );
 
+userRouter.put(
+  "/learner/viewedPage",
+  isAuthorizedByRole(new Set(["Learner"])),
+  async (req, res) => {
+    const accessToken = getAccessToken(req)!;
+    try {
+      const learnerId = await authService.getUserIdFromAccessToken(accessToken);
+      const learner = await userService.getUserById(learnerId.toString());
+
+      if (!isLearner(learner)) {
+        return res.status(403).send("Forbidden: User is not a learner.");
+      }
+
+      const { unitId, moduleId, pageId } = req.body;
+
+      const updatedUser = await userService.updateNextPage(learnerId.toString(), {
+        unitId,
+        moduleId,
+        pageId,
+      });
+
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
 export default userRouter;

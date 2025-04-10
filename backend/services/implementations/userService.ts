@@ -19,9 +19,12 @@ import { getErrorCode, getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IUserService from "../interfaces/userService";
 import CourseModuleService from "./courseModuleService";
+import CourseUnitService from "./courseUnitService";
+import courseunitMgmodel from "../../models/courseunit.mgmodel";
 
 const Logger = logger(__filename);
 const courseModuleService = new CourseModuleService();
+const courseUnitService = new CourseUnitService();
 
 const getMongoUserByAuthId = async (authId: string): Promise<User> => {
   const user: User | null = await MgUser.findOne({ authId });
@@ -418,6 +421,48 @@ class UserService implements IUserService {
       },
     );
     return modifiedCount;
+  }
+
+  private async getNextPage(unitId: string, moduleId: string, pageId: string): Promise<string | null> {
+    const module = await courseModuleService.getCourseModule(moduleId);
+    const curPageIndex = module.pages.findIndex((page) => page.id === pageId);
+    const nextPage = module.pages[curPageIndex + 1];
+    if (nextPage) {
+      return nextPage.id;
+    }
+    const unit = await courseUnitService.getCourseUnit(unitId);
+    const curModuleIndex = unit.modules.findIndex((module) => module === moduleId);
+    const nextModuleId = unit.modules[curModuleIndex + 1];
+    if (nextModuleId) {
+      try {
+        const nextModule = await courseModuleService.getCourseModule(nextModuleId);
+        if (nextModule && nextModule.pages.length > 0) {
+          return nextModule.pages[0].id;
+        }
+      } catch (error) {}
+    }
+    const nextUnit = await courseunitMgmodel.findOne({displayIndex: unit.displayIndex + 1});
+    if (nextUnit) {
+      const nextModule = await courseModuleService.getCourseModule(nextUnit.modules[0].toString());
+      if (nextModule && nextModule.pages.length > 0) {
+        return nextModule.pages[0].id;
+      }
+    }
+    return null;
+  }
+
+  async updateNextPage(learnerId: string, justViewed: {unitId: string, moduleId: string, pageId: string}): Promise<Learner | null> {
+    const nextPageId = await this.getNextPage(justViewed.unitId, justViewed.moduleId, justViewed.pageId);
+    if (!nextPageId) {
+      Logger.warn(`No next page found for learner ${learnerId} after viewing ${justViewed.pageId} in module ${justViewed.moduleId} of unit ${justViewed.unitId}`);
+      return null;
+    }
+    const updatedUser = await LearnerModel.findByIdAndUpdate(
+      learnerId,
+      { nextPage: nextPageId },
+      { new: true },
+    );
+    return updatedUser;
   }
 }
 

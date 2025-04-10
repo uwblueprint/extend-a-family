@@ -155,5 +155,13 @@ interface IUserService {
     moduleId: string,
     activityId: string,
   ): Promise<number>;
+
+  /**
+   * Update the next page for a learner
+   * @param learnerId the id of the learner to update the next page for
+   * @param justViewed information about the page that the learner just viewed
+   * @returns the updated learner
+   */
+  updateNextPage(learnerId: string, justViewed: {unitId: string, moduleId: string, pageId: string}): Promise<Learner | null>;
 }
 export default IUserService;
