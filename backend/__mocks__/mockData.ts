@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { LearnerDTO, Role, Status } from "../types/userTypes";
 
 export const testLessons = [

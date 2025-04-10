@@ -1,9 +1,6 @@
 import db from "../../../testUtils/testDb";
-import CourseModuleService from "../courseModuleService";
 
 describe("courseModuleService", (): void => {
-  let courseModuleService: CourseModuleService;
-
   beforeAll(async () => {
     await db.connect();
   });
@@ -12,9 +9,7 @@ describe("courseModuleService", (): void => {
     await db.disconnect();
   });
 
-  beforeEach(async () => {
-    courseModuleService = new CourseModuleService();
-  });
+  beforeEach(async () => {});
 
   afterEach(async () => {
     await db.clear();
