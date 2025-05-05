@@ -4,14 +4,10 @@ import { useTheme } from "@mui/material/styles";
 import { useUser } from "../../hooks/useUser";
 
 interface ProfilePictureProps {
-  firstName?: string;
-  lastName?: string;
+  size: number;
 }
 
-const ProfilePicture = ({
-  firstName = "",
-  lastName = "",
-}: ProfilePictureProps): React.ReactElement => {
+const ProfilePicture = ({ size }: ProfilePictureProps): React.ReactElement => {
   const theme = useTheme();
   const user = useUser();
 
@@ -19,26 +15,29 @@ const ProfilePicture = ({
     <Box
       sx={{
         display: "flex",
-        width: "160px",
-        height: "160px",
+        width: `${size}px`,
+        height: `${size}px`,
         justifyContent: "center",
         alignItems: "center",
-        gap: "66.667px",
         borderRadius: "5000px",
-        background: "#D5F7FF",
       }}
     >
-      <Avatar sx={{ width: "100%", height: "100%", bgcolor: "#D5F7FF" }}>
+      <Avatar
+        sx={{
+          width: "100%",
+          height: "100%",
+          bgcolor: theme.palette[user.role].Hover,
+        }}
+      >
         <Typography
           sx={{
             color: theme.palette[user.role].Default,
-            fontSize: "60px",
+            fontSize: 0.375 * size,
             fontWeight: 400,
             lineHeight: "140%",
-            letterSpacing: "-3px",
           }}
         >
-          {`${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`}
+          {`${user.firstName.charAt(0) || ""}${user.lastName.charAt(0) || ""}`}
         </Typography>
       </Avatar>
     </Box>

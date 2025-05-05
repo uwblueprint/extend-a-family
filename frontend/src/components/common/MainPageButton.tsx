@@ -28,8 +28,8 @@ const MainPageButton = (): React.ReactElement => {
           flex: "1 0 0",
           alignSelf: "stretch",
           position: "absolute",
-          left: "36px",
-          top: "86px",
+          left: "12px",
+          top: "80px",
           borderRadius: "4px",
         }}
       >

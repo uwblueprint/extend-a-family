@@ -74,14 +74,13 @@ const MyAccount = (): React.ReactElement => {
         maxWidth={false}
         sx={{
           display: "flex",
-          padding: "48px",
+          padding: "48px 0px",
           flexDirection: "column",
           alignItems: "center",
           gap: "48px",
           flex: "1 0 0",
           alignSelf: "stretch",
           background: theme.palette.Neutral[200],
-          height: "92vh",
         }}
       >
         <MainPageButton />
@@ -95,7 +94,6 @@ const MyAccount = (): React.ReactElement => {
             borderRadius: "16px",
             background: theme.palette.Neutral[100],
             width: "464px",
-            height: "653px",
           }}
         >
           <Container
@@ -116,10 +114,7 @@ const MyAccount = (): React.ReactElement => {
             </Typography>
           </Container>
 
-          <ProfilePicture
-            firstName={authenticatedUser.firstName}
-            lastName={authenticatedUser.lastName}
-          />
+          <ProfilePicture size={160} />
 
           <Container
             sx={{
