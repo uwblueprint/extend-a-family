@@ -267,6 +267,25 @@ authRouter.post(
   },
 );
 
+authRouter.put(
+  "/changePassword",
+  updateTemporaryPasswordRequestValidator,
+  async (req, res) => {
+    try {
+      const accessToken = getAccessToken(req)!;
+      const newAccessToken = await authService.changeUserPassword(
+        accessToken,
+        req.body.newPassword,
+      );
+      res.status(200).json({
+        accessToken: newAccessToken,
+      });
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
 authRouter.post(
   "/updateUserStatus",
   updateUserStatusRequestValidator,

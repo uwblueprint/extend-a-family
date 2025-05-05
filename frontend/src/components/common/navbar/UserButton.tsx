@@ -1,10 +1,10 @@
 import React from "react";
-import { AccountCircle } from "@mui/icons-material";
 import { Box, IconButton, Popover, useTheme } from "@mui/material";
 import RefreshCredentials from "../../auth/RefreshCredentials";
 import ResetPassword from "../../auth/ResetPassword";
 import Logout from "../../auth/Logout";
 import MyAccountButton from "../../auth/MyAccountButton";
+import ProfilePicture from "../../profile/ProfilePicture";
 
 const UserButton = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
@@ -31,7 +31,7 @@ const UserButton = () => {
         onClick={handleClick}
         sx={{ color: theme.palette.Neutral[400] }}
       >
-        <AccountCircle />
+        <ProfilePicture size={24} />
       </IconButton>
       <Popover
         id={id}
