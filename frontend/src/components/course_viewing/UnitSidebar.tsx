@@ -116,7 +116,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
               htmlColor={theme.palette.Neutral[700]}
             />
           </ListItemIcon>
-          <Typography variant="bodyMedium">Edit unit title</Typography>
+          <Typography variant="bodyMedium">Edit Title</Typography>
         </MenuItem>
         <Divider component="li" />
         <MenuItem

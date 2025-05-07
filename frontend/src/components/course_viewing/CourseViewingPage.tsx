@@ -7,7 +7,7 @@ import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import CourseModulesGrid from "./CourseModulesGrid";
 import CreateUnitModal from "./modals/CreateUnitModal";
 import DeleteUnitModal from "./modals/DeleteUnitModal";
-import EditUnitModal from "./modals/EditUnitModals";
+import EditUnitModal from "./modals/EditUnitModal";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();

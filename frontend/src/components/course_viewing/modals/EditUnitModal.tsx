@@ -1,6 +1,6 @@
 import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
-import { PersonOutlineOutlined } from "@mui/icons-material";
+import { ModeOutlined } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -8,12 +8,11 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  InputAdornment,
-  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
 import { useUser } from "../../../hooks/useUser";
+import StartAdornedTextField from "../../common/form/StartAdornedTextField";
 
 interface EditUnitModalProps {
   openEditUnitModal: boolean;
@@ -72,7 +71,6 @@ export default function EditUnitModal(props: EditUnitModalProps) {
             sx={{
               margin: "0px",
               padding: "0px",
-              marginBottom: "12px",
             }}
           >
             <Typography
@@ -98,10 +96,10 @@ export default function EditUnitModal(props: EditUnitModalProps) {
                 gap: "24px",
               }}
             >
-              <TextField
+              <StartAdornedTextField
                 required
                 type="text"
-                placeholder="Unit Title"
+                label="Unit Title"
                 onChange={(event) => setEditUnitName(event.target.value)}
                 variant="outlined"
                 sx={{
@@ -111,13 +109,8 @@ export default function EditUnitModal(props: EditUnitModalProps) {
                   height: "56px",
                   width: "100%",
                 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonOutlineOutlined />
-                    </InputAdornment>
-                  ),
-                }}
+                adornment={<ModeOutlined />}
+                focusedBorderColor={theme.palette.Administrator.Default}
               />
             </Box>
           </DialogContent>
