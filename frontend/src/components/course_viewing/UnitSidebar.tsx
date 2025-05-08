@@ -24,6 +24,10 @@ import AddIcon from "@mui/icons-material/Add";
 import { CourseUnit } from "../../types/CourseTypes";
 import { useUser } from "../../hooks/useUser";
 import { isAdministrator } from "../../types/UserTypes";
+import CreateUnitModal from "./modals/CreateUnitModal";
+import EditUnitModal from "./modals/EditUnitModal";
+import DeleteUnitModal from "./modals/DeleteUnitModal";
+import CourseAPIClient from "../../APIClients/CourseAPIClient";
 
 enum ModalType {
   Create = "Create",
@@ -32,41 +36,91 @@ enum ModalType {
 }
 interface UnitSideBarProps {
   courseUnits: CourseUnit[];
+  setCourseUnits: React.Dispatch<React.SetStateAction<CourseUnit[]>>;
   handleClose: () => void;
-  handleOpenCreateUnitModal: () => void;
-  handleOpenDeleteUnitModal: () => void;
-  handleOpenEditUnitModal: () => void;
-  setSelectedUnitId: (value: React.SetStateAction<string>) => void;
   open: boolean;
   onSelectUnit: (unit: CourseUnit) => void;
 }
 
-export default function UnitSidebar(props: UnitSideBarProps) {
+export default function UnitSidebar({
+  courseUnits,
+  setCourseUnits,
+  handleClose,
+  open,
+  onSelectUnit,
+}: UnitSideBarProps) {
   const theme = useTheme();
   const user = useUser();
-  const {
-    courseUnits,
-    handleClose,
-    open,
-    onSelectUnit,
-    handleOpenCreateUnitModal,
-    handleOpenDeleteUnitModal,
-    handleOpenEditUnitModal,
-    setSelectedUnitId,
-  } = props;
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
-
   const openContextMenu = Boolean(anchorEl);
 
+  const [contextMenuUnit, setContextMenuUnit] = useState<CourseUnit | null>();
+  const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
+  const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
+  const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleContextMenuOpen = (event: any, courseId: string) => {
+  const handleContextMenuOpen = (event: any, unit: CourseUnit) => {
     setAnchorEl(event.currentTarget);
-    setSelectedUnitId(courseId);
+    setContextMenuUnit(unit);
   };
   const handleContextMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const createUnit = async (title: string) => {
+    const unit = await CourseAPIClient.createUnit(title);
+    if (unit) {
+      setCourseUnits((prev) => [...prev, unit]);
+    }
+  };
+  const editUnit = async (title: string) => {
+    if (contextMenuUnit) {
+      const editedUnit = await CourseAPIClient.editUnit(
+        contextMenuUnit.id,
+        title,
+      );
+      if (editedUnit) {
+        setCourseUnits((prev) =>
+          prev.map((unit) => (unit.id === editedUnit.id ? editedUnit : unit)),
+        );
+      }
+    }
+  };
+  const deleteUnit = async () => {
+    if (contextMenuUnit) {
+      const deletedUnitId = await CourseAPIClient.deleteUnit(
+        contextMenuUnit.id,
+      );
+      if (deletedUnitId) {
+        setCourseUnits((prev) =>
+          prev.filter((unit) => unit.id !== deletedUnitId),
+        );
+      }
+    }
+  };
+
+  const handleOpenCreateUnitModal = () => {
+    setOpenCreateUnitModal(true);
+  };
+  const handleCloseCreateUnitModal = () => {
+    setOpenCreateUnitModal(false);
+  };
+
+  const handleOpenEditUnitModal = () => {
+    setOpenEditUnitModal(true);
+  };
+  const handleCloseEditUnitModal = () => {
+    setOpenEditUnitModal(false);
+  };
+
+  const handleOpenDeleteUnitModal = () => {
+    setOpenDeleteUnitModal(true);
+  };
+  const handleCloseDeleteUnitModal = () => {
+    setOpenDeleteUnitModal(false);
   };
 
   const handleOpenModal = (action: string) => {
@@ -214,10 +268,10 @@ export default function UnitSidebar(props: UnitSideBarProps) {
         </Box>
         <ContextMenu />
         <List sx={{ width: "100%" }}>
-          {courseUnits.map((course, index) => {
+          {courseUnits.map((unit, index) => {
             return (
               <ListItem
-                key={course.id}
+                key={unit.id}
                 disablePadding
                 sx={{
                   borderBottom: 1,
@@ -228,7 +282,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
                 }}
               >
                 <ListItemButton
-                  key={course.id}
+                  key={unit.id}
                   sx={{
                     py: "15px",
                     px: "32px",
@@ -244,7 +298,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
                 >
                   <ListItemText
                     disableTypography
-                    primary={`${course.displayIndex}. ${course.title}`}
+                    primary={`${unit.displayIndex}. ${unit.title}`}
                     sx={
                       selectedIndex === index
                         ? theme.typography.titleMedium
@@ -256,7 +310,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
                       edge="end"
                       onClick={(event) => {
                         event.stopPropagation(); // Prevent triggering the list item click
-                        handleContextMenuOpen(event, course.id); // Custom function to handle button click
+                        handleContextMenuOpen(event, unit); // Custom function to handle button click
                       }}
                       sx={{ marginLeft: "16px" }}
                     >
@@ -297,6 +351,23 @@ export default function UnitSidebar(props: UnitSideBarProps) {
           </Button>
         )}
       </Box>
+
+      <CreateUnitModal
+        openCreateUnitModal={openCreateUnitModal}
+        handleCloseCreateUnitModal={handleCloseCreateUnitModal}
+        createUnit={createUnit}
+      />
+      <EditUnitModal
+        openEditUnitModal={openEditUnitModal}
+        handleCloseEditUnitModal={handleCloseEditUnitModal}
+        editUnit={editUnit}
+        currentTitle={contextMenuUnit?.title ?? ""}
+      />
+      <DeleteUnitModal
+        openDeleteUnitModal={openDeleteUnitModal}
+        handleCloseDeleteUnitModal={handleCloseDeleteUnitModal}
+        deleteUnit={deleteUnit}
+      />
     </Drawer>
   );
 }

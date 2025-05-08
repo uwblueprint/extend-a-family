@@ -21,12 +21,16 @@ const StartAdornedTextField: React.FC<StartAdornedTextFieldProps> = ({
   onBlur,
   slotProps,
   sx,
+  value,
+  defaultValue,
   ...props
 }) => {
-  const [shrink, setShrink] = useState(false);
+  const [shrink, setShrink] = useState(!!value || !!defaultValue);
   return (
     <TextField
       {...props}
+      value={value}
+      defaultValue={defaultValue}
       onFocus={(e) => {
         setShrink(true);
         onFocus?.(e);

@@ -27,7 +27,7 @@ export default function EditUnitModal({
   editUnit,
   currentTitle,
 }: EditUnitModalProps) {
-  const [title, setTitle] = useState(currentTitle);
+  const [title, setTitle] = useState("");
   const theme = useTheme();
   const user = useUser();
 
@@ -99,7 +99,7 @@ export default function EditUnitModal({
                 required
                 type="text"
                 label="Unit Title"
-                value={title}
+                defaultValue={currentTitle}
                 onChange={(event) => setTitle(event.target.value)}
                 variant="outlined"
                 sx={{
