@@ -61,3 +61,9 @@ export type ElementType =
   | DisplayElementType
   | InteractiveElementType
   | HybridElementType;
+
+export enum UnitSidebarModalType {
+  Create = "Create",
+  Delete = "Delete",
+  Edit = "Edit",
+}

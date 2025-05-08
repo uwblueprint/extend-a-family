@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import UnitSidebar from "./UnitSidebar";
+import UnitSidebar from "./sidebar/UnitSidebar";
 import { CourseUnit } from "../../types/CourseTypes";
-import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import CourseModulesGrid from "./CourseModulesGrid";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
-  const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
   const [selectedUnit, setSelectedUnit] = useState<CourseUnit | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -20,31 +18,12 @@ export default function CourseUnitsPage() {
     setSidebarOpen(false);
   };
 
-  useEffect(() => {
-    const getCouseUnits = async () => {
-      const data = await CourseAPIClient.getUnits();
-      setCourseUnits(data);
-
-      // Set selectedUnit to the first unit if data is not empty
-      if (data.length > 0) {
-        setSelectedUnit(data[0]);
-      }
-    };
-    getCouseUnits();
-  }, []);
-
-  const handleSelectUnit = (unit: CourseUnit) => {
-    setSelectedUnit(unit);
-  };
-
   return (
     <Box display="flex" width="100%">
       <UnitSidebar
-        courseUnits={courseUnits}
-        setCourseUnits={setCourseUnits}
+        setSelectedUnit={setSelectedUnit}
         handleClose={handleDrawerClose}
         open={sidebarOpen}
-        onSelectUnit={handleSelectUnit}
       />
 
       <Box sx={{ flexGrow: 1, p: "48px" }}>

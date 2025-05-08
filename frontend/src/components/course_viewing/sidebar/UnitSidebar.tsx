@@ -1,65 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Divider,
   Drawer,
   IconButton,
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
-  Menu,
-  MenuItem,
   Typography,
   useTheme,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import MoveDownIcon from "@mui/icons-material/MoveDown";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import AddIcon from "@mui/icons-material/Add";
-import { CourseUnit } from "../../types/CourseTypes";
-import { useUser } from "../../hooks/useUser";
-import { isAdministrator } from "../../types/UserTypes";
-import CreateUnitModal from "./modals/CreateUnitModal";
-import EditUnitModal from "./modals/EditUnitModal";
-import DeleteUnitModal from "./modals/DeleteUnitModal";
-import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import { CourseUnit, UnitSidebarModalType } from "../../../types/CourseTypes";
+import { useUser } from "../../../hooks/useUser";
+import { isAdministrator } from "../../../types/UserTypes";
+import CreateUnitModal from "../modals/CreateUnitModal";
+import EditUnitModal from "../modals/EditUnitModal";
+import DeleteUnitModal from "../modals/DeleteUnitModal";
+import CourseAPIClient from "../../../APIClients/CourseAPIClient";
+import ContextMenu from "./ContextMenu";
 
-enum ModalType {
-  Create = "Create",
-  Delete = "Delete",
-  Edit = "Edit",
-}
 interface UnitSideBarProps {
-  courseUnits: CourseUnit[];
-  setCourseUnits: React.Dispatch<React.SetStateAction<CourseUnit[]>>;
   handleClose: () => void;
   open: boolean;
-  onSelectUnit: (unit: CourseUnit) => void;
+  setSelectedUnit: React.Dispatch<React.SetStateAction<CourseUnit | null>>;
 }
 
 export default function UnitSidebar({
-  courseUnits,
-  setCourseUnits,
   handleClose,
   open,
-  onSelectUnit,
+  setSelectedUnit,
 }: UnitSideBarProps) {
   const theme = useTheme();
   const user = useUser();
 
+  const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const openContextMenu = Boolean(anchorEl);
 
   const [contextMenuUnit, setContextMenuUnit] = useState<CourseUnit | null>();
   const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
+
+  useEffect(() => {
+    const getCouseUnits = async () => {
+      const data = await CourseAPIClient.getUnits();
+      setCourseUnits(data);
+
+      // Set selectedUnit to the first unit if data is not empty
+      if (data.length > 0) {
+        setSelectedUnit(data[0]);
+      }
+    };
+    getCouseUnits();
+  }, [setSelectedUnit]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleContextMenuOpen = (event: any, unit: CourseUnit) => {
@@ -126,96 +124,25 @@ export default function UnitSidebar({
   const handleOpenModal = (action: string) => {
     handleContextMenuClose();
     switch (action) {
-      case ModalType.Create:
+      case UnitSidebarModalType.Create:
         handleOpenCreateUnitModal();
         break;
-      case ModalType.Delete:
+      case UnitSidebarModalType.Delete:
         handleOpenDeleteUnitModal();
         break;
-      case ModalType.Edit:
+      case UnitSidebarModalType.Edit:
         handleOpenEditUnitModal();
         break;
       default:
     }
   };
 
-  const ContextMenu = () => {
-    return (
-      <Menu
-        anchorEl={anchorEl}
-        open={openContextMenu}
-        onClose={handleContextMenuClose}
-        sx={{
-          padding: "0px",
-          margin: "0px",
-        }}
-        MenuListProps={{
-          sx: {
-            py: 0,
-            backgroundColor: theme.palette.Neutral[200],
-            paddingTop: "8px",
-            paddingBottom: "8px",
-          },
-        }}
-      >
-        <MenuItem
-          sx={{
-            height: "48px",
-          }}
-          onClick={() => handleOpenModal(ModalType.Edit)}
-        >
-          <ListItemIcon>
-            <EditOutlinedIcon
-              fontSize="small"
-              htmlColor={theme.palette.Neutral[700]}
-            />
-          </ListItemIcon>
-          <Typography variant="bodyMedium">Edit Title</Typography>
-        </MenuItem>
-        <Divider component="li" />
-        <MenuItem
-          sx={{
-            height: "48px",
-          }}
-        >
-          <ListItemIcon>
-            <MoveDownIcon
-              fontSize="small"
-              htmlColor={theme.palette.Neutral[700]}
-            />
-          </ListItemIcon>
-          <Typography variant="bodyMedium">Move</Typography>
-        </MenuItem>
-        <Divider component="li" />
-        <MenuItem
-          onClick={() => handleOpenModal(ModalType.Delete)}
-          sx={{
-            height: "48px",
-          }}
-        >
-          <ListItemIcon>
-            <DeleteOutlineIcon
-              fontSize="small"
-              htmlColor={theme.palette.Error.Default}
-            />
-          </ListItemIcon>
-          <Typography
-            variant="bodyMedium"
-            noWrap
-            color={theme.palette.Error.Default}
-          >
-            Delete
-          </Typography>
-        </MenuItem>
-      </Menu>
-    );
-  };
   const handleListItemClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number,
   ) => {
     setSelectedIndex(index);
-    onSelectUnit(courseUnits[index]);
+    setSelectedUnit(courseUnits[index]);
   };
 
   return (
@@ -266,7 +193,11 @@ export default function UnitSidebar({
             Close
           </Button>
         </Box>
-        <ContextMenu />
+        <ContextMenu
+          anchorEl={anchorEl}
+          onClose={handleContextMenuClose}
+          onModalOpen={handleOpenModal}
+        />
         <List sx={{ width: "100%" }}>
           {courseUnits.map((unit, index) => {
             return (
