@@ -29,6 +29,7 @@ export interface Learner extends User {
 
 export interface Facilitator extends User {
   learners: Array<ObjectId>;
+  bio?: string;
 }
 
 const baseOptions = {
@@ -105,6 +106,10 @@ const FacilitatorSchema = new Schema({
   learners: {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     default: [],
+  },
+  bio: {
+    type: String,
+    required: false,
   },
 });
 
