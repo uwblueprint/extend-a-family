@@ -36,7 +36,7 @@ interface UnitSideBarProps {
   handleOpenCreateUnitModal: () => void;
   handleOpenDeleteUnitModal: () => void;
   handleOpenEditUnitModal: () => void;
-  setSelectedCourseId: (value: React.SetStateAction<string>) => void;
+  setSelectedUnitId: (value: React.SetStateAction<string>) => void;
   open: boolean;
   onSelectUnit: (unit: CourseUnit) => void;
 }
@@ -52,7 +52,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
     handleOpenCreateUnitModal,
     handleOpenDeleteUnitModal,
     handleOpenEditUnitModal,
-    setSelectedCourseId,
+    setSelectedUnitId,
   } = props;
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -63,7 +63,7 @@ export default function UnitSidebar(props: UnitSideBarProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleContextMenuOpen = (event: any, courseId: string) => {
     setAnchorEl(event.currentTarget);
-    setSelectedCourseId(courseId);
+    setSelectedUnitId(courseId);
   };
   const handleContextMenuClose = () => {
     setAnchorEl(null);
@@ -169,7 +169,6 @@ export default function UnitSidebar(props: UnitSideBarProps) {
       sx={{
         maxWidth: "301px",
         width: "100%",
-        height: "100%",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
           boxSizing: "border-box",
@@ -183,7 +182,10 @@ export default function UnitSidebar(props: UnitSideBarProps) {
     >
       <Box
         height="100%"
-        sx={{ backgroundColor: theme.palette[user.role].Light }}
+        sx={{
+          backgroundColor: theme.palette[user.role].Light,
+          overflowX: "hidden",
+        }}
       >
         <Box
           height="59px"

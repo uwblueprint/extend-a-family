@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { ModeOutlined } from "@mui/icons-material";
 import {
@@ -17,18 +17,15 @@ import StartAdornedTextField from "../../common/form/StartAdornedTextField";
 interface CreateUnitModalProps {
   openCreateUnitModal: boolean;
   handleCloseCreateUnitModal: () => void;
-  setCreateUnitName: (value: React.SetStateAction<string>) => void;
-  createUnit: () => void;
+  createUnit: (title: string) => Promise<void>;
 }
 
-export default function CreateUnitModal(props: CreateUnitModalProps) {
-  const {
-    openCreateUnitModal,
-    handleCloseCreateUnitModal,
-    setCreateUnitName,
-    createUnit,
-  } = props;
-
+export default function CreateUnitModal({
+  openCreateUnitModal,
+  handleCloseCreateUnitModal,
+  createUnit,
+}: CreateUnitModalProps) {
+  const [title, setTitle] = useState("");
   const theme = useTheme();
   const user = useUser();
 
@@ -100,7 +97,7 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
                 required
                 type="text"
                 label="Unit Title"
-                onChange={(event) => setCreateUnitName(event.target.value)}
+                onChange={(event) => setTitle(event.target.value)}
                 variant="outlined"
                 sx={{
                   display: "flex",
@@ -155,7 +152,10 @@ export default function CreateUnitModal(props: CreateUnitModalProps) {
                 bgcolor: theme.palette[user.role].Default,
               },
             }}
-            onClick={createUnit}
+            onClick={async () => {
+              await createUnit(title);
+              handleCloseCreateUnitModal();
+            }}
             disableElevation
           >
             <Typography variant="labelLarge">CREATE</Typography>

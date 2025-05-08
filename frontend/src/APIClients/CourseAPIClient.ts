@@ -18,6 +18,58 @@ const getUnits = async (): Promise<CourseUnit[]> => {
   }
 };
 
+const createUnit = async (title: string): Promise<CourseUnit | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(
+      "/course/",
+      { title },
+      { headers: { Authorization: bearerToken } },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+const editUnit = async (
+  unitId: string,
+  title: string,
+): Promise<CourseUnit | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.put(
+      `/course/${unitId}`,
+      { title },
+      { headers: { Authorization: bearerToken } },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+const deleteUnit = async (unitId: string): Promise<string | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.delete(`/course/${unitId}`, {
+      headers: { Authorization: bearerToken },
+    });
+    return data.id;
+  } catch (error) {
+    return null;
+  }
+};
+
 const getModules = async (unitId: string): Promise<CourseModule[]> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -97,6 +149,9 @@ const getModuleById = async (
 
 export default {
   getUnits,
+  createUnit,
+  editUnit,
+  deleteUnit,
   getModules,
   uploadThumbnail,
   lessonUpload,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { ModeOutlined } from "@mui/icons-material";
 import {
@@ -17,18 +17,17 @@ import StartAdornedTextField from "../../common/form/StartAdornedTextField";
 interface EditUnitModalProps {
   openEditUnitModal: boolean;
   handleCloseEditUnitModal: () => void;
-  setEditUnitName: (value: React.SetStateAction<string>) => void;
-  editUnit: () => void;
+  editUnit: (title: string) => Promise<void>;
+  currentTitle: string;
 }
 
-export default function EditUnitModal(props: EditUnitModalProps) {
-  const {
-    openEditUnitModal,
-    handleCloseEditUnitModal,
-    setEditUnitName,
-    editUnit,
-  } = props;
-
+export default function EditUnitModal({
+  openEditUnitModal,
+  handleCloseEditUnitModal,
+  editUnit,
+  currentTitle,
+}: EditUnitModalProps) {
+  const [title, setTitle] = useState(currentTitle);
   const theme = useTheme();
   const user = useUser();
 
@@ -100,7 +99,8 @@ export default function EditUnitModal(props: EditUnitModalProps) {
                 required
                 type="text"
                 label="Unit Title"
-                onChange={(event) => setEditUnitName(event.target.value)}
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
                 variant="outlined"
                 sx={{
                   display: "flex",
@@ -155,7 +155,10 @@ export default function EditUnitModal(props: EditUnitModalProps) {
                 bgcolor: theme.palette[user.role].Default,
               },
             }}
-            onClick={editUnit}
+            onClick={async () => {
+              await editUnit(title);
+              handleCloseEditUnitModal();
+            }}
             disableElevation
           >
             <Typography variant="labelLarge">SAVE EDIT</Typography>

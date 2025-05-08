@@ -143,10 +143,10 @@ courseRouter.post(
   createCourseUnitDtoValidator,
   async (req, res) => {
     try {
-      const newCourse = await courseUnitService.createCourseUnit({
+      const newUnit = await courseUnitService.createCourseUnit({
         title: req.body.title,
       });
-      res.status(201).json(newCourse);
+      res.status(201).json(newUnit);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }
@@ -179,10 +179,10 @@ courseRouter.put(
   async (req, res) => {
     const { unitId } = req.params;
     try {
-      const course = await courseUnitService.updateCourseUnit(unitId, {
+      const updatedUnit = await courseUnitService.updateCourseUnit(unitId, {
         title: req.body.title,
       });
-      res.status(200).json(course);
+      res.status(200).json(updatedUnit);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }

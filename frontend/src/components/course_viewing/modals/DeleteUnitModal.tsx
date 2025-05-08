@@ -16,7 +16,7 @@ import { useUser } from "../../../hooks/useUser";
 interface DeleteUnitModalProps {
   openDeleteUnitModal: boolean;
   handleCloseDeleteUnitModal: () => void;
-  deleteUnit: () => void;
+  deleteUnit: () => Promise<void>;
 }
 
 export default function CreateUnitModal(props: DeleteUnitModalProps) {
@@ -131,7 +131,10 @@ export default function CreateUnitModal(props: DeleteUnitModalProps) {
                 bgcolor: theme.palette.Error.Default,
               },
             }}
-            onClick={() => deleteUnit()}
+            onClick={async () => {
+              await deleteUnit();
+              handleCloseDeleteUnitModal();
+            }}
             disableElevation
           >
             <Typography variant="labelLarge">DELETE</Typography>

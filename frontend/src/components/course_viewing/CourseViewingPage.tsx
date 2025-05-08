@@ -12,14 +12,12 @@ import EditUnitModal from "./modals/EditUnitModal";
 export default function CourseUnitsPage() {
   const theme = useTheme();
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
-  const [createUnitName, setCreateUnitName] = useState("");
-  const [editUnitName, setEditUnitName] = useState("");
-  const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
-  const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
-  const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
-  const [selectedCourseId, setSelectedCourseId] = useState("");
-  const [open, setOpen] = useState(true);
   const [selectedUnit, setSelectedUnit] = useState<CourseUnit | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [selectedUnitId, setSelectedUnitId] = useState("");
+  const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
+  const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
+  const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
 
   const handleOpenCreateUnitModal = () => {
     setOpenCreateUnitModal(true);
@@ -45,27 +43,35 @@ export default function CourseUnitsPage() {
     setOpenEditUnitModal(true);
   };
 
-  const createUnit = () => {
-    // dummy function
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const unitName = createUnitName;
+  const createUnit = async (title: string) => {
+    const unit = await CourseAPIClient.createUnit(title);
+    if (unit) {
+      setCourseUnits((prev) => [...prev, unit]);
+    }
   };
-  const deleteUnit = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const courseId = selectedCourseId;
+  const editUnit = async (title: string) => {
+    const editedUnit = await CourseAPIClient.editUnit(selectedUnitId, title);
+    if (editedUnit) {
+      setCourseUnits((prev) =>
+        prev.map((unit) => (unit.id === editedUnit.id ? editedUnit : unit)),
+      );
+    }
   };
-
-  const editUnit = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const courseId = editUnitName;
+  const deleteUnit = async () => {
+    const deletedUnitId = await CourseAPIClient.deleteUnit(selectedUnitId);
+    if (deletedUnitId) {
+      setCourseUnits((prev) =>
+        prev.filter((unit) => unit.id !== deletedUnitId),
+      );
+    }
   };
 
   const handleDrawerOpen = () => {
-    setOpen(true);
+    setSidebarOpen(true);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setSidebarOpen(false);
   };
 
   useEffect(() => {
@@ -86,11 +92,10 @@ export default function CourseUnitsPage() {
   };
 
   return (
-    <Box display="flex" width="100%" height="100%">
+    <Box display="flex" width="100%">
       <CreateUnitModal
         openCreateUnitModal={openCreateUnitModal}
         handleCloseCreateUnitModal={handleCloseCreateUnitModal}
-        setCreateUnitName={setCreateUnitName}
         createUnit={createUnit}
       />
       <DeleteUnitModal
@@ -102,8 +107,8 @@ export default function CourseUnitsPage() {
       <EditUnitModal
         openEditUnitModal={openEditUnitModal}
         handleCloseEditUnitModal={handleCloseEditUnitModal}
-        setEditUnitName={setEditUnitName}
         editUnit={editUnit}
+        currentTitle={selectedUnit?.title ?? ""}
       />
 
       <UnitSidebar
@@ -112,8 +117,8 @@ export default function CourseUnitsPage() {
         handleOpenCreateUnitModal={handleOpenCreateUnitModal}
         handleOpenDeleteUnitModal={handleOpenDeleteUnitModal}
         handleOpenEditUnitModal={handleOpenEditUnitModal}
-        setSelectedCourseId={setSelectedCourseId}
-        open={open}
+        setSelectedUnitId={setSelectedUnitId}
+        open={sidebarOpen}
         onSelectUnit={handleSelectUnit}
       />
 
@@ -121,7 +126,7 @@ export default function CourseUnitsPage() {
         {selectedUnit ? (
           <Stack spacing="14px">
             <Box display="flex" alignItems="center" paddingLeft="10px">
-              {!open && (
+              {!sidebarOpen && (
                 <Button
                   type="button"
                   sx={{
@@ -148,7 +153,10 @@ export default function CourseUnitsPage() {
                 Unit {selectedUnit.displayIndex}: {selectedUnit.title}
               </Typography>
             </Box>
-            <CourseModulesGrid unitId={selectedUnit.id} isSidebarOpen={open} />
+            <CourseModulesGrid
+              unitId={selectedUnit.id}
+              isSidebarOpen={sidebarOpen}
+            />
           </Stack>
         ) : (
           <Typography>Loading units...</Typography>
