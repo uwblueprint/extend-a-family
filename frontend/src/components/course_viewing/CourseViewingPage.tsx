@@ -1,57 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import UnitSidebar from "./UnitSidebar";
+import UnitSidebar from "./sidebar/UnitSidebar";
 import { CourseUnit } from "../../types/CourseTypes";
-import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import CourseModulesGrid from "./CourseModulesGrid";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
-  const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
-
-  const [open, setOpen] = useState(true);
   const [selectedUnit, setSelectedUnit] = useState<CourseUnit | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleDrawerOpen = () => {
-    setOpen(true);
+    setSidebarOpen(true);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  useEffect(() => {
-    const getCouseUnits = async () => {
-      const data = await CourseAPIClient.getUnits();
-      setCourseUnits(data);
-
-      // Set selectedUnit to the first unit if data is not empty
-      if (data.length > 0) {
-        setSelectedUnit(data[0]);
-      }
-    };
-    getCouseUnits();
-  }, []);
-
-  const handleSelectUnit = (unit: CourseUnit) => {
-    setSelectedUnit(unit);
+    setSidebarOpen(false);
   };
 
   return (
-    <Box display="flex" width="100%" height="100%">
+    <Box display="flex" width="100%">
       <UnitSidebar
-        courseUnits={courseUnits}
+        setSelectedUnit={setSelectedUnit}
         handleClose={handleDrawerClose}
-        open={open}
-        onSelectUnit={handleSelectUnit}
+        open={sidebarOpen}
       />
 
       <Box sx={{ flexGrow: 1, p: "48px" }}>
         {selectedUnit ? (
           <Stack spacing="14px">
             <Box display="flex" alignItems="center" paddingLeft="10px">
-              {!open && (
+              {!sidebarOpen && (
                 <Button
                   type="button"
                   sx={{
@@ -78,7 +57,10 @@ export default function CourseUnitsPage() {
                 Unit {selectedUnit.displayIndex}: {selectedUnit.title}
               </Typography>
             </Box>
-            <CourseModulesGrid unitId={selectedUnit.id} isSidebarOpen={open} />
+            <CourseModulesGrid
+              unitId={selectedUnit.id}
+              isSidebarOpen={sidebarOpen}
+            />
           </Stack>
         ) : (
           <Typography>Loading units...</Typography>

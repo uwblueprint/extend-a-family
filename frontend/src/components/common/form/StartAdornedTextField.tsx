@@ -11,6 +11,7 @@ type StartAdornedTextFieldProps = TextFieldProps & {
  * Custom MUI TextField that supports start adornment with floating label.
  * Accepts the usual MUI TextField props, plus some custom props:
  * @param adornment JSX Element to be placed in start adornment slot
+ * @param label placeholder that floats to label position on click
  * @param focusedBorderColor (optional) color of border and label when text field is focused
  */
 const StartAdornedTextField: React.FC<StartAdornedTextFieldProps> = ({
@@ -20,12 +21,16 @@ const StartAdornedTextField: React.FC<StartAdornedTextFieldProps> = ({
   onBlur,
   slotProps,
   sx,
+  value,
+  defaultValue,
   ...props
 }) => {
-  const [shrink, setShrink] = useState(false);
+  const [shrink, setShrink] = useState(!!value || !!defaultValue);
   return (
     <TextField
       {...props}
+      value={value}
+      defaultValue={defaultValue}
       onFocus={(e) => {
         setShrink(true);
         onFocus?.(e);
@@ -50,6 +55,7 @@ const StartAdornedTextField: React.FC<StartAdornedTextFieldProps> = ({
       }}
       sx={{
         ...sx,
+        marginTop: "5px",
         "& .MuiInputLabel-shrink": {
           marginLeft: 0,
         },
