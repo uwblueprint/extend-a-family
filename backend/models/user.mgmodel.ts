@@ -32,9 +32,21 @@ export interface Facilitator extends User {
   bio?: string;
 }
 
-const baseOptions = {
+const options = {
   discriminatorKey: "role",
   timestamps: true,
+  toObject: {
+    virtuals: true,
+    versionKey: false,
+    transform: (_doc: Document, ret: Record<string, unknown>) => {
+      // eslint-disable-next-line no-underscore-dangle, no-param-reassign
+      delete ret._id;
+      // eslint-disable-next-line no-param-reassign
+      delete ret.createdAt;
+      // eslint-disable-next-line no-param-reassign
+      delete ret.updatedAt;
+    },
+  },
 };
 
 export const BookmarkSchema: Schema = new Schema({
@@ -83,43 +95,37 @@ export const UserSchema: Schema = new Schema(
       required: true,
     },
   },
-  baseOptions,
+  options,
 );
-
-/* eslint-disable no-param-reassign */
-UserSchema.set("toObject", {
-  virtuals: true,
-  versionKey: false,
-  transform: (_doc: Document, ret: Record<string, unknown>) => {
-    // eslint-disable-next-line no-underscore-dangle
-    delete ret._id;
-    delete ret.createdAt;
-    delete ret.updatedAt;
-  },
-});
 
 const UserModel = mongoose.model<User>("User", UserSchema);
 
-const AdministratorSchema = new Schema({});
+const AdministratorSchema = new Schema({}, options);
 
-const FacilitatorSchema = new Schema({
-  learners: {
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    default: [],
+const FacilitatorSchema = new Schema(
+  {
+    learners: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      default: [],
+    },
+    bio: {
+      type: String,
+      required: false,
+    },
   },
-  bio: {
-    type: String,
-    required: false,
-  },
-});
+  options,
+);
 
-const LearnerSchema = new Schema({
-  facilitator: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const LearnerSchema = new Schema(
+  {
+    facilitator: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
-});
+  options,
+);
 
 const AdministratorModel = UserModel.discriminator(
   "Administrator",

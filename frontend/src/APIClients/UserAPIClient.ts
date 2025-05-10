@@ -38,24 +38,25 @@ const getUsers = async (): Promise<User[]> => {
 };
 
 const updateUserDetails = async (
-  userId: string,
   firstName: string,
   lastName: string,
-  role: string,
+  role: Role,
   status: string,
+  bio?: string,
 ): Promise<User> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
   )}`;
   try {
-    const response = await baseAPIClient.put(
-      `/users/updateMyAccount/${userId}`,
+    const { data } = await baseAPIClient.put(
+      `/users/updateMyAccount`,
       {
         firstName,
         lastName,
         role,
         status,
+        bio,
       },
       {
         headers: { Authorization: bearerToken },
@@ -63,7 +64,10 @@ const updateUserDetails = async (
     );
     setLocalStorageObjProperty(AUTHENTICATED_USER_KEY, "firstName", firstName);
     setLocalStorageObjProperty(AUTHENTICATED_USER_KEY, "lastName", lastName);
-    return response.data;
+    if (role === "Facilitator" && bio) {
+      setLocalStorageObjProperty(AUTHENTICATED_USER_KEY, "bio", bio);
+    }
+    return data;
   } catch (error) {
     throw new Error("Failed to update user details");
   }

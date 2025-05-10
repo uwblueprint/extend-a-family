@@ -18,12 +18,13 @@ export type BookmarkDTO = CoursePageDTO & {
 
 export type UserDTO = {
   id: string;
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
   role: Role;
   status: Status;
   profilePicture?: string;
+  bio?: string;
   bookmarks: BookmarkDTO[];
 };
 

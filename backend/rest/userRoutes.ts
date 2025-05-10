@@ -72,6 +72,32 @@ userRouter.post(
   },
 );
 
+userRouter.put(
+  "/updateMyAccount",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  updateUserDtoValidator,
+  async (req, res) => {
+    const accessToken = getAccessToken(req);
+    try {
+      if (!accessToken) {
+        throw new Error("Unauthorized: No access token provided");
+      }
+      const userId = await authService.getUserIdFromAccessToken(accessToken);
+
+      const updatedUser = await userService.updateUserById(userId.toString(), {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        role: req.body.role,
+        status: req.body.status,
+        bio: req.body.bio,
+      });
+      res.status(200).json(updatedUser);
+    } catch (error: unknown) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
 userRouter.post(
   "/addBookmark",
   isAuthorizedByRole(new Set(["Learner", "Administrator", "Facilitator"])),
@@ -423,25 +449,6 @@ userRouter.put(
 
       res.status(200).json(updatedUser);
     } catch (error) {
-      res.status(500).send(getErrorMessage(error));
-    }
-  },
-);
-
-userRouter.put(
-  "/updateMyAccount/:userId",
-  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
-  updateUserDtoValidator,
-  async (req, res) => {
-    try {
-      const updatedUser = await userService.updateUserById(req.params.userId, {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        role: req.body.role,
-        status: "Active",
-      });
-      res.status(200).json(updatedUser);
-    } catch (error: unknown) {
       res.status(500).send(getErrorMessage(error));
     }
   },
