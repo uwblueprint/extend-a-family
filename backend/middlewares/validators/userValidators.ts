@@ -76,6 +76,20 @@ export const updateUserDtoValidator = async (
   if (!validatePrimitive(req.body.role, "string") && isRole(req.body.role)) {
     return res.status(400).send(getApiValidationError("role", "string"));
   }
+  return next();
+};
+
+export const updateUserAccountValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.firstName, "string")) {
+    return res.status(400).send(getApiValidationError("firstName", "string"));
+  }
+  if (!validatePrimitive(req.body.lastName, "string")) {
+    return res.status(400).send(getApiValidationError("lastName", "string"));
+  }
   if (req.body.bio) {
     if (req.body.role !== "Facilitator") {
       // remove bio field from non-facilitator
