@@ -147,11 +147,7 @@ const MyAccount = (): React.ReactElement => {
             >
               <Container
                 disableGutters
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
+                sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <Typography
                   variant="bodySmall"
@@ -168,11 +164,7 @@ const MyAccount = (): React.ReactElement => {
               </Container>
               <Container
                 disableGutters
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
+                sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <Typography
                   variant="bodySmall"
@@ -189,11 +181,7 @@ const MyAccount = (): React.ReactElement => {
               </Container>
               <Container
                 disableGutters
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
+                sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <Typography
                   variant="bodySmall"
