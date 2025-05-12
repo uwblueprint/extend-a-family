@@ -69,6 +69,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
           <DialogContentText>
             <Typography variant="bodyMedium" color={theme.palette.Neutral[700]}>
               This action can&apos;t be undone. A deleted user cannot be
+              recovered.
             </Typography>
           </DialogContentText>
         </DialogContent>

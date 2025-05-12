@@ -18,6 +18,7 @@ import UserTable from "./UserTable";
 import AddAdminModal from "./AddAdminModal";
 import DeleteUserModal from "./DeleteUserModal";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
+import { isCaseInsensitiveSubstring } from "../../utils/StringUtils";
 
 const ManageUserPage = (): React.ReactElement => {
   // Main state
@@ -30,15 +31,15 @@ const ManageUserPage = (): React.ReactElement => {
   const [openDeleteUserModal, setOpenDeleteUserModal] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState("");
   const [openAddUserSnackbar, setOpenAddUserSnackbar] = useState(false);
-  const [openDeleteUserSnackbar, setOpenDeleteUserSnackbar] = useState(true);
-  const [addSnackbarName, setAddSnackbarName] = useState("Jane Doe");
+  const [openDeleteUserSnackbar, setOpenDeleteUserSnackbar] = useState(false);
+  const [addSnackbarName, setAddSnackbarName] = useState("");
   const [deleteSnackbarName, setDeleteSnackbarName] = useState("");
   // States for admin modal inputs
   const [deleteFirstName, setDeleteFirstName] = useState("");
   const [deleteLastName, setDeleteLastName] = useState("");
-  const [firstName, setFirstName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
-  const [lastName, setLastName] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
-  const [email, setEmail] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
 
   const [selectedRole, setSelectedRole] = useState<string>("");
 
@@ -67,11 +68,12 @@ const ManageUserPage = (): React.ReactElement => {
   // Filter users based on search query
   const filteredUsers = users.filter(
     (user) =>
-      (user.firstName || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      (user.lastName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.email || "").toLowerCase().includes(searchQuery.toLowerCase()),
+      isCaseInsensitiveSubstring(user.firstName, searchQuery) ||
+      isCaseInsensitiveSubstring(user.lastName, searchQuery) ||
+      isCaseInsensitiveSubstring(user.email, searchQuery) ||
+      (searchQuery.split(" ").length > 1 &&
+        isCaseInsensitiveSubstring(user.firstName, searchQuery.split(" ")[0]) &&
+        isCaseInsensitiveSubstring(user.lastName, searchQuery.split(" ")[1])),
   );
 
   // Pagination handlers
@@ -117,13 +119,12 @@ const ManageUserPage = (): React.ReactElement => {
   };
   const handleCloseDeleteUserModal = () => setOpenDeleteUserModal(false);
 
-  // TODO: Implement these actions as needed
   const handleDeleteUser = async (
     userId: string,
     dFirstName: string,
     dLastName: string,
   ) => {
-    const deletedUser = await UserAPIClient.deleteUsers(userId);
+    const deletedUser = await UserAPIClient.deleteUser(userId);
     if (deletedUser) {
       handleCloseDeleteUserModal();
       setDeleteSnackbarName(`${dFirstName} ${dLastName}`);
@@ -133,12 +134,14 @@ const ManageUserPage = (): React.ReactElement => {
   };
 
   const handleAddAdmin = async () => {
-    const admin = await AuthAPIClient.inviteAdmin(firstName, lastName, email);
-    if (admin) {
-      setAddSnackbarName(`${admin.firstName} ${admin.lastName}`);
-      handleCloseAddAdminModal();
-      setOpenAddUserSnackbar(true);
-      await getUsers();
+    if (firstName && lastName && email) {
+      const admin = await AuthAPIClient.inviteAdmin(firstName, lastName, email);
+      if (admin) {
+        setAddSnackbarName(`${admin.firstName} ${admin.lastName}`);
+        handleCloseAddAdminModal();
+        setOpenAddUserSnackbar(true);
+        await getUsers();
+      }
     }
   };
 

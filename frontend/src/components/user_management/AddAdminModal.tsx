@@ -3,8 +3,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  TextField,
-  InputAdornment,
   Box,
   Typography,
   Button,
@@ -13,6 +11,7 @@ import {
 import { PersonOutlineOutlined, AlternateEmail } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
+import StartAdornedTextField from "../common/form/StartAdornedTextField";
 
 interface AddAdminModalProps {
   open: boolean;
@@ -54,19 +53,19 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
           },
         }}
       >
+        <IconButton
+          onClick={onClose}
+          sx={{ position: "absolute", top: 2, right: 2 }}
+        >
+          <CloseIcon sx={{ color: "black" }} />
+        </IconButton>
         <Box sx={{ position: "relative", width: "100%" }}>
-          <IconButton
-            onClick={onClose}
-            sx={{ position: "absolute", top: 8, right: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-          <DialogTitle sx={{ margin: 0, padding: 0, marginBottom: "12px" }}>
+          <DialogTitle sx={{ margin: 0, padding: 0 }}>
             <Typography
               variant="headlineMedium"
               color={theme.palette.Neutral[700]}
             >
-              Add new admin
+              Add New Admin
             </Typography>
           </DialogTitle>
         </Box>
@@ -79,10 +78,10 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
               gap: "24px",
             }}
           >
-            <TextField
+            <StartAdornedTextField
               required
               type="text"
-              placeholder="First Name"
+              label="First Name"
               onChange={(event) => setFirstName(event.target.value)}
               variant="outlined"
               sx={{
@@ -92,18 +91,12 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
                 height: "56px",
                 width: "100%",
               }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonOutlineOutlined />
-                  </InputAdornment>
-                ),
-              }}
+              adornment={<PersonOutlineOutlined />}
             />
-            <TextField
+            <StartAdornedTextField
               required
               type="text"
-              placeholder="Last Name"
+              label="Last Name"
               onChange={(event) => setLastName(event.target.value)}
               variant="outlined"
               sx={{
@@ -113,18 +106,12 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
                 height: "56px",
                 width: "100%",
               }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonOutlineOutlined />
-                  </InputAdornment>
-                ),
-              }}
+              adornment={<PersonOutlineOutlined />}
             />
-            <TextField
+            <StartAdornedTextField
               required
               type="email"
-              placeholder="Email"
+              label="Email"
               onChange={(event) => setEmail(event.target.value)}
               variant="outlined"
               sx={{
@@ -134,13 +121,7 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
                 maxHeight: "56px",
                 width: "100%",
               }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <AlternateEmail />
-                  </InputAdornment>
-                ),
-              }}
+              adornment={<AlternateEmail />}
             />
           </Box>
         </DialogContent>

@@ -69,7 +69,7 @@ const updateUserDetails = async (
   }
 };
 
-const deleteUsers = async (userId: string): Promise<boolean> => {
+const deleteUser = async (userId: string): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
@@ -91,5 +91,5 @@ export default {
   getUsersByRole,
   getUsers,
   updateUserDetails,
-  deleteUsers,
+  deleteUser,
 };
