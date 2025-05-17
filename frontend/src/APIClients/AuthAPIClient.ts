@@ -6,6 +6,7 @@ import {
   getLocalStorageObjProperty,
   setLocalStorageObjProperty,
 } from "../utils/LocalStorageUtils";
+import { Administrator } from "../types/UserTypes";
 
 const login = async (
   email: string,
@@ -192,6 +193,28 @@ const isUserVerified = async (
   }
 };
 
+const inviteAdmin = async (
+  firstName: string,
+  lastName: string,
+  email: string,
+): Promise<Administrator | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+
+  try {
+    const { data } = await baseAPIClient.post(
+      `/auth/inviteAdmin`,
+      { firstName, lastName, email },
+      { headers: { Authorization: bearerToken } },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default {
   login,
   logout,
@@ -202,4 +225,5 @@ export default {
   updateUserStatus,
   refresh,
   isUserVerified,
+  inviteAdmin,
 };
