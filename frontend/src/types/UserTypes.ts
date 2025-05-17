@@ -12,7 +12,7 @@ export type BaseUser = {
 };
 
 export type Administrator = BaseUser;
-export type Facilitator = BaseUser & { learners: string[] };
+export type Facilitator = BaseUser & { learners: string[]; bio?: string };
 export type Learner = BaseUser & { facilitator: string };
 
 export type User = Administrator | Facilitator | Learner;

@@ -10,13 +10,16 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUser } from "../../hooks/useUser";
+import { isAuthenticatedFacilitator } from "../../types/AuthTypes";
+import CharacterLimitTextField from "../common/form/CharacterLimitTextField";
 
 interface EditDetailsModalProps {
   open: boolean;
   onClose: () => void;
   firstName: string;
   lastName: string;
-  onSave: (firstName: string, lastName: string) => void;
+  bio?: string;
+  onSave: (firstName: string, lastName: string, bio?: string) => void;
 }
 
 const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
@@ -24,11 +27,13 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
   onClose,
   firstName,
   lastName,
+  bio,
   onSave,
 }) => {
   const theme = useTheme();
   const [editedFirstName, setEditedFirstName] = useState(firstName);
   const [editedLastName, setEditedLastName] = useState(lastName);
+  const [editedBio, setEditedBio] = useState(bio);
   const user = useUser();
 
   // Reset form when modal opens
@@ -36,14 +41,15 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
     if (open) {
       setEditedFirstName(firstName);
       setEditedLastName(lastName);
+      setEditedBio(bio);
     }
-  }, [open, firstName, lastName]);
+  }, [open, firstName, lastName, bio]);
 
   const handleSave = () => {
     if (!editedFirstName.trim() || !editedLastName.trim()) {
       return;
     }
-    onSave(editedFirstName, editedLastName);
+    onSave(editedFirstName, editedLastName, editedBio);
   };
 
   return (
@@ -129,6 +135,18 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
             sx: theme.typography.bodyMedium,
           }}
         />
+        {isAuthenticatedFacilitator(user) && (
+          <CharacterLimitTextField
+            maxLength={500}
+            fullWidth
+            multiline
+            rows={10}
+            label="About you"
+            placeholder="Tell learners a little about yourself..."
+            value={editedBio}
+            onChange={(e) => setEditedBio(e.target.value)}
+          />
+        )}
       </Box>
 
       <Box

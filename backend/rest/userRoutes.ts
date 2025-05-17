@@ -6,6 +6,7 @@ import {
   addBookmarkValidator,
   createUserDtoValidator,
   deleteBookmarkValidator,
+  updateUserAccountValidator,
   updateUserDtoValidator,
   uploadProfilePictureValidator,
 } from "../middlewares/validators/userValidators";
@@ -66,6 +67,32 @@ userRouter.post(
         profilePicture: imageURL,
       });
       res.status(200).json(imageURL);
+    } catch (error: unknown) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
+userRouter.put(
+  "/updateMyAccount",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  updateUserAccountValidator,
+  async (req, res) => {
+    const accessToken = getAccessToken(req);
+    try {
+      if (!accessToken) {
+        throw new Error("Unauthorized: No access token provided");
+      }
+      const userId = await authService.getUserIdFromAccessToken(accessToken);
+
+      const oldUser: UserDTO = await userService.getUserById(userId.toString());
+      const updatedUser = await userService.updateUserById(userId.toString(), {
+        ...oldUser,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        bio: req.body.bio,
+      });
+      res.status(200).json(updatedUser);
     } catch (error: unknown) {
       res.status(500).send(getErrorMessage(error));
     }
@@ -408,12 +435,14 @@ userRouter.put(
         throw new Error("Unauthorized: User retrieved is not a facilitator.");
       }
 
+      const oldLearner: UserDTO = await userService.getUserById(
+        selectedLearnerId,
+      );
       // update learner
       const updateLearnerPayload: UpdateUserDTO = {
+        ...oldLearner,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        role: req.body.role,
-        status: "Active",
       };
 
       const updatedUser = await userService.updateUserById(
@@ -423,25 +452,6 @@ userRouter.put(
 
       res.status(200).json(updatedUser);
     } catch (error) {
-      res.status(500).send(getErrorMessage(error));
-    }
-  },
-);
-
-userRouter.put(
-  "/updateMyAccount/:userId",
-  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
-  updateUserDtoValidator,
-  async (req, res) => {
-    try {
-      const updatedUser = await userService.updateUserById(req.params.userId, {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        role: req.body.role,
-        status: "Active",
-      });
-      res.status(200).json(updatedUser);
-    } catch (error: unknown) {
       res.status(500).send(getErrorMessage(error));
     }
   },

@@ -4,7 +4,7 @@ export type Role = "Administrator" | "Facilitator" | "Learner";
 
 export type Status = "Active" | "Invited";
 
-export type AuthenticatedUser = {
+export type BaseAuthenticatedUser = {
   id: string;
   firstName: string;
   lastName: string;
@@ -19,13 +19,19 @@ export type AuthError = {
   errorData?: [Role, Role];
 };
 
-export type AuthenticatedAdministrator = AuthenticatedUser;
-export type AuthenticatedFacilitator = AuthenticatedUser & {
+export type AuthenticatedAdministrator = BaseAuthenticatedUser;
+export type AuthenticatedFacilitator = BaseAuthenticatedUser & {
   learners: string[];
+  bio?: string;
 };
-export type AuthenticatedLearner = AuthenticatedUser & {
+export type AuthenticatedLearner = BaseAuthenticatedUser & {
   facilitator: string;
 };
+
+export type AuthenticatedUser =
+  | AuthenticatedAdministrator
+  | AuthenticatedFacilitator
+  | AuthenticatedLearner;
 
 export type DecodedJWT =
   | string

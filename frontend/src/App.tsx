@@ -8,7 +8,7 @@ import Signup from "./components/auth/SignupPage";
 import Welcome from "./components/auth/WelcomePage";
 import CreateModulePage from "./components/pages/CreateModulePage";
 import Default from "./components/pages/Default";
-import MyAccount from "./components/pages/MyAccountPage";
+import MyAccount from "./components/profile/MyAccountPage";
 import NotAuthorized from "./components/pages/NotAuthorized";
 import NotFound from "./components/pages/NotFound";
 import AUTHENTICATED_USER_KEY from "./constants/AuthConstants";
