@@ -10,7 +10,7 @@ RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.
 RUN apt-get update && apt-get install -y libcurl3
 
 RUN yarn install
-RUN yarn global add nodemon ts-node typescript
+RUN yarn global add nodemon@2.0.22 ts-node@10.9.1 typescript@5.2.2
 
 COPY . ./
 
