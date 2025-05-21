@@ -8,10 +8,17 @@ import {
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ICourseUnitService from "../interfaces/courseUnitService";
+import CourseModuleService from "./courseModuleService";
 
 const Logger = logger(__filename);
 
 class CourseUnitService implements ICourseUnitService {
+  private courseModuleService: CourseModuleService;
+
+  constructor() {
+    this.courseModuleService = new CourseModuleService();
+  }
+
   async getCourseUnits(): Promise<Array<CourseUnitDTO>> {
     try {
       const courseUnits: Array<CourseUnit> = await MgCourseUnit.find().sort(
@@ -86,25 +93,45 @@ class CourseUnitService implements ICourseUnitService {
   }
 
   async deleteCourseUnit(id: string): Promise<string> {
+    const session = await MgCourseUnit.startSession();
+    session.startTransaction();
     try {
-      const deletedCourseUnit: CourseUnit | null =
-        await MgCourseUnit.findByIdAndDelete(id);
-      if (!deletedCourseUnit) {
+      const courseUnit: CourseUnit | null = await MgCourseUnit.findById(
+        id,
+      ).session(session);
+      if (!courseUnit) {
         throw new Error(`Course unit with id ${id} not found`);
       }
 
-      // get the index and update the ones behind it
-      await MgCourseUnit.updateMany(
-        { displayIndex: { $gt: deletedCourseUnit.displayIndex } },
-        { $inc: { displayIndex: -1 } },
-      );
+      // First, delete all modules within this unit
+      // eslint-disable-next-line no-restricted-syntax
+      for (const moduleId of courseUnit.modules) {
+        // eslint-disable-next-line no-await-in-loop
+        await this.courseModuleService.deleteCourseModule(
+          id,
+          moduleId.toString(),
+        );
+      }
 
+      // Now delete the course unit itself
+      await MgCourseUnit.findByIdAndDelete(id).session(session);
+
+      // Update displayIndex for remaining units
+      await MgCourseUnit.updateMany(
+        { displayIndex: { $gt: courseUnit.displayIndex } },
+        { $inc: { displayIndex: -1 } },
+      ).session(session);
+
+      await session.commitTransaction();
       return id;
     } catch (error: unknown) {
+      await session.abortTransaction();
       Logger.error(
         `Failed to delete course unit. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
+    } finally {
+      await session.endSession();
     }
   }
 }
