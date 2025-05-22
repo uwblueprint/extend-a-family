@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import fs from "fs/promises";
-import { Schema, startSession } from "mongoose";
+import { ClientSession, Schema, startSession } from "mongoose";
 import { PDFDocument } from "pdf-lib";
 import MgCourseModule, {
   CourseModule,
@@ -186,12 +186,27 @@ class CourseModuleService implements ICourseModuleService {
   async deleteCourseModule(
     courseUnitId: string,
     courseModuleId: string,
+    currSession?: ClientSession,
   ): Promise<string> {
     let deletedCourseModuleId: string;
-    const session = await startSession();
-    session.startTransaction();
+    const session: ClientSession = currSession ?? (await startSession());
+    if (!currSession) {
+      session.startTransaction();
+    }
     try {
-      // first update the course units module reference
+      // Find the module to get its pages
+      const courseModule = await MgCourseModule.findById(
+        courseModuleId,
+      ).session(session);
+      if (!courseModule) {
+        throw new Error(`Course module with id ${courseModuleId} not found.`);
+      }
+      // Delete all pages within the module
+      await CoursePageModel.deleteMany({
+        _id: { $in: courseModule.pages },
+      }).session(session);
+
+      // Remove the module reference from the unit
       const courseUnit = await MgCourseUnit.findByIdAndUpdate(
         courseUnitId,
         {
@@ -218,14 +233,18 @@ class CourseModuleService implements ICourseModuleService {
         { $inc: { displayIndex: -1 } },
       ).session(session);
 
-      await session.commitTransaction();
+      if (!currSession) {
+        await session.commitTransaction();
+      }
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete course module. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
     } finally {
-      await session.endSession();
+      if (!currSession) {
+        await session.endSession();
+      }
     }
 
     return deletedCourseModuleId;
