@@ -208,6 +208,7 @@ const Signup = (): React.ReactElement => {
           <PasswordCheck 
             newPassword={password}
             confirmPassword={confirmPassword}
+            passwordLabel="Password"
             setNewPassword={setPassword}
             setConfirmPassword={setConfirmPassword}
             onValidationChange={setIsPasswordValid}
