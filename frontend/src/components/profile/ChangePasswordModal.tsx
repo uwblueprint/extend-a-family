@@ -91,6 +91,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
         <PasswordCheck
           newPassword={newPassword}
           confirmPassword={confirmPassword}
+          passwordLabel="New Password"
           setNewPassword={setNewPassword}
           setConfirmPassword={setConfirmPassword}
           onValidationChange={setIsFormValid}
