@@ -24,6 +24,7 @@ export default function CourseUnitsPage() {
         setSelectedUnit={setSelectedUnit}
         handleClose={handleDrawerClose}
         open={sidebarOpen}
+        selectedUnit={selectedUnit}
       />
 
       <Box sx={{ flexGrow: 1, p: "48px" }}>
