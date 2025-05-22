@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import fs from "fs/promises";
-import { Schema, startSession } from "mongoose";
+import { ClientSession, Schema, startSession } from "mongoose";
 import { PDFDocument } from "pdf-lib";
 import MgCourseModule, {
   CourseModule,
@@ -186,10 +186,13 @@ class CourseModuleService implements ICourseModuleService {
   async deleteCourseModule(
     courseUnitId: string,
     courseModuleId: string,
+    currSession?: ClientSession,
   ): Promise<string> {
     let deletedCourseModuleId: string;
-    const session = await startSession();
-    session.startTransaction();
+    const session: ClientSession = currSession ?? (await startSession());
+    if (!currSession) {
+      session.startTransaction();
+    }
     try {
       // Find the module to get its pages
       const courseModule = await MgCourseModule.findById(
@@ -230,14 +233,18 @@ class CourseModuleService implements ICourseModuleService {
         { $inc: { displayIndex: -1 } },
       ).session(session);
 
-      await session.commitTransaction();
+      if (!currSession) {
+        await session.commitTransaction();
+      }
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete course module. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
     } finally {
-      await session.endSession();
+      if (!currSession) {
+        await session.endSession();
+      }
     }
 
     return deletedCourseModuleId;

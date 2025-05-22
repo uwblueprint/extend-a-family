@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import { startSession } from "mongoose";
 import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import {
   CourseUnitDTO,
@@ -93,7 +94,7 @@ class CourseUnitService implements ICourseUnitService {
   }
 
   async deleteCourseUnit(id: string): Promise<string> {
-    const session = await MgCourseUnit.startSession();
+    const session = await startSession();
     session.startTransaction();
     try {
       const courseUnit: CourseUnit | null = await MgCourseUnit.findById(
@@ -110,6 +111,7 @@ class CourseUnitService implements ICourseUnitService {
         await this.courseModuleService.deleteCourseModule(
           id,
           moduleId.toString(),
+          session,
         );
       }
 
