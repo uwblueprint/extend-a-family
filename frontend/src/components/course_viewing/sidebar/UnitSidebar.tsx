@@ -27,12 +27,14 @@ interface UnitSideBarProps {
   handleClose: () => void;
   open: boolean;
   setSelectedUnit: React.Dispatch<React.SetStateAction<CourseUnit | null>>;
+  selectedUnit: CourseUnit | null;
 }
 
 export default function UnitSidebar({
   handleClose,
   open,
   setSelectedUnit,
+  selectedUnit,
 }: UnitSideBarProps) {
   const theme = useTheme();
   const user = useUser();
@@ -84,6 +86,9 @@ export default function UnitSidebar({
         setCourseUnits((prev) =>
           prev.map((unit) => (unit.id === editedUnit.id ? editedUnit : unit)),
         );
+        if (contextMenuUnit.id === selectedUnit?.id) {
+          setSelectedUnit(editedUnit);
+        }
       }
     }
   };
