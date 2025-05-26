@@ -98,7 +98,6 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
         variant="outlined"
         type={showPassword ? "text" : "password"}
         fullWidth
-        margin="normal"
         placeholder={`Your ${passwordLabel.toLowerCase()}`}
         value={newPassword}
         onChange={handleNewPasswordChange}
@@ -125,7 +124,6 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
         variant="outlined"
         type={showConfirmPassword ? "text" : "password"}
         fullWidth
-        margin="normal"
         placeholder={`Rewrite your ${passwordLabel.toLowerCase()}`}
         value={confirmPassword}
         onChange={handleConfirmPasswordChange}
@@ -147,7 +145,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
           ),
         }}
       />
-      <Box sx={{ marginTop: 2 }}>
+      <Box>
         {passwordRequirements.map((requirement, index) => (
           <Box
             key={index}
