@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Container,
+  Divider,
   Drawer,
   IconButton,
   InputAdornment,
@@ -13,11 +14,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import {
-  AlternateEmail,
-  BadgeOutlined,
-  Close,
-} from "@mui/icons-material";
+import { AlternateEmail, BadgeOutlined, Close } from "@mui/icons-material";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
@@ -43,7 +40,7 @@ const Signup = (): React.ReactElement => {
   const [errorData, setErrorData] = useState<PresentableError | null>(null);
   const [emailError, setEmailError] = useState<PresentableError | null>(null);
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
-  
+
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
 
@@ -205,7 +202,14 @@ const Signup = (): React.ReactElement => {
               ),
             }}
           />
-          <PasswordCheck 
+          <Divider
+            sx={{
+              width: "100%",
+              borderBottomWidth: 2,
+              borderColor: theme.palette.Neutral[400],
+            }}
+          />
+          <PasswordCheck
             newPassword={password}
             confirmPassword={confirmPassword}
             passwordLabel="Password"
