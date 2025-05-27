@@ -13,7 +13,7 @@ import {
   CourseModuleDTO,
   CreateCourseModuleDTO,
   UpdateCourseModuleDTO,
-  ModuleStatus, // <-- NEW: enum with 'draft' | 'published' | 'unpublished'
+  ModuleStatus,
 } from "../../types/courseTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
