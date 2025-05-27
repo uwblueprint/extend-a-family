@@ -6,7 +6,7 @@ import CreatePasswordHelpModal from "../help/CreatePasswordHelpModal";
 import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
 import PasswordCheck from "./PasswordCheck";
 import { useUser } from "../../hooks/useUser";
-import { HOME_PAGE } from "../../constants/Routes";
+import { LANDING_PAGE } from "../../constants/Routes";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import AuthContext from "../../contexts/AuthContext";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
@@ -69,7 +69,7 @@ const CreatePasswordPage = (): React.ReactElement => {
   const handleCloseHelpModal = () => setIsHelpModalOpen(false);
 
   if (user.status !== "Invited") {
-    return <Redirect to={HOME_PAGE} />;
+    return <Redirect to={LANDING_PAGE} />;
   }
 
   if (isPasswordConfirmed) {

@@ -1,4 +1,8 @@
-export const HOME_PAGE = "/";
+export const LANDING_PAGE = "/";
+
+export const HOME_PAGE = "/home";
+
+export const BOOKMARKS_PAGE = "/bookmarks";
 
 export const WELCOME_PAGE = "/welcome";
 

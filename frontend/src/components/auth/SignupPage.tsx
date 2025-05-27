@@ -20,7 +20,7 @@ import {
   Close,
 } from "@mui/icons-material";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
-import { HOME_PAGE, WELCOME_PAGE } from "../../constants/Routes";
+import { LANDING_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import logo from "../assets/logoColoured.png";
 import { getSignUpPath, getSignUpPrompt } from "./WelcomePage";
@@ -78,7 +78,7 @@ const Signup = (): React.ReactElement => {
   };
 
   if (authenticatedUser) {
-    return <Redirect to={HOME_PAGE} />;
+    return <Redirect to={LANDING_PAGE} />;
   }
 
   return (
