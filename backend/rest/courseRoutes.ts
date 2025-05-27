@@ -19,7 +19,7 @@ import { getErrorMessage } from "../utilities/errorUtils";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const courseRouter: Router = Router();
+const courseRouter: Router = Router({ mergeParams: true });
 const courseUnitService: CourseUnitService = new CourseUnitService();
 const courseModuleService: CourseModuleService = new CourseModuleService();
 const coursePageService: CoursePageService = new CoursePageService();
@@ -312,10 +312,10 @@ courseRouter.delete(
   },
 );
 
-courseRouter.patch("/:moduleId/publish", async (req, res, next) => {
+courseRouter.patch("/:unitId/:moduleId/publish", async (req, res, next) => {
   const { unitId, moduleId } = req.params;
   try {
-    const updated = await CourseModuleService.publishCourseModule(
+    const updated = await courseModuleService.publishCourseModule(
       unitId,
       moduleId,
     );
@@ -325,11 +325,10 @@ courseRouter.patch("/:moduleId/publish", async (req, res, next) => {
   }
 });
 
-/** PATCH /api/course-units/:unitId/modules/:moduleId/unpublish */
-courseRouter.patch("/:moduleId/unpublish", async (req, res, next) => {
+courseRouter.patch("/:unitId/:moduleId/unpublish", async (req, res, next) => {
   const { unitId, moduleId } = req.params;
   try {
-    const updated = await CourseModuleService.unpublishCourseModule(
+    const updated = await courseModuleService.unpublishCourseModule(
       unitId,
       moduleId,
     );
