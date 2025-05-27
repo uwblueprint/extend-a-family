@@ -312,4 +312,31 @@ courseRouter.delete(
   },
 );
 
+courseRouter.patch("/:moduleId/publish", async (req, res, next) => {
+  const { unitId, moduleId } = req.params;
+  try {
+    const updated = await CourseModuleService.publishCourseModule(
+      unitId,
+      moduleId,
+    );
+    res.json(updated);
+  } catch (e) {
+    next(e);
+  }
+});
+
+/** PATCH /api/course-units/:unitId/modules/:moduleId/unpublish */
+courseRouter.patch("/:moduleId/unpublish", async (req, res, next) => {
+  const { unitId, moduleId } = req.params;
+  try {
+    const updated = await CourseModuleService.unpublishCourseModule(
+      unitId,
+      moduleId,
+    );
+    res.json(updated);
+  } catch (e) {
+    next(e);
+  }
+});
+
 export default courseRouter;

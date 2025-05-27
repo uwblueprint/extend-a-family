@@ -7,6 +7,7 @@ export interface CourseModule extends Document {
   title: string;
   pages: [ObjectId];
   imageURL: string;
+  status: "draft" | "published" | "unpublished";
 }
 
 export const CourseModuleSchema: Schema = new Schema({
@@ -26,6 +27,12 @@ export const CourseModuleSchema: Schema = new Schema({
   ],
   imageURL: {
     type: String,
+  },
+  status: {
+    type: String,
+    enum: ["draft", "published", "unpublished"],
+    default: "draft",
+    required: true,
   },
 });
 
