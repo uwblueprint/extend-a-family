@@ -13,6 +13,7 @@ import {
   CourseModuleDTO,
   CreateCourseModuleDTO,
   UpdateCourseModuleDTO,
+  ModuleStatus, // <-- NEW: enum with 'draft' | 'published' | 'unpublished'
 } from "../../types/courseTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
@@ -25,6 +26,15 @@ const fileStorageService: IFileStorageService = new FileStorageService(
   defaultBucket,
 );
 const Logger = logger(__filename);
+
+/**
+ * Allowed transitions for the module status finite‑state machine.
+ */
+const validTransitions: Record<ModuleStatus, ReadonlyArray<ModuleStatus>> = {
+  [ModuleStatus.Draft]: [ModuleStatus.Published],
+  [ModuleStatus.Published]: [ModuleStatus.Unpublished],
+  [ModuleStatus.Unpublished]: [ModuleStatus.Published],
+};
 
 class CourseModuleService implements ICourseModuleService {
   private fileStorageService: FileStorageService;
@@ -104,7 +114,7 @@ class CourseModuleService implements ICourseModuleService {
         unitId: courseUnit._id.toString(), // eslint-disable-line no-underscore-dangle
         lessonPdfUrl,
         pages: await pageObjects,
-      };
+      } as CourseModuleDTO;
     } catch (error) {
       Logger.error(
         `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
@@ -134,6 +144,8 @@ class CourseModuleService implements ICourseModuleService {
 
       newCourseModule = await MgCourseModule.create({
         ...courseModuleDTO,
+        // default status is draft; rely on schema default but keep explicit for clarity
+        status: ModuleStatus.Draft,
         displayIndex: numCourseModules + 1,
         session,
       });
@@ -164,6 +176,7 @@ class CourseModuleService implements ICourseModuleService {
       id: newCourseModule.id,
       displayIndex: newCourseModule.displayIndex,
       title: newCourseModule.title,
+      status: newCourseModule.status as ModuleStatus,
     } as CourseModuleDTO;
   }
 
@@ -195,6 +208,7 @@ class CourseModuleService implements ICourseModuleService {
       id: updatedModule.id,
       title: updatedModule.title,
       displayIndex: updatedModule.displayIndex,
+      status: updatedModule.status as ModuleStatus,
     } as CourseModuleDTO;
   }
 
@@ -263,6 +277,79 @@ class CourseModuleService implements ICourseModuleService {
     }
 
     return deletedCourseModuleId;
+  }
+
+  /**
+   * Publish a module (Draft → Published or Unpublished → Published).
+   */
+  async publishCourseModule(
+    courseUnitId: string,
+    moduleId: string,
+  ): Promise<CourseModuleDTO> {
+    return this.changeStatus(courseUnitId, moduleId, ModuleStatus.Published);
+  }
+
+  /**
+   * Unpublish a module (Published → Unpublished).
+   */
+  async unpublishCourseModule(
+    courseUnitId: string,
+    moduleId: string,
+  ): Promise<CourseModuleDTO> {
+    return this.changeStatus(courseUnitId, moduleId, ModuleStatus.Unpublished);
+  }
+
+  /**
+   * Internal helper that validates state transitions.
+   */
+  private async changeStatus(
+    courseUnitId: string,
+    moduleId: string,
+    newStatus: ModuleStatus,
+  ): Promise<CourseModuleDTO> {
+    const session = await startSession();
+    session.startTransaction();
+    try {
+      const courseUnit = await MgCourseUnit.findById(courseUnitId).session(
+        session,
+      );
+      if (!courseUnit || !courseUnit.modules.includes(moduleId as Schema.Types.ObjectId)) {
+        throw new Error("Module not found in specified unit");
+      }
+
+      const module = await MgCourseModule.findById(moduleId).session(session);
+      if (!module) {
+        throw new Error("Module not found");
+      }
+
+      if (
+        !validTransitions[module.status as ModuleStatus].includes(newStatus)
+      ) {
+        const msg = `Cannot transition from "${module.status}" to "${newStatus}"`;
+        throw new Error(msg);
+      }
+
+      module.status = newStatus;
+      await module.save({ session });
+      await session.commitTransaction();
+
+      return {
+        id: module.id,
+        title: module.title,
+        displayIndex: module.displayIndex,
+        status: module.status as ModuleStatus,
+      } as CourseModuleDTO;
+    } catch (error) {
+      await session.abortTransaction();
+      Logger.error(
+        `Failed to change status for module ${moduleId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 
   async uploadLessons(
@@ -334,6 +421,7 @@ class CourseModuleService implements ICourseModuleService {
         id: updatedModule.id,
         displayIndex: updatedModule.displayIndex,
         title: updatedModule.title,
+        status: updatedModule.status as ModuleStatus,
       } as CourseModuleDTO;
     } catch (error) {
       await session.abortTransaction();
