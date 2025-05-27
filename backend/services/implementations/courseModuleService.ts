@@ -313,7 +313,10 @@ class CourseModuleService implements ICourseModuleService {
       const courseUnit = await MgCourseUnit.findById(courseUnitId).session(
         session,
       );
-      if (!courseUnit || !courseUnit.modules.includes(moduleId as Schema.Types.ObjectId)) {
+      if (
+        !courseUnit ||
+        !courseUnit.modules.includes(moduleId as Schema.Types.ObjectId)
+      ) {
         throw new Error("Module not found in specified unit");
       }
 
