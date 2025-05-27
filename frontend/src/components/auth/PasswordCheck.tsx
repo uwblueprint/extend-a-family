@@ -15,6 +15,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 interface PasswordCheckProps {
   newPassword: string;
   confirmPassword: string;
+  passwordLabel: string;
   setNewPassword: (password: string) => void;
   setConfirmPassword: (password: string) => void;
   onValidationChange: (isValid: boolean) => void;
@@ -23,6 +24,7 @@ interface PasswordCheckProps {
 const PasswordCheck: React.FC<PasswordCheckProps> = ({
   newPassword,
   confirmPassword,
+  passwordLabel,
   setNewPassword,
   setConfirmPassword,
   onValidationChange,
@@ -92,12 +94,11 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
   return (
     <>
       <TextField
-        label="New password"
+        label={passwordLabel}
         variant="outlined"
         type={showPassword ? "text" : "password"}
         fullWidth
-        margin="normal"
-        placeholder="Your new password"
+        placeholder={`Your ${passwordLabel.toLowerCase()}`}
         value={newPassword}
         onChange={handleNewPasswordChange}
         InputProps={{
@@ -123,8 +124,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
         variant="outlined"
         type={showConfirmPassword ? "text" : "password"}
         fullWidth
-        margin="normal"
-        placeholder="Rewrite your new password"
+        placeholder={`Rewrite your ${passwordLabel.toLowerCase()}`}
         value={confirmPassword}
         onChange={handleConfirmPasswordChange}
         InputProps={{
@@ -145,7 +145,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
           ),
         }}
       />
-      <Box sx={{ marginTop: 2 }}>
+      <Box>
         {passwordRequirements.map((requirement, index) => (
           <Box
             key={index}
