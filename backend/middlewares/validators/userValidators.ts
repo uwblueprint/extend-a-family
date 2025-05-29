@@ -5,6 +5,7 @@ import {
   validateFileType,
   validatePrimitive,
 } from "./util";
+import { isRole } from "../../types/userTypes";
 
 export const uploadProfilePictureValidator = async (
   req: Request,
@@ -51,7 +52,7 @@ export const createUserDtoValidator = async (
   if (!validatePrimitive(req.body.email, "string")) {
     return res.status(400).send(getApiValidationError("email", "string"));
   }
-  if (!validatePrimitive(req.body.role, "string")) {
+  if (!validatePrimitive(req.body.role, "string") && isRole(req.body.role)) {
     return res.status(400).send(getApiValidationError("role", "string"));
   }
   if (!validatePrimitive(req.body.password, "string")) {
@@ -72,8 +73,31 @@ export const updateUserDtoValidator = async (
   if (!validatePrimitive(req.body.lastName, "string")) {
     return res.status(400).send(getApiValidationError("lastName", "string"));
   }
-  if (!validatePrimitive(req.body.role, "string")) {
+  if (!validatePrimitive(req.body.role, "string") && isRole(req.body.role)) {
     return res.status(400).send(getApiValidationError("role", "string"));
+  }
+  return next();
+};
+
+export const updateUserAccountValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.firstName, "string")) {
+    return res.status(400).send(getApiValidationError("firstName", "string"));
+  }
+  if (!validatePrimitive(req.body.lastName, "string")) {
+    return res.status(400).send(getApiValidationError("lastName", "string"));
+  }
+  if (req.body.bio) {
+    if (req.body.role !== "Facilitator") {
+      // remove bio field from non-facilitator
+      req.body.bio = undefined;
+    } else if (!validatePrimitive(req.body.bio, "string")) {
+      // validate string type for facilitator
+      return res.status(400).send(getApiValidationError("bio", "string"));
+    }
   }
   return next();
 };
