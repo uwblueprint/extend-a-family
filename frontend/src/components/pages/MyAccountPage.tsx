@@ -9,12 +9,14 @@ import ChangePasswordModal from "../profile/ChangePasswordModal";
 import AuthContext from "../../contexts/AuthContext";
 import userAPIClient from "../../APIClients/UserAPIClient";
 import authAPIClient from "../../APIClients/AuthAPIClient";
+import UploadProfilePictureModal from "../user_management/UploadProfilePictureModal";
 
 const MyAccount = (): React.ReactElement => {
   const theme = useTheme();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
     useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   const { setAuthenticatedUser, authenticatedUser } = useContext(AuthContext);
 
@@ -114,7 +116,7 @@ const MyAccount = (): React.ReactElement => {
             </Typography>
           </Container>
 
-          <ProfilePicture size={160} />
+          <ProfilePicture size={160} setUploadModalOpen={setUploadModalOpen} />
 
           <Container
             sx={{
@@ -307,6 +309,10 @@ const MyAccount = (): React.ReactElement => {
         open={isChangePasswordModalOpen}
         onClose={() => setIsChangePasswordModalOpen(false)}
         onSave={handleSavePassword}
+      />
+      <UploadProfilePictureModal
+        open={uploadModalOpen}
+        setUploadModalOpen={setUploadModalOpen}
       />
     </>
   );

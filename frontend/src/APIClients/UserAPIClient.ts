@@ -69,8 +69,37 @@ const updateUserDetails = async (
   }
 };
 
+const uploadProfilePicture = async (
+  userId: string,
+  file: File,
+): Promise<string> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const formData = new FormData();
+    formData.append("uploadedImage", file);
+
+    const { data } = await baseAPIClient.post(
+      `/users/${userId}/uploadProfilePicture`,
+      formData,
+      {
+        headers: {
+          Authorization: bearerToken,
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+    return data;
+  } catch (error) {
+    return `Failed to upload profile picture. Reason: ${error}`;
+  }
+};
+
 export default {
   getUsersByRole,
   getUsers,
   updateUserDetails,
+  uploadProfilePicture,
 };

@@ -31,7 +31,7 @@ const UserButton = () => {
         onClick={handleClick}
         sx={{ color: theme.palette.Neutral[400] }}
       >
-        <ProfilePicture size={24} />
+        <ProfilePicture size={24} setUploadModalOpen={null} />
       </IconButton>
       <Popover
         id={id}
