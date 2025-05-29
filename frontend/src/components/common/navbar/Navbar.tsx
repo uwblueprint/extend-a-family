@@ -15,6 +15,7 @@ import NotificationAPIClient from "../../../APIClients/NotificationAPIClient";
 import { useUser } from "../../../hooks/useUser";
 import { Notification } from "../../../types/NotificationTypes";
 import { useSocket } from "../../../contexts/SocketContext";
+import PageTabs from "./PageTabs";
 import UserButton from "./UserButton";
 import { LANDING_PAGE } from "../../../constants/Routes";
 import eafLogo from "../../assets/logoColoured.png";
@@ -100,7 +101,8 @@ export default function Navbar() {
             />
           </Link>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: "flex" }}>
+          <Box sx={{ display: "flex", gap: "24px" }}>
+            <PageTabs />
             <IconButton
               size="large"
               aria-label="show new notifications"
