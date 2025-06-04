@@ -25,5 +25,33 @@ export interface MultipleChoiceActivityDTO extends ActivityDTO {
 
 export interface MultiSelectActivityDTO extends ActivityDTO {
   questionType: QuestionType.MultiSelect;
-  correctAnswer: number[];
+  correctAnswers: number[];
 }
+
+export type CreateActivityDTO =
+  | Pick<
+      MultipleChoiceActivityDTO,
+      | "questionType"
+      | "activityNumber"
+      | "questionText"
+      | "instruction"
+      | "options"
+      | "correctAnswer"
+      | "imageUrl"
+      | "additionalContext"
+      | "userFeedback"
+    >
+  | Pick<
+      MultiSelectActivityDTO,
+      | "questionType"
+      | "activityNumber"
+      | "questionText"
+      | "instruction"
+      | "options"
+      | "correctAnswers"
+      | "imageUrl"
+      | "additionalContext"
+      | "userFeedback"
+    >;
+
+export type UpdateActivityDTO = CreateActivityDTO;
