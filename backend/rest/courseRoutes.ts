@@ -312,30 +312,40 @@ courseRouter.delete(
   },
 );
 
-courseRouter.patch("/:unitId/:moduleId/publish", async (req, res, next) => {
-  const { unitId, moduleId } = req.params;
-  try {
-    const updated = await courseModuleService.publishCourseModule(
-      unitId,
-      moduleId,
-    );
-    res.json(updated);
-  } catch (e) {
-    next(e);
-  }
-});
+courseRouter.patch(
+  "/:unitId/:moduleId/publish",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  moduleBelongsToUnitValidator,
+  async (req, res, next) => {
+    const { unitId, moduleId } = req.params;
+    try {
+      const updated = await courseModuleService.publishCourseModule(
+        unitId,
+        moduleId,
+      );
+      res.json(updated);
+    } catch (e) {
+      next(e);
+    }
+  },
+);
 
-courseRouter.patch("/:unitId/:moduleId/unpublish", async (req, res, next) => {
-  const { unitId, moduleId } = req.params;
-  try {
-    const updated = await courseModuleService.unpublishCourseModule(
-      unitId,
-      moduleId,
-    );
-    res.json(updated);
-  } catch (e) {
-    next(e);
-  }
-});
+courseRouter.patch(
+  "/:unitId/:moduleId/unpublish",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  moduleBelongsToUnitValidator,
+  async (req, res, next) => {
+    const { unitId, moduleId } = req.params;
+    try {
+      const updated = await courseModuleService.unpublishCourseModule(
+        unitId,
+        moduleId,
+      );
+      res.json(updated);
+    } catch (e) {
+      next(e);
+    }
+  },
+);
 
 export default courseRouter;
