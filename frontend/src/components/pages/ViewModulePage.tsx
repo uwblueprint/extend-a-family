@@ -22,6 +22,7 @@ import {
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
 import "./ViewModulePage.css";
+import NeedHelpModal from "../help/NeedHelpModal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -54,6 +55,7 @@ const ViewModulePage = () => {
   const currentPageObject = module?.pages[currentPage];
   const thumbnailRefs = useRef<(HTMLDivElement | null)[]>([]);
   const numPages = module?.pages.length || 0;
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   const fetchModule = useCallback(async () => {
     const fetchedModule = await CourseAPIClient.getModuleById(
@@ -296,6 +298,7 @@ const ViewModulePage = () => {
                     paddingX: "12px",
                     paddingY: "10px",
                   }}
+                  onClick={() => setIsHelpModalOpen(true)}
                 >
                   <Typography
                     color={theme.palette.Learner.Default}
@@ -436,6 +439,12 @@ const ViewModulePage = () => {
           </Box>
         </Box>
       </Box>
+      <NeedHelpModal
+        open={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+        module={module}
+        currentPage={currentPageObject || null}
+      />
     </Document>
   );
 };

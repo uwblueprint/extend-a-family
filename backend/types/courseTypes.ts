@@ -15,6 +15,7 @@ export type CourseModuleDTO = {
   imageURL?: string;
   pages: CoursePageDTO[];
   lessonPdfUrl?: string;
+  unitId?: string;
 };
 
 export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
