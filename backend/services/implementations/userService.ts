@@ -1,5 +1,5 @@
 import * as firebaseAdmin from "firebase-admin";
-import { ObjectId } from "mongoose";
+import { Model, ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
 import MgUser, {
   Learner,
@@ -217,36 +217,26 @@ class UserService implements IUserService {
     userId: ObjectId | string,
     user: UpdateUserDTO,
   ): Promise<UserDTO> {
-    let oldUser: User | null;
-
     try {
-      // must explicitly specify runValidators when updating through findByIdAndUpdate
-      oldUser = await MgUser.findByIdAndUpdate(
-        userId,
-        {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          status: user.status,
-        },
-        { runValidators: true },
-      );
+      const MgUserDiscriminator = MgUser.discriminators?.[
+        user.role
+      ] as Model<User>;
 
-      if (!oldUser) {
+      const updatedUser: User | null =
+        await MgUserDiscriminator.findByIdAndUpdate(userId, user, {
+          runValidators: true,
+          new: true,
+        });
+
+      if (!updatedUser) {
         throw new Error(`userId ${userId} not found.`);
       }
+
+      return updatedUser.toObject();
     } catch (error: unknown) {
       Logger.error(`Failed to update user. Reason = ${getErrorMessage(error)}`);
       throw error;
     }
-
-    return {
-      ...oldUser.toObject(),
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-      status: user.status,
-    };
   }
 
   async deleteUserById(userId: string): Promise<void> {

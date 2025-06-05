@@ -1,3 +1,4 @@
+import { ClientSession } from "mongoose";
 import {
   CourseModuleDTO,
   CreateCourseModuleDTO,
@@ -44,13 +45,15 @@ interface ICourseModuleService {
   /**
    * Deletes 1 course, reduces display index of all course modules with a display index higher than
    * than the course with this display index
+   * @param courseUnitId the id of the course unit that the course module belongs to
    * @param courseModuleId the id of the course module we want to delete
-   * @param courseUniteId the id of the course unit that the course module belongs to
+   * @param currSession (optional) current parent MongoDB session
    * @throws Error if the course id does't exist in the database
    */
   deleteCourseModule(
     courseUnitId: string,
     courseModuleId: string,
+    currSession?: ClientSession,
   ): Promise<string>;
 
   /**

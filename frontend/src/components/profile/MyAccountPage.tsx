@@ -3,12 +3,14 @@ import { Container, Typography, Button, useTheme } from "@mui/material";
 import PasswordIcon from "@mui/icons-material/Password";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import MainPageButton from "../common/MainPageButton";
-import ProfilePicture from "../profile/ProfilePicture";
-import EditDetailsModal from "../profile/EditDetailsModal";
-import ChangePasswordModal from "../profile/ChangePasswordModal";
+import ProfilePicture from "./ProfilePicture";
+import EditDetailsModal from "./EditDetailsModal";
+import ChangePasswordModal from "./ChangePasswordModal";
 import AuthContext from "../../contexts/AuthContext";
 import userAPIClient from "../../APIClients/UserAPIClient";
 import authAPIClient from "../../APIClients/AuthAPIClient";
+import { isAuthenticatedFacilitator } from "../../types/AuthTypes";
+import { isFacilitator } from "../../types/UserTypes";
 
 const MyAccount = (): React.ReactElement => {
   const theme = useTheme();
@@ -22,25 +24,32 @@ const MyAccount = (): React.ReactElement => {
     return <Typography>Please log in to view your account.</Typography>;
   }
 
-  const handleSaveDetails = async (firstName: string, lastName: string) => {
+  const handleSaveDetails = async (
+    firstName: string,
+    lastName: string,
+    bio?: string,
+  ) => {
     try {
       if (!authenticatedUser || !authenticatedUser.id) {
         throw new Error("User information is not available.");
       }
 
       const updatedUser = await userAPIClient.updateUserDetails(
-        authenticatedUser.id,
         firstName,
         lastName,
         authenticatedUser.role,
         authenticatedUser.status,
+        bio,
       );
 
       setAuthenticatedUser({
         ...authenticatedUser,
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
+        bio: isFacilitator(updatedUser) ? updatedUser.bio : undefined,
       });
+
+      setIsEditModalOpen(false);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error updating user details:", error);
@@ -119,10 +128,10 @@ const MyAccount = (): React.ReactElement => {
           <Container
             sx={{
               display: "flex",
-              width: "400px",
               flexDirection: "column",
               alignItems: "flex-start",
               gap: "24px",
+              padding: 0,
             }}
           >
             <Typography variant="headlineSmall">Details</Typography>
@@ -138,11 +147,7 @@ const MyAccount = (): React.ReactElement => {
             >
               <Container
                 disableGutters
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
+                sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <Typography
                   variant="bodySmall"
@@ -159,11 +164,7 @@ const MyAccount = (): React.ReactElement => {
               </Container>
               <Container
                 disableGutters
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
+                sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <Typography
                   variant="bodySmall"
@@ -180,11 +181,7 @@ const MyAccount = (): React.ReactElement => {
               </Container>
               <Container
                 disableGutters
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
+                sx={{ display: "flex", justifyContent: "space-between" }}
               >
                 <Typography
                   variant="bodySmall"
@@ -200,6 +197,35 @@ const MyAccount = (): React.ReactElement => {
                 </Typography>
               </Container>
             </Container>
+          </Container>
+          {isAuthenticatedFacilitator(authenticatedUser) && (
+            <Container
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "16px",
+              }}
+            >
+              <Typography variant="headlineSmall">Bio</Typography>
+              {authenticatedUser.bio ? (
+                <Typography
+                  variant="bodyMedium"
+                  sx={{ color: theme.palette.Neutral[700] }}
+                >
+                  {authenticatedUser.bio}
+                </Typography>
+              ) : (
+                <Typography
+                  variant="bodySmall"
+                  sx={{ color: theme.palette.Neutral[500] }}
+                >
+                  Add a bio to help your learners get to know you!
+                </Typography>
+              )}
+            </Container>
+          )}
+          <Container>
             <Container
               disableGutters
               sx={{
@@ -301,6 +327,11 @@ const MyAccount = (): React.ReactElement => {
         onClose={() => setIsEditModalOpen(false)}
         firstName={authenticatedUser.firstName}
         lastName={authenticatedUser.lastName}
+        bio={
+          isAuthenticatedFacilitator(authenticatedUser)
+            ? authenticatedUser.bio
+            : undefined
+        }
         onSave={handleSaveDetails}
       />
       <ChangePasswordModal

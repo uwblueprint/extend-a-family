@@ -125,6 +125,7 @@ const CreatePasswordPage = (): React.ReactElement => {
             <PasswordCheck
               newPassword={newPassword}
               confirmPassword={confirmPassword}
+              passwordLabel="New Password"
               setNewPassword={setNewPassword}
               setConfirmPassword={setConfirmPassword}
               onValidationChange={setIsFormValid}

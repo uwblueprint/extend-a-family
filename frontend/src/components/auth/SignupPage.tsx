@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Container,
+  Divider,
   Drawer,
   IconButton,
   InputAdornment,
@@ -13,12 +14,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import {
-  AlternateEmail,
-  BadgeOutlined,
-  Password,
-  Close,
-} from "@mui/icons-material";
+import { AlternateEmail, BadgeOutlined, Close } from "@mui/icons-material";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import { LANDING_PAGE, WELCOME_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
@@ -32,6 +28,7 @@ import {
 } from "../../errors/AuthErrors";
 import { PresentableError } from "../../types/ErrorTypes";
 import ErrorAlert from "../common/ErrorAlert";
+import PasswordCheck from "./PasswordCheck";
 
 const Signup = (): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
@@ -43,6 +40,9 @@ const Signup = (): React.ReactElement => {
   const [errorData, setErrorData] = useState<PresentableError | null>(null);
   const [emailError, setEmailError] = useState<PresentableError | null>(null);
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
+
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const onSignupClick = async () => {
     setEmailError(null);
@@ -202,26 +202,20 @@ const Signup = (): React.ReactElement => {
               ),
             }}
           />
-          <TextField
-            required
-            label="Password"
-            type="password"
-            placeholder="Your Password"
-            onChange={(event) => setPassword(event.target.value)}
-            variant="outlined"
+          <Divider
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignSelf: "stretch",
-              maxHeight: "56px",
+              width: "100%",
+              borderBottomWidth: 2,
+              borderColor: theme.palette.Neutral[400],
             }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Password />
-                </InputAdornment>
-              ),
-            }}
+          />
+          <PasswordCheck
+            newPassword={password}
+            confirmPassword={confirmPassword}
+            passwordLabel="Password"
+            setNewPassword={setPassword}
+            setConfirmPassword={setConfirmPassword}
+            onValidationChange={setIsPasswordValid}
           />
           <Box
             sx={{
@@ -234,6 +228,7 @@ const Signup = (): React.ReactElement => {
             <Button
               variant="contained"
               onClick={onSignupClick}
+              disabled={!isPasswordValid}
               fullWidth
               sx={{
                 bgcolor: theme.palette.Facilitator.Default,
