@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import fs from "fs/promises";
-import { ClientSession, Schema, startSession } from "mongoose";
+import mongoose, { ClientSession, Schema, startSession } from "mongoose";
 import { PDFDocument } from "pdf-lib";
 import MgCourseModule, {
   CourseModule,
@@ -313,10 +313,11 @@ class CourseModuleService implements ICourseModuleService {
       const courseUnit = await MgCourseUnit.findById(courseUnitId).session(
         session,
       );
-      if (
-        !courseUnit ||
-        !courseUnit.modules.includes(moduleId as Schema.Types.ObjectId)
-      ) {
+      const newModuleId = new mongoose.Types.ObjectId(moduleId);
+      const belongsToUnit = courseUnit?.modules.some((m) =>
+        (m as unknown as mongoose.Types.ObjectId).equals(newModuleId),
+      );
+      if (!courseUnit || !belongsToUnit) {
         throw new Error("Module not found in specified unit");
       }
 
