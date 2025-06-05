@@ -1,0 +1,59 @@
+#!/bin/bash
+
+echo "=== Getting Bearer Token ==="
+echo ""
+
+# Step 1: Replace these with your actual credentials
+EMAIL="your_email@example.com"
+PASSWORD="your_password"
+ROLE="Facilitator"  # Change to "Administrator" or "Learner" if needed
+
+echo "Attempting login with:"
+echo "Email: $EMAIL"
+echo "Role: $ROLE"
+echo ""
+
+# Step 2: Login request
+echo "Sending login request..."
+LOGIN_RESPONSE=$(curl -s -X POST http://localhost:5000/auth/login \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"email\": \"$EMAIL\",
+    \"password\": \"$PASSWORD\",
+    \"attemptedRole\": \"$ROLE\"
+  }")
+
+echo "Login Response:"
+echo "$LOGIN_RESPONSE" | jq '.' 2>/dev/null || echo "$LOGIN_RESPONSE"
+echo ""
+
+# Step 3: Extract the access token
+ACCESS_TOKEN=$(echo "$LOGIN_RESPONSE" | jq -r '.accessToken' 2>/dev/null)
+USER_ID=$(echo "$LOGIN_RESPONSE" | jq -r '.id' 2>/dev/null)
+
+if [ "$ACCESS_TOKEN" != "null" ] && [ "$ACCESS_TOKEN" != "" ]; then
+    echo "✅ SUCCESS! Bearer token obtained:"
+    echo "Bearer Token: $ACCESS_TOKEN"
+    echo "User ID: $USER_ID"
+    echo ""
+    
+    echo "=== How to use this token ==="
+    echo "Add this header to your API requests:"
+    echo "Authorization: Bearer $ACCESS_TOKEN"
+    echo ""
+    
+    echo "=== Example: Invite Learner ==="
+    echo "curl -X POST http://localhost:5000/auth/inviteLearner \\"
+    echo "  -H \"Content-Type: application/json\" \\"
+    echo "  -H \"Authorization: Bearer $ACCESS_TOKEN\" \\"
+    echo "  -d '{"
+    echo "    \"firstName\": \"John\","
+    echo "    \"lastName\": \"Doe\","
+    echo "    \"email\": \"learner@example.com\","
+    echo "    \"facilitatorId\": \"$USER_ID\""
+    echo "  }'"
+else
+    echo "❌ LOGIN FAILED"
+    echo "Please check your credentials and try again"
+    echo "Make sure the backend server is running on http://localhost:5000"
+fi

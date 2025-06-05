@@ -74,6 +74,20 @@ class CourseModuleService implements ICourseModuleService {
       if (!courseModule) {
         throw new Error(`Course module with id ${courseModuleId} not found.`);
       }
+
+      // Find the unit that contains this module
+      const courseUnit = await MgCourseUnit.findOne({
+        modules: courseModuleId,
+      })
+        .lean()
+        .exec();
+
+      if (!courseUnit) {
+        throw new Error(
+          `No unit found containing module with id ${courseModuleId}`,
+        );
+      }
+
       const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
         `course/pdfs/module-${courseModuleId}.pdf`,
       );
@@ -87,6 +101,7 @@ class CourseModuleService implements ICourseModuleService {
       const pageObjects = Promise.all(courseModule.pages.map(fetchPage));
       return {
         ...courseModule,
+        unitId: courseUnit._id.toString(),
         lessonPdfUrl,
         pages: await pageObjects,
       };
