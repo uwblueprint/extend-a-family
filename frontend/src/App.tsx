@@ -6,6 +6,8 @@ import authAPIClient from "./APIClients/AuthAPIClient";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import Signup from "./components/auth/SignupPage";
 import Welcome from "./components/auth/WelcomePage";
+import Home from "./components/pages/Home";
+import Bookmarks from "./components/pages/Bookmarks";
 import CreateModulePage from "./components/pages/CreateModulePage";
 import Default from "./components/pages/Default";
 import MyAccount from "./components/profile/MyAccountPage";
@@ -87,8 +89,20 @@ const App = (): React.ReactElement => {
                 />
                 <PrivateRoute
                   exact
-                  path={Routes.HOME_PAGE}
+                  path={Routes.LANDING_PAGE}
                   component={Default}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.HOME_PAGE}
+                  component={Home}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.BOOKMARKS_PAGE}
+                  component={Bookmarks}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
                 <PrivateRoute

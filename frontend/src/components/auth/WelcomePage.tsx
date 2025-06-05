@@ -14,7 +14,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
-import { HOME_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
+import { LANDING_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import background from "../assets/backgroundImage.png";
 import logo from "../assets/logoWhite.png";
@@ -43,7 +43,7 @@ const Welcome = (): React.ReactElement => {
   const [selectedRole, setSelectedRole] = useState<Role>("Learner");
   const theme = useTheme();
   if (authenticatedUser) {
-    return <Redirect to={HOME_PAGE} />;
+    return <Redirect to={LANDING_PAGE} />;
   }
 
   const handleButtonClick = (role: Role) => {

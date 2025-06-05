@@ -12,6 +12,18 @@ const palette: PaletteOptions = {
     Default: "#006877",
     Pressed: "#00363F",
   },
+  NewLearnerLight: {
+    Default: "#F5FDFF",
+    Selected: "#CCF5FF",
+    Pressed: "#D8EAEF",
+    Hover: "#E5F5F9",
+  },
+  NewLearnerDark: {
+    Default: "#006877",
+    Selected: "#00515C",
+    Pressed: "#3F5053",
+    Hover: "#416166",
+  },
   Administrator: {
     Light: "#FFF8F6",
     Hover: "#FFD9CC",
