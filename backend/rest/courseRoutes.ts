@@ -316,7 +316,7 @@ courseRouter.patch(
   "/:unitId/:moduleId/publish",
   isAuthorizedByRole(new Set(["Administrator"])),
   moduleBelongsToUnitValidator,
-  async (req, res, next) => {
+  async (req, res) => {
     const { unitId, moduleId } = req.params;
     try {
       const updated = await courseModuleService.publishCourseModule(
@@ -324,8 +324,8 @@ courseRouter.patch(
         moduleId,
       );
       res.json(updated);
-    } catch (e) {
-      next(e);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
     }
   },
 );
@@ -334,7 +334,7 @@ courseRouter.patch(
   "/:unitId/:moduleId/unpublish",
   isAuthorizedByRole(new Set(["Administrator"])),
   moduleBelongsToUnitValidator,
-  async (req, res, next) => {
+  async (req, res) => {
     const { unitId, moduleId } = req.params;
     try {
       const updated = await courseModuleService.unpublishCourseModule(
@@ -342,8 +342,8 @@ courseRouter.patch(
         moduleId,
       );
       res.json(updated);
-    } catch (e) {
-      next(e);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
     }
   },
 );
