@@ -9,6 +9,7 @@ export type BaseUser = {
   email: string;
   role: Role;
   status: Status;
+  profilePicture?: string;
 };
 
 export type Bookmark = {

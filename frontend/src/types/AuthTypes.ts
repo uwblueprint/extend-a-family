@@ -12,6 +12,7 @@ export type BaseAuthenticatedUser = {
   role: Role;
   accessToken: string;
   status: Status;
+  profilePicture?: string;
 };
 
 export type AuthError = {
