@@ -7,6 +7,16 @@ import {
 } from "../utils/LocalStorageUtils";
 import baseAPIClient from "./BaseAPIClient";
 
+// BookmarkDTO type - matches backend/types/userTypes.ts
+export type BookmarkDTO = {
+  id: string;
+  title: string;
+  type: string;
+  unitId: string;
+  moduleId: string;
+  pageId: string;
+};
+
 const getUsersByRole = async (role: Role): Promise<User[]> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -73,8 +83,76 @@ const updateUserDetails = async (
   }
 };
 
+const addBookmark = async (
+  unitId: string,
+  moduleId: string,
+  pageId: string,
+): Promise<BookmarkDTO[]> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(
+      "/users/addBookmark",
+      {
+        unitId,
+        moduleId,
+        pageId,
+      },
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    throw new Error("Failed to add bookmark");
+  }
+};
+
+const deleteBookmark = async (pageId: string): Promise<BookmarkDTO[]> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(
+      "/users/deleteBookmark",
+      {
+        pageId,
+      },
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    throw new Error("Failed to delete bookmark");
+  }
+};
+
+const getCurrentUser = async (): Promise<
+  User & { bookmarks: BookmarkDTO[] }
+> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.get("/users/myaccount", {
+      headers: { Authorization: bearerToken },
+    });
+    return data;
+  } catch (error) {
+    throw new Error("Failed to get current user");
+  }
+};
+
 export default {
   getUsersByRole,
   getUsers,
   updateUserDetails,
+  addBookmark,
+  deleteBookmark,
+  getCurrentUser,
 };

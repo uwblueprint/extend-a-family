@@ -184,6 +184,25 @@ userRouter.post(
   },
 );
 
+/* Get current user data including bookmarks */
+userRouter.get(
+  "/myaccount",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
+  async (req, res) => {
+    const accessToken = getAccessToken(req);
+    try {
+      if (!accessToken) {
+        throw new Error("Unauthorized: No access token provided");
+      }
+      const userId = await authService.getUserIdFromAccessToken(accessToken);
+      const user = await userService.getUserById(userId.toString());
+      res.status(200).json(user);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
 /* Get all users, optionally filter by a userId or email query parameter to retrieve a single user */
 userRouter.get(
   "/",
