@@ -53,7 +53,7 @@ export default function CourseModulesGrid({
           >
             <CardActionArea
               component={Link}
-              to={`${Routes.VIEW_PAGE}?moduleId=${module.id}`}
+              to={`${Routes.VIEW_PAGE}?unitId=${unitId}&moduleId=${module.id}`}
               sx={{ padding: "12px", borderRadius: "8px" }}
             >
               <CardMedia
