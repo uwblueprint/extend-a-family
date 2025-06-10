@@ -314,6 +314,8 @@ class CourseModuleService implements ICourseModuleService {
         session,
       );
       const newModuleId = new mongoose.Types.ObjectId(moduleId);
+
+      // Check if the course unit exists and if the module belongs to it
       const belongsToUnit = courseUnit?.modules.some((m) =>
         (m as unknown as mongoose.Types.ObjectId).equals(newModuleId),
       );
@@ -325,6 +327,7 @@ class CourseModuleService implements ICourseModuleService {
       if (!module) {
         throw new Error("Module not found");
       }
+      // End of module not found check
 
       if (
         !validTransitions[module.status as ModuleStatus].includes(newStatus)
