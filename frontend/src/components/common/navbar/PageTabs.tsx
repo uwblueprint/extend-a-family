@@ -92,7 +92,6 @@ const PageTabs = () => {
       </Button>
     </Box>
   );
-
 };
 
 export default PageTabs;
