@@ -12,8 +12,17 @@ declare module "@mui/material/styles" {
     Pressed: string;
   }
 
+  interface NewPaletteColorOptions {
+    Default: string;
+    Selected: string;
+    Pressed: string;
+    Hover: string;
+  }
+
   interface PaletteOptions {
     Learner: PaletteColorOptions;
+    NewLearnerLight: NewPaletteColorOptions;
+    NewLearnerDark: NewPaletteColorOptions;
     Administrator: PaletteColorOptions;
     Facilitator: PaletteColorOptions;
     Error: PaletteColorOptions;

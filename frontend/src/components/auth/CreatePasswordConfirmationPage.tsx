@@ -3,7 +3,7 @@ import { Container, Typography, Button, Box, useTheme } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { useHistory } from "react-router-dom";
 import Logo from "../assets/logoColoured.png";
-import { HOME_PAGE } from "../../constants/Routes";
+import { LANDING_PAGE } from "../../constants/Routes";
 import { useUser } from "../../hooks/useUser";
 
 const CreatePasswordConfirmationPage = (): React.ReactElement => {
@@ -12,7 +12,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
   const theme = useTheme();
   const handleBackToHome = () => {
     user.status = "Active";
-    history.push(HOME_PAGE);
+    history.push(LANDING_PAGE);
   };
 
   return (

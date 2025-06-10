@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { Box, Container, Link, Typography, useTheme } from "@mui/material";
-import { HOME_PAGE } from "../../constants/Routes";
+import { LANDING_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { Role } from "../../types/AuthTypes";
 import LoginForm from "./LoginForm";
@@ -24,7 +24,7 @@ const Login: React.FC<LoginProps> = ({
 
   const theme = useTheme();
   if (authenticatedUser) {
-    return <Redirect to={HOME_PAGE} />;
+    return <Redirect to={LANDING_PAGE} />;
   }
 
   const redirectSignUpPath = (): boolean => {
