@@ -156,6 +156,7 @@ const ViewModulePage = () => {
       const userData = await UserAPIClient.getCurrentUser();
       setBookmarks(userData.bookmarks || []);
     } catch (error) {
+      /* eslint-disable-next-line no-console */
       console.error("Failed to fetch bookmarks:", error);
     }
   }, []);
@@ -183,6 +184,7 @@ const ViewModulePage = () => {
 
       setBookmarks(updatedBookmarks);
     } catch (error) {
+      /* eslint-disable-next-line no-console */
       console.error("Failed to toggle bookmark:", error);
     } finally {
       setIsBookmarkLoading(false);
