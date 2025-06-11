@@ -13,7 +13,7 @@ import { useHistory, Redirect } from "react-router-dom";
 import AuthContext from "../../../contexts/AuthContext";
 import ForgotPasswordConfirmation from "./ForgotPasswordConfirmation";
 import authAPIClient from "../../../APIClients/AuthAPIClient";
-import { HOME_PAGE, WELCOME_PAGE } from "../../../constants/Routes";
+import { LANDING_PAGE, WELCOME_PAGE } from "../../../constants/Routes";
 
 const ForgotPasswordPage = (): React.ReactElement => {
   const [email, setEmail] = useState("");
@@ -23,7 +23,7 @@ const ForgotPasswordPage = (): React.ReactElement => {
 
   const { authenticatedUser } = useContext(AuthContext);
   if (authenticatedUser) {
-    return <Redirect to={HOME_PAGE} />;
+    return <Redirect to={LANDING_PAGE} />;
   }
 
   const handleResetPassword = async () => {

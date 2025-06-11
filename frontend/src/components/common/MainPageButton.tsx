@@ -2,7 +2,7 @@ import React from "react";
 import { Typography, Button, useTheme } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { useHistory } from "react-router-dom";
-import { HOME_PAGE } from "../../constants/Routes";
+import { LANDING_PAGE } from "../../constants/Routes";
 import { useUser } from "../../hooks/useUser";
 
 const MainPageButton = (): React.ReactElement => {
@@ -10,7 +10,7 @@ const MainPageButton = (): React.ReactElement => {
   const theme = useTheme();
   const user = useUser();
 
-  const navigateTo = () => history.push(HOME_PAGE);
+  const navigateTo = () => history.push(LANDING_PAGE);
   return (
     <>
       <Button
