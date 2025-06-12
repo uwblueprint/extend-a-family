@@ -11,6 +11,9 @@ export function isRole(role: string): role is Role {
 export type Status = "Invited" | "Active";
 
 export type BookmarkDTO = CoursePageDTO & {
+  id: string;
+  title: string;
+  type: string;
   unitId: string;
   moduleId: string;
   pageId: string;

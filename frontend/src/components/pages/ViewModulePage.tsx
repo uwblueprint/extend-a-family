@@ -13,9 +13,10 @@ import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
-import UserAPIClient, { BookmarkDTO } from "../../APIClients/UserAPIClient";
+import UserAPIClient from "../../APIClients/UserAPIClient";
 import * as Routes from "../../constants/Routes";
 import useQueryParams from "../../hooks/useQueryParams";
+import { Bookmark } from "../../types/UserTypes";
 import {
   CourseModule,
   isActivityPage,
@@ -42,7 +43,7 @@ const ViewModulePage = () => {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [bookmarks, setBookmarks] = useState<BookmarkDTO[]>([]);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
   const [module, setModule] = useState<
     (CourseModule & { lessonPdfUrl: string }) | null
@@ -170,7 +171,7 @@ const ViewModulePage = () => {
 
     setIsBookmarkLoading(true);
     try {
-      let updatedBookmarks: BookmarkDTO[];
+      let updatedBookmarks: Bookmark[];
 
       if (isBookmarked) {
         updatedBookmarks = await UserAPIClient.deleteBookmark(pageId);
