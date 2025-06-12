@@ -28,6 +28,7 @@ interface UnitSideBarProps {
   open: boolean;
   setSelectedUnit: React.Dispatch<React.SetStateAction<CourseUnit | null>>;
   selectedUnit: CourseUnit | null;
+  sidebarTitle?: string;
 }
 
 export default function UnitSidebar({
@@ -35,6 +36,7 @@ export default function UnitSidebar({
   open,
   setSelectedUnit,
   selectedUnit,
+  sidebarTitle = "Units",
 }: UnitSideBarProps) {
   const theme = useTheme();
   const user = useUser();
@@ -183,7 +185,7 @@ export default function UnitSidebar({
           fontWeight="700"
           fontSize="16px"
         >
-          Units
+          {sidebarTitle}
           <Button
             type="button"
             sx={{
