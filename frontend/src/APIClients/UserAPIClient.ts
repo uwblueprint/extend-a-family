@@ -1,21 +1,11 @@
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { Role } from "../types/AuthTypes";
-import { User } from "../types/UserTypes";
+import { User, Bookmark } from "../types/UserTypes";
 import {
   getLocalStorageObjProperty,
   setLocalStorageObjProperty,
 } from "../utils/LocalStorageUtils";
 import baseAPIClient from "./BaseAPIClient";
-
-// BookmarkDTO type - matches backend/types/userTypes.ts
-export type BookmarkDTO = {
-  id: string;
-  title: string;
-  type: string;
-  unitId: string;
-  moduleId: string;
-  pageId: string;
-};
 
 const getUsersByRole = async (role: Role): Promise<User[]> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
@@ -87,7 +77,7 @@ const addBookmark = async (
   unitId: string,
   moduleId: string,
   pageId: string,
-): Promise<BookmarkDTO[]> => {
+): Promise<Bookmark[]> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
@@ -110,7 +100,7 @@ const addBookmark = async (
   }
 };
 
-const deleteBookmark = async (pageId: string): Promise<BookmarkDTO[]> => {
+const deleteBookmark = async (pageId: string): Promise<Bookmark[]> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
@@ -131,9 +121,7 @@ const deleteBookmark = async (pageId: string): Promise<BookmarkDTO[]> => {
   }
 };
 
-const getCurrentUser = async (): Promise<
-  User & { bookmarks: BookmarkDTO[] }
-> => {
+const getCurrentUser = async (): Promise<User & { bookmarks: Bookmark[] }> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
