@@ -12,3 +12,10 @@ export function padNumber(num: number) {
   }
   return `0${num}`;
 }
+
+export function isCaseInsensitiveSubstring(
+  str: string,
+  substr: string,
+): boolean {
+  return (str ?? "").toLowerCase().includes((substr ?? "").toLowerCase());
+}
