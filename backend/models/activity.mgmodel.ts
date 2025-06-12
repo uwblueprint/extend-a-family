@@ -8,7 +8,6 @@ export interface Activity extends Document {
   activityNumber: string;
   questionText: string;
   instruction: string;
-  options: string[];
   imageUrl?: string;
   additionalContext?: string;
   userFeedback?: string;
@@ -17,11 +16,13 @@ export interface Activity extends Document {
 // Specific question type interfaces
 export interface MultipleChoiceActivity extends Activity {
   questionType: QuestionType.MultipleChoice;
+  options: string[];
   correctAnswer: number;
 }
 
 export interface MultiSelectActivity extends Activity {
   questionType: QuestionType.MultiSelect;
+  options: string[];
   correctAnswers: number[];
 }
 
@@ -52,16 +53,6 @@ export const ActivitySchema: Schema = new Schema(
       type: String,
       required: true,
       maxlength: 200,
-    },
-    options: {
-      type: [String],
-      required: true,
-      validate: {
-        validator: (options: string[]) => {
-          return options.length >= 2 && options.length <= 6;
-        },
-        message: "Must have between 2 and 6 options",
-      },
     },
     imageUrl: {
       type: String,
@@ -98,6 +89,16 @@ const ActivityModel = mongoose.model<Activity>("Activity", ActivitySchema);
 
 // Multiple choice specific schema
 const MultipleChoiceActivitySchema = new Schema({
+  options: {
+    type: [String],
+    required: true,
+    validate: {
+      validator: (options: string[]) => {
+        return options.length >= 2 && options.length <= 6;
+      },
+      message: "Must have between 2 and 6 options",
+    },
+  },
   correctAnswer: {
     type: Number,
     required: true,
@@ -112,6 +113,16 @@ const MultipleChoiceActivitySchema = new Schema({
 
 // Multi-select specific schema
 const MultiSelectActivitySchema = new Schema({
+  options: {
+    type: [String],
+    required: true,
+    validate: {
+      validator: (options: string[]) => {
+        return options.length >= 2 && options.length <= 6;
+      },
+      message: "Must have between 2 and 6 options",
+    },
+  },
   correctAnswers: {
     type: [Number],
     required: true,
