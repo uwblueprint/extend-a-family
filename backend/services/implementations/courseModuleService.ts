@@ -101,7 +101,7 @@ class CourseModuleService implements ICourseModuleService {
       const pageObjects = Promise.all(courseModule.pages.map(fetchPage));
       return {
         ...courseModule,
-        unitId: courseUnit._id.toString(),
+        unitId: courseUnit._id.toString(), // eslint-disable-line no-underscore-dangle
         lessonPdfUrl,
         pages: await pageObjects,
       };
