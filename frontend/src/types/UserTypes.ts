@@ -11,6 +11,15 @@ export type BaseUser = {
   status: Status;
 };
 
+export type Bookmark = {
+  id: string;
+  title: string;
+  type: string;
+  unitId: string;
+  moduleId: string;
+  pageId: string;
+};
+
 export type Administrator = BaseUser;
 export type Facilitator = BaseUser & { learners: string[]; bio?: string };
 export type Learner = BaseUser & { facilitator: string };

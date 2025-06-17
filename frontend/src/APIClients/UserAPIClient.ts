@@ -1,6 +1,6 @@
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { Role } from "../types/AuthTypes";
-import { User } from "../types/UserTypes";
+import { User, Bookmark } from "../types/UserTypes";
 import {
   getLocalStorageObjProperty,
   setLocalStorageObjProperty,
@@ -89,6 +89,69 @@ const deleteUser = async (userId: string): Promise<boolean> => {
   } catch (error) {
     return false;
   }
+}
+
+const addBookmark = async (
+  unitId: string,
+  moduleId: string,
+  pageId: string,
+): Promise<Bookmark[]> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(
+      "/users/addBookmark",
+      {
+        unitId,
+        moduleId,
+        pageId,
+      },
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    throw new Error("Failed to add bookmark");
+  }
+};
+
+const deleteBookmark = async (pageId: string): Promise<Bookmark[]> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(
+      "/users/deleteBookmark",
+      {
+        pageId,
+      },
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    throw new Error("Failed to delete bookmark");
+  }
+};
+
+const getCurrentUser = async (): Promise<User & { bookmarks: Bookmark[] }> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.get("/users/myaccount", {
+      headers: { Authorization: bearerToken },
+    });
+    return data;
+  } catch (error) {
+    throw new Error("Failed to get current user");
+  }
 };
 
 export default {
@@ -96,4 +159,7 @@ export default {
   getUsers,
   updateUserDetails,
   deleteUser,
+  addBookmark,
+  deleteBookmark,
+  getCurrentUser,
 };
