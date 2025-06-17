@@ -89,7 +89,7 @@ const deleteUser = async (userId: string): Promise<boolean> => {
   } catch (error) {
     return false;
   }
-}
+};
 
 const addBookmark = async (
   unitId: string,
