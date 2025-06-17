@@ -39,19 +39,19 @@ const NeedHelpModal: React.FC<NeedHelpModalProps> = ({
 
   const handleNext = async () => {
     if (!isAuthenticatedLearner(user)) {
-      console.error("Only learners can submit help requests");
+      console.error("Only learners can submit help requests"); // eslint-disable-line no-console
       setCurrentScreen("error");
       return;
     }
 
     if (!module || !currentPage || !helpText.trim()) {
-      console.error("Missing required information for help request");
+      console.error("Missing required information for help request"); // eslint-disable-line no-console
       setCurrentScreen("error");
       return;
     }
 
     if (!module.unitId) {
-      console.error("Module unitId is missing");
+      console.error("Module unitId is missing"); // eslint-disable-line no-console
       setCurrentScreen("error");
       return;
     }
@@ -70,11 +70,11 @@ const NeedHelpModal: React.FC<NeedHelpModalProps> = ({
       if (helpRequest) {
         setCurrentScreen("confirmation");
       } else {
-        console.error("Failed to create help request");
+        console.error("Failed to create help request"); // eslint-disable-line no-console
         setCurrentScreen("error");
       }
     } catch (error) {
-      console.error("Error creating help request:", error);
+      console.error("Error creating help request:", error); // eslint-disable-line no-console
       setCurrentScreen("error");
     } finally {
       setIsSubmitting(false);
