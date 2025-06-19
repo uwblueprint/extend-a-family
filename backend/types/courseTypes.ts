@@ -6,7 +6,9 @@ export type CourseUnitDTO = {
 };
 
 export type CreateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
-export type UpdateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
+export type UpdateCourseUnitDTO = Partial<
+  Pick<CourseUnitDTO, "title" | "displayIndex">
+>;
 
 export type CourseModuleDTO = {
   id: string;
