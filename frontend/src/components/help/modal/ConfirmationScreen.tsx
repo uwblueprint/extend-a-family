@@ -103,27 +103,18 @@ const ConfirmationScreen: React.FC<ConfirmationScreenProps> = ({
           }}
         >
           <Typography
+            variant="headlineMedium"
             sx={{
               color: theme.palette.Neutral[700],
-              fontFamily: "Lexend Deca",
-              fontSize: "26px",
-              fontStyle: "normal",
-              fontWeight: 600,
-              lineHeight: "120%",
               textAlign: "center",
             }}
           >
             We let your facilitator know.
           </Typography>
           <Typography
+            variant="bodySmall"
             sx={{
               color: theme.palette.Neutral[500],
-              fontFamily: "Lexend Deca",
-              fontSize: "14px",
-              fontStyle: "normal",
-              fontWeight: 400,
-              lineHeight: "140%",
-              letterSpacing: "0.32px",
               textAlign: "center",
             }}
           >
