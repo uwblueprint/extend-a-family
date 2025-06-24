@@ -26,6 +26,23 @@ export interface MultiSelectActivity extends Activity {
   correctAnswers: number[];
 }
 
+export interface MatchingActivity extends Activity {
+  questionType: QuestionType.Matching;
+  matches: Map<string, string>;
+}
+
+export interface TableActivity extends Activity {
+  questionType: QuestionType.Table;
+  columnLabels: string[];
+  rowlabels: string[];
+  rowImageUrls: string[];
+  correctAnswers: Set<[number, number]>; //representing table coords
+}
+
+export interface TextInputActivity extends Activity {
+  questionType: QuestionType.Custom;
+}
+
 // Base schema with common fields
 const baseOptions = {
   discriminatorKey: "questionType",
@@ -139,6 +156,39 @@ const MultiSelectActivitySchema = new Schema({
     },
   },
 });
+
+const MatchingActivitySchema = new Schema({
+  matches: {
+    type: {String: String},
+    required: true,
+    validate: {
+      validator: (options: string[]) => {
+        return options.length >= 2 && options.length <= 6;
+      },
+      message: "Must have between 2 and 6 sets of matches",
+    },
+  },
+});
+
+const TableActivitySchema = new Schema({
+  columnLabels: {
+    type: [String],
+    required: true,
+  },
+  rowLabels: {
+    type: [String],
+    required: true,
+  },
+  rowImageUrls: {
+    type: [String],
+    required: false,
+  },
+  correctAnswers: {
+    type: ([Number, Number]),
+    required: true,
+  }
+});
+
 
 // Discriminator models
 const MultipleChoiceActivityModel =
