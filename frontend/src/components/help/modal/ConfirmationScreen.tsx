@@ -133,6 +133,7 @@ const ConfirmationScreen: React.FC<ConfirmationScreenProps> = ({
         }}
       >
         <Typography
+          variant="labelMedium"
           onClick={(e) => {
             e.stopPropagation();
             handlers.handleBackToHome();
@@ -140,12 +141,6 @@ const ConfirmationScreen: React.FC<ConfirmationScreenProps> = ({
           sx={{
             color: theme.palette.Learner.Default,
             textAlign: "center",
-            fontFamily: "Lexend Deca",
-            fontSize: "14px",
-            fontWeight: 300,
-            lineHeight: "120%",
-            letterSpacing: "0.7px",
-            textTransform: "uppercase",
             cursor: "pointer",
             "&:hover": {
               opacity: 0.8,
@@ -178,16 +173,11 @@ const ConfirmationScreen: React.FC<ConfirmationScreenProps> = ({
           }}
         >
           <Typography
+            variant="labelMedium"
             sx={{
               color: theme.palette.Neutral[100],
               textAlign: "center",
-              fontFamily: "Lexend Deca",
-              fontSize: "14px",
               fontStyle: "normal",
-              fontWeight: 300,
-              lineHeight: "120%",
-              letterSpacing: "0.7px",
-              textTransform: "uppercase",
             }}
           >
             Back to Content

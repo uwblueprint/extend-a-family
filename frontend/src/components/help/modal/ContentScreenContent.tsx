@@ -85,7 +85,6 @@ const ContentScreenContent: React.FC<ContentScreenContentProps> = ({
             },
           },
           "& .MuiOutlinedInput-input": {
-            padding: "16px 12px",
             flex: "1 0 0",
             alignSelf: "stretch",
           },
