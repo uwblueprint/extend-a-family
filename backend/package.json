@@ -33,7 +33,7 @@
     "mongodb": "^6.6.2",
     "mongoose": "^8.4.0",
     "mongoose-lean-id": "^1.0.0",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^2.0.1",
     "node-fetch": "^2.6.1",
     "nodemailer": "^6.9.9",
     "pdf-lib": "^1.17.1",
