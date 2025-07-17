@@ -389,14 +389,14 @@ class CourseModuleService implements ICourseModuleService {
 
       // 4. Create lesson pages using LessonPageModel
       const createdPages: Array<string> = [];
-      for (let i = 0; i < numPages; i += 1) {
+      for (let i = 1; i <= numPages; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         const newPage = await LessonPageModel.create(
           [
             {
               // Note: Wrapped in array as per Mongoose v7+ requirements
-              title: `Page ${i + 1}`,
-              displayIndex: courseModule.pages.length + i + 1,
+              title: `Page ${i}`,
+              displayIndex: courseModule.pages.length + i,
               type: "Lesson",
               source: pdfFileName,
               pageIndex: i,
