@@ -74,9 +74,9 @@ ActivitySchema.set("toObject", {
 });
 
 // Base model
-const ActivityModel =
-  mongoose.models.Activity ||
-  mongoose.model<Activity>("Activity", ActivitySchema);
+// const ActivityModel =
+//   mongoose.models.Activity ||
+//   mongoose.model<Activity>("Activity", ActivitySchema);
 
 // Multiple choice specific schema
 const MultipleChoiceActivitySchema = new Schema({
