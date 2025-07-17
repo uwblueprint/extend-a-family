@@ -430,6 +430,24 @@ const ViewModulePage = () => {
               alignItems: "center",
             }}
           >
+            <Button
+              sx={{
+                height: "48px",
+                paddingLeft: "16px",
+                paddingRight: "24px",
+                paddingY: "10px",
+                gap: "8px",
+                border: "1px solid",
+                borderColor: theme.palette.Neutral[500],
+                borderRadius: "4px",
+                color: theme.palette.Learner.Default,
+              }}
+              onClick={() => setIsFullScreen((prev) => !prev)}
+            >
+              <FullscreenIcon />
+              <Typography variant="labelLarge">Fullscreen</Typography>
+            </Button>
+
             <Box display="flex" gap="16px">
               <IconButton
                 disabled={currentPage <= 0}
@@ -466,24 +484,6 @@ const ViewModulePage = () => {
                 <ArrowForwardIcon sx={{ fontSize: "16px" }} />
               </IconButton>
             </Box>
-
-            <Button
-              sx={{
-                height: "48px",
-                paddingLeft: "16px",
-                paddingRight: "24px",
-                paddingY: "10px",
-                gap: "8px",
-                border: "1px solid",
-                borderColor: theme.palette.Neutral[500],
-                borderRadius: "4px",
-                color: theme.palette.Learner.Default,
-              }}
-              onClick={() => setIsFullScreen((prev) => !prev)}
-            >
-              <FullscreenIcon />
-              <Typography variant="labelLarge">Fullscreen</Typography>
-            </Button>
           </Box>
         </Box>
       </Box>
