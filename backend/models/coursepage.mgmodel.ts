@@ -55,7 +55,7 @@ export const CoursePageSchema: Schema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ["Lesson", "Activity"],
+      enum: ["Lesson", "MultipleChoiceActivity", "MultiSelectActivity"],
     },
   },
   baseOptions,
@@ -72,12 +72,12 @@ const LessonPageSchema: Schema = new Schema({
   },
 });
 
-const ActivityPageSchema: Schema = new Schema({
-  layout: {
-    type: [ElementSkeletonSchema],
-    required: true,
-  },
-});
+// const ActivityPageSchema: Schema = new Schema({
+//   layout: {
+//     type: [ElementSkeletonSchema],
+//     required: true,
+//   },
+// });
 
 /* eslint-disable no-param-reassign */
 CoursePageSchema.set("toObject", {
@@ -100,10 +100,6 @@ const LessonPageModel = CoursePageModel.discriminator(
   "Lesson",
   LessonPageSchema,
 );
-const ActivityPageModel = CoursePageModel.discriminator(
-  "Activity",
-  ActivityPageSchema,
-);
 
-export { ActivityPageModel, LessonPageModel };
+export { LessonPageModel };
 export default CoursePageModel;

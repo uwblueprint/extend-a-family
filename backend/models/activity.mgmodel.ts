@@ -1,9 +1,9 @@
-import mongoose, { Document, ObjectId, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 import { QuestionType } from "../types/activityTypes";
+import CoursePageModel, { CoursePage } from "./coursepage.mgmodel";
 
 // Base Activity Interface
-export interface Activity extends Document {
-  id: ObjectId;
+export interface Activity extends CoursePage {
   questionType: QuestionType;
   activityNumber: string;
   questionText: string;
@@ -13,7 +13,6 @@ export interface Activity extends Document {
   userFeedback?: string;
 }
 
-// Specific question type interfaces
 export interface MultipleChoiceActivity extends Activity {
   questionType: QuestionType.MultipleChoice;
   options: string[];
@@ -26,11 +25,6 @@ export interface MultiSelectActivity extends Activity {
   correctAnswers: number[];
 }
 
-// Base schema with common fields
-const baseOptions = {
-  discriminatorKey: "questionType",
-  timestamps: true,
-};
 
 export const ActivitySchema: Schema = new Schema(
   {
@@ -42,7 +36,6 @@ export const ActivitySchema: Schema = new Schema(
     activityNumber: {
       type: String,
       required: true,
-      // Could add validation for format like "4.1"
     },
     questionText: {
       type: String,
@@ -69,7 +62,6 @@ export const ActivitySchema: Schema = new Schema(
       maxlength: 500,
     },
   },
-  baseOptions,
 );
 
 /* eslint-disable no-param-reassign */
@@ -84,11 +76,9 @@ ActivitySchema.set("toObject", {
   },
 });
 
-// Base model
-const ActivityModel = mongoose.model<Activity>("Activity", ActivitySchema);
-
-// Multiple choice specific schema
+// Create combined schemas for each specific activity type
 const MultipleChoiceActivitySchema = new Schema({
+  ...ActivitySchema.obj, // inherit base fields from ActivitySchema
   options: {
     type: [String],
     required: true,
@@ -111,8 +101,8 @@ const MultipleChoiceActivitySchema = new Schema({
   },
 });
 
-// Multi-select specific schema
 const MultiSelectActivitySchema = new Schema({
+  ...ActivitySchema.obj, // inherit base fields from ActivitySchema
   options: {
     type: [String],
     required: true,
@@ -140,18 +130,38 @@ const MultiSelectActivitySchema = new Schema({
   },
 });
 
-// Discriminator models
+MultipleChoiceActivitySchema.set("toObject", {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc: Document, ret: Record<string, unknown>) => {
+    // eslint-disable-next-line no-underscore-dangle
+    delete ret._id;
+    delete ret.createdAt;
+    delete ret.updatedAt;
+  },
+});
+
+MultiSelectActivitySchema.set("toObject", {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc: Document, ret: Record<string, unknown>) => {
+    // eslint-disable-next-line no-underscore-dangle
+    delete ret._id;
+    delete ret.createdAt;
+    delete ret.updatedAt;
+  },
+});
+
 const MultipleChoiceActivityModel =
-  ActivityModel.discriminator<MultipleChoiceActivity>(
+  CoursePageModel.discriminator<MultipleChoiceActivity>(
     QuestionType.MultipleChoice,
     MultipleChoiceActivitySchema,
   );
 
 const MultiSelectActivityModel =
-  ActivityModel.discriminator<MultiSelectActivity>(
+  CoursePageModel.discriminator<MultiSelectActivity>(
     QuestionType.MultiSelect,
     MultiSelectActivitySchema,
   );
 
 export { MultipleChoiceActivityModel, MultiSelectActivityModel };
-export default ActivityModel;

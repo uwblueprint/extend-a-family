@@ -1,3 +1,5 @@
+import { CoursePageDTO } from "./courseTypes";
+
 export enum QuestionType {
   MultipleChoice = "MultipleChoice",
   MultiSelect = "MultiSelect",
@@ -6,8 +8,7 @@ export enum QuestionType {
   Custom = "Custom",
 }
 
-export interface ActivityDTO {
-  id: string;
+export interface ActivityDTO extends CoursePageDTO {
   questionType: QuestionType;
   activityNumber: string;
   questionText: string;
