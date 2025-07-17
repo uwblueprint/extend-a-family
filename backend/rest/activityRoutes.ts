@@ -1,15 +1,13 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction, Router } from "express";
 import mongoose from "mongoose";
 import { isAuthorizedByRole } from "../middlewares/auth";
 import CourseModuleModel from "../models/coursemodule.mgmodel";
-import ActivityModel, {
-  MultipleChoiceActivityModel,
-  MultiSelectActivityModel,
-} from "../models/activity.mgmodel";
+import ActivityModel from "../models/activity.mgmodel";
 import { QuestionType } from "../types/activityTypes";
 import { ModuleStatus } from "../types/courseTypes";
+import activityService from "../services/implementations/activityService";
 
-const router = express.Router();
+const activityRouter: Router = express.Router();
 
 // Middleware: ensure module status is Draft or Unpublished
 const checkModuleEditable = async (
@@ -45,7 +43,8 @@ const checkModuleEditable = async (
  * POST /activities/:moduleId/:questionType
  * Optional body: { index?: number }
  */
-router.post(
+
+activityRouter.post(
   "/:moduleId/:questionType",
   isAuthorizedByRole(new Set(["Administrator"])),
   checkModuleEditable,
@@ -53,76 +52,18 @@ router.post(
     const { moduleId, questionType } = req.params;
     const { index } = req.body as { index?: number };
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try {
-      // Create empty activity in transaction
-      let activity;
-      switch (questionType as QuestionType) {
-        case QuestionType.MultipleChoice:
-          [activity] = await MultipleChoiceActivityModel.create(
-            [
-              {
-                questionType,
-                activityNumber: "",
-                questionText: "",
-                instruction: "",
-                options: [],
-                correctOption: "",
-              },
-            ],
-            { session },
-          );
-          break;
-        case QuestionType.MultiSelect:
-          [activity] = await MultiSelectActivityModel.create(
-            [
-              {
-                questionType,
-                activityNumber: "",
-                questionText: "",
-                instruction: "",
-                options: [],
-                correctAnswers: [],
-              },
-            ],
-            { session },
-          );
-          break;
-        default:
-          res.status(400).send("Unsupported question type");
-          await session.abortTransaction();
-          session.endSession();
-          return;
-      }
-
-      // Push into module.pages at index or end
-      const pushOp =
-        typeof index === "number"
-          ? { $each: [activity.id], $position: index }
-          : activity.id;
-
-      const updatedModule = await CourseModuleModel.findByIdAndUpdate(
+      const result = await activityService.createActivity(
         moduleId,
-        { $push: { pages: pushOp } },
-        { new: true, session },
-      ).lean();
-
-      if (!updatedModule) {
-        res.status(404).send("Module not found");
-        await session.abortTransaction();
-        session.endSession();
-        return;
-      }
-
-      await session.commitTransaction();
-      session.endSession();
-
-      res.status(200).json({ pages: updatedModule.pages });
+        questionType as QuestionType,
+        index,
+      );
+      res.status(200).json(result);
     } catch (e) {
-      await session.abortTransaction();
-      session.endSession();
       const message = e instanceof Error ? e.message : "Server error";
+      if (message === "Module not found") res.status(404).send(message);
+      if (message === "Unsupported question type")
+        res.status(400).send(message);
       res.status(500).send(message);
     }
   },
@@ -132,7 +73,7 @@ router.post(
  * Delete Activity (Transactional)
  * DELETE /activities/:moduleId/:activityId
  */
-router.delete(
+activityRouter.delete(
   "/:moduleId/:activityId",
   isAuthorizedByRole(new Set(["Administrator"])),
   checkModuleEditable,
@@ -174,7 +115,7 @@ router.delete(
 /**
  * Get Activity
  */
-router.get(
+activityRouter.get(
   "/:activityId",
   isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
   async (req: Request, res: Response): Promise<void> => {
@@ -196,7 +137,7 @@ router.get(
 /**
  * Update Activity
  */
-router.patch(
+activityRouter.patch(
   "/:activityId",
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req: Request, res: Response): Promise<void> => {
@@ -219,4 +160,4 @@ router.patch(
   },
 );
 
-export default router;
+export default activityRouter;
