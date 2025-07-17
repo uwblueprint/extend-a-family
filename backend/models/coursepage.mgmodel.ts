@@ -1,31 +1,30 @@
-import { ObjectId } from "mongodb";
 import mongoose, { Document, Schema } from "mongoose";
 import mongooseLeanId from "mongoose-lean-id";
 import { ElementSkeleton, PageType } from "../types/courseTypes";
 
-const ElementSkeletonSchema: Schema = new Schema({
-  x: {
-    type: Number,
-    required: true,
-  },
-  y: {
-    type: Number,
-    required: true,
-  },
-  w: {
-    type: Number,
-    required: true,
-  },
-  h: {
-    type: Number,
-    required: true,
-  },
-  content: {
-    type: ObjectId,
-    required: true,
-    ref: "CourseElement",
-  },
-});
+// const ElementSkeletonSchema: Schema = new Schema({
+//   x: {
+//     type: Number,
+//     required: true,
+//   },
+//   y: {
+//     type: Number,
+//     required: true,
+//   },
+//   w: {
+//     type: Number,
+//     required: true,
+//   },
+//   h: {
+//     type: Number,
+//     required: true,
+//   },
+//   content: {
+//     type: ObjectId,
+//     required: true,
+//     ref: "CourseElement",
+//   },
+// });
 
 export interface CoursePage extends Document {
   id: string;

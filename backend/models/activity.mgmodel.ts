@@ -25,44 +25,41 @@ export interface MultiSelectActivity extends Activity {
   correctAnswers: number[];
 }
 
-
-export const ActivitySchema: Schema = new Schema(
-  {
-    questionType: {
-      type: String,
-      required: true,
-      enum: Object.values(QuestionType),
-    },
-    activityNumber: {
-      type: String,
-      required: true,
-    },
-    questionText: {
-      type: String,
-      required: true,
-      maxlength: 1000,
-    },
-    instruction: {
-      type: String,
-      required: true,
-      maxlength: 200,
-    },
-    imageUrl: {
-      type: String,
-      required: false,
-    },
-    additionalContext: {
-      type: String,
-      required: false,
-      maxlength: 500,
-    },
-    userFeedback: {
-      type: String,
-      required: false,
-      maxlength: 500,
-    },
+export const ActivitySchema: Schema = new Schema({
+  questionType: {
+    type: String,
+    required: true,
+    enum: Object.values(QuestionType),
   },
-);
+  activityNumber: {
+    type: String,
+    required: true,
+  },
+  questionText: {
+    type: String,
+    required: true,
+    maxlength: 1000,
+  },
+  instruction: {
+    type: String,
+    required: true,
+    maxlength: 200,
+  },
+  imageUrl: {
+    type: String,
+    required: false,
+  },
+  additionalContext: {
+    type: String,
+    required: false,
+    maxlength: 500,
+  },
+  userFeedback: {
+    type: String,
+    required: false,
+    maxlength: 500,
+  },
+});
 
 /* eslint-disable no-param-reassign */
 ActivitySchema.set("toObject", {
