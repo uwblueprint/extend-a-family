@@ -44,7 +44,7 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
           display: "block",
         }}
       >
-        Type: {bookmark.type}
+        {bookmark.type === "Lesson" ? "Slide" : bookmark.type}
       </Typography>
     </Box>
   );
