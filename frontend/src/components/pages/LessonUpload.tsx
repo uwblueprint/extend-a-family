@@ -38,7 +38,7 @@ const LessonUpload = (): React.ReactElement => {
 
   return (
     <div style={{ textAlign: "center", width: "25%", margin: "0px auto" }}>
-      <h1>My Account</h1>
+      <h1>Upload Lesson PDF</h1>
       <Button
         component="label"
         role={undefined}
