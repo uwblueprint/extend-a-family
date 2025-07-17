@@ -101,7 +101,7 @@ const LessonPageModel = CoursePageModel.discriminator(
   LessonPageSchema,
 );
 const ActivityPageModel = CoursePageModel.discriminator(
-  "Activity",
+  "ActivityPage",
   ActivityPageSchema,
 );
 
