@@ -12,6 +12,7 @@ import authAPIClient from "../../APIClients/AuthAPIClient";
 import { isAuthenticatedFacilitator } from "../../types/AuthTypes";
 import { isFacilitator } from "../../types/UserTypes";
 import UploadProfilePictureModal from "../user_management/UploadProfilePictureModal";
+import EmailPrefrencesButton from './EmailPrefrencesButtons'
 
 const MyAccount = (): React.ReactElement => {
   const theme = useTheme();
@@ -20,11 +21,15 @@ const MyAccount = (): React.ReactElement => {
     useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
+  const [selectedEmailPrefrence, setSelectedEmailPrefrence] = useState<number>(2)
+
   const { setAuthenticatedUser, authenticatedUser } = useContext(AuthContext);
 
   if (!authenticatedUser) {
     return <Typography>Please log in to view your account.</Typography>;
   }
+
+
 
   const handleSaveDetails = async (
     firstName: string,
@@ -229,8 +234,26 @@ const MyAccount = (): React.ReactElement => {
                   Add a bio to help your learners get to know you!
                 </Typography>
               )}
+              
             </Container>
           )}
+          {isAuthenticatedFacilitator(authenticatedUser) && (
+            <Container
+                    sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "16px",
+                  }}
+                >
+                  <Typography variant="headlineSmall">
+                    Email Me...
+                  </Typography>
+                  <EmailPrefrencesButton setPrefrence={setSelectedEmailPrefrence} selectedId={selectedEmailPrefrence} buttonId={0} text="Once I have 5 unread notifications"/>
+                  <EmailPrefrencesButton setPrefrence={setSelectedEmailPrefrence} selectedId={selectedEmailPrefrence} buttonId={1} text="For all notiifcations"/>
+                  <EmailPrefrencesButton setPrefrence={setSelectedEmailPrefrence} selectedId={selectedEmailPrefrence} buttonId={2} text="Never"/>
+                </Container>)
+              }
           <Container>
             <Container
               disableGutters
