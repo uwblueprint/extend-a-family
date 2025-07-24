@@ -62,11 +62,11 @@ userRouter.post(
         contentType,
       );
       const userDTO: UserDTO = await userService.getUserById(userId);
-      await userService.updateUserById(userId, {
+      const updatedUser = await userService.updateUserById(userId, {
         ...userDTO,
         profilePicture: imageURL,
       });
-      res.status(200).json(imageURL);
+      res.status(200).json(updatedUser);
     } catch (error: unknown) {
       res.status(500).send(getErrorMessage(error));
     }
