@@ -20,31 +20,39 @@ interface IActivityService {
    * Deletes an activity and removes it from the module.
    * @param moduleId The ID of the course module.
    * @param activityId The ID of the activity to delete.
+   * @param questionType The type of question/activity to delete.
    * @returns An object containing the updated list of page IDs.
    * @throws Error if deletion fails.
    */
   deleteActivity(
     moduleId: string,
     activityId: string,
+    questionType: QuestionType,
   ): Promise<{ pages: string[] }>;
 
   /**
-   * Retrieves an activity by its ID.
+   * Retrieves an activity by its ID and question type.
    * @param activityId The ID of the activity.
+   * @param questionType The type of question/activity to retrieve.
    * @returns The activity object.
    * @throws Error if not found.
    */
-  getActivity(activityId: string): Promise<Activity>;
+  getActivity(
+    activityId: string,
+    questionType: QuestionType,
+  ): Promise<Activity | null>;
 
   /**
    * Updates an activity with the provided fields.
    * @param activityId The ID of the activity.
+   * @param questionType The type of question/activity to update.
    * @param update The fields to update.
    * @returns The updated activity object.
    * @throws Error if not found or update fails.
    */
   updateActivity(
     activityId: string,
+    questionType: QuestionType,
     update: Partial<Activity>,
   ): Promise<Activity>;
 }
