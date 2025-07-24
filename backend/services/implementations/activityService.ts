@@ -121,7 +121,7 @@ class ActivityService {
     const activity = await (Model as typeof mongoose.Model)
       .findById(activityId)
       .lean();
-    if (!activity || Array.isArray(activity)) {
+    if (!activity) {
       throw new Error("Activity not found");
     }
     return activity as unknown as Activity;
