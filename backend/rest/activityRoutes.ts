@@ -1,8 +1,6 @@
 import express, { Request, Response, NextFunction, Router } from "express";
-import mongoose from "mongoose";
 import { isAuthorizedByRole } from "../middlewares/auth";
 import CourseModuleModel from "../models/coursemodule.mgmodel";
-import ActivityModel from "../models/activity.mgmodel";
 import { QuestionType } from "../types/activityTypes";
 import { ModuleStatus } from "../types/courseTypes";
 import activityService from "../services/implementations/activityService";
@@ -74,39 +72,25 @@ activityRouter.post(
  * DELETE /activities/:moduleId/:activityId
  */
 activityRouter.delete(
-  "/:moduleId/:activityId",
+  "/:moduleId/:activityId/:questionType",
   isAuthorizedByRole(new Set(["Administrator"])),
   checkModuleEditable,
   async (req: Request, res: Response): Promise<void> => {
-    const { moduleId, activityId } = req.params;
+    const { moduleId, activityId, questionType } = req.params;
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try {
-      // Remove from activity collection
-      await ActivityModel.findByIdAndDelete(activityId, { session });
-      // Pull from module.pages
-      const updatedModule = await CourseModuleModel.findByIdAndUpdate(
+      const result = await activityService.deleteActivity(
         moduleId,
-        { $pull: { pages: activityId } },
-        { new: true, session },
-      ).lean();
-
-      if (!updatedModule) {
-        res.status(404).send("Module not found");
-        await session.abortTransaction();
-        session.endSession();
+        activityId,
+        questionType as QuestionType,
+      );
+      res.status(200).json(result);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Server error";
+      if (message === "Module not found") {
+        res.status(404).send(message);
         return;
       }
-
-      await session.commitTransaction();
-      session.endSession();
-
-      res.status(200).json({ pages: updatedModule.pages });
-    } catch (e) {
-      await session.abortTransaction();
-      session.endSession();
-      const message = e instanceof Error ? e.message : "Server error";
       res.status(500).send(message);
     }
   },
@@ -116,12 +100,15 @@ activityRouter.delete(
  * Get Activity
  */
 activityRouter.get(
-  "/:activityId",
+  "/:activityId/:questionType",
   isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
   async (req: Request, res: Response): Promise<void> => {
-    const { activityId } = req.params;
+    const { activityId, questionType } = req.params;
     try {
-      const activity = await ActivityModel.findById(activityId).lean();
+      const activity = await activityService.getActivity(
+        activityId,
+        questionType as QuestionType,
+      );
       if (!activity) {
         res.status(404).send("Activity not found");
         return;
@@ -138,16 +125,16 @@ activityRouter.get(
  * Update Activity
  */
 activityRouter.patch(
-  "/:activityId",
+  "/:activityId/:questionType",
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req: Request, res: Response): Promise<void> => {
-    const { activityId } = req.params;
+    const { activityId, questionType } = req.params;
     try {
-      const updated = await ActivityModel.findByIdAndUpdate(
+      const updated = await activityService.updateActivity(
         activityId,
+        questionType as QuestionType,
         req.body,
-        { new: true, runValidators: true },
-      ).lean();
+      );
       if (!updated) {
         res.status(404).send("Activity not found");
         return;

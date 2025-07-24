@@ -1,11 +1,8 @@
 import mongoose, { ObjectId } from "mongoose";
-import CourseModuleModel from "../../models/coursemodule.mgmodel";
-import ActivityModel, {
-  Activity,
-  MultipleChoiceActivityModel,
-  MultiSelectActivityModel,
-} from "../../models/activity.mgmodel";
 import { QuestionType } from "../../types/activityTypes";
+import CourseModuleModel from "../../models/coursemodule.mgmodel";
+import { Activity } from "../../models/activity.mgmodel";
+import { activityModelMapper } from "../../utilities/activityModelMapper";
 
 class ActivityService {
   static async createActivity(
@@ -16,41 +13,34 @@ class ActivityService {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      let activity;
-      switch (questionType) {
-        case QuestionType.MultipleChoice:
-          [activity] = await MultipleChoiceActivityModel.create(
-            [
-              {
-                questionType,
-                activityNumber: "",
-                questionText: "",
-                instruction: "",
-                options: [],
-                correctOption: "",
-              },
-            ],
-            { session },
-          );
-          break;
-        case QuestionType.MultiSelect:
-          [activity] = await MultiSelectActivityModel.create(
-            [
-              {
-                questionType,
-                activityNumber: "",
-                questionText: "",
-                instruction: "",
-                options: [],
-                correctAnswers: [],
-              },
-            ],
-            { session },
-          );
-          break;
-        default:
-          throw new Error("Unsupported question type");
+      const Model =
+        activityModelMapper[questionType as keyof typeof activityModelMapper];
+      if (!Model) {
+        throw new Error("Unsupported question type");
       }
+
+      const baseActivity = {
+        questionType,
+        activityNumber: "",
+        questionText: "",
+        instruction: "",
+        options: [],
+      };
+
+      let activityData;
+      if (questionType === QuestionType.MultipleChoice) {
+        activityData = { ...baseActivity, correctOption: "" };
+      } else if (questionType === QuestionType.MultiSelect) {
+        activityData = { ...baseActivity, correctAnswers: [] };
+      } else {
+        activityData = baseActivity;
+      }
+
+      const activityDocs = await (Model as typeof mongoose.Model).create(
+        [activityData],
+        { session },
+      );
+      const activity = activityDocs[0];
 
       const pushOp =
         typeof index === "number"
@@ -82,11 +72,20 @@ class ActivityService {
   static async deleteActivity(
     moduleId: string,
     activityId: string,
+    questionType: QuestionType,
   ): Promise<{ pages: string[] }> {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      await ActivityModel.findByIdAndDelete(activityId, { session });
+      const Model =
+        activityModelMapper[questionType as keyof typeof activityModelMapper];
+      if (!Model) {
+        throw new Error("Unsupported question type");
+      }
+
+      await (Model as typeof mongoose.Model).findByIdAndDelete(activityId, {
+        session,
+      });
 
       const updatedModule = await CourseModuleModel.findByIdAndUpdate(
         moduleId,
@@ -110,19 +109,40 @@ class ActivityService {
     }
   }
 
-  static async getActivity(activityId: string) {
-    const activity = await ActivityModel.findById(activityId).lean();
-    if (!activity) {
+  static async getActivity(
+    activityId: string,
+    questionType: QuestionType,
+  ): Promise<Activity | null> {
+    const Model =
+      activityModelMapper[questionType as keyof typeof activityModelMapper];
+    if (!Model) {
+      throw new Error("Unsupported question type");
+    }
+    const activity = await (Model as typeof mongoose.Model)
+      .findById(activityId)
+      .lean();
+    if (!activity || Array.isArray(activity)) {
       throw new Error("Activity not found");
     }
-    return activity;
+    return activity as unknown as Activity;
   }
 
-  static async updateActivity(activityId: string, update: Partial<Activity>) {
-    const updated = await ActivityModel.findByIdAndUpdate(activityId, update, {
-      new: true,
-      runValidators: true,
-    }).lean();
+  static async updateActivity(
+    activityId: string,
+    questionType: QuestionType,
+    update: Partial<Activity>,
+  ) {
+    const Model =
+      activityModelMapper[questionType as keyof typeof activityModelMapper];
+    if (!Model) {
+      throw new Error("Unsupported question type");
+    }
+    const updated = await (Model as typeof mongoose.Model)
+      .findByIdAndUpdate(activityId, update, {
+        new: true,
+        runValidators: true,
+      })
+      .lean();
     if (!updated) {
       throw new Error("Activity not found");
     }
