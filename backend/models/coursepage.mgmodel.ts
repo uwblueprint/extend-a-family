@@ -26,7 +26,7 @@ import { ElementSkeleton, PageType } from "../types/courseTypes";
 //   },
 // });
 
-interface CoursePageBase extends Document {
+export interface CoursePageBase extends Document {
   id: string;
   title: string;
   type: PageType;

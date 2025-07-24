@@ -1,9 +1,9 @@
 import { Document, Schema } from "mongoose";
 import { QuestionType } from "../types/activityTypes";
-import CoursePageModel, { CoursePage } from "./coursepage.mgmodel";
+import CoursePageModel, { CoursePageBase } from "./coursepage.mgmodel";
 
 // Base Activity Interface
-export interface Activity extends CoursePage {
+export interface Activity extends CoursePageBase {
   questionType: QuestionType;
   activityNumber: string;
   questionText: string;
