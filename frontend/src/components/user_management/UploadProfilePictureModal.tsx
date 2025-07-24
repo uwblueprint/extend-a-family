@@ -26,7 +26,7 @@ const UploadProfilePictureModal = ({
   open,
   setUploadModalOpen,
 }: UploadProfilePictureModalProps) => {
-  const { authenticatedUser } = useContext(AuthContext);
+  const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
   let role: "Learner" | "Facilitator" | "Administrator";
   if (authenticatedUser?.role === "Learner") {
     role = "Learner";
@@ -48,7 +48,14 @@ const UploadProfilePictureModal = ({
         "id",
       );
       if (userId) {
-        await UserAPIClient.uploadProfilePicture(userId, file);
+        const updatedUser = await UserAPIClient.uploadProfilePicture(
+          userId,
+          file,
+        );
+        setAuthenticatedUser({
+          ...authenticatedUser!,
+          profilePicture: updatedUser.profilePicture,
+        });
       } else {
         <Redirect to={HOME_PAGE} />;
       }

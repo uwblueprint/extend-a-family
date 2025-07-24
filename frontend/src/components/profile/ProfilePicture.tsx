@@ -39,18 +39,7 @@ const ProfilePicture = ({
           width: "100%",
           height: "100%",
           bgcolor: theme.palette[user.role].Hover,
-          // "&:hover": {
-          //   backgroundColor: "rgba(0, 0, 0, 0.6)",
-
-          //   "& .avatar-text": {
-          //     display: "none",
-          //   },
-
-          //   "& .camera-icon": {
-          //     display: "block",
-          //   },
-          // },
-          ":hover": {
+          "&:hover": {
             backgroundColor: "rgba(0, 0, 0, 0.6)",
 
             "& .avatar-text": {
@@ -60,9 +49,9 @@ const ProfilePicture = ({
             "& .camera-icon": {
               display: "block",
             },
-          }
+          },
         }}
-        // src={"https://firebasestorage.googleapis.com/v0/b/extendafamily-7613e.appspot.com/o/user%2FprofilePicture%2F67eb2ab6573648d85acc9dcb?alt=media&token=caf34eb7-e9a1-4da7-a7c4-702ecdc693f3"}
+        src={sourceUrl}
       >
         <Typography
           sx={{

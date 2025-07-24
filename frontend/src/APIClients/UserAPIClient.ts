@@ -94,7 +94,7 @@ const deleteUser = async (userId: string): Promise<boolean> => {
 const uploadProfilePicture = async (
   userId: string,
   file: File,
-): Promise<string> => {
+): Promise<User> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
@@ -178,7 +178,7 @@ const getCurrentUser = async (): Promise<User & { bookmarks: Bookmark[] }> => {
     });
     return data;
   } catch (error) {
-    throw new Error("Failed to get current user");
+    throw new Error(`Failed to upload profile picture. Reason: ${error}`);
   }
 };
 

@@ -125,7 +125,11 @@ const MyAccount = (): React.ReactElement => {
             </Typography>
           </Container>
 
-          <ProfilePicture size={160} setUploadModalOpen={setUploadModalOpen} sourceUrl={authenticatedUser.profilePicture} />
+          <ProfilePicture
+            size={160}
+            setUploadModalOpen={setUploadModalOpen}
+            sourceUrl={authenticatedUser.profilePicture}
+          />
 
           <Container
             sx={{
