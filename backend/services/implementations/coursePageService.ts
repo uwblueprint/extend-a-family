@@ -5,7 +5,6 @@ import MgCourseModule, {
 } from "../../models/coursemodule.mgmodel";
 import MgCoursePage from "../../models/coursepage.mgmodel";
 import {
-  CoursePageDTO,
   CoursePageDTOBase,
   CreateCoursePageDTO,
   UpdateCoursePageDTO,
@@ -51,7 +50,7 @@ class CoursePageService implements ICoursePageService {
   async getCoursePage(
     coursePageId: string,
     lean = false,
-  ): Promise<CoursePageDTO> {
+  ): Promise<CoursePageDTOBase> {
     try {
       const coursePage = lean
         ? await MgCoursePage.findById(coursePageId).lean().exec()

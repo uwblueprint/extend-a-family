@@ -1,5 +1,5 @@
 import { Document, Schema } from "mongoose";
-import { QuestionType } from "../types/activityTypes";
+import { QuestionType } from "../types/courseTypes";
 import CoursePageModel, { CoursePageBase } from "./coursepage.mgmodel";
 
 // Base Activity Interface

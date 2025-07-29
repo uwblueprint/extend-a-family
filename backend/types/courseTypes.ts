@@ -40,6 +40,24 @@ export type LessonPageDTO = CoursePageDTOBase & {
   source: string;
 };
 
+export enum QuestionType {
+  MultipleChoice = "MultipleChoice",
+  MultiSelect = "MultiSelect",
+  Matching = "Matching",
+  Table = "Table",
+  Custom = "Custom",
+}
+
+export interface ActivityPageDTO extends CoursePageDTOBase {
+  questionType: QuestionType;
+  activityNumber: string;
+  questionText: string;
+  instruction: string;
+  imageUrl?: string;
+  additionalContext?: string;
+  userFeedback?: string;
+}
+
 export type ElementSkeleton = {
   id: string;
   x: number;
@@ -49,21 +67,21 @@ export type ElementSkeleton = {
   content: string;
 };
 
-export type ActivityPageDTO = CoursePageDTOBase & {
-  type: "Activity";
-  layout: [ElementSkeleton];
-};
+// export type ActivityPageDTO = CoursePageDTOBase & {
+//   type: "Activity";
+//   layout: [ElementSkeleton];
+// };
 
 export type CoursePageDTO = LessonPageDTO | ActivityPageDTO;
 
 export type CreateCoursePageDTO =
   | Pick<CoursePageDTO, "title" | "type">
   | Pick<LessonPageDTO, "title" | "type" | "source">
-  | Pick<ActivityPageDTO, "title" | "type" | "layout">;
+  | Pick<ActivityPageDTO, "title" | "type">;
 export type UpdateCoursePageDTO =
   | Pick<CoursePageDTO, "title" | "type">
   | Pick<LessonPageDTO, "title" | "type" | "source">
-  | Pick<ActivityPageDTO, "title" | "type" | "layout">;
+  | Pick<ActivityPageDTO, "title" | "type">;
 
 export enum InteractiveElementType {
   TextInput = "TextInput",
