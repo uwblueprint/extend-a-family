@@ -119,6 +119,23 @@ export const addBookmarkValidator = async (
   return next();
 };
 
+export const completeActivityValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.unitId, "string")) {
+    return res.status(400).send(getApiValidationError("unitId", "string"));
+  }
+  if (!validatePrimitive(req.body.moduleId, "string")) {
+    return res.status(400).send(getApiValidationError("moduleId", "string"));
+  }
+  if (!validatePrimitive(req.body.pageId, "string")) {
+    return res.status(400).send(getApiValidationError("pageId", "string"));
+  }
+  return next();
+};
+
 export const deleteBookmarkValidator = async (
   req: Request,
   res: Response,
@@ -126,6 +143,9 @@ export const deleteBookmarkValidator = async (
 ) => {
   if (!validatePrimitive(req.body.pageId, "string")) {
     return res.status(400).send(getApiValidationError("pageId", "string"));
+  }
+  if (!validatePrimitive(req.body.activityId, "string")) {
+    return res.status(400).send(getApiValidationError("activityId", "string"));
   }
   return next();
 };

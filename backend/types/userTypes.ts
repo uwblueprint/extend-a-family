@@ -29,6 +29,7 @@ export type UserDTO = {
   profilePicture?: string;
   bio?: string;
   bookmarks: BookmarkDTO[];
+  nextPage?: string;
 };
 
 export type CreateUserDTO = Omit<UserDTO, "id" | "bookmarks"> & {
@@ -56,6 +57,7 @@ export function isFacilitator(user: UserDTO): user is FacilitatorDTO {
 
 export type LearnerDTO = UserDTO & {
   facilitator: string;
+  activitiesCompleted: Map<string, Map<string, string[]>>;
 };
 
 export function isLearner(user: UserDTO): user is LearnerDTO {
