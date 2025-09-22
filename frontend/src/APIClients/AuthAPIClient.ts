@@ -1,12 +1,12 @@
 import { AxiosError } from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { AuthenticatedUser, AuthError, Role, Status } from "../types/AuthTypes";
-import baseAPIClient from "./BaseAPIClient";
+import { Administrator } from "../types/UserTypes";
 import {
   getLocalStorageObjProperty,
   setLocalStorageObjProperty,
 } from "../utils/LocalStorageUtils";
-import { Administrator } from "../types/UserTypes";
+import baseAPIClient from "./BaseAPIClient";
 
 const login = async (
   email: string,
