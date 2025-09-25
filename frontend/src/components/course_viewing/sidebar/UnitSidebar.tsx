@@ -167,7 +167,7 @@ export default function UnitSidebar({
       open={open}
     >
       <Box
-        height="100%"
+        height="100vh"
         sx={{
           backgroundColor: theme.palette[user.role].Light,
           overflowX: "hidden",
