@@ -73,13 +73,10 @@ class CourseUnitService implements ICourseUnitService {
   ): Promise<CourseUnitDTO> {
     try {
       const updatedCourseUnit: CourseUnit | null =
-        await MgCourseUnit.findByIdAndUpdate(
-          id,
-          {
-            title: courseUnit.title,
-          },
-          { runValidators: true, new: true },
-        );
+        await MgCourseUnit.findByIdAndUpdate(id, courseUnit, {
+          runValidators: true,
+          new: true,
+        });
 
       if (!updatedCourseUnit) {
         throw new Error(`Course unit with id ${id} not found.`);
