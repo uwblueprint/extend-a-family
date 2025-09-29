@@ -38,6 +38,7 @@ export type CourseModule = {
   title: string;
   imageURL?: string;
   pages: [CoursePage];
+  unitId?: string;
 };
 
 export enum InteractiveElementType {

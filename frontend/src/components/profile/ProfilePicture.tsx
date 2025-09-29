@@ -1,13 +1,20 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { Box, Typography, Avatar } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { CameraAlt } from "@mui/icons-material";
 import { useUser } from "../../hooks/useUser";
 
 interface ProfilePictureProps {
   size: number;
+  setUploadModalOpen: Dispatch<SetStateAction<boolean>> | null;
+  sourceUrl?: string;
 }
 
-const ProfilePicture = ({ size }: ProfilePictureProps): React.ReactElement => {
+const ProfilePicture = ({
+  size,
+  setUploadModalOpen,
+  sourceUrl,
+}: ProfilePictureProps): React.ReactElement => {
   const theme = useTheme();
   const user = useUser();
 
@@ -21,13 +28,30 @@ const ProfilePicture = ({ size }: ProfilePictureProps): React.ReactElement => {
         alignItems: "center",
         borderRadius: "5000px",
       }}
+      onClick={() => {
+        if (setUploadModalOpen) {
+          setUploadModalOpen(true);
+        }
+      }}
     >
       <Avatar
         sx={{
           width: "100%",
           height: "100%",
           bgcolor: theme.palette[user.role].Hover,
+          "&:hover": {
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+
+            "& .avatar-text": {
+              display: "none",
+            },
+
+            "& .camera-icon": {
+              display: "block",
+            },
+          },
         }}
+        src={sourceUrl}
       >
         <Typography
           sx={{
@@ -39,6 +63,15 @@ const ProfilePicture = ({ size }: ProfilePictureProps): React.ReactElement => {
         >
           {`${user.firstName.charAt(0) || ""}${user.lastName.charAt(0) || ""}`}
         </Typography>
+        <CameraAlt
+          className="camera-icon"
+          sx={{
+            position: "absolute",
+            display: "none",
+            color: "white",
+            fontSize: 0.4 * size,
+          }}
+        />
       </Avatar>
     </Box>
   );

@@ -2,7 +2,7 @@ import { AuthErrorCodes } from "../errors/AuthErrors";
 
 export type Role = "Administrator" | "Facilitator" | "Learner";
 
-export type Status = "Active" | "Invited";
+export type Status = "Invited" | "Active" | "PendingApproval";
 
 export type BaseAuthenticatedUser = {
   id: string;
@@ -12,6 +12,7 @@ export type BaseAuthenticatedUser = {
   role: Role;
   accessToken: string;
   status: Status;
+  profilePicture?: string;
 };
 
 export type AuthError = {

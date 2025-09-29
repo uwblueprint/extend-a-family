@@ -1,31 +1,30 @@
-import { ObjectId } from "mongodb";
 import mongoose, { Document, Schema } from "mongoose";
 import mongooseLeanId from "mongoose-lean-id";
 import { ElementSkeleton, PageType } from "../types/courseTypes";
 
-const ElementSkeletonSchema: Schema = new Schema({
-  x: {
-    type: Number,
-    required: true,
-  },
-  y: {
-    type: Number,
-    required: true,
-  },
-  w: {
-    type: Number,
-    required: true,
-  },
-  h: {
-    type: Number,
-    required: true,
-  },
-  content: {
-    type: ObjectId,
-    required: true,
-    ref: "CourseElement",
-  },
-});
+// const ElementSkeletonSchema: Schema = new Schema({
+//   x: {
+//     type: Number,
+//     required: true,
+//   },
+//   y: {
+//     type: Number,
+//     required: true,
+//   },
+//   w: {
+//     type: Number,
+//     required: true,
+//   },
+//   h: {
+//     type: Number,
+//     required: true,
+//   },
+//   content: {
+//     type: ObjectId,
+//     required: true,
+//     ref: "CourseElement",
+//   },
+// });
 
 export interface CoursePage extends Document {
   id: string;
@@ -55,7 +54,7 @@ export const CoursePageSchema: Schema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ["Lesson", "Activity"],
+      enum: ["Lesson", "MultipleChoiceActivity", "MultiSelectActivity"],
     },
   },
   baseOptions,
@@ -72,12 +71,12 @@ const LessonPageSchema: Schema = new Schema({
   },
 });
 
-const ActivityPageSchema: Schema = new Schema({
-  layout: {
-    type: [ElementSkeletonSchema],
-    required: true,
-  },
-});
+// const ActivityPageSchema: Schema = new Schema({
+//   layout: {
+//     type: [ElementSkeletonSchema],
+//     required: true,
+//   },
+// });
 
 /* eslint-disable no-param-reassign */
 CoursePageSchema.set("toObject", {
@@ -100,10 +99,6 @@ const LessonPageModel = CoursePageModel.discriminator(
   "Lesson",
   LessonPageSchema,
 );
-const ActivityPageModel = CoursePageModel.discriminator(
-  "Activity",
-  ActivityPageSchema,
-);
 
-export { ActivityPageModel, LessonPageModel };
+export { LessonPageModel };
 export default CoursePageModel;

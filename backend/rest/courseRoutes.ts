@@ -19,7 +19,7 @@ import { getErrorMessage } from "../utilities/errorUtils";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const courseRouter: Router = Router();
+const courseRouter: Router = Router({ mergeParams: true });
 const courseUnitService: CourseUnitService = new CourseUnitService();
 const courseModuleService: CourseModuleService = new CourseModuleService();
 const coursePageService: CoursePageService = new CoursePageService();
@@ -306,6 +306,42 @@ courseRouter.delete(
         req.params.pageId,
       );
       res.status(200).json({ id: deletedCoursePageId });
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.patch(
+  "/:unitId/:moduleId/publish",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  moduleBelongsToUnitValidator,
+  async (req, res) => {
+    const { unitId, moduleId } = req.params;
+    try {
+      const updated = await courseModuleService.publishCourseModule(
+        unitId,
+        moduleId,
+      );
+      res.json(updated);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.patch(
+  "/:unitId/:moduleId/unpublish",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  moduleBelongsToUnitValidator,
+  async (req, res) => {
+    const { unitId, moduleId } = req.params;
+    try {
+      const updated = await courseModuleService.unpublishCourseModule(
+        unitId,
+        moduleId,
+      );
+      res.json(updated);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
     }

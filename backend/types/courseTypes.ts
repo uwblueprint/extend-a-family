@@ -8,6 +8,12 @@ export type CourseUnitDTO = {
 export type CreateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 export type UpdateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 
+export enum ModuleStatus {
+  Draft = "draft",
+  Published = "published",
+  Unpublished = "unpublished",
+}
+
 export type CourseModuleDTO = {
   id: string;
   displayIndex: number;
@@ -15,6 +21,8 @@ export type CourseModuleDTO = {
   imageURL?: string;
   pages: CoursePageDTO[];
   lessonPdfUrl?: string;
+  unitId?: string;
+  status: ModuleStatus;
 };
 
 export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;

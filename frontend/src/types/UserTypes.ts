@@ -1,6 +1,6 @@
 import { Role } from "./AuthTypes";
 
-export type Status = "Invited" | "Active";
+export type Status = "Invited" | "Active" | "PendingApproval";
 
 export type BaseUser = {
   id: string;
@@ -9,6 +9,7 @@ export type BaseUser = {
   email: string;
   role: Role;
   status: Status;
+  profilePicture?: string;
 };
 
 export type Bookmark = {
