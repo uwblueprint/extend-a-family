@@ -1,7 +1,15 @@
-import React from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Box,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { CourseModule } from "../../types/CourseTypes";
-import BookmarkItem from "./BookmarkItem";
+import ModuleBookmarksGrid from "./ModuleBookmarksGrid";
 
 interface ModuleSectionProps {
   module: CourseModule;
@@ -17,30 +25,73 @@ interface ModuleSectionProps {
 
 const ModuleSection: React.FC<ModuleSectionProps> = ({ module, bookmarks }) => {
   const theme = useTheme();
+  const [expanded, setExpanded] = useState(false);
+
+  // Count slides and activities 
+  const slideCount = bookmarks.filter((b) => b.type === "Lesson").length;
+  const activityCount = bookmarks.filter((b) => b.type !== "Lesson").length;
+
+  // Handle pluralization
+  const slideLabel = slideCount === 1 ? "slide" : "slides";
+  const activityLabel = activityCount === 1 ? "activity" : "activities";
 
   return (
-    <Box sx={{ marginLeft: "40px", marginBottom: "60px" }}>
-      {/* Module Header */}
-      <Typography
-        variant="titleMedium"
+    <Accordion
+      disableGutters
+      expanded={expanded}
+      onChange={(_, isExpanded) => setExpanded(isExpanded)}
+      sx={{
+        border: "1px solid var(--Neutral-300, #D1D2D4)",
+        borderRadius: "8px",
+        boxShadow: "none",
+      }}
+    >
+      {/* Header */}
+      <AccordionSummary
+        expandIcon={
+          <ArrowDropDownIcon
+            sx={{
+              width: "43.192px",
+              height: "37.831px",
+              color: "#000000",
+            }}
+          />
+        }
         sx={{
-          marginBottom: "32px",
-          color: theme.palette.Neutral[600],
-          fontWeight: 600,
-          paddingLeft: "12px",
-          borderLeft: `4px solid ${theme.palette.Neutral[400]}`,
+          width: "100%",
+          backgroundColor: expanded ? "var(--Surface-Hover, #F5F5F5)" : "transparent",
+          padding: "30px 32px",
+          display: "flex",
+          alignItems: "center",
         }}
       >
-        Module {module.displayIndex}: {module.title}
-      </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            gap: "10px",
+            flex: "1 0 0",
+          }}
+        >
+          <Typography sx={{ ...theme.typography.titleLarge }}>
+            Module {module.displayIndex}: {module.title}
+          </Typography>
+          <Typography sx={{ ...theme.typography.labelLarge }}>
+            {activityCount} bookmarked {activityLabel}, {slideCount} bookmarked {slideLabel}
+          </Typography>
+        </Box>
+      </AccordionSummary>
 
-      {/* Bookmarks List */}
-      <Box sx={{ marginLeft: "40px" }}>
-        {bookmarks.map((bookmark) => (
-          <BookmarkItem key={bookmark.id} bookmark={bookmark} />
-        ))}
-      </Box>
-    </Box>
+      {/* Content */}
+      <AccordionDetails
+        sx={{
+          padding: "32px 32px 42px 32px",
+        }}
+      >
+        <ModuleBookmarksGrid bookmarks={bookmarks} />
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
