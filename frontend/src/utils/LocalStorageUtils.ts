@@ -29,9 +29,9 @@ export const getLocalStorageObjProperty = <O extends Record<string, P>, P>(
 export const setLocalStorageObjProperty = <O extends Record<string, string>>(
   localStorageKey: string,
   property: string,
-  value: string,
+  value: string | number | undefined,
 ): void => {
-  const object: Record<string, string> | null =
+  const object: Record<string, string | number | undefined> | null =
     getLocalStorageObj<O>(localStorageKey);
 
   if (!object) return;

@@ -24,6 +24,7 @@ export type AuthenticatedAdministrator = BaseAuthenticatedUser;
 export type AuthenticatedFacilitator = BaseAuthenticatedUser & {
   learners: string[];
   bio?: string;
+  emailPrefrence: number;
 };
 export type AuthenticatedLearner = BaseAuthenticatedUser & {
   facilitator: string;

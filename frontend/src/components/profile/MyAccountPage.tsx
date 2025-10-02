@@ -12,6 +12,7 @@ import authAPIClient from "../../APIClients/AuthAPIClient";
 import { isAuthenticatedFacilitator } from "../../types/AuthTypes";
 import { isFacilitator } from "../../types/UserTypes";
 import UploadProfilePictureModal from "../user_management/UploadProfilePictureModal";
+import EmailPrefrencesButton from "./EmailPrefrencesButtons";
 
 const MyAccount = (): React.ReactElement => {
   const theme = useTheme();
@@ -19,8 +20,14 @@ const MyAccount = (): React.ReactElement => {
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
     useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-
   const { setAuthenticatedUser, authenticatedUser } = useContext(AuthContext);
+  const [localEmailPrefrence, setLocalEmailPrefrence] = useState<number>(
+    authenticatedUser &&
+      isAuthenticatedFacilitator(authenticatedUser) &&
+      authenticatedUser.emailPrefrence
+      ? authenticatedUser.emailPrefrence
+      : 1,
+  );
 
   if (!authenticatedUser) {
     return <Typography>Please log in to view your account.</Typography>;
@@ -29,7 +36,8 @@ const MyAccount = (): React.ReactElement => {
   const handleSaveDetails = async (
     firstName: string,
     lastName: string,
-    bio?: string,
+    bio?: string | undefined,
+    emailPrefrence?: number | undefined,
   ) => {
     try {
       if (!authenticatedUser || !authenticatedUser.id) {
@@ -42,6 +50,7 @@ const MyAccount = (): React.ReactElement => {
         authenticatedUser.role,
         authenticatedUser.status,
         bio,
+        emailPrefrence,
       );
 
       setAuthenticatedUser({
@@ -49,6 +58,7 @@ const MyAccount = (): React.ReactElement => {
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         bio: isFacilitator(updatedUser) ? updatedUser.bio : undefined,
+        emailPrefrence,
       });
 
       setIsEditModalOpen(false);
@@ -75,6 +85,21 @@ const MyAccount = (): React.ReactElement => {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Error updating password:", error);
+    }
+  };
+
+  const handleEmailPrefrenceClick = async (emailPrefrence: number) => {
+    setLocalEmailPrefrence(emailPrefrence);
+    if (
+      isAuthenticatedFacilitator(authenticatedUser) &&
+      authenticatedUser.emailPrefrence !== emailPrefrence
+    ) {
+      await handleSaveDetails(
+        authenticatedUser.firstName,
+        authenticatedUser.lastName,
+        authenticatedUser.bio,
+        emailPrefrence,
+      );
     }
   };
 
@@ -231,6 +256,36 @@ const MyAccount = (): React.ReactElement => {
               )}
             </Container>
           )}
+          {isAuthenticatedFacilitator(authenticatedUser) && (
+            <Container
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "16px",
+              }}
+            >
+              <Typography variant="headlineSmall">Email Me...</Typography>
+              <EmailPrefrencesButton
+                setPrefrence={handleEmailPrefrenceClick}
+                selectedId={localEmailPrefrence}
+                buttonId={5}
+                text="Once I have 5 unread notifications"
+              />
+              <EmailPrefrencesButton
+                setPrefrence={handleEmailPrefrenceClick}
+                selectedId={localEmailPrefrence}
+                buttonId={1}
+                text="For all notiifcations"
+              />
+              <EmailPrefrencesButton
+                setPrefrence={handleEmailPrefrenceClick}
+                selectedId={localEmailPrefrence}
+                buttonId={-1}
+                text="Never"
+              />
+            </Container>
+          )}
           <Container>
             <Container
               disableGutters
@@ -336,6 +391,11 @@ const MyAccount = (): React.ReactElement => {
         bio={
           isAuthenticatedFacilitator(authenticatedUser)
             ? authenticatedUser.bio
+            : undefined
+        }
+        emailPrefrence={
+          isAuthenticatedFacilitator(authenticatedUser)
+            ? authenticatedUser.emailPrefrence
             : undefined
         }
         onSave={handleSaveDetails}
