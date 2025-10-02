@@ -18,8 +18,14 @@ interface EditDetailsModalProps {
   onClose: () => void;
   firstName: string;
   lastName: string;
-  bio?: string;
-  onSave: (firstName: string, lastName: string, bio?: string) => void;
+  bio?: string | undefined;
+  emailPrefrence?: number | undefined;
+  onSave: (
+    firstName: string,
+    lastName: string,
+    bio?: string,
+    emailPrefrence?: number,
+  ) => void;
 }
 
 const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
@@ -28,12 +34,13 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
   firstName,
   lastName,
   bio,
+  emailPrefrence,
   onSave,
 }) => {
   const theme = useTheme();
   const [editedFirstName, setEditedFirstName] = useState(firstName);
   const [editedLastName, setEditedLastName] = useState(lastName);
-  const [editedBio, setEditedBio] = useState(bio);
+  const [editedBio, setEditedBio] = useState<string>(bio || "");
   const user = useUser();
 
   // Reset form when modal opens
@@ -41,7 +48,7 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
     if (open) {
       setEditedFirstName(firstName);
       setEditedLastName(lastName);
-      setEditedBio(bio);
+      setEditedBio(bio || "");
     }
   }, [open, firstName, lastName, bio]);
 
@@ -49,7 +56,7 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
     if (!editedFirstName.trim() || !editedLastName.trim()) {
       return;
     }
-    onSave(editedFirstName, editedLastName, editedBio);
+    onSave(editedFirstName, editedLastName, editedBio, emailPrefrence);
   };
 
   return (
