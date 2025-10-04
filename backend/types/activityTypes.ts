@@ -18,6 +18,19 @@ export interface ActivityDTO extends CoursePageDTO {
   userFeedback?: string;
 }
 
+export interface Media {
+  id: string
+  mediaType: "text" | "media"
+  context: string
+}
+
+export interface MatchingActivityDTO extends ActivityDTO {
+  questionType: QuestionType.Matching;
+  media: Map<1 | 2 | 3, Media[]>;
+  answers: Set<string>[];
+  rows: number; 
+}
+
 export interface MultipleChoiceActivityDTO extends ActivityDTO {
   questionType: QuestionType.MultipleChoice;
   options: string[];
@@ -28,6 +41,14 @@ export interface MultiSelectActivityDTO extends ActivityDTO {
   questionType: QuestionType.MultiSelect;
   options: string[];
   correctAnswers: number[];
+}
+
+export interface TableActivityDTO extends ActivityDTO {
+  questionType: QuestionType.Table;
+  columnLabels: string[];
+  rowLabels: string[];
+  rowImageUrls: string[];
+  correctAnswers: number[][];
 }
 
 // Future question types would have their own specific fields
@@ -68,6 +89,27 @@ export type CreateActivityDTO =
       | "imageUrl"
       | "additionalContext"
       | "userFeedback"
+    >
+  | Pick<
+      MatchingActivityDTO,
+      | "questionType"
+      | "activityNumber"
+      | "questionText"
+      | "instruction"
+      | "media"
+      | "answers"
+      | "rows"
+    >
+  | Pick<
+      TableActivityDTO,
+      | "questionType"
+      | "activityNumber"
+      | "questionText"
+      | "instruction"
+      | "columnLabels"
+      | "rowLabels"
+      | "rowImageUrls"
+      | "correctAnswers"
     >;
 
 export type UpdateActivityDTO = CreateActivityDTO;

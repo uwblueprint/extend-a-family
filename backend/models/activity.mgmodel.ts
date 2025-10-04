@@ -25,6 +25,27 @@ export interface MultiSelectActivity extends Activity {
   correctAnswers: number[];
 }
 
+export interface Media {
+  id: string
+  mediaType: "text" | "media"
+  context: string
+}
+
+export interface MatchingActivity extends Activity {
+  questionType: QuestionType.Matching;
+  media: Map<1 | 2 | 3, Media[]>;
+  answers: Set<string>[];
+  rows: number; 
+}
+
+export interface TableActivity extends Activity {
+  questionType: QuestionType.Table;
+  columnLabels: string[];
+  rowLabels: string[];
+  rowImageUrls: string[];
+  correctAnswers: number[][]; // [row, col]
+}
+
 export const ActivitySchema: Schema = new Schema({
   questionType: {
     type: String,
@@ -74,6 +95,49 @@ ActivitySchema.set("toObject", {
 });
 
 // Create combined schemas for each specific activity type
+
+const MediaSchema = new Schema({
+  id: { type: String, required: true },
+  mediaType: { type: String, enum: ["text", "media"], required: true },
+  context: { type: String, required: true },
+});
+
+const MatchingActivitySchema = new Schema({
+  ...ActivitySchema.obj,
+  media: {
+    type: Map,
+    of: [MediaSchema], 
+    required: true,
+    validate: {
+      validator: (mediaMap: Map<string, any[]>) => {
+        const keys = Array.from(mediaMap.keys());
+        return keys.every((k) => ["1", "2", "3"].includes(k));
+      },
+      message: "Media map keys must be 1, 2, or 3",
+    },
+  },
+  answers: {
+    type: [[String]],
+    required: true,
+    set: (val: string[][]) =>
+      val.map((arr) => Array.from(new Set(arr))), // ensures uniqueness
+    validate: {
+      validator: (value: string[][]) => value.every((arr) => arr.length === 3 || arr.length === 2),
+      message: "Each answer set must have exactly 3 unique elements",
+    },
+  },
+  rows: {
+    type: Number,
+    required: true,
+    validate: {
+      validator: (value: number) => {
+        return value >= 2 && value <= 6;
+      },
+      message: "Must have between 2 and 6 rows",
+    }
+  }
+})
+
 const MultipleChoiceActivitySchema = new Schema({
   ...ActivitySchema.obj, // inherit base fields from ActivitySchema
   options: {
@@ -127,27 +191,37 @@ const MultiSelectActivitySchema = new Schema({
   },
 });
 
-MultipleChoiceActivitySchema.set("toObject", {
-  virtuals: true,
-  versionKey: false,
-  transform: (_doc: Document, ret: Record<string, unknown>) => {
-    // eslint-disable-next-line no-underscore-dangle
-    delete ret._id;
-    delete ret.createdAt;
-    delete ret.updatedAt;
+const TableActivitySchema = new Schema({
+  ...ActivitySchema.obj,
+  columnLabels: {
+    type: [String],
+    required: true,
   },
+  rowLabels: {
+    type: [String],
+    required: true,
+  },
+  rowImageUrls: {
+    type: [String],
+    required: false,
+  },
+  correctAnswers: {
+    type: [[Number]],
+    required: true,
+    validate: {
+      validator: (value: number[][]) =>
+        value.every((pair) => pair.length === 2),
+      message: "Each coordinate must be a pair of numbers [row, col]",
+    },
+  }
 });
 
-MultiSelectActivitySchema.set("toObject", {
-  virtuals: true,
-  versionKey: false,
-  transform: (_doc: Document, ret: Record<string, unknown>) => {
-    // eslint-disable-next-line no-underscore-dangle
-    delete ret._id;
-    delete ret.createdAt;
-    delete ret.updatedAt;
-  },
-});
+
+const MatchingActivityModel =
+  CoursePageModel.discriminator<MatchingActivity>(
+    QuestionType.Matching,
+    MatchingActivitySchema,
+  );
 
 const MultipleChoiceActivityModel =
   CoursePageModel.discriminator<MultipleChoiceActivity>(
@@ -161,4 +235,10 @@ const MultiSelectActivityModel =
     MultiSelectActivitySchema,
   );
 
-export { MultipleChoiceActivityModel, MultiSelectActivityModel };
+const TableActivityModel =
+  CoursePageModel.discriminator<TableActivity>(
+    QuestionType.Table,
+    TableActivitySchema,
+  );
+
+export { MatchingActivityModel, MultipleChoiceActivityModel, MultiSelectActivityModel, TableActivityModel };
