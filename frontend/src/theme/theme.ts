@@ -1,67 +1,105 @@
+import "@fontsource/lexend-deca";
 import {
   createTheme,
   PaletteOptions,
   TypographyOptions,
 } from "@mui/material/styles";
-import "@fontsource/lexend-deca";
 
 const palette: PaletteOptions = {
   Learner: {
-    Light: "#F5FDFF",
-    Hover: "#CCF5FF",
-    Default: "#006877",
-    Pressed: "#00363F",
-  },
-  NewLearnerLight: {
-    Default: "#F5FDFF",
-    Selected: "#CCF5FF",
-    Pressed: "#D8EAEF",
-    Hover: "#E5F5F9",
-  },
-  NewLearnerDark: {
-    Default: "#006877",
-    Selected: "#00515C",
-    Pressed: "#3F5053",
-    Hover: "#416166",
+    Light: {
+      Default: "#E8FCFF",
+      Hover: "#CCF8FF",
+      Selected: "#AFF0FA",
+      Pressed: "#90E3F0",
+    },
+    Dark: {
+      Default: "#006C7D",
+      Hover: "#004D59",
+      Selected: "#003942",
+      Pressed: "#002E36",
+    },
   },
   Administrator: {
-    Light: "#FFF8F6",
-    Hover: "#FFD9CC",
-    Default: "#8F4C34",
-    Pressed: "#5C1900",
+    Light: {
+      Default: "#FFE6DD",
+      Hover: "#FCC4B1",
+      Selected: "#FFD9CC",
+      Pressed: "#000000",
+    },
+    Dark: {
+      Default: "#8F4C34",
+      Hover: "#663625",
+      Selected: "#4D281C",
+      Pressed: "#3C2016",
+    },
   },
   Facilitator: {
-    Light: "#F9F5FF",
-    Hover: "#D6D6FF",
-    Default: "#555A92",
-    Pressed: "#1F257A",
-  },
-  Error: {
-    Light: "#FFF2F0",
-    Hover: "#FFD1CC",
-    Default: "#BA1A1A",
-    Pressed: "#690005",
-  },
-  Success: {
-    Light: "#FDFFF0",
-    Hover: "#FAFFCC",
-    Default: "#687021",
-    Pressed: "#444B04",
-  },
-  Warning: {
-    Light: "#FFFBEF",
-    Hover: "#FFF2CC",
-    Default: "#775900",
-    Pressed: "#3F2F00",
+    Light: {
+      Default: "#F2F3FF",
+      Hover: "#E5E7FF",
+      Selected: "#D9DBFF",
+      Pressed: "#CACDFC",
+    },
+    Dark: {
+      Default: "#4F549E",
+      Hover: "#32377D",
+      Selected: "#1F2469",
+      Pressed: "#191D54",
+    },
   },
   Neutral: {
     100: "#FFFFFF",
-    200: "#F8FAFA",
-    300: "#E4E5E5",
-    400: "#CACCCC",
-    500: "#6F797B",
-    600: "#404B4D",
-    700: "#111111",
+    200: "#F2F2F2",
+    300: "#D1D2D4",
+    400: "#B2B3B5",
+    500: "#919295",
+    600: "#7A7C7F",
+    700: "#555759",
+    800: "#4A4C4D",
+    900: "#111111",
+  },
+  Success: {
+    Light: {
+      Default: "#FAFFEF",
+      Hover: "#EAFAC8",
+      Selected: "#E0F7AD",
+      Pressed: "#D4F291",
+    },
+    Dark: {
+      Default: "#486902",
+      Hover: "#385200",
+      Selected: "#2A3D00",
+      Pressed: "#213000",
+    },
+  },
+  Error: {
+    Light: {
+      Default: "#FFEFEF",
+      Hover: "#FFE0E0",
+      Selected: "#FFD4D4",
+      Pressed: "#FFBDBD",
+    },
+    Dark: {
+      Default: "#AD2323",
+      Hover: "#801313",
+      Selected: "#610A0A",
+      Pressed: "#540000",
+    },
+  },
+  Warning: {
+    Light: {
+      Default: "#FFF5E0",
+      Hover: "#FFEABF",
+      Selected: "#FFDD99",
+      Pressed: "#FFCC66",
+    },
+    Dark: {
+      Default: "#693902",
+      Hover: "#522C00",
+      Selected: "#3D2100",
+      Pressed: "#301A00",
+    },
   },
 };
 

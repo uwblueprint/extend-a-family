@@ -1,15 +1,15 @@
-import React from "react";
-import {
-  Dialog,
-  Container,
-  Typography,
-  Button,
-  IconButton,
-  useTheme,
-  Box,
-} from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import {
+  Box,
+  Button,
+  Container,
+  Dialog,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import React from "react";
 
 interface CreatePasswordHelpConfirmationModalProps {
   open: boolean;
@@ -155,9 +155,9 @@ const CreatePasswordHelpConfirmationModal: React.FC<
             lineHeight: theme.typography.labelLarge.lineHeight,
             letterSpacing: theme.typography.labelLarge.letterSpacing,
             color: theme.palette.Neutral[100],
-            backgroundColor: theme.palette.Learner.Default,
+            backgroundColor: theme.palette.Learner.Dark.Default,
             "&:hover": {
-              background: theme.palette.Learner.Pressed,
+              background: theme.palette.Learner.Dark.Pressed,
             },
           }}
         >

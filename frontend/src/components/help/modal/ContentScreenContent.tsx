@@ -1,6 +1,6 @@
-import React from "react";
-import { Typography, Box, TextField, Button } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { Theme } from "@mui/material/styles";
+import React from "react";
 
 interface ContentScreenContentProps {
   handleBackToHome: () => void;
@@ -80,7 +80,7 @@ const ContentScreenContent: React.FC<ContentScreenContentProps> = ({
               borderColor: theme.palette.Neutral[500],
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: theme.palette.Learner.Default,
+              borderColor: theme.palette.Learner.Dark.Default,
               borderWidth: "2px",
             },
           },
@@ -110,7 +110,7 @@ const ContentScreenContent: React.FC<ContentScreenContentProps> = ({
           variant="labelMedium"
           onClick={handleBackToHome}
           sx={{
-            color: theme.palette.Learner.Default,
+            color: theme.palette.Learner.Dark.Default,
             cursor: "pointer",
             "&:hover": {
               opacity: 0.8,
@@ -131,12 +131,12 @@ const ContentScreenContent: React.FC<ContentScreenContentProps> = ({
             alignItems: "center",
             gap: "8px",
             borderRadius: "4px",
-            background: theme.palette.Learner.Default,
+            background: theme.palette.Learner.Dark.Default,
             padding: "10px 24px",
             minWidth: "auto",
             width: "auto",
             "&:hover": {
-              background: theme.palette.Learner.Pressed,
+              background: theme.palette.Learner.Dark.Pressed,
             },
             "&:disabled": {
               background: theme.palette.Neutral[400],

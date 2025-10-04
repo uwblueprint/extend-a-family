@@ -1,16 +1,16 @@
-import React from "react";
+import CloseIcon from "@mui/icons-material/Close";
 import {
+  Box,
+  Button,
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogContentText,
-  Box,
-  Typography,
-  Button,
+  DialogTitle,
   IconButton,
+  Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
+import React from "react";
 
 interface DeleteUserModalProps {
   open: boolean;
@@ -89,14 +89,14 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             display: "flex",
             height: "40px",
             gap: "8px",
-            "&:hover": { bgcolor: theme.palette.Administrator.Hover },
+            "&:hover": { bgcolor: theme.palette.Administrator.Light.Hover },
             borderColor: theme.palette.Neutral[500],
           }}
           onClick={onClose}
         >
           <Typography
             variant="labelLarge"
-            color={theme.palette.Administrator.Default}
+            color={theme.palette.Administrator.Dark.Default}
           >
             GO BACK
           </Typography>
@@ -107,8 +107,8 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             display: "flex",
             height: "40px",
             gap: "8px",
-            backgroundColor: theme.palette.Error.Default,
-            "&:hover": { bgcolor: theme.palette.Error.Default },
+            backgroundColor: theme.palette.Error.Dark.Default,
+            "&:hover": { bgcolor: theme.palette.Error.Dark.Default },
           }}
           onClick={() =>
             handleDeleteUser(deleteUserId, deleteFirstName, deleteLastName)

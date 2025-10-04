@@ -1,6 +1,6 @@
+import { Box, Container, Link, Typography, useTheme } from "@mui/material";
 import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
-import { Box, Container, Link, Typography, useTheme } from "@mui/material";
 import { LANDING_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { Role } from "../../types/AuthTypes";
@@ -44,7 +44,7 @@ const Login: React.FC<LoginProps> = ({
         <Box>
           <Typography
             variant="headlineMedium"
-            sx={{ color: theme.palette.Administrator.Pressed }}
+            sx={{ color: theme.palette.Administrator.Dark.Pressed }}
           >
             {title}
           </Typography>
@@ -52,7 +52,7 @@ const Login: React.FC<LoginProps> = ({
         <Box marginTop="12px">
           <Typography
             variant="bodyMedium"
-            sx={{ color: theme.palette.Administrator.Pressed }}
+            sx={{ color: theme.palette.Administrator.Dark.Pressed }}
           >
             {description}
           </Typography>
@@ -93,7 +93,7 @@ const Login: React.FC<LoginProps> = ({
                     <Typography
                       variant="labelSmall"
                       style={{
-                        color: theme.palette[userRole].Default,
+                        color: theme.palette[userRole].Dark.Default,
                         textTransform: "uppercase",
                       }}
                     >
@@ -107,7 +107,7 @@ const Login: React.FC<LoginProps> = ({
                   <Typography
                     variant="labelSmall"
                     style={{
-                      color: theme.palette[userRole].Default,
+                      color: theme.palette[userRole].Dark.Default,
                     }}
                     onClick={() => setShowDrawerLogin(false)}
                     sx={{ cursor: "pointer" }}

@@ -1,17 +1,17 @@
-import React, { useState, useContext } from "react";
-import { Container, Typography, Button, useTheme } from "@mui/material";
-import PasswordIcon from "@mui/icons-material/Password";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import MainPageButton from "../common/MainPageButton";
-import ProfilePicture from "./ProfilePicture";
-import EditDetailsModal from "./EditDetailsModal";
-import ChangePasswordModal from "./ChangePasswordModal";
-import AuthContext from "../../contexts/AuthContext";
-import userAPIClient from "../../APIClients/UserAPIClient";
+import PasswordIcon from "@mui/icons-material/Password";
+import { Button, Container, Typography, useTheme } from "@mui/material";
+import React, { useContext, useState } from "react";
 import authAPIClient from "../../APIClients/AuthAPIClient";
+import userAPIClient from "../../APIClients/UserAPIClient";
+import AuthContext from "../../contexts/AuthContext";
 import { isAuthenticatedFacilitator } from "../../types/AuthTypes";
 import { isFacilitator } from "../../types/UserTypes";
+import MainPageButton from "../common/MainPageButton";
 import UploadProfilePictureModal from "../user_management/UploadProfilePictureModal";
+import ChangePasswordModal from "./ChangePasswordModal";
+import EditDetailsModal from "./EditDetailsModal";
+import ProfilePicture from "./ProfilePicture";
 
 const MyAccount = (): React.ReactElement => {
   const theme = useTheme();
@@ -254,9 +254,10 @@ const MyAccount = (): React.ReactElement => {
                   alignSelf: "stretch",
                   borderRadius: "4px",
                   backgroundColor:
-                    theme.palette[authenticatedUser.role].Default,
+                    theme.palette[authenticatedUser.role].Dark.Default,
                   "&:hover": {
-                    background: theme.palette[authenticatedUser.role].Pressed,
+                    background:
+                      theme.palette[authenticatedUser.role].Dark.Pressed,
                   },
                   padding: "10px 24px 10px 16px",
                   flex: "1 0 0",
@@ -295,9 +296,9 @@ const MyAccount = (): React.ReactElement => {
                   gap: "8px",
                   alignSelf: "stretch",
                   borderRadius: "4px",
-                  backgroundColor: theme.palette.Error.Light,
+                  backgroundColor: theme.palette.Error.Light.Default,
                   "&:hover": {
-                    background: theme.palette.Error.Hover,
+                    background: theme.palette.Error.Light.Hover,
                   },
                   padding: "10px 24px 10px 16px",
                   flex: "1 0 0",
@@ -314,10 +315,12 @@ const MyAccount = (): React.ReactElement => {
                     alignSelf: "stretch",
                   }}
                 >
-                  <PasswordIcon sx={{ color: theme.palette.Error.Default }} />
+                  <PasswordIcon
+                    sx={{ color: theme.palette.Error.Dark.Default }}
+                  />
                   <Typography
                     variant="labelLarge"
-                    sx={{ color: theme.palette.Error.Default }}
+                    sx={{ color: theme.palette.Error.Dark.Default }}
                   >
                     Change Password
                   </Typography>

@@ -1,14 +1,14 @@
-import React from "react";
-import {
-  Dialog,
-  Typography,
-  Box,
-  IconButton,
-  useTheme,
-  Button,
-} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { NeedHelpModalProps, ModalHandlers } from "./types";
+import {
+  Box,
+  Button,
+  Dialog,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import React from "react";
+import { ModalHandlers, NeedHelpModalProps } from "./types";
 
 interface ConfirmationScreenProps extends NeedHelpModalProps {
   handlers: ModalHandlers;
@@ -139,7 +139,7 @@ const ConfirmationScreen: React.FC<ConfirmationScreenProps> = ({
             handlers.handleBackToHome();
           }}
           sx={{
-            color: theme.palette.Learner.Default,
+            color: theme.palette.Learner.Dark.Default,
             textAlign: "center",
             cursor: "pointer",
             "&:hover": {
@@ -163,12 +163,12 @@ const ConfirmationScreen: React.FC<ConfirmationScreenProps> = ({
             alignItems: "center",
             gap: "8px",
             borderRadius: "4px",
-            background: theme.palette.Learner.Default,
+            background: theme.palette.Learner.Dark.Default,
             padding: "10px 24px",
             minWidth: "auto",
             width: "auto",
             "&:hover": {
-              background: theme.palette.Learner.Pressed,
+              background: theme.palette.Learner.Dark.Pressed,
             },
           }}
         >
