@@ -15,11 +15,9 @@ import EmailService from "../../services/implementations/emailService";
 import UserService from "../../services/implementations/userService";
 import nodemailerConfig from "../../nodemailer.config";
 
-
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
-
 
 export const uploadProfilePictureValidator = async (
   req: Request,
@@ -98,10 +96,10 @@ export const updateUserAccountValidator = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const accessToken = getAccessToken(req)
-  const userId = await authService.getUserIdFromAccessToken(accessToken || "")
-  const authId = await userService.getAuthIdById(userId.toString())
-  const role: string = await userService.getUserRoleByAuthId(authId)
+  const accessToken = getAccessToken(req);
+  const userId = await authService.getUserIdFromAccessToken(accessToken || "");
+  const authId = await userService.getAuthIdById(userId.toString());
+  const role: string = await userService.getUserRoleByAuthId(authId);
   if (!validatePrimitive(req.body.firstName, "string")) {
     return res.status(400).send(getApiValidationError("firstName", "string"));
   }
@@ -109,7 +107,7 @@ export const updateUserAccountValidator = async (
     return res.status(400).send(getApiValidationError("lastName", "string"));
   }
   if (req.body.bio) {
-    if (role != "Facilitator") {
+    if (role !== "Facilitator") {
       // remove bio field from non-facilitator
       req.body.bio = undefined;
     } else if (!validatePrimitive(req.body.bio, "string")) {
@@ -118,7 +116,7 @@ export const updateUserAccountValidator = async (
     }
   }
   if (req.body.emailPrefrence) {
-    if (role != "Facilitator") {
+    if (role !== "Facilitator") {
       // remove bio field from non-facilitator
       req.body.emailPrefrence = undefined;
     } else if (!validatePrimitive(req.body.emailPrefrence, "integer")) {
