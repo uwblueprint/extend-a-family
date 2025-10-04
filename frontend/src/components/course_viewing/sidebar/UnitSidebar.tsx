@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import AddIcon from "@mui/icons-material/Add";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Box,
   Button,
@@ -11,16 +13,14 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import AddIcon from "@mui/icons-material/Add";
-import { CourseUnit, UnitSidebarModalType } from "../../../types/CourseTypes";
+import React, { useEffect, useState } from "react";
+import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import { useUser } from "../../../hooks/useUser";
+import { CourseUnit, UnitSidebarModalType } from "../../../types/CourseTypes";
 import { isAdministrator } from "../../../types/UserTypes";
 import CreateUnitModal from "../modals/CreateUnitModal";
-import EditUnitModal from "../modals/EditUnitModal";
 import DeleteUnitModal from "../modals/DeleteUnitModal";
-import CourseAPIClient from "../../../APIClients/CourseAPIClient";
+import EditUnitModal from "../modals/EditUnitModal";
 import ContextMenu from "./ContextMenu";
 
 interface UnitSideBarProps {
@@ -169,7 +169,7 @@ export default function UnitSidebar({
       <Box
         height="100vh"
         sx={{
-          backgroundColor: theme.palette[user.role].Light,
+          backgroundColor: theme.palette[user.role].Light.Default,
           overflowX: "hidden",
         }}
       >
@@ -224,10 +224,10 @@ export default function UnitSidebar({
                     px: "32px",
                     backgroundColor:
                       selectedIndex === index
-                        ? theme.palette[user.role].Hover
+                        ? theme.palette[user.role].Dark.Hover
                         : "transparent",
                     "&:hover": {
-                      backgroundColor: theme.palette[user.role].Hover,
+                      backgroundColor: theme.palette[user.role].Dark.Hover,
                     },
                   }}
                   onClick={(event) => handleListItemClick(event, index)}
@@ -268,7 +268,7 @@ export default function UnitSidebar({
               width: "100%",
               height: "40px",
               maxWidth: "236px",
-              backgroundColor: theme.palette[user.role].Default,
+              backgroundColor: theme.palette[user.role].Dark.Default,
               alignItems: "center",
               marginTop: "24px",
               marginBottom: "24px",

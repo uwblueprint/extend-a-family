@@ -1,19 +1,19 @@
-import React, { useState, useContext } from "react";
+import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import {
-  Container,
-  TextField,
   Button,
-  Typography,
+  Container,
   InputAdornment,
+  TextField,
+  Typography,
   useTheme,
 } from "@mui/material";
-import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
-import { useHistory, Redirect } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Redirect, useHistory } from "react-router-dom";
 
-import AuthContext from "../../../contexts/AuthContext";
-import ForgotPasswordConfirmation from "./ForgotPasswordConfirmation";
 import authAPIClient from "../../../APIClients/AuthAPIClient";
 import { LANDING_PAGE, WELCOME_PAGE } from "../../../constants/Routes";
+import AuthContext from "../../../contexts/AuthContext";
+import ForgotPasswordConfirmation from "./ForgotPasswordConfirmation";
 
 const ForgotPasswordPage = (): React.ReactElement => {
   const [email, setEmail] = useState("");
@@ -147,14 +147,14 @@ const ForgotPasswordPage = (): React.ReactElement => {
                 gap: 1,
                 borderRadius: 1,
                 width: 500,
-                backgroundColor: theme.palette.Learner.Default,
+                backgroundColor: theme.palette.Learner.Dark.Default,
                 color: theme.palette.Neutral[300],
                 marginTop: 4,
                 "&:hover": {
                   backgroundColor: "#002A32",
                 },
                 "&:active": {
-                  backgroundColor: theme.palette.Learner.Pressed,
+                  backgroundColor: theme.palette.Learner.Dark.Pressed,
                 },
               }}
             >
@@ -165,7 +165,7 @@ const ForgotPasswordPage = (): React.ReactElement => {
             <Button variant="text" sx={{ padding: 0 }}>
               <Typography
                 variant="labelSmall"
-                sx={{ color: theme.palette.Learner.Default }}
+                sx={{ color: theme.palette.Learner.Dark.Default }}
                 onClick={handleBackToLogin}
               >
                 Remember your password? Back to Login

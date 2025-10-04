@@ -1,16 +1,16 @@
-import React from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Box,
-  Typography,
-  Button,
-  IconButton,
-} from "@mui/material";
-import { PersonOutlineOutlined, AlternateEmail } from "@mui/icons-material";
+import { AlternateEmail, PersonOutlineOutlined } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import React from "react";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
 
 interface AddAdminModalProps {
@@ -140,14 +140,14 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
               display: "flex",
               height: "40px",
               gap: "8px",
-              "&:hover": { bgcolor: theme.palette.Administrator.Hover },
+              "&:hover": { bgcolor: theme.palette.Administrator.Light.Hover },
               borderColor: theme.palette.Neutral[500],
             }}
             onClick={onClose}
           >
             <Typography
               variant="labelLarge"
-              color={theme.palette.Administrator.Default}
+              color={theme.palette.Administrator.Dark.Default}
             >
               CANCEL
             </Typography>
@@ -158,8 +158,8 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
               display: "flex",
               height: "40px",
               gap: "8px",
-              backgroundColor: theme.palette.Administrator.Default,
-              "&:hover": { bgcolor: theme.palette.Administrator.Default },
+              backgroundColor: theme.palette.Administrator.Dark.Default,
+              "&:hover": { bgcolor: theme.palette.Administrator.Dark.Default },
             }}
             onClick={handleAddAdmin}
           >

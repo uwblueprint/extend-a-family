@@ -1,8 +1,4 @@
-import {
-  PaletteColor,
-  PaletteColorOptions,
-  TypographyOptions,
-} from "@mui/material/styles";
+import "@mui/material/styles";
 
 declare module "@mui/material/styles" {
   interface PaletteColorOptions {
@@ -19,15 +15,22 @@ declare module "@mui/material/styles" {
     Hover: string;
   }
 
+  interface UserShadeColorOptions {
+    Default: string;
+    Hover: string;
+    Selected: string;
+    Pressed: string;
+  }
+
+  interface UserColorOptions {
+    Light: UserShadeColorOptions;
+    Dark: UserShadeColorOptions;
+  }
+
   interface PaletteOptions {
-    Learner: PaletteColorOptions;
-    NewLearnerLight: NewPaletteColorOptions;
-    NewLearnerDark: NewPaletteColorOptions;
-    Administrator: PaletteColorOptions;
-    Facilitator: PaletteColorOptions;
-    Error: PaletteColorOptions;
-    Success: PaletteColorOptions;
-    Warning: PaletteColorOptions;
+    Learner: UserColorOptions;
+    Administrator: UserColorOptions;
+    Facilitator: UserColorOptions;
     Neutral: {
       100: string;
       200: string;
@@ -36,7 +39,12 @@ declare module "@mui/material/styles" {
       500: string;
       600: string;
       700: string;
+      800: string;
+      900: string;
     };
+    Success: UserColorOptions;
+    Error: UserColorOptions;
+    Warning: UserColorOptions;
   }
 
   interface TypographyOptions {

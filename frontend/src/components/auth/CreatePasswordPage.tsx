@@ -1,15 +1,15 @@
+import { Box, Button, Container, Typography, useTheme } from "@mui/material";
 import React, { useContext, useState } from "react";
-import { Box, Container, Typography, Button, useTheme } from "@mui/material";
 import { Redirect } from "react-router-dom";
+import AuthAPIClient from "../../APIClients/AuthAPIClient";
+import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
+import { LANDING_PAGE } from "../../constants/Routes";
+import AuthContext from "../../contexts/AuthContext";
+import { useUser } from "../../hooks/useUser";
 import Logo from "../assets/logoColoured.png";
 import CreatePasswordHelpModal from "../help/CreatePasswordHelpModal";
 import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
 import PasswordCheck from "./PasswordCheck";
-import { useUser } from "../../hooks/useUser";
-import { LANDING_PAGE } from "../../constants/Routes";
-import AuthAPIClient from "../../APIClients/AuthAPIClient";
-import AuthContext from "../../contexts/AuthContext";
-import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 
 const CreatePasswordPage = (): React.ReactElement => {
   const user = useUser();
@@ -139,9 +139,9 @@ const CreatePasswordPage = (): React.ReactElement => {
                 padding: "10px 24px",
                 width: "100%",
                 textTransform: "none",
-                backgroundColor: theme.palette[`${user.role}`].Default,
+                backgroundColor: theme.palette[`${user.role}`].Dark.Default,
                 "&:hover": {
-                  background: theme.palette[`${user.role}`].Pressed,
+                  background: theme.palette[`${user.role}`].Dark.Pressed,
                 },
                 "&.Mui-disabled": {
                   backgroundColor: "#ccc",
@@ -157,7 +157,7 @@ const CreatePasswordPage = (): React.ReactElement => {
                   textAlign: "right",
                   marginTop: 2,
                   marginRight: "12px",
-                  color: theme.palette.Learner.Default,
+                  color: theme.palette.Learner.Dark.Default,
                   cursor: "pointer",
                   "&:hover": {
                     textDecoration: "underline",

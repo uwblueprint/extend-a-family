@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { AlternateEmail, Password } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -8,19 +8,19 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { AlternateEmail, Password } from "@mui/icons-material";
 import InputAdornment from "@mui/material/InputAdornment";
-import { AuthenticatedUser, AuthError, Role } from "../../types/AuthTypes";
-import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
-import { PresentableError } from "../../types/ErrorTypes";
-import { FORGOT_PASSWORD_PAGE } from "../../constants/Routes";
+import { useContext, useState } from "react";
 import authAPIClient from "../../APIClients/AuthAPIClient";
+import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
+import { FORGOT_PASSWORD_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import {
   AuthErrorCodes,
   authErrors,
   defaultAuthError,
 } from "../../errors/AuthErrors";
+import { AuthenticatedUser, AuthError, Role } from "../../types/AuthTypes";
+import { PresentableError } from "../../types/ErrorTypes";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import ErrorAlert from "../common/ErrorAlert";
 
@@ -156,7 +156,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                 alignSelf: "stretch",
                 maxHeight: "56px",
                 "& .MuiFormHelperText-root": {
-                  color: theme.palette.Error.Default,
+                  color: theme.palette.Error.Dark.Default,
                 },
               }}
             />
@@ -179,7 +179,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                 alignSelf: "stretch",
                 maxHeight: "56px",
                 "& .MuiFormHelperText-root": {
-                  color: theme.palette.Error.Default,
+                  color: theme.palette.Error.Dark.Default,
                 },
               }}
               InputProps={{
@@ -197,8 +197,8 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
                   variant="bodySmall"
                   style={{
                     color: passwordError
-                      ? theme.palette.Error.Default
-                      : theme.palette[userRole].Default,
+                      ? theme.palette.Error.Dark.Default
+                      : theme.palette[userRole].Dark.Default,
                   }}
                 >
                   Forgot Password
@@ -218,7 +218,7 @@ const LoginForm = ({ userRole }: LoginFormProps) => {
               justifyContent: "center",
               alignItems: "center",
               borderRadius: "4px",
-              backgroundColor: theme.palette[userRole].Default,
+              backgroundColor: theme.palette[userRole].Dark.Default,
               boxShadow: "none",
             }}
           >

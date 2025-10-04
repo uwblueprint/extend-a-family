@@ -1,10 +1,10 @@
-import React from "react";
-import { Container, Typography, Button, Box, useTheme } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { Box, Button, Container, Typography, useTheme } from "@mui/material";
+import React from "react";
 import { useHistory } from "react-router-dom";
-import Logo from "../assets/logoColoured.png";
 import { LANDING_PAGE } from "../../constants/Routes";
 import { useUser } from "../../hooks/useUser";
+import Logo from "../assets/logoColoured.png";
 
 const CreatePasswordConfirmationPage = (): React.ReactElement => {
   const user = useUser();
@@ -96,7 +96,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             alignItems: "center",
             gap: theme.spacing(1),
             borderRadius: "4px",
-            background: theme.palette[`${user.role}`].Default,
+            background: theme.palette[`${user.role}`].Dark.Default,
             color: theme.palette.Neutral[100],
             textAlign: "center",
             fontSize: theme.typography.labelLarge.fontSize,
@@ -106,7 +106,7 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             letterSpacing: theme.typography.labelLarge.letterSpacing,
             textTransform: theme.typography.labelLarge.textTransform,
             "&:hover": {
-              background: theme.palette[`${user.role}`].Pressed,
+              background: theme.palette[`${user.role}`].Dark.Pressed,
             },
           }}
           onClick={handleBackToHome}

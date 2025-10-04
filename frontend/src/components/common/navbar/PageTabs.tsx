@@ -1,11 +1,10 @@
-import React from "react";
-import HomeIcon from "@mui/icons-material/Home";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
-import { Button, Box, useTheme } from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import { Box, Button, useTheme } from "@mui/material";
 import { useHistory, useLocation } from "react-router-dom";
-import { HOME_PAGE, BOOKMARKS_PAGE } from "../../../constants/Routes";
+import { BOOKMARKS_PAGE, HOME_PAGE } from "../../../constants/Routes";
 
 const PageTabs = () => {
   const theme = useTheme();
@@ -43,18 +42,18 @@ const PageTabs = () => {
         sx={{
           ...sharedStyle,
           backgroundColor: isHome
-            ? theme.palette.NewLearnerLight.Selected
+            ? theme.palette.Learner.Light.Selected
             : "transparent",
           color: isHome
-            ? theme.palette.NewLearnerDark.Selected
-            : theme.palette.NewLearnerDark.Default,
+            ? theme.palette.Learner.Dark.Selected
+            : theme.palette.Learner.Dark.Default,
           "&:hover": {
-            backgroundColor: theme.palette.NewLearnerLight.Hover,
-            color: theme.palette.NewLearnerDark.Hover,
+            backgroundColor: theme.palette.Learner.Light.Hover,
+            color: theme.palette.Learner.Dark.Hover,
           },
           "&:active": {
-            backgroundColor: theme.palette.Learner.Light,
-            color: theme.palette.NewLearnerDark.Pressed,
+            backgroundColor: theme.palette.Learner.Light.Default,
+            color: theme.palette.Learner.Dark.Pressed,
           },
         }}
       >
@@ -73,18 +72,18 @@ const PageTabs = () => {
         sx={{
           ...sharedStyle,
           backgroundColor: isBookmarks
-            ? theme.palette.NewLearnerLight.Selected
+            ? theme.palette.Learner.Light.Selected
             : "transparent",
           color: isBookmarks
-            ? theme.palette.NewLearnerDark.Selected
-            : theme.palette.NewLearnerDark.Default,
+            ? theme.palette.Learner.Dark.Selected
+            : theme.palette.Learner.Dark.Default,
           "&:hover": {
-            backgroundColor: theme.palette.NewLearnerLight.Hover,
-            color: theme.palette.NewLearnerDark.Hover,
+            backgroundColor: theme.palette.Learner.Light.Hover,
+            color: theme.palette.Learner.Dark.Hover,
           },
           "&:active": {
-            backgroundColor: theme.palette.NewLearnerLight.Pressed,
-            color: theme.palette.NewLearnerDark.Pressed,
+            backgroundColor: theme.palette.Learner.Light.Pressed,
+            color: theme.palette.Learner.Dark.Pressed,
           },
         }}
       >

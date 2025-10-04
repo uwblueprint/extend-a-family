@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { Box, MenuItem, Typography, Button, Stack } from "@mui/material";
-import { Search, FilterList, Add } from "@mui/icons-material";
+import { Add, FilterList, Search } from "@mui/icons-material";
+import { Box, Button, MenuItem, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import StartAdornedTextField from "../common/form/StartAdornedTextField";
-import { isRole } from "../../types/UserTypes";
+import React, { useState } from "react";
 import { useUser } from "../../hooks/useUser";
+import { isRole } from "../../types/UserTypes";
+import StartAdornedTextField from "../common/form/StartAdornedTextField";
 
 interface TopToolBarProps {
   searchQuery: string;
@@ -59,14 +59,14 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
               }}
             />
           }
-          focusedBorderColor={theme.palette[role].Default}
+          focusedBorderColor={theme.palette[role].Dark.Default}
           sx={{
             minWidth: "400px",
             borderRadius: "8px",
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
                 borderColor: isSearchActive
-                  ? theme.palette[role].Default
+                  ? theme.palette[role].Dark.Default
                   : theme.palette.Neutral[500],
               },
               "&:hover fieldset": {
@@ -91,7 +91,7 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
               <FilterList sx={{ color: theme.palette.Neutral[500] }} />
             </Box>
           }
-          focusedBorderColor={theme.palette[role].Default}
+          focusedBorderColor={theme.palette[role].Dark.Default}
           sx={{
             width: "250px",
             textTransform: "uppercase",
@@ -118,10 +118,10 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
                   sx={{
                     display: "inline-block",
                     color: isRole(roleOption)
-                      ? theme.palette[roleOption].Default
+                      ? theme.palette[roleOption].Dark.Default
                       : undefined,
                     backgroundColor: isRole(roleOption)
-                      ? theme.palette[roleOption].Light
+                      ? theme.palette[roleOption].Light.Default
                       : undefined,
                     padding: "4px 8px",
                     borderRadius: "8px",
@@ -137,11 +137,11 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
           variant="contained"
           startIcon={<Add />}
           sx={{
-            backgroundColor: theme.palette.Administrator.Default,
+            backgroundColor: theme.palette.Administrator.Dark.Default,
             height: "56px",
             color: "white",
             "&:hover": {
-              backgroundColor: theme.palette.Administrator.Default,
+              backgroundColor: theme.palette.Administrator.Dark.Default,
             },
           }}
           onClick={handleOpenAddAdminModal}

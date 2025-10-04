@@ -1,20 +1,20 @@
-import React from "react";
+import { Delete } from "@mui/icons-material";
 import {
-  TableContainer,
+  Avatar,
+  Box,
+  Button,
   Paper,
   Table,
   TableBody,
-  TableRow,
   TableCell,
-  Avatar,
-  Box,
-  Typography,
+  TableContainer,
   TableFooter,
   TablePagination,
-  Button,
+  TableRow,
+  Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { Delete } from "@mui/icons-material";
+import React from "react";
 import { User } from "../../types/UserTypes";
 import placeholderImage from "../assets/placeholder_profile.png";
 
@@ -101,8 +101,8 @@ const UserTable: React.FC<UserTableProps> = ({
                   sx={{
                     marginRight: "16px",
                     display: "inline-block",
-                    backgroundColor: theme.palette[user.role].Light,
-                    color: theme.palette[user.role].Default,
+                    backgroundColor: theme.palette[user.role].Light.Default,
+                    color: theme.palette[user.role].Dark.Default,
                   }}
                 >
                   {user.role.toUpperCase()}
@@ -115,7 +115,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     padding: "4px 16px",
                     borderRadius: "4px",
                     borderColor: theme.palette.Neutral[500],
-                    color: theme.palette.Error.Default,
+                    color: theme.palette.Error.Dark.Default,
                   }}
                   onClick={() =>
                     handleOpenDeleteUserModal(

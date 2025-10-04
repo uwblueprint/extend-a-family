@@ -1,14 +1,14 @@
-import React, { useState } from "react";
 import {
+  Box,
+  Button,
   Dialog,
   DialogContent,
+  IconButton,
   TextField,
   Typography,
-  Button,
-  Box,
   useTheme,
-  IconButton,
 } from "@mui/material";
+import React, { useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import CreatePasswordHelpConfirmationModal from "./CreatePasswordHelpConfirmationModal";
@@ -151,7 +151,7 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
             variant="text"
             onClick={onClose}
             sx={{
-              color: theme.palette.Learner.Default,
+              color: theme.palette.Learner.Dark.Default,
               textAlign: "left",
               fontSize: theme.typography.bodyMedium.fontSize,
               fontWeight: theme.typography.bodySmall.fontWeight,
@@ -189,9 +189,9 @@ const CreatePasswordHelpModal: React.FC<CreatePasswordHelpModalProps> = ({
               lineHeight: theme.typography.labelLarge.lineHeight,
               letterSpacing: theme.typography.labelLarge.letterSpacing,
               color: theme.palette.Neutral[100],
-              backgroundColor: theme.palette.Learner.Default,
+              backgroundColor: theme.palette.Learner.Dark.Default,
               "&:hover": {
-                background: theme.palette.Learner.Pressed,
+                background: theme.palette.Learner.Dark.Pressed,
               },
             }}
           >

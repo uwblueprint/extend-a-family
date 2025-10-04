@@ -1,4 +1,6 @@
-import React from "react";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import MoveDownIcon from "@mui/icons-material/MoveDown";
 import {
   Divider,
   ListItemIcon,
@@ -7,9 +9,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import MoveDownIcon from "@mui/icons-material/MoveDown";
 import { UnitSidebarModalType } from "../../../types/CourseTypes";
 
 interface ContextMenuProps {
@@ -76,13 +75,13 @@ const ContextMenu = ({ anchorEl, onClose, onModalOpen }: ContextMenuProps) => {
         <ListItemIcon>
           <DeleteOutlineIcon
             fontSize="small"
-            htmlColor={theme.palette.Error.Default}
+            htmlColor={theme.palette.Error.Dark.Default}
           />
         </ListItemIcon>
         <Typography
           variant="bodyMedium"
           noWrap
-          color={theme.palette.Error.Default}
+          color={theme.palette.Error.Dark.Default}
         >
           Delete
         </Typography>

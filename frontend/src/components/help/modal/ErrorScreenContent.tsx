@@ -1,6 +1,6 @@
-import React from "react";
-import { Typography, Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Theme } from "@mui/material/styles";
+import React from "react";
 
 interface ErrorScreenContentProps {
   handleBackToContent: () => void;
@@ -66,12 +66,12 @@ const ErrorScreenContent: React.FC<ErrorScreenContentProps> = ({
             alignItems: "center",
             gap: "8px",
             borderRadius: "4px",
-            background: theme.palette.Learner.Default,
+            background: theme.palette.Learner.Dark.Default,
             padding: "10px 24px",
             minWidth: "auto",
             width: "auto",
             "&:hover": {
-              background: theme.palette.Learner.Pressed,
+              background: theme.palette.Learner.Dark.Pressed,
             },
           }}
         >
