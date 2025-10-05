@@ -95,9 +95,9 @@ courseRouter.put(
       if (testSet.size !== maxIndex) {
         throw Error("invalid arangement");
       }
-      updatedUnits.forEach(async (unit) => {
-        await courseUnitService.updateCourseUnit(unit.id, unit);
-      });
+      await Promise.all(
+        updatedUnits.map((unit) => courseUnitService.updateCourseUnit(unit.id, unit))
+      );
       res.status(200).send("success");
     } catch (error: unknown) {
       res.status(500).send(getErrorMessage(error));
