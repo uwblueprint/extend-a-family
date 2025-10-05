@@ -26,7 +26,7 @@ const FeedbackThumbnail = () => {
         justifyContent: "center",
         alignItems: "center",
         gap: "8px",
-        border: `border: 1px solid ${theme.palette.Neutral[400]}`,
+        border: `1px solid ${theme.palette.Neutral[400]}`,
         background: theme.palette.Learner.Light.Default,
       }}
       px="57px"

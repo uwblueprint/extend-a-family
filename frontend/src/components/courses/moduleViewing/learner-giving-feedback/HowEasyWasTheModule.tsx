@@ -31,6 +31,7 @@ const RatingRadioButton = ({
   selected: boolean;
   onClick: () => void;
 }) => {
+  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -45,7 +46,7 @@ const RatingRadioButton = ({
         <RadioButtonChecked
           sx={{
             fontSize: "54px",
-            color: "#006C7D",
+            color: theme.palette.Learner.Dark.Default,
           }}
         />
       ) : (

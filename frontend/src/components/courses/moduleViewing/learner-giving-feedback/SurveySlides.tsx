@@ -26,11 +26,6 @@ const SurveySlides = () => {
 
   const submitFeedback = () => {
     // TODO: Handle feedback submission logic here
-    console.log("Feedback submitted:", {
-      contentLiked,
-      moduleEaseRating,
-      moduleFeedbackText,
-    });
   };
 
   switch (formStage) {
