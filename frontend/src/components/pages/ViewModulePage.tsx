@@ -22,7 +22,7 @@ import {
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
-import { DidYouLikeTheContentSlide } from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
+import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import "./ViewModulePage.css";
 
@@ -334,7 +334,7 @@ const ViewModulePage = () => {
                 </Typography>
               </Box>
             )}
-            {isDidYouLikeTheContentPage && <DidYouLikeTheContentSlide />}
+            {isDidYouLikeTheContentPage && <SurveySlides />}
           </Box>
           <Box
             height={isFullScreen ? "80px" : "48px"}
