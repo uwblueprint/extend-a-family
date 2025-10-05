@@ -1,6 +1,8 @@
 import * as React from "react";
 import DidYouLikeTheContentSlide from "./DidYouLikeTheContent";
 import HowEasyWasTheModuleSlide from "./HowEasyWasTheModule";
+import ThanksForTheFeedbackSlide from "./ThanksForTheFeedback";
+import WhatDidYouThink from "./WhatDidYouThink";
 
 enum SurveyFormStage {
   DidYouLikeTheContent = "DidYouLikeTheContent",
@@ -19,6 +21,17 @@ const SurveySlides = () => {
   const [moduleEaseRating, setModuleEaseRating] = React.useState<
     number | undefined
   >();
+  const [moduleFeedbackText, setModuleFeedbackText] =
+    React.useState<string>("");
+
+  const submitFeedback = () => {
+    // TODO: Handle feedback submission logic here
+    console.log("Feedback submitted:", {
+      contentLiked,
+      moduleEaseRating,
+      moduleFeedbackText,
+    });
+  };
 
   switch (formStage) {
     case SurveyFormStage.DidYouLikeTheContent:
@@ -46,9 +59,18 @@ const SurveySlides = () => {
         />
       );
     case SurveyFormStage.WhatDidYouThinkOfTheModule:
-      return <div>WhatDidYouThinkOfTheModule</div>;
+      return (
+        <WhatDidYouThink
+          text={moduleFeedbackText}
+          onChange={setModuleFeedbackText}
+          onSubmit={() => {
+            setFormStage(SurveyFormStage.ThanksForTheFeedback);
+            submitFeedback();
+          }}
+        />
+      );
     case SurveyFormStage.ThanksForTheFeedback:
-      return <div>ThanksForTheFeedback</div>;
+      return <ThanksForTheFeedbackSlide />;
     case SurveyFormStage.Congratulations:
       return <div>Congratulations</div>;
     default:
