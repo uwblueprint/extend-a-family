@@ -376,7 +376,7 @@ const Welcome = (): React.ReactElement => {
         <InfoBox
           title="Facilitators"
           description="The person who is helping people learn about money."
-          backgroundColor={`${theme.palette.Facilitator.Light}`}
+          backgroundColor={theme.palette.Facilitator.Light.Default}
           borderColor={theme.palette.Facilitator.Dark.Default}
           signUpRedirect
         />
@@ -384,7 +384,7 @@ const Welcome = (): React.ReactElement => {
           title="Administrator"
           description="The person who monitors the program."
           instruction="Ask an existing administrator to help setup your account."
-          backgroundColor={`${theme.palette.Administrator.Light}`}
+          backgroundColor={theme.palette.Administrator.Light.Default}
           borderColor={theme.palette.Administrator.Dark.Default}
         />
       </Container>
