@@ -24,13 +24,19 @@ const DeleteBookmarkButton: React.FC<DeleteBookmarkButtonProps> = ({ onClick }) 
         borderRadius: "100px",
         background: "#FFF",
         boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
-        transition: "opacity 0.2s ease-in-out, transform 0.2s ease-in-out",
+        transition:
+          "opacity 0.2s ease-in-out, background 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
         opacity: 0,
         visibility: "hidden",
         pointerEvents: "none",
         cursor: "pointer",
         "&:hover": {
-          transform: "scale(1.08)",
+          background:
+            "linear-gradient(0deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%), #FFF",
+        },
+        "&:active": {
+          background:
+            "linear-gradient(0deg, rgba(0, 0, 0, 0.10) 0%, rgba(0, 0, 0, 0.10) 100%), #FFF",
         },
       }}
     >
