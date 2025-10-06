@@ -5,6 +5,7 @@ import PanToolAltOutlinedIcon from "@mui/icons-material/PanToolAltOutlined";
 import { Link as RouterLink } from "react-router-dom";
 import { Bookmark } from "../../types/UserTypes";
 import { buildViewPageUrl } from "../../utils/routeBuilders";
+import DeleteBookmarkButton from "./DeleteBookmarkButton";
 
 interface BookmarkItemProps {
   bookmark: Bookmark;
@@ -24,13 +25,12 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
       component={RouterLink}
       to={to}
       sx={{
+        position: "relative",
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
         padding: "21.756px 14.504px 14.504px 14.504px",
         gap: "9.065px",
-        flex: "1 0 0",
-        alignSelf: "stretch",
         borderRadius: "7.252px",
         border: "0.907px solid #D9D9D9",
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
@@ -41,11 +41,17 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
           boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
           transform: "translateY(-1px)",
         },
+        "&:hover .delete-btn": {
+          opacity: 1,
+          visibility: "visible",
+          pointerEvents: "auto",
+        },
       }}
     >
       {/* Image */}
       <Box
         sx={{
+          position: "relative",
           display: "flex",
           height: "226.923px",
           minWidth: "250px",
@@ -61,8 +67,12 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
             "url('https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=200&q=80')", // TEMP
           backgroundSize: "cover",
           backgroundPosition: "center",
+          overflow: "hidden",
         }}
-      />
+      >
+        {/* Delete button */}
+        <DeleteBookmarkButton onClick={(e) => e.preventDefault()} />
+      </Box>
 
       {/* Type (Slide or Activity) with icon */}
       <Box
@@ -88,7 +98,7 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
         </Typography>
       </Box>
 
-      {/* Bookmark Title */}
+      {/* Title */}
       <Typography
         sx={{
           color: theme.palette.Neutral[700],
