@@ -1,3 +1,5 @@
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Button,
@@ -10,16 +12,14 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { LANDING_PAGE, SIGNUP_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
+import { Role } from "../../types/AuthTypes";
 import background from "../assets/backgroundImage.png";
 import logo from "../assets/logoWhite.png";
 import Login from "./Login";
-import { Role } from "../../types/AuthTypes";
 
 export const getSignUpPrompt = (role: Role): string | undefined => {
   if (role === "Administrator") {
@@ -73,7 +73,7 @@ const Welcome = (): React.ReactElement => {
           sx={{
             width: "100%",
             height: "100%",
-            backgroundColor: theme.palette[userRole].Hover,
+            backgroundColor: theme.palette[userRole].Light.Hover,
             justifyContent: "space-between",
             display: "flex",
             alignItems: "center",
@@ -81,7 +81,7 @@ const Welcome = (): React.ReactElement => {
             textTransform: "none",
             borderRadius: "8px",
             "&:hover": {
-              bgcolor: theme.palette[userRole].Hover,
+              bgcolor: theme.palette[userRole].Light.Hover,
             },
           }}
           onClick={() => handleButtonClick(userRole)}
@@ -89,12 +89,14 @@ const Welcome = (): React.ReactElement => {
           <Typography
             variant="bodyLarge"
             style={{
-              color: theme.palette[userRole].Pressed,
+              color: theme.palette[userRole].Dark.Pressed,
             }}
           >
             {buttonText}
           </Typography>
-          <ArrowForwardIcon sx={{ color: theme.palette[userRole].Pressed }} />
+          <ArrowForwardIcon
+            sx={{ color: theme.palette[userRole].Dark.Pressed }}
+          />
         </Button>
       </Box>
     );
@@ -295,7 +297,7 @@ const Welcome = (): React.ReactElement => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "stretch",
-            backgroundColor: theme.palette.Learner.Light,
+            backgroundColor: theme.palette.Learner.Light.Default,
           }}
           disableGutters
         >
@@ -368,22 +370,22 @@ const Welcome = (): React.ReactElement => {
           title="Learners"
           description="The person who is learning about money."
           instruction="Ask a facilitator to setup your account."
-          backgroundColor={theme.palette.Learner.Light}
-          borderColor={theme.palette.Learner.Default}
+          backgroundColor={theme.palette.Learner.Light.Default}
+          borderColor={theme.palette.Learner.Dark.Default}
         />
         <InfoBox
           title="Facilitators"
           description="The person who is helping people learn about money."
-          backgroundColor={`${theme.palette.Facilitator.Light}`}
-          borderColor={theme.palette.Facilitator.Default}
+          backgroundColor={theme.palette.Facilitator.Light.Default}
+          borderColor={theme.palette.Facilitator.Dark.Default}
           signUpRedirect
         />
         <InfoBox
           title="Administrator"
           description="The person who monitors the program."
           instruction="Ask an existing administrator to help setup your account."
-          backgroundColor={`${theme.palette.Administrator.Light}`}
-          borderColor={theme.palette.Administrator.Default}
+          backgroundColor={theme.palette.Administrator.Light.Default}
+          borderColor={theme.palette.Administrator.Dark.Default}
         />
       </Container>
 

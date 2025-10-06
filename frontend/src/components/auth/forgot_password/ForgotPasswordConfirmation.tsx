@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import SendIcon from "@mui/icons-material/Send";
 import {
-  Container,
-  Typography,
-  useTheme,
-  Snackbar,
   Box,
   Button,
+  Container,
+  Snackbar,
+  Typography,
+  useTheme,
 } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
+import React, { useEffect, useState } from "react";
 import authAPIClient from "../../../APIClients/AuthAPIClient";
 
 interface ForgotPasswordConfirmationProps {
@@ -99,7 +99,7 @@ const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
             variant="labelSmall"
             onClick={onBackToEmail}
             sx={{
-              color: theme.palette.Learner.Default,
+              color: theme.palette.Learner.Dark.Default,
               padding: 0,
             }}
           >
@@ -113,7 +113,7 @@ const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
               onClick={handleResendEmail}
               sx={{
                 color: canResend
-                  ? theme.palette.Learner.Default
+                  ? theme.palette.Learner.Dark.Default
                   : theme.palette.text?.disabled,
                 padding: 0,
               }}
@@ -127,7 +127,7 @@ const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
             onClick={handleResendEmail}
             sx={{
               color: canResend
-                ? theme.palette.Learner.Default
+                ? theme.palette.Learner.Dark.Default
                 : theme.palette.text?.disabled,
               padding: 0,
             }}
@@ -176,11 +176,11 @@ const ForgotPasswordConfirmation: React.FC<ForgotPasswordConfirmationProps> = ({
         >
           <SendIcon
             sx={{
-              color: theme.palette.Success.Default,
+              color: theme.palette.Success.Dark.Default,
               marginRight: "16px",
             }}
           />
-          <Typography sx={{ color: theme.palette.Success.Default }}>
+          <Typography sx={{ color: theme.palette.Success.Dark.Default }}>
             {`A new reset email has been sent. 
             Please check your inbox (and spam folder).`}
           </Typography>

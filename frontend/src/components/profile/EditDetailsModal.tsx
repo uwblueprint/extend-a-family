@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import CloseIcon from "@mui/icons-material/Close";
 import {
+  Box,
+  Button,
   Dialog,
   IconButton,
-  Typography,
-  Button,
   TextField,
+  Typography,
   useTheme,
-  Box,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import { isAuthenticatedFacilitator } from "../../types/AuthTypes";
 import CharacterLimitTextField from "../common/form/CharacterLimitTextField";
@@ -183,7 +183,7 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
           <Typography
             variant="labelLarge"
             sx={{
-              color: theme.palette[user.role].Default,
+              color: theme.palette[user.role].Dark.Default,
             }}
           >
             Cancel
@@ -199,9 +199,9 @@ const EditDetailsModal: React.FC<EditDetailsModalProps> = ({
             alignItems: "center",
             gap: "8px",
             borderRadius: "4px",
-            backgroundColor: theme.palette[user.role].Default,
+            backgroundColor: theme.palette[user.role].Dark.Default,
             "&:hover": {
-              background: theme.palette[user.role].Pressed,
+              background: theme.palette[user.role].Dark.Pressed,
             },
             padding: "10px 24px",
           }}

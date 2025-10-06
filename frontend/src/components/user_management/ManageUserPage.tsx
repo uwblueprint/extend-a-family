@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import {
   Box,
   Button,
@@ -8,17 +8,17 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import React, { useEffect, useState } from "react";
 
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import { User } from "../../types/UserTypes";
 
-import TopToolBar from "./TopToolBar";
-import UserTable from "./UserTable";
-import AddAdminModal from "./AddAdminModal";
-import DeleteUserModal from "./DeleteUserModal";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import { isCaseInsensitiveSubstring } from "../../utils/StringUtils";
+import AddAdminModal from "./AddAdminModal";
+import DeleteUserModal from "./DeleteUserModal";
+import TopToolBar from "./TopToolBar";
+import UserTable from "./UserTable";
 
 const ManageUserPage = (): React.ReactElement => {
   // Main state
@@ -151,7 +151,7 @@ const ManageUserPage = (): React.ReactElement => {
         size="small"
         onClick={handleCloseAddAdminSnackbar}
         sx={{
-          color: theme.palette.Learner.Default,
+          color: theme.palette.Learner.Dark.Default,
         }}
       >
         UNDO
@@ -164,7 +164,7 @@ const ManageUserPage = (): React.ReactElement => {
         size="small"
         onClick={handleCloseDeleteUserSnackbar}
         sx={{
-          color: theme.palette.Learner.Default,
+          color: theme.palette.Learner.Dark.Default,
         }}
       >
         UNDO
@@ -187,7 +187,7 @@ const ManageUserPage = (): React.ReactElement => {
       >
         <SnackbarContent
           sx={{
-            backgroundColor: theme.palette.Success.Hover,
+            backgroundColor: theme.palette.Success.Light.Hover,
             color: theme.palette.Neutral[700],
             paddingTop: "12px",
             paddingLeft: "32px",
@@ -205,13 +205,13 @@ const ManageUserPage = (): React.ReactElement => {
             >
               <PersonOutlineIcon
                 sx={{
-                  color: theme.palette.Success.Default,
+                  color: theme.palette.Success.Dark.Default,
                 }}
               />
               <Typography
                 variant="bodyMedium"
                 sx={{
-                  color: theme.palette.Success.Default,
+                  color: theme.palette.Success.Dark.Default,
                 }}
               >
                 &quot;{addSnackbarName}&quot; was added as admin
@@ -234,7 +234,7 @@ const ManageUserPage = (): React.ReactElement => {
       >
         <SnackbarContent
           sx={{
-            backgroundColor: theme.palette.Error.Hover,
+            backgroundColor: theme.palette.Error.Light.Hover,
             color: theme.palette.Neutral[700],
             paddingTop: "12px",
             paddingLeft: "32px",
@@ -253,13 +253,13 @@ const ManageUserPage = (): React.ReactElement => {
             >
               <PersonOutlineIcon
                 sx={{
-                  color: theme.palette.Error.Default,
+                  color: theme.palette.Error.Dark.Default,
                 }}
               />
               <Typography
                 variant="bodyMedium"
                 sx={{
-                  color: theme.palette.Error.Default,
+                  color: theme.palette.Error.Dark.Default,
                 }}
               >
                 &quot;{deleteSnackbarName}&quot; was deleted from the user list

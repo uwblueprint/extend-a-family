@@ -31,6 +31,14 @@ module.exports = {
     "react/no-array-index-key": "off",
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-static-element-interactions": "off",
+    // Using the new React 17+ JSX transform (tsconfig jsx: "react-jsx"), so importing React in scope is unnecessary.
+    // Disable legacy rules that still expect an explicit import.
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-uses-react": "off",
   },
-  ignorePatterns: ["build/*", ".eslintrc.js", "src/theme/themeAugmentation.d.ts"],
+  ignorePatterns: [
+    "build/*",
+    ".eslintrc.js",
+    "src/theme/themeAugmentation.d.ts",
+  ],
 };

@@ -1,7 +1,7 @@
-import React, { Dispatch, SetStateAction } from "react";
-import { Box, Typography, Avatar } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import { CameraAlt } from "@mui/icons-material";
+import { Avatar, Box, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import React, { Dispatch, SetStateAction } from "react";
 import { useUser } from "../../hooks/useUser";
 
 interface ProfilePictureProps {
@@ -38,7 +38,7 @@ const ProfilePicture = ({
         sx={{
           width: "100%",
           height: "100%",
-          bgcolor: theme.palette[user.role].Hover,
+          bgcolor: theme.palette[user.role].Light.Hover,
           "&:hover": {
             backgroundColor: "rgba(0, 0, 0, 0.6)",
 
@@ -55,7 +55,7 @@ const ProfilePicture = ({
       >
         <Typography
           sx={{
-            color: theme.palette[user.role].Default,
+            color: theme.palette[user.role].Dark.Default,
             fontSize: 0.375 * size,
             fontWeight: 400,
             lineHeight: "140%",

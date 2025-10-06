@@ -1,21 +1,21 @@
-import React, {
-  ChangeEvent,
-  useContext,
-  Dispatch,
-  SetStateAction,
-} from "react";
-import { Redirect } from "react-router-dom";
-import { Box, Typography, IconButton, useTheme, Dialog } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
-import Divider from "@mui/material/Divider";
+import { Box, Dialog, IconButton, Typography, useTheme } from "@mui/material";
 import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
 import { VisuallyHidden } from "@reach/visually-hidden";
-import AuthContext from "../../contexts/AuthContext";
+import React, {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useContext,
+} from "react";
+import { Redirect } from "react-router-dom";
 import UserAPIClient from "../../APIClients/UserAPIClient";
-import { getLocalStorageObjProperty } from "../../utils/LocalStorageUtils";
 import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { HOME_PAGE } from "../../constants/Routes";
+import AuthContext from "../../contexts/AuthContext";
+import { getLocalStorageObjProperty } from "../../utils/LocalStorageUtils";
 
 interface UploadProfilePictureModalProps {
   open: boolean;
@@ -117,7 +117,7 @@ const UploadProfilePictureModal = ({
         style={{
           width: "100%",
           height: "auto",
-          backgroundImage: `repeating-linear-gradient(0deg, ${theme.palette[role].Default}, ${theme.palette[role].Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Default} 19px), repeating-linear-gradient(90deg, ${theme.palette[role].Default}, ${theme.palette[role].Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Default} 19px), repeating-linear-gradient(180deg, ${theme.palette[role].Default}, ${theme.palette[role].Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Default} 19px), repeating-linear-gradient(270deg, ${theme.palette[role].Default}, ${theme.palette[role].Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Default} 19px)`,
+          backgroundImage: `repeating-linear-gradient(0deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px), repeating-linear-gradient(90deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px), repeating-linear-gradient(180deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px), repeating-linear-gradient(270deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px)`,
           backgroundSize: "1px 100%, 100% 1px, 1px 100% , 100% 1px",
           backgroundPosition: "0 0, 0 0, calc(100% - 1px) 0, 0 100%",
           backgroundRepeat: "no-repeat",
@@ -131,7 +131,7 @@ const UploadProfilePictureModal = ({
           paddingRight: "100px",
           gap: "16px",
           borderRadius: "4px",
-          backgroundColor: theme.palette[role].Light,
+          backgroundColor: theme.palette[role].Light.Default,
         }}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
@@ -153,13 +153,13 @@ const UploadProfilePictureModal = ({
         </VisuallyHidden>
       </Box>
 
-      <Box sx={{ width: "100%", color: theme.palette[role].Default }}>
+      <Box sx={{ width: "100%", color: theme.palette[role].Dark.Default }}>
         <Divider
           sx={{
             my: 1,
-            borderBlockColor: theme.palette[role].Hover,
+            borderBlockColor: theme.palette[role].Light.Hover,
             "&::before, &::after": {
-              borderColor: theme.palette[role].Hover, // Ensures both lines are the same color
+              borderColor: theme.palette[role].Light.Hover, // Ensures both lines are the same color
             },
             margin: "0px",
           }}
@@ -171,8 +171,8 @@ const UploadProfilePictureModal = ({
         <Button
           sx={{
             width: "100%",
-            background: theme.palette[role].Default,
-            "&:hover": { background: theme.palette[role].Pressed },
+            background: theme.palette[role].Dark.Default,
+            "&:hover": { background: theme.palette[role].Dark.Pressed },
           }}
           variant="contained"
           startIcon={<FileUploadOutlinedIcon />}
@@ -186,7 +186,7 @@ const UploadProfilePictureModal = ({
       </Box>
       <Typography
         sx={{
-          color: theme.palette[role].Default,
+          color: theme.palette[role].Dark.Default,
           textAlign: "center",
           fontSize: "12.5px",
           fontWeight: 100,

@@ -1,6 +1,6 @@
-import React from "react";
-import { Typography, Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Theme } from "@mui/material/styles";
+import React from "react";
 
 interface ConfirmationScreenContentProps {
   handleBackToHome: () => void;
@@ -109,7 +109,7 @@ const ConfirmationScreenContent: React.FC<ConfirmationScreenContentProps> = ({
             handleBackToHome();
           }}
           sx={{
-            color: theme.palette.Learner.Default,
+            color: theme.palette.Learner.Dark.Default,
             cursor: "pointer",
             "&:hover": {
               opacity: 0.8,
@@ -132,12 +132,12 @@ const ConfirmationScreenContent: React.FC<ConfirmationScreenContentProps> = ({
             alignItems: "center",
             gap: "8px",
             borderRadius: "4px",
-            background: theme.palette.Learner.Default,
+            background: theme.palette.Learner.Dark.Default,
             padding: "10px 24px",
             minWidth: "auto",
             width: "auto",
             "&:hover": {
-              background: theme.palette.Learner.Pressed,
+              background: theme.palette.Learner.Dark.Pressed,
             },
           }}
         >
