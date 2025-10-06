@@ -24,6 +24,7 @@ import { padNumber } from "../../utils/StringUtils";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
+import NeedHelpModal from "../help/NeedHelpModal";
 import "./ViewModulePage.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -63,6 +64,8 @@ const ViewModulePage = () => {
   // const isWhatDidYouThinkOfTheModulePage = currentPage === numPages + 2;
   // const isThanksForTheFeedbackPage = currentPage === numPages + 3;
   // const isCongratulationsPage = currentPage === numPages + 4;
+
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   const fetchModule = useCallback(async () => {
     const fetchedModule = await CourseAPIClient.getModuleById(
@@ -265,6 +268,7 @@ const ViewModulePage = () => {
                     paddingX: "12px",
                     paddingY: "10px",
                   }}
+                  onClick={() => setIsHelpModalOpen(true)}
                 >
                   <Typography
                     color={theme.palette.Learner.Dark.Default}
@@ -406,6 +410,12 @@ const ViewModulePage = () => {
           </Box>
         </Box>
       </Box>
+      <NeedHelpModal
+        open={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+        module={module}
+        currentPage={currentPageObject || null}
+      />
     </Document>
   );
 };
