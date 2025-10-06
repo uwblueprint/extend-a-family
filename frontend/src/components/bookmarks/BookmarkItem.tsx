@@ -2,7 +2,9 @@ import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import WidthWideOutlinedIcon from "@mui/icons-material/WidthWideOutlined";
 import PanToolAltOutlinedIcon from "@mui/icons-material/PanToolAltOutlined";
+import { Link as RouterLink } from "react-router-dom";
 import { Bookmark } from "../../types/UserTypes";
+import { buildViewPageUrl } from "../../utils/routeBuilders";
 
 interface BookmarkItemProps {
   bookmark: Bookmark;
@@ -11,9 +13,16 @@ interface BookmarkItemProps {
 const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
   const theme = useTheme();
   const isSlide = bookmark.type === "Lesson";
+  const to = buildViewPageUrl({
+    unitId: bookmark.unitId,
+    moduleId: bookmark.moduleId,
+    pageId: bookmark.pageId,
+  });
 
   return (
     <Box
+      component={RouterLink}
+      to={to}
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -26,6 +35,8 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
         border: "0.907px solid #D9D9D9",
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
         transition: "all 0.2s ease-in-out",
+        textDecoration: "none",
+        color: "inherit",
         "&:hover": {
           boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
           transform: "translateY(-1px)",
