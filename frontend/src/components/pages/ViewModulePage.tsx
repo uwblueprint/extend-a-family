@@ -21,6 +21,9 @@ import {
   isLessonPage,
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
+import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
+import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
+import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import "./ViewModulePage.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -55,6 +58,12 @@ const ViewModulePage = () => {
   const thumbnailRefs = useRef<(HTMLDivElement | null)[]>([]);
   const numPages = module?.pages.length || 0;
 
+  const isDidYouLikeTheContentPage = currentPage === numPages;
+  // const isHowEasyWasTheModulePage = currentPage === numPages + 1;
+  // const isWhatDidYouThinkOfTheModulePage = currentPage === numPages + 2;
+  // const isThanksForTheFeedbackPage = currentPage === numPages + 3;
+  // const isCongratulationsPage = currentPage === numPages + 4;
+
   const fetchModule = useCallback(async () => {
     const fetchedModule = await CourseAPIClient.getModuleById(
       requestedModuleId,
@@ -62,7 +71,7 @@ const ViewModulePage = () => {
     return fetchedModule;
   }, [requestedModuleId]);
 
-  const currentPageId = module?.pages[currentPage].id;
+  const currentPageId = module?.pages[currentPage]?.id;
 
   useEffect(() => {
     if (currentPageId) {
@@ -164,58 +173,14 @@ const ViewModulePage = () => {
         }}
         className="no-scrollbar"
       >
-        {module?.pages.map((page, index) => (
-          <Box
-            key={`thumbnail_${index}`}
-            ref={(el: HTMLDivElement | null) => {
-              thumbnailRefs.current[index] = el;
-            }}
-            sx={{
-              color:
-                index + 1 === currentPage
-                  ? theme.palette.Learner.Dark.Default
-                  : "black",
-              cursor: "pointer",
-              marginBottom: "10px",
-              borderRadius: "5px",
-              display: "flex",
-              justifyItems: "center",
-              flexDirection: "row",
-              gap: "8px",
-            }}
-            onClick={() => setCurrentPage(index)}
-          >
-            <Box
-              sx={{
-                color:
-                  index === currentPage
-                    ? theme.palette.Learner.Dark.Default
-                    : "black",
-              }}
-            >
-              <Typography
-                variant="labelSmall"
-                sx={{
-                  fontWeight: index + 1 === currentPage ? "700" : "300",
-                  display: "block",
-                }}
-              >
-                {padNumber(index + 1)}
-              </Typography>
-              {index === currentPage && (
-                <BookmarkIcon sx={{ fontSize: "16px" }} />
-              )}
-            </Box>
-            <Box
-              sx={{
-                position: "relative",
-                border:
-                  currentPage === index
-                    ? `2px solid ${theme.palette.Learner.Dark.Default}`
-                    : "none",
-                borderRadius: "4px",
-                width: "fit-content",
-              }}
+        {module?.pages
+          .map((page, index) => (
+            <ModuleSidebarThumbnail
+              key={`thumbnail_${index}`}
+              index={index}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              thumbnailRefs={thumbnailRefs}
             >
               {isActivityPage(page) && (
                 <PlayCircleOutlineIcon
@@ -243,18 +208,22 @@ const ViewModulePage = () => {
                   customRenderer={() => <Box height={215} width={280} />}
                 />
               )}
-            </Box>
-          </Box>
-        ))}
+            </ModuleSidebarThumbnail>
+          ))
+          .concat(
+            <ModuleSidebarThumbnail
+              key="feedback_thumbnail"
+              index={numPages}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              thumbnailRefs={thumbnailRefs}
+            >
+              <FeedbackThumbnail />
+            </ModuleSidebarThumbnail>,
+          )}
       </Box>
     ),
-    [
-      currentPage,
-      isFullScreen,
-      module?.pages,
-      theme.palette.Learner.Dark.Default,
-      theme.palette.Neutral,
-    ],
+    [currentPage, isFullScreen, module?.pages, numPages, theme.palette.Neutral],
   );
 
   return (
@@ -365,6 +334,7 @@ const ViewModulePage = () => {
                 </Typography>
               </Box>
             )}
+            {isDidYouLikeTheContentPage && <SurveySlides />}
           </Box>
           <Box
             height={isFullScreen ? "80px" : "48px"}
