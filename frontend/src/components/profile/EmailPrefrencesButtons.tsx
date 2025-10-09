@@ -19,8 +19,8 @@ const EmailPrefrencesButton: React.FC<EmailPrefrencesButtonProps> = ({
   function emailOptionSelecttor() {
     if (selectedId === buttonId) {
       return {
-        backgroud: theme.palette.Facilitator.Light,
-        border: theme.palette.Facilitator.Default,
+        backgroud: theme.palette.Facilitator.Light.Default,
+        border: theme.palette.Facilitator.Dark.Default,
       };
     }
     return {
