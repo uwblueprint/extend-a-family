@@ -22,7 +22,11 @@ export type Bookmark = {
 };
 
 export type Administrator = BaseUser;
-export type Facilitator = BaseUser & { learners: string[]; bio?: string };
+export type Facilitator = BaseUser & {
+  learners: string[];
+  bio?: string;
+  emailPrefrence: number;
+};
 export type Learner = BaseUser & { facilitator: string };
 
 export type User = Administrator | Facilitator | Learner;

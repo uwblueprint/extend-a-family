@@ -27,7 +27,6 @@ export type UserDTO = {
   role: Role;
   status: Status;
   profilePicture?: string;
-  bio?: string;
   bookmarks: BookmarkDTO[];
 };
 
@@ -35,7 +34,12 @@ export type CreateUserDTO = Omit<UserDTO, "id" | "bookmarks"> & {
   password: string;
 };
 
-export type UpdateUserDTO = Omit<UserDTO, "id" | "email" | "bookmarks">;
+type UserOmmitedDTO = Omit<UserDTO, "id" | "email" | "bookmarks">;
+
+export type UpdateUserDTO = UserOmmitedDTO & {
+  bio?: string;
+  emailPrefrence?: number;
+};
 
 export type SignupUserDTO = Omit<CreateUserDTO, "role">;
 
@@ -48,6 +52,7 @@ export function isAdministrator(user: UserDTO): user is AdminDTO {
 export type FacilitatorDTO = UserDTO & {
   learners: string[];
   bio?: string;
+  emailPrefrence: number;
 };
 
 export function isFacilitator(user: UserDTO): user is FacilitatorDTO {
