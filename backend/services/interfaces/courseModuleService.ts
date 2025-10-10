@@ -18,7 +18,7 @@ interface ICourseModuleService {
    * @param courseModuleId the id of the course module we want to fetch
    * @throws Error if course module was not successfully fetched
    */
-  getCourseModule(courseModuleId: string): Promise<CourseModuleDTO | null>;
+  getCourseModule(courseModuleId: string): Promise<CourseModuleDTO>;
 
   /**
    * Creates a course module

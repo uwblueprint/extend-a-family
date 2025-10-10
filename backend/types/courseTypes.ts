@@ -31,15 +31,34 @@ export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
 export type UpdateCourseModuleDTO = Pick<CourseModuleDTO, "title" | "imageURL">;
 
 export type PageType = "Lesson" | "Activity";
-export type CoursePageDTO = {
+export type CoursePageDTOBase = {
   id: string;
   title: string;
   type: PageType;
 };
 
-export type LessonPageDTO = CoursePageDTO & {
+export type LessonPageDTO = CoursePageDTOBase & {
+  type: "Lesson";
   source: string;
 };
+
+export enum QuestionType {
+  MultipleChoice = "MultipleChoice",
+  MultiSelect = "MultiSelect",
+  Matching = "Matching",
+  Table = "Table",
+  Custom = "Custom",
+}
+
+export interface ActivityPageDTO extends CoursePageDTOBase {
+  questionType: QuestionType;
+  activityNumber: string;
+  questionText: string;
+  instruction: string;
+  imageUrl?: string;
+  additionalContext?: string;
+  userFeedback?: string;
+}
 
 export type ElementSkeleton = {
   id: string;
@@ -49,18 +68,22 @@ export type ElementSkeleton = {
   h: number;
   content: string;
 };
-export type ActivityPageDTO = CoursePageDTO & {
-  layout: [ElementSkeleton];
-};
+
+// export type ActivityPageDTO = CoursePageDTOBase & {
+//   type: "Activity";
+//   layout: [ElementSkeleton];
+// };
+
+export type CoursePageDTO = LessonPageDTO | ActivityPageDTO;
 
 export type CreateCoursePageDTO =
   | Pick<CoursePageDTO, "title" | "type">
   | Pick<LessonPageDTO, "title" | "type" | "source">
-  | Pick<ActivityPageDTO, "title" | "type" | "layout">;
+  | Pick<ActivityPageDTO, "title" | "type">;
 export type UpdateCoursePageDTO =
   | Pick<CoursePageDTO, "title" | "type">
   | Pick<LessonPageDTO, "title" | "type" | "source">
-  | Pick<ActivityPageDTO, "title" | "type" | "layout">;
+  | Pick<ActivityPageDTO, "title" | "type">;
 
 export enum InteractiveElementType {
   TextInput = "TextInput",
