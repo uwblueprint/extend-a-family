@@ -80,7 +80,7 @@ export const UserSchema: Schema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ["Invited", "Active"],
+      enum: ["Invited", "Active", "PendingApproval"],
     },
     email: {
       type: String,
