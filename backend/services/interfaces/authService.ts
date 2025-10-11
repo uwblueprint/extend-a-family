@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose";
 import { AuthDTO, Token } from "../../types/authTypes";
-import { Role } from "../../types/userTypes";
+import { Role, Status } from "../../types/userTypes";
 
 interface IAuthService {
   /**
@@ -109,6 +109,12 @@ interface IAuthService {
    * @returns the userid from the access token
    */
   getUserIdFromAccessToken(accessToken: string): Promise<ObjectId>;
+
+  /**
+   * Returns the user signup status based on the specified email address
+   * @param requestedEmail email address for requested user
+   */
+  getStatusByEmail(requestedEmail: string): Promise<Status>;
 }
 
 export default IAuthService;

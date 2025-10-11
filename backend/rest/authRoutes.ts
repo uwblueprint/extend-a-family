@@ -24,6 +24,7 @@ import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
 import { getErrorMessage } from "../utilities/errorUtils";
 import { AuthError, AuthErrorCodes } from "../types/authTypes";
+import { Status } from "../types/userTypes";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -90,13 +91,15 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
 /* Signup a user, returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
 authRouter.post("/signup", signupRequestValidator, async (req, res) => {
   try {
+    const userStatus = await authService.getStatusByEmail(req.body.email);
+
     await userService.createUser({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
       role: req.body.role,
       password: req.body.password,
-      status: "Active",
+      status: userStatus as Status,
     });
 
     const authDTO = await authService.generateToken(
