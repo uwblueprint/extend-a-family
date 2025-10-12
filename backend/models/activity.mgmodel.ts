@@ -33,17 +33,16 @@ export interface Media {
 
 export interface MatchingActivity extends Activity {
   questionType: QuestionType.Matching;
-  media: Map<1 | 2 | 3, Media[]>;
-  answers: Set<string>[];
+  media: Map<string, Media[]>; // key: column number
+  correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
   rows: number; 
 }
 
 export interface TableActivity extends Activity {
   questionType: QuestionType.Table;
   columnLabels: string[];
-  rowLabels: string[];
-  rowImageUrls: string[];
-  correctAnswers: number[][]; // [row, col]
+  rowLabels: Map<string, string | undefined>; // key: label, value: image url 
+  correctAnswers: number[][]; // list of table cords which represent answers [row, col]
 }
 
 export const ActivitySchema: Schema = new Schema({
@@ -80,7 +79,7 @@ export const ActivitySchema: Schema = new Schema({
     required: false,
     maxlength: 500,
   },
-});
+}, { discriminatorKey: "questionType", timestamps: true });
 
 /* eslint-disable no-param-reassign */
 ActivitySchema.set("toObject", {
@@ -116,14 +115,14 @@ const MatchingActivitySchema = new Schema({
       message: "Media map keys must be 1, 2, or 3",
     },
   },
-  answers: {
+  correctAnswers: {
     type: [[String]],
     required: true,
     set: (val: string[][]) =>
       val.map((arr) => Array.from(new Set(arr))), // ensures uniqueness
     validate: {
       validator: (value: string[][]) => value.every((arr) => arr.length === 3 || arr.length === 2),
-      message: "Each answer set must have exactly 3 unique elements",
+      message: "Each answer set must have exactly 2 or 3 unique elements",
     },
   },
   rows: {
@@ -198,12 +197,12 @@ const TableActivitySchema = new Schema({
     required: true,
   },
   rowLabels: {
-    type: [String],
+    type: Map,
+    of: {
+      type: String,
+      required: false, 
+    },
     required: true,
-  },
-  rowImageUrls: {
-    type: [String],
-    required: false,
   },
   correctAnswers: {
     type: [[Number]],

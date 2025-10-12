@@ -26,8 +26,8 @@ export interface Media {
 
 export interface MatchingActivityDTO extends ActivityDTO {
   questionType: QuestionType.Matching;
-  media: Map<1 | 2 | 3, Media[]>;
-  answers: Set<string>[];
+  media: Map<"1" | "2" | "3", Media[]>;
+  correctAnswers: string[][];
   rows: number; 
 }
 
@@ -46,8 +46,7 @@ export interface MultiSelectActivityDTO extends ActivityDTO {
 export interface TableActivityDTO extends ActivityDTO {
   questionType: QuestionType.Table;
   columnLabels: string[];
-  rowLabels: string[];
-  rowImageUrls: string[];
+  rowLabels: Map<string, string | undefined>; // key is label, and value is image URL
   correctAnswers: number[][];
 }
 
@@ -97,7 +96,7 @@ export type CreateActivityDTO =
       | "questionText"
       | "instruction"
       | "media"
-      | "answers"
+      | "correctAnswers"
       | "rows"
     >
   | Pick<
@@ -108,7 +107,6 @@ export type CreateActivityDTO =
       | "instruction"
       | "columnLabels"
       | "rowLabels"
-      | "rowImageUrls"
       | "correctAnswers"
     >;
 
