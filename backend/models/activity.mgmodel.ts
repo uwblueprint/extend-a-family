@@ -26,60 +26,63 @@ export interface MultiSelectActivity extends Activity {
 }
 
 export interface Media {
-  id: string
-  mediaType: "text" | "media"
-  context: string
+  id: string;
+  mediaType: "text" | "media";
+  context: string;
 }
 
 export interface MatchingActivity extends Activity {
   questionType: QuestionType.Matching;
   media: Map<string, Media[]>; // key: column number
   correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
-  rows: number; 
+  rows: number;
 }
 
 export interface TableActivity extends Activity {
   questionType: QuestionType.Table;
   columnLabels: string[];
-  rowLabels: Map<string, string | undefined>; // key: label, value: image url 
+  rowLabels: Map<string, string | undefined>; // key: label, value: image url
   correctAnswers: number[][]; // list of table cords which represent answers [row, col]
 }
 
-export const ActivitySchema: Schema = new Schema({
-  questionType: {
-    type: String,
-    required: true,
-    enum: Object.values(QuestionType),
+export const ActivitySchema: Schema = new Schema(
+  {
+    questionType: {
+      type: String,
+      required: true,
+      enum: Object.values(QuestionType),
+    },
+    activityNumber: {
+      type: String,
+      required: true,
+    },
+    questionText: {
+      type: String,
+      required: true,
+      maxlength: 1000,
+    },
+    instruction: {
+      type: String,
+      required: true,
+      maxlength: 200,
+    },
+    imageUrl: {
+      type: String,
+      required: false,
+    },
+    additionalContext: {
+      type: String,
+      required: false,
+      maxlength: 500,
+    },
+    userFeedback: {
+      type: String,
+      required: false,
+      maxlength: 500,
+    },
   },
-  activityNumber: {
-    type: String,
-    required: true,
-  },
-  questionText: {
-    type: String,
-    required: true,
-    maxlength: 1000,
-  },
-  instruction: {
-    type: String,
-    required: true,
-    maxlength: 200,
-  },
-  imageUrl: {
-    type: String,
-    required: false,
-  },
-  additionalContext: {
-    type: String,
-    required: false,
-    maxlength: 500,
-  },
-  userFeedback: {
-    type: String,
-    required: false,
-    maxlength: 500,
-  },
-}, { discriminatorKey: "questionType", timestamps: true });
+  { discriminatorKey: "questionType", timestamps: true },
+);
 
 /* eslint-disable no-param-reassign */
 ActivitySchema.set("toObject", {
@@ -105,9 +108,10 @@ const MatchingActivitySchema = new Schema({
   ...ActivitySchema.obj,
   media: {
     type: Map,
-    of: [MediaSchema], 
+    of: [MediaSchema],
     required: true,
     validate: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       validator: (mediaMap: Map<string, any[]>) => {
         const keys = Array.from(mediaMap.keys());
         return keys.every((k) => ["1", "2", "3"].includes(k));
@@ -118,10 +122,10 @@ const MatchingActivitySchema = new Schema({
   correctAnswers: {
     type: [[String]],
     required: true,
-    set: (val: string[][]) =>
-      val.map((arr) => Array.from(new Set(arr))), // ensures uniqueness
+    set: (val: string[][]) => val.map((arr) => Array.from(new Set(arr))), // ensures uniqueness
     validate: {
-      validator: (value: string[][]) => value.every((arr) => arr.length === 3 || arr.length === 2),
+      validator: (value: string[][]) =>
+        value.every((arr) => arr.length === 3 || arr.length === 2),
       message: "Each answer set must have exactly 2 or 3 unique elements",
     },
   },
@@ -133,9 +137,9 @@ const MatchingActivitySchema = new Schema({
         return value >= 2 && value <= 6;
       },
       message: "Must have between 2 and 6 rows",
-    }
-  }
-})
+    },
+  },
+});
 
 const MultipleChoiceActivitySchema = new Schema({
   ...ActivitySchema.obj, // inherit base fields from ActivitySchema
@@ -200,7 +204,7 @@ const TableActivitySchema = new Schema({
     type: Map,
     of: {
       type: String,
-      required: false, 
+      required: false,
     },
     required: true,
   },
@@ -212,15 +216,13 @@ const TableActivitySchema = new Schema({
         value.every((pair) => pair.length === 2),
       message: "Each coordinate must be a pair of numbers [row, col]",
     },
-  }
+  },
 });
 
-
-const MatchingActivityModel =
-  CoursePageModel.discriminator<MatchingActivity>(
-    QuestionType.Matching,
-    MatchingActivitySchema,
-  );
+const MatchingActivityModel = CoursePageModel.discriminator<MatchingActivity>(
+  QuestionType.Matching,
+  MatchingActivitySchema,
+);
 
 const MultipleChoiceActivityModel =
   CoursePageModel.discriminator<MultipleChoiceActivity>(
@@ -234,10 +236,14 @@ const MultiSelectActivityModel =
     MultiSelectActivitySchema,
   );
 
-const TableActivityModel =
-  CoursePageModel.discriminator<TableActivity>(
-    QuestionType.Table,
-    TableActivitySchema,
-  );
+const TableActivityModel = CoursePageModel.discriminator<TableActivity>(
+  QuestionType.Table,
+  TableActivitySchema,
+);
 
-export { MatchingActivityModel, MultipleChoiceActivityModel, MultiSelectActivityModel, TableActivityModel };
+export {
+  MatchingActivityModel,
+  MultipleChoiceActivityModel,
+  MultiSelectActivityModel,
+  TableActivityModel,
+};

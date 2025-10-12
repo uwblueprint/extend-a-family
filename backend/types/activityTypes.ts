@@ -19,16 +19,16 @@ export interface ActivityDTO extends CoursePageDTO {
 }
 
 export interface Media {
-  id: string
-  mediaType: "text" | "media"
-  context: string
+  id: string;
+  mediaType: "text" | "media";
+  context: string;
 }
 
 export interface MatchingActivityDTO extends ActivityDTO {
   questionType: QuestionType.Matching;
   media: Map<"1" | "2" | "3", Media[]>;
   correctAnswers: string[][];
-  rows: number; 
+  rows: number;
 }
 
 export interface MultipleChoiceActivityDTO extends ActivityDTO {
