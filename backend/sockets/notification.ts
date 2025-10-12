@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
-import NotificationService from "../services/implementations/notificationService";
 import MgNotification, { Notification } from "../models/notification.mgmodel";
+import NotificationService from "../services/implementations/notificationService";
 import logger from "../utilities/logger";
 
 const Logger = logger(__filename);
@@ -8,9 +8,9 @@ const notificationService = new NotificationService();
 
 const registerNotificationHandlers = (io: Server, socket: Socket) => {
   // change this to http request idk
-  const markNotificationAsRead = async (userId: string) => {
+  const markNotificationAsSeen = async (userId: string) => {
     try {
-      const updates = await notificationService.markReadNotifications(userId);
+      const updates = await notificationService.markSeenNotifications(userId);
       io.to(userId).emit("notification:readUpdates", updates);
     } catch (error) {
       Logger.error(
@@ -18,7 +18,7 @@ const registerNotificationHandlers = (io: Server, socket: Socket) => {
       );
     }
   };
-  socket.on("notification:read", markNotificationAsRead);
+  socket.on("notification:read", markNotificationAsSeen);
 };
 
 const registerNotificationSchemaListener = (io: Server) => {
@@ -40,6 +40,6 @@ const removeNotificationHandlers = (io: Server, socket: Socket) => {
 
 export {
   registerNotificationHandlers,
-  removeNotificationHandlers,
   registerNotificationSchemaListener,
+  removeNotificationHandlers,
 };

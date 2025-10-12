@@ -1,9 +1,11 @@
-import mongoose, { Schema, Document, ObjectId } from "mongoose";
+import mongoose, { Document, ObjectId, Schema } from "mongoose";
 
 export interface Notification extends Document {
   id: ObjectId;
   message: string;
+  helpRequest: ObjectId;
   user: ObjectId;
+  seen: boolean;
   read: boolean;
   createdAt: Date;
   link: string;
@@ -15,10 +17,19 @@ export const NotificationSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    helpRequest: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "HelpRequest",
+      required: true,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    seen: {
+      type: Boolean,
+      default: false,
     },
     read: {
       type: Boolean,

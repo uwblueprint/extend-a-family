@@ -1,15 +1,15 @@
 /* eslint-disable no-underscore-dangle */
 import { Router } from "express";
-import { getErrorMessage } from "../utilities/errorUtils";
-import { HelpRequestService } from "../services/implementations/helpRequestService";
-import MgNotification from "../models/notification.mgmodel";
+import { getAccessToken } from "../middlewares/auth";
 import {
   createHelpRequestDtoValidator,
   updateHelpRequestDtoValidator,
 } from "../middlewares/validators/helpRequestValidators";
-import { getAccessToken } from "../middlewares/auth";
+import MgNotification from "../models/notification.mgmodel";
 import AuthService from "../services/implementations/authService";
+import { HelpRequestService } from "../services/implementations/helpRequestService";
 import UserService from "../services/implementations/userService";
+import { getErrorMessage } from "../utilities/errorUtils";
 
 const helpRequestRouter: Router = Router();
 
@@ -58,6 +58,7 @@ helpRequestRouter.post("/", createHelpRequestDtoValidator, async (req, res) => {
     // make and send a notificaiton to the facilitator
     await MgNotification.create({
       message: req.body.message,
+      helpRequest: createdHelpRequest.id,
       user: req.body.facilitator,
       link: `/help-requests/${createdHelpRequest.id}`,
     });

@@ -1,8 +1,10 @@
 import { ObjectId } from "mongoose";
+import { HelpRequest } from "../models/helprequest.mgmodel";
 
 export type NotificationDTO = {
   id: ObjectId;
   message: string;
+  seen: boolean;
   read: boolean;
   createdAt: Date;
   user: ObjectId;
@@ -17,11 +19,14 @@ export type CreateNotificationDTO = {
 
 export type UpdateNotificationDTO = {
   message?: string;
+  seen?: boolean;
   read?: boolean;
   link?: string;
 };
 
-export type UserNotification = Omit<NotificationDTO, "user">;
+export type UserNotification = Omit<NotificationDTO, "user"> & {
+  helpRequest: HelpRequest;
+};
 
 export type NotificationsResponseDTO = {
   notifications: UserNotification[];
