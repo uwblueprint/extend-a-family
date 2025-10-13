@@ -33,8 +33,23 @@ class NotificationService implements INotificationService {
 
       notifications = await Promise.all(
         foundNotifications.map(async (notification) => {
-          const populatedNotification: UserNotification =
+          let populatedNotification: UserNotification =
             await notification.populate("helpRequest");
+          populatedNotification = await notification.populate(
+            "helpRequest.learner",
+          );
+          populatedNotification = await notification.populate(
+            "helpRequest.unit",
+            "title",
+          );
+          populatedNotification = await notification.populate(
+            "helpRequest.module",
+            "title",
+          );
+          populatedNotification = await notification.populate(
+            "helpRequest.page",
+            "title",
+          );
           return {
             id: populatedNotification.id,
             message: populatedNotification.message,
