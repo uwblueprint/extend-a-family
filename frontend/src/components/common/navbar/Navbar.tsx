@@ -14,6 +14,7 @@ import { useSocket } from "../../../contexts/SocketContext";
 import { useUser } from "../../../hooks/useUser";
 import { Notification } from "../../../types/NotificationTypes";
 import eafLogo from "../../assets/logoColoured.png";
+import NotifiactionsFetchError from "../../notification/NotificationsFetchError";
 import NotificationList from "../../notification/NotificationsList";
 import PageTabs from "./PageTabs";
 import UserButton from "./UserButton";
@@ -26,20 +27,24 @@ export default function Navbar() {
   const NUMBER_OF_NOTIFICATIONS_TO_LOAD = 10;
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [numUnseenNotifications, setNumUnseenNotification] = useState(0);
+  const [errorFetchNotifs, setErrorFetchNotifs] = useState(false);
 
   const fetchNotifications = async () => {
     const data = await NotificationAPIClient.getNotifications(
-      notifications.length,
+      0, // Always start from the beginning
       NUMBER_OF_NOTIFICATIONS_TO_LOAD,
     );
-    if (!data) return;
-    setNotifications((prev) => [...data.notifications, ...prev]);
+    if (!data) {
+      setErrorFetchNotifs(true);
+      return;
+    }
+    setNotifications(data.notifications);
     setNumUnseenNotification(data.numberOfUnseenNotifications);
+    setErrorFetchNotifs(false);
   };
 
   useEffect(() => {
     fetchNotifications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -74,6 +79,7 @@ export default function Navbar() {
 
   const handleNotificationClose = () => {
     socket?.emit("notification:read", user.id);
+    fetchNotifications();
     handleClose();
   };
 
@@ -131,7 +137,14 @@ export default function Navbar() {
           horizontal: "left",
         }}
       >
-        <NotificationList notifications={notifications} />
+        {errorFetchNotifs ? (
+          <NotifiactionsFetchError />
+        ) : (
+          <NotificationList
+            notifications={notifications}
+            refreshNotifs={fetchNotifications}
+          />
+        )}
       </Popover>
     </Box>
   );

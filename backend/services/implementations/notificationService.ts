@@ -26,7 +26,10 @@ class NotificationService implements INotificationService {
     let totalNumberOfNotifications: number;
     let numberOfUnseenNotifications: number;
     try {
-      const foundNotifications = await MgNotification.find({ user })
+      const foundNotifications = await MgNotification.find({
+        user,
+        read: false,
+      })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
@@ -170,6 +173,25 @@ class NotificationService implements INotificationService {
       throw error;
     }
     return updates;
+  }
+
+  async markNotificationRead(notificationId: string): Promise<NotificationDTO> {
+    try {
+      const updatedNotification = await this.updateNotification(
+        notificationId,
+        {
+          read: true,
+        },
+      );
+      return updatedNotification;
+    } catch (error) {
+      Logger.error(
+        `Failed to mark notification as read. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import { Delete } from "@mui/icons-material";
+import { Delete, MarkUnreadChatAltOutlined } from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -15,8 +15,8 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
+import { useUser } from "../../hooks/useUser";
 import { User } from "../../types/UserTypes";
-import placeholderImage from "../assets/placeholder_profile.png";
 
 interface UserTableProps {
   filteredUsers: User[];
@@ -47,6 +47,7 @@ const UserTable: React.FC<UserTableProps> = ({
   handleOpenDeleteUserModal,
 }) => {
   const theme = useTheme();
+  const { role } = useUser();
   return (
     <TableContainer
       component={Paper}
@@ -79,7 +80,7 @@ const UserTable: React.FC<UserTableProps> = ({
                   flexDirection: "row",
                 }}
               >
-                <Avatar src={placeholderImage} alt={user.firstName} />
+                <Avatar src={user.profilePicture} alt={user.firstName} />
                 <Box
                   sx={{
                     marginLeft: "16px",
@@ -96,37 +97,72 @@ const UserTable: React.FC<UserTableProps> = ({
                 </Box>
               </TableCell>
               <TableCell sx={{ textAlign: "right", paddingRight: "0px" }}>
-                <Typography
-                  variant="labelMedium"
-                  sx={{
-                    marginRight: "16px",
-                    display: "inline-block",
-                    backgroundColor: theme.palette[user.role].Light.Default,
-                    color: theme.palette[user.role].Dark.Default,
-                  }}
-                >
-                  {user.role.toUpperCase()}
-                </Typography>
-                <Button
-                  variant="outlined"
-                  startIcon={<Delete />}
-                  sx={{
-                    height: "40px",
-                    padding: "4px 16px",
-                    borderRadius: "4px",
-                    borderColor: theme.palette.Neutral[500],
-                    color: theme.palette.Error.Dark.Default,
-                  }}
-                  onClick={() =>
-                    handleOpenDeleteUserModal(
-                      user.id,
-                      user.firstName,
-                      user.lastName,
-                    )
-                  }
-                >
-                  <Typography variant="labelLarge">DELETE USER</Typography>
-                </Button>
+                {role === "Facilitator" &&
+                  (user.status === "Active" ? (
+                    <Typography
+                      variant="labelMedium"
+                      sx={{
+                        display: "inline-block",
+                        backgroundColor: "#F6F6F6",
+                        color: theme.palette.Neutral[700],
+                        padding: "4px 8px",
+                      }}
+                    >
+                      ACCOUNT PENDING
+                    </Typography>
+                  ) : (
+                    <>
+                      <MarkUnreadChatAltOutlined
+                        sx={{
+                          width: "24px",
+                          height: "24px",
+                          color: theme.palette.Facilitator.Dark.Selected,
+                        }}
+                      />
+                      <Typography
+                        variant="labelMedium"
+                        sx={{ marginLeft: "16px" }}
+                      >
+                        X% COMPLETE
+                      </Typography>
+                    </>
+                  ))}
+                {role === "Administrator" && (
+                  <>
+                    <Typography
+                      variant="labelMedium"
+                      sx={{
+                        marginRight: "16px",
+                        display: "inline-block",
+                        backgroundColor: theme.palette[user.role].Light.Default,
+                        color: theme.palette[user.role].Dark.Default,
+                        padding: "4px 8px",
+                      }}
+                    >
+                      {user.role.toUpperCase()}
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Delete />}
+                      sx={{
+                        height: "40px",
+                        padding: "4px 16px",
+                        borderRadius: "4px",
+                        borderColor: theme.palette.Neutral[500],
+                        color: theme.palette.Error.Dark.Default,
+                      }}
+                      onClick={() =>
+                        handleOpenDeleteUserModal(
+                          user.id,
+                          user.firstName,
+                          user.lastName,
+                        )
+                      }
+                    >
+                      <Typography variant="labelLarge">DELETE USER</Typography>
+                    </Button>
+                  </>
+                )}
               </TableCell>
             </TableRow>
           ))}

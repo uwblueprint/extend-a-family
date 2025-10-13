@@ -8,12 +8,13 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import { User } from "../../types/UserTypes";
 
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
+import { useUser } from "../../hooks/useUser";
 import { isCaseInsensitiveSubstring } from "../../utils/StringUtils";
 import AddAdminModal from "./AddAdminModal";
 import DeleteUserModal from "./DeleteUserModal";
@@ -44,18 +45,22 @@ const ManageUserPage = (): React.ReactElement => {
   const [selectedRole, setSelectedRole] = useState<string>("");
 
   const theme = useTheme();
+  const { role } = useUser();
 
   // Add this outside of useEffect so it can be reused
-  const getUsers = async () => {
-    const allUsers = await UserAPIClient.getUsers();
+  const getUsers = useCallback(async () => {
+    const allUsers =
+      role === "Administrator"
+        ? await UserAPIClient.getUsers()
+        : await UserAPIClient.facilitatorGetLearners();
     setUserData(allUsers);
     setUsers(allUsers);
-  };
+  }, [role]);
 
   // Fetch all users on mount
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [getUsers]);
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * usersPerPage - users.length) : 0;

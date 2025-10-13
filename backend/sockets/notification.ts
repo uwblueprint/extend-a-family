@@ -24,10 +24,36 @@ const registerNotificationHandlers = (io: Server, socket: Socket) => {
 const registerNotificationSchemaListener = (io: Server) => {
   MgNotification.schema.on(
     "notificationSaved",
-    (notification: Notification) => {
-      io.to(notification.user.toString()).emit(
+    async (notification: Notification) => {
+      let populatedNotification = await notification.populate("helpRequest");
+      populatedNotification = await notification.populate(
+        "helpRequest.learner",
+      );
+      populatedNotification = await notification.populate(
+        "helpRequest.unit",
+        "title",
+      );
+      populatedNotification = await notification.populate(
+        "helpRequest.module",
+        "title",
+      );
+      populatedNotification = await notification.populate(
+        "helpRequest.page",
+        "title",
+      );
+      // Transform the notification to have 'id' instead of '_id' for frontend compatibility
+      const notificationObj = populatedNotification.toObject();
+      const notificationForFrontend = {
+        ...notificationObj,
+        // eslint-disable-next-line no-underscore-dangle
+        id: notificationObj._id.toString(),
+      };
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete, no-underscore-dangle
+      delete notificationForFrontend._id;
+
+      io.to(populatedNotification.user.toString()).emit(
         "notification:new",
-        notification,
+        notificationForFrontend,
       );
     },
   );

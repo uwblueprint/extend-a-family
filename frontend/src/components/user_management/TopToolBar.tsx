@@ -35,10 +35,14 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
       {/* Title Section */}
       <Stack direction="column">
         <Typography variant="headlineLarge" color={theme.palette.Neutral[700]}>
-          User List
+          {role === "Administrator" && <>User List</>}
+          {role === "Facilitator" && <>Learner List</>}
         </Typography>
         <Typography variant="bodyMedium" color={theme.palette.Neutral[700]}>
-          View all the people using this platform
+          {role === "Administrator" && (
+            <>View all the people using this platform</>
+          )}
+          {role === "Facilitator" && <>View a complete list of your learners</>}
         </Typography>
       </Stack>
       {/* Controls Section */}
@@ -75,82 +79,106 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
             },
           }}
         />
-        <StartAdornedTextField
-          select
-          variant="outlined"
-          label="Filter"
-          value={filterLabel}
-          adornment={
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-              }}
-            >
-              <FilterList sx={{ color: theme.palette.Neutral[500] }} />
-            </Box>
-          }
-          focusedBorderColor={theme.palette[role].Dark.Default}
-          sx={{
-            width: "250px",
-            textTransform: "uppercase",
-            textAlign: "left",
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: theme.palette.Neutral[600],
-              },
-              "&:hover fieldset": {
-                borderColor: theme.palette.Neutral[600],
-              },
-            },
-          }}
-        >
-          {["All", "Administrator", "Facilitator", "Learner"].map(
-            (roleOption) => (
-              <MenuItem
-                key={roleOption}
-                value={roleOption}
-                onClick={() => handleRoleSelect(roleOption)}
+        {role === "Administrator" && (
+          <StartAdornedTextField
+            select
+            variant="outlined"
+            label="Filter"
+            value={filterLabel}
+            adornment={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
               >
-                <Typography
-                  variant="labelMedium"
-                  sx={{
-                    display: "inline-block",
-                    color: isRole(roleOption)
-                      ? theme.palette[roleOption].Dark.Default
-                      : undefined,
-                    backgroundColor: isRole(roleOption)
-                      ? theme.palette[roleOption].Light.Default
-                      : undefined,
-                    padding: "4px 8px",
-                    borderRadius: "8px",
-                  }}
+                <FilterList sx={{ color: theme.palette.Neutral[500] }} />
+              </Box>
+            }
+            focusedBorderColor={theme.palette[role].Dark.Default}
+            sx={{
+              width: "250px",
+              textTransform: "uppercase",
+              textAlign: "left",
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: theme.palette.Neutral[600],
+                },
+                "&:hover fieldset": {
+                  borderColor: theme.palette.Neutral[600],
+                },
+              },
+            }}
+          >
+            {["All", "Administrator", "Facilitator", "Learner"].map(
+              (roleOption) => (
+                <MenuItem
+                  key={roleOption}
+                  value={roleOption}
+                  onClick={() => handleRoleSelect(roleOption)}
                 >
-                  {roleOption.toUpperCase()}
-                </Typography>
-              </MenuItem>
-            ),
-          )}
-        </StartAdornedTextField>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          sx={{
-            backgroundColor: theme.palette.Administrator.Dark.Default,
-            height: "56px",
-            color: "white",
-            "&:hover": {
+                  <Typography
+                    variant="labelMedium"
+                    sx={{
+                      display: "inline-block",
+                      color: isRole(roleOption)
+                        ? theme.palette[roleOption].Dark.Default
+                        : undefined,
+                      backgroundColor: isRole(roleOption)
+                        ? theme.palette[roleOption].Light.Default
+                        : undefined,
+                      padding: "4px 8px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    {roleOption.toUpperCase()}
+                  </Typography>
+                </MenuItem>
+              ),
+            )}
+          </StartAdornedTextField>
+        )}
+        {role === "Administrator" && (
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            sx={{
               backgroundColor: theme.palette.Administrator.Dark.Default,
-            },
-          }}
-          onClick={handleOpenAddAdminModal}
-          disableElevation
-        >
-          <Typography variant="labelLarge" color={theme.palette.Neutral[100]}>
-            ADD NEW ADMIN
-          </Typography>
-        </Button>
+              height: "56px",
+              color: "white",
+              "&:hover": {
+                backgroundColor: theme.palette.Administrator.Dark.Default,
+              },
+            }}
+            onClick={handleOpenAddAdminModal}
+            disableElevation
+          >
+            <Typography variant="labelLarge" color={theme.palette.Neutral[100]}>
+              ADD NEW ADMIN
+            </Typography>
+          </Button>
+        )}
+        {role === "Facilitator" && (
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            sx={{
+              backgroundColor: theme.palette.Facilitator.Dark.Default,
+              height: "56px",
+              color: "white",
+              "&:hover": {
+                backgroundColor: theme.palette.Facilitator.Dark.Default,
+              },
+            }}
+            onClick={() => {}}
+            disableElevation
+          >
+            <Typography variant="labelLarge" color={theme.palette.Neutral[100]}>
+              CREATE LEARNER ACCOUNT
+            </Typography>
+          </Button>
+        )}
       </Stack>
     </Stack>
   );
