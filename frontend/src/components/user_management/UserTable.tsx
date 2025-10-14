@@ -223,7 +223,7 @@ const UserTable: React.FC<UserTableProps> = ({
         }}
         sx={{ borderRadius: "8px" }}
       >
-        <ChatWithLearner learner={chatWithUser!} />
+        {chatWithUser && <ChatWithLearner learner={chatWithUser} />}
       </Popover>
     </TableContainer>
   );
