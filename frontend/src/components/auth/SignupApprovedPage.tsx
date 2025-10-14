@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Button, Container, Typography, useTheme } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import logo from "../assets/logoColoured.png";
+import { WELCOME_PAGE } from "../../constants/Routes";
 
 const SignupApproved = (): React.ReactElement => {
   const theme = useTheme();
@@ -61,7 +62,7 @@ const SignupApproved = (): React.ReactElement => {
 
           <Button
             variant="contained"
-            // onClick={onSignupClick}
+            href={WELCOME_PAGE}
             fullWidth
             sx={{
               bgcolor: theme.palette.Facilitator.Dark.Default,

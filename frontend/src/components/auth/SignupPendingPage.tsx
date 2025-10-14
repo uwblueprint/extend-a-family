@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Button, Container, Typography, useTheme } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import logo from "../assets/logoColoured.png";
+import { WELCOME_PAGE } from "../../constants/Routes";
 
 const SignupPending = (): React.ReactElement => {
   const theme = useTheme();
@@ -62,7 +63,7 @@ const SignupPending = (): React.ReactElement => {
 
           <Button
             variant="contained"
-            // onClick={onSignupClick}
+            href={WELCOME_PAGE}
             fullWidth
             sx={{
               bgcolor: theme.palette.Facilitator.Dark.Default,

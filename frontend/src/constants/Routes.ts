@@ -8,9 +8,9 @@ export const WELCOME_PAGE = "/welcome";
 
 export const SIGNUP_PAGE = "/signup";
 
-export const SIGNUP_APPROVED_PAGE = "/signup-approved";
+export const SIGNUP_APPROVED_PAGE = "/signup/approved";
 
-export const SIGNUP_PENDING_PAGE = "/signup-pending";
+export const SIGNUP_PENDING_PAGE = "/signup/pending";
 
 export const CREATE_MODULE_PAGE = "/create-module";
 
