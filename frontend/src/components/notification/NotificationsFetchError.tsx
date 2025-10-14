@@ -85,6 +85,5 @@ export default function NotifiactionsFetchError() {
         </Box>
       </Box>
     </Box>
-    // </Box>
   );
 }
