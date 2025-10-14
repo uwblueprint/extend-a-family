@@ -213,6 +213,8 @@ authRouter.post(
         length: 20,
         numbers: true,
       });
+      const token = getAccessToken(req)!;
+      const facilitatorId = await authService.getUserIdFromAccessToken(token);
       const invitedLearnerUser = await userService.createLearner(
         {
           firstName: req.body.firstName,
