@@ -12,6 +12,7 @@ interface TopToolBarProps {
   filterLabel: string;
   handleRoleSelect: (role: string) => void;
   handleOpenAddAdminModal: () => void;
+  handleOpenAddLearnerModal: () => void;
 }
 
 const TopToolBar: React.FC<TopToolBarProps> = ({
@@ -20,6 +21,7 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
   filterLabel,
   handleRoleSelect,
   handleOpenAddAdminModal,
+  handleOpenAddLearnerModal,
 }) => {
   const { role } = useUser();
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -171,7 +173,7 @@ const TopToolBar: React.FC<TopToolBarProps> = ({
                 backgroundColor: theme.palette.Facilitator.Dark.Default,
               },
             }}
-            onClick={() => {}}
+            onClick={handleOpenAddLearnerModal}
             disableElevation
           >
             <Typography variant="labelLarge" color={theme.palette.Neutral[100]}>

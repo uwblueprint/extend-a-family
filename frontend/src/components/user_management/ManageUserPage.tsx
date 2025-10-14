@@ -17,6 +17,7 @@ import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import { useUser } from "../../hooks/useUser";
 import { isCaseInsensitiveSubstring } from "../../utils/StringUtils";
 import AddAdminModal from "./AddAdminModal";
+import AddLearnerModal from "./AddLearnerModal";
 import DeleteUserModal from "./DeleteUserModal";
 import TopToolBar from "./TopToolBar";
 import UserTable from "./UserTable";
@@ -33,14 +34,21 @@ const ManageUserPage = (): React.ReactElement => {
   const [deleteUserId, setDeleteUserId] = useState("");
   const [openAddUserSnackbar, setOpenAddUserSnackbar] = useState(false);
   const [openDeleteUserSnackbar, setOpenDeleteUserSnackbar] = useState(false);
-  const [addSnackbarName, setAddSnackbarName] = useState("");
+  const [addSnackbarMessage, setAddSnackbarMessage] = useState("");
   const [deleteSnackbarName, setDeleteSnackbarName] = useState("");
+
   // States for admin modal inputs
   const [deleteFirstName, setDeleteFirstName] = useState("");
   const [deleteLastName, setDeleteLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+
+  // States for learner modal inputs
+  const [openAddLearnerModal, setOpenAddLearnerModal] = useState(false);
+  const [learnerFirstName, setLearnerFirstName] = useState("");
+  const [learnerLastName, setLearnerLastName] = useState("");
+  const [learnerEmail, setLearnerEmail] = useState("");
 
   const [selectedRole, setSelectedRole] = useState<string>("");
 
@@ -112,6 +120,9 @@ const ManageUserPage = (): React.ReactElement => {
   const handleCloseAddAdminSnackbar = () => setOpenAddUserSnackbar(false);
   const handleCloseDeleteUserSnackbar = () => setOpenDeleteUserSnackbar(false);
 
+  const handleCloseAddLearnerModal = () => setOpenAddLearnerModal(false);
+  const handleOpenAddLearnerModal = () => setOpenAddLearnerModal(true);
+
   const handleOpenDeleteUserModal = (
     userId: string,
     dFirstName: string,
@@ -142,8 +153,28 @@ const ManageUserPage = (): React.ReactElement => {
     if (firstName && lastName && email) {
       const admin = await AuthAPIClient.inviteAdmin(firstName, lastName, email);
       if (admin) {
-        setAddSnackbarName(`${admin.firstName} ${admin.lastName}`);
+        setAddSnackbarMessage(
+          `"${admin.firstName} ${admin.lastName}" was added as admin`,
+        );
         handleCloseAddAdminModal();
+        setOpenAddUserSnackbar(true);
+        await getUsers();
+      }
+    }
+  };
+
+  const handleAddLearner = async () => {
+    if (learnerFirstName && learnerLastName && learnerEmail) {
+      const learner = await AuthAPIClient.inviteLearner(
+        learnerFirstName,
+        learnerLastName,
+        learnerEmail,
+      );
+      if (learner) {
+        setAddSnackbarMessage(
+          `User "${learner.firstName} ${learner.lastName}" was created`,
+        );
+        handleCloseAddLearnerModal();
         setOpenAddUserSnackbar(true);
         await getUsers();
       }
@@ -159,7 +190,7 @@ const ManageUserPage = (): React.ReactElement => {
           color: theme.palette.Learner.Dark.Default,
         }}
       >
-        UNDO
+        CLOSE
       </Button>
     </>
   );
@@ -176,7 +207,7 @@ const ManageUserPage = (): React.ReactElement => {
       </Button>
     </>
   );
-  const AddAdminSnackbar = () => {
+  const AddUserSnackbar = () => {
     return (
       <Snackbar
         anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
@@ -219,7 +250,7 @@ const ManageUserPage = (): React.ReactElement => {
                   color: theme.palette.Success.Dark.Default,
                 }}
               >
-                &quot;{addSnackbarName}&quot; was added as admin
+                {addSnackbarMessage}
               </Typography>
             </span>
           }
@@ -281,7 +312,7 @@ const ManageUserPage = (): React.ReactElement => {
       role="main"
       sx={{ display: "flex", flexDirection: "column", padding: "25px" }}
     >
-      <AddAdminSnackbar />
+      <AddUserSnackbar />
       <DeleteUserSnackbar />
       <DeleteUserModal
         open={openDeleteUserModal}
@@ -299,6 +330,14 @@ const ManageUserPage = (): React.ReactElement => {
         setEmail={setEmail}
         handleAddAdmin={handleAddAdmin}
       />
+      <AddLearnerModal
+        open={openAddLearnerModal}
+        onClose={handleCloseAddLearnerModal}
+        setFirstName={setLearnerFirstName}
+        setLastName={setLearnerLastName}
+        setEmail={setLearnerEmail}
+        handleAddLearner={handleAddLearner}
+      />
       <Stack direction="column" spacing={2} margin="2rem">
         <TopToolBar
           searchQuery={searchQuery}
@@ -306,6 +345,7 @@ const ManageUserPage = (): React.ReactElement => {
           filterLabel={selectedRole}
           handleRoleSelect={handleRoleSelect}
           handleOpenAddAdminModal={handleOpenAddAdminModal}
+          handleOpenAddLearnerModal={handleOpenAddLearnerModal}
         />
         <UserTable
           filteredUsers={filteredUsers}

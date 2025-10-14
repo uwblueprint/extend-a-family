@@ -2,13 +2,16 @@ import { Box, Divider, Typography, useTheme } from "@mui/material";
 import { Notification } from "../../types/NotificationTypes";
 import NotificationItem from "./NotificationItem";
 import NotificationsEmpty from "./NotificationsEmpty";
+import NotifiactionsFetchError from "./NotificationsFetchError";
 
 export default function NotificationList({
   notifications,
   refreshNotifs,
+  errorFetchNotifs,
 }: {
   notifications: Notification[];
   refreshNotifs: () => void;
+  errorFetchNotifs: boolean;
 }) {
   const theme = useTheme();
   return (
@@ -62,7 +65,10 @@ export default function NotificationList({
           refreshNotifs={refreshNotifs}
         />
       ))}
-      {notifications.length === 0 && <NotificationsEmpty />}
+      {errorFetchNotifs && <NotifiactionsFetchError />}
+      {notifications.length === 0 && !errorFetchNotifs && (
+        <NotificationsEmpty />
+      )}
     </Box>
   );
 }

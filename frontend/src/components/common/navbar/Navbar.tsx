@@ -6,64 +6,28 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Popover from "@mui/material/Popover";
 import Toolbar from "@mui/material/Toolbar";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import NotificationAPIClient from "../../../APIClients/NotificationAPIClient";
 import { LANDING_PAGE } from "../../../constants/Routes";
 import { useSocket } from "../../../contexts/SocketContext";
+import useNotifications from "../../../hooks/useNotifications";
 import { useUser } from "../../../hooks/useUser";
-import { Notification } from "../../../types/NotificationTypes";
 import eafLogo from "../../assets/logoColoured.png";
-import NotifiactionsFetchError from "../../notification/NotificationsFetchError";
 import NotificationList from "../../notification/NotificationsList";
 import PageTabs from "./PageTabs";
 import UserButton from "./UserButton";
 
 export default function Navbar() {
   const user = useUser();
-  const socket = useSocket();
   const theme = useTheme();
+  const socket = useSocket();
 
-  const NUMBER_OF_NOTIFICATIONS_TO_LOAD = 10;
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [numUnseenNotifications, setNumUnseenNotification] = useState(0);
-  const [errorFetchNotifs, setErrorFetchNotifs] = useState(false);
-
-  const fetchNotifications = async () => {
-    const data = await NotificationAPIClient.getNotifications(
-      0, // Always start from the beginning
-      NUMBER_OF_NOTIFICATIONS_TO_LOAD,
-    );
-    if (!data) {
-      setErrorFetchNotifs(true);
-      return;
-    }
-    setNotifications(data.notifications);
-    setNumUnseenNotification(data.numberOfUnseenNotifications);
-    setErrorFetchNotifs(false);
-  };
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.on("notification:new", (notification: Notification) => {
-      setNotifications((prev) => [notification, ...prev]);
-      setNumUnseenNotification((prev) => prev + 1);
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-    socket.on("notification:readUpdates", (updates) => {
-      setNumUnseenNotification(0);
-    });
-
-    // eslint-disable-next-line consistent-return
-    return () => {
-      socket.off("notification:new");
-      socket.off("notification:readUpdates");
-    };
-  }, [socket]);
+  const {
+    notifications,
+    numUnseenNotifications,
+    errorFetchNotifs,
+    fetchNotifications,
+  } = useNotifications();
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
@@ -137,14 +101,11 @@ export default function Navbar() {
           horizontal: "left",
         }}
       >
-        {errorFetchNotifs ? (
-          <NotifiactionsFetchError />
-        ) : (
-          <NotificationList
-            notifications={notifications}
-            refreshNotifs={fetchNotifications}
-          />
-        )}
+        <NotificationList
+          notifications={notifications}
+          refreshNotifs={fetchNotifications}
+          errorFetchNotifs={errorFetchNotifs}
+        />
       </Popover>
     </Box>
   );

@@ -3,7 +3,9 @@ import {
   Avatar,
   Box,
   Button,
+  IconButton,
   Paper,
+  Popover,
   Table,
   TableBody,
   TableCell,
@@ -17,6 +19,7 @@ import { useTheme } from "@mui/material/styles";
 import React from "react";
 import { useUser } from "../../hooks/useUser";
 import { User } from "../../types/UserTypes";
+import ChatWithLearner from "./chat-with-learner/ChatWithLearner";
 
 interface UserTableProps {
   filteredUsers: User[];
@@ -48,6 +51,14 @@ const UserTable: React.FC<UserTableProps> = ({
 }) => {
   const theme = useTheme();
   const { role } = useUser();
+
+  const [chatPopoverAnchorEl, setChatPopoverAnchorEl] =
+    React.useState<HTMLButtonElement | null>(null);
+  const chatPopoverOpen = Boolean(chatPopoverAnchorEl);
+  const chatPopoverId = chatPopoverOpen ? "chat-popover" : undefined;
+
+  const [chatWithUser, setChatWithUser] = React.useState<User | null>(null);
+
   return (
     <TableContainer
       component={Paper}
@@ -99,6 +110,31 @@ const UserTable: React.FC<UserTableProps> = ({
               <TableCell sx={{ textAlign: "right", paddingRight: "0px" }}>
                 {role === "Facilitator" &&
                   (user.status === "Active" ? (
+                    <>
+                      <IconButton
+                        size="large"
+                        aria-label="show messages with learner"
+                        onClick={(event) => {
+                          setChatPopoverAnchorEl(event.currentTarget);
+                          setChatWithUser(user);
+                        }}
+                      >
+                        <MarkUnreadChatAltOutlined
+                          sx={{
+                            width: "24px",
+                            height: "24px",
+                            color: theme.palette.Facilitator.Dark.Selected,
+                          }}
+                        />
+                      </IconButton>
+                      <Typography
+                        variant="labelMedium"
+                        sx={{ marginLeft: "16px" }}
+                      >
+                        X% COMPLETE
+                      </Typography>
+                    </>
+                  ) : (
                     <Typography
                       variant="labelMedium"
                       sx={{
@@ -110,22 +146,6 @@ const UserTable: React.FC<UserTableProps> = ({
                     >
                       ACCOUNT PENDING
                     </Typography>
-                  ) : (
-                    <>
-                      <MarkUnreadChatAltOutlined
-                        sx={{
-                          width: "24px",
-                          height: "24px",
-                          color: theme.palette.Facilitator.Dark.Selected,
-                        }}
-                      />
-                      <Typography
-                        variant="labelMedium"
-                        sx={{ marginLeft: "16px" }}
-                      >
-                        X% COMPLETE
-                      </Typography>
-                    </>
                   ))}
                 {role === "Administrator" && (
                   <>
@@ -192,6 +212,19 @@ const UserTable: React.FC<UserTableProps> = ({
           </TableRow>
         </TableFooter>
       </Table>
+      <Popover
+        id={chatPopoverId}
+        open={chatPopoverOpen}
+        anchorEl={chatPopoverAnchorEl}
+        onClose={() => setChatPopoverAnchorEl(null)}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        sx={{ borderRadius: "8px" }}
+      >
+        <ChatWithLearner learner={chatWithUser!} />
+      </Popover>
     </TableContainer>
   );
 };
