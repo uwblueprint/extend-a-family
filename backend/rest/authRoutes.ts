@@ -3,15 +3,15 @@ import { CookieOptions, Router } from "express";
 import { generate } from "generate-password";
 import {
   getAccessToken,
-  isAuthorizedByUserId,
   isAuthorizedByRole,
+  isAuthorizedByUserId,
   isFirstTimeInvitedUser,
 } from "../middlewares/auth";
 import {
+  forgotPasswordRequestValidator,
+  inviteUserRequestValidator,
   loginRequestValidator,
   signupRequestValidator,
-  inviteUserRequestValidator,
-  forgotPasswordRequestValidator,
   updateTemporaryPasswordRequestValidator,
   updateUserStatusRequestValidator,
 } from "../middlewares/validators/authValidators";
@@ -22,8 +22,8 @@ import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
-import { getErrorMessage } from "../utilities/errorUtils";
 import { AuthError, AuthErrorCodes } from "../types/authTypes";
+import { getErrorMessage } from "../utilities/errorUtils";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -204,6 +204,10 @@ authRouter.post(
   inviteUserRequestValidator,
   isAuthorizedByRole(new Set(["Facilitator"])),
   async (req, res) => {
+    const accessToken = getAccessToken(req)!;
+    const facilitatorId = await authService.getUserIdFromAccessToken(
+      accessToken,
+    );
     try {
       const temporaryPassword = generate({
         length: 20,
@@ -218,7 +222,7 @@ authRouter.post(
           password: temporaryPassword,
           status: "Invited",
         },
-        req.body.facilitatorId,
+        facilitatorId.toString(),
       );
       await authService.sendLearnerInvite(
         req.body.firstName,

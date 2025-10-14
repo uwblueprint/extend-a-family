@@ -96,7 +96,9 @@ courseRouter.put(
         throw Error("invalid arangement");
       }
       await Promise.all(
-        updatedUnits.map((unit) => courseUnitService.updateCourseUnit(unit.id, unit))
+        updatedUnits.map((unit) =>
+          courseUnitService.updateCourseUnit(unit.id, unit),
+        ),
       );
       res.status(200).send("success");
     } catch (error: unknown) {
