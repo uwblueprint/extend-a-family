@@ -1,11 +1,10 @@
 import mongoose, { ObjectId } from "mongoose";
-import { QuestionType } from "../../types/activityTypes";
-import CourseModuleModel from "../../models/coursemodule.mgmodel";
 import { Activity } from "../../models/activity.mgmodel";
+import CourseModuleModel from "../../models/coursemodule.mgmodel";
+import { QuestionType } from "../../types/activityTypes";
 import { activityModelMapper } from "../../utilities/activityModelMapper";
-import { IActivityService } from "../../interfaces/IActivityService";
 
-class ActivityService implements IActivityService {
+class ActivityService {
   static async createActivity(
     moduleId: string,
     questionType: QuestionType,
@@ -132,7 +131,7 @@ class ActivityService implements IActivityService {
     activityId: string,
     questionType: QuestionType,
     update: Partial<Activity>,
-  ) {
+  ): Promise<Activity> {
     const Model =
       activityModelMapper[questionType as keyof typeof activityModelMapper];
     if (!Model) {
@@ -147,7 +146,8 @@ class ActivityService implements IActivityService {
     if (!updated) {
       throw new Error("Activity not found");
     }
-    return updated;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return updated as any as Activity;
   }
 }
 
