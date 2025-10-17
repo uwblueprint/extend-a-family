@@ -3,8 +3,9 @@ import { QuestionType } from "../../types/activityTypes";
 import CourseModuleModel from "../../models/coursemodule.mgmodel";
 import { Activity } from "../../models/activity.mgmodel";
 import { activityModelMapper } from "../../utilities/activityModelMapper";
+import { IActivityService } from "../../interfaces/IActivityService";
 
-class ActivityService {
+class ActivityService implements IActivityService {
   static async createActivity(
     moduleId: string,
     questionType: QuestionType,

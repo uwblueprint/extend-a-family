@@ -59,9 +59,14 @@ activityRouter.post(
       res.status(200).json(result);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Server error";
-      if (message === "Module not found") res.status(404).send(message);
-      if (message === "Unsupported question type")
+      if (message === "Module not found") {
+        res.status(404).send(message);
+        return;
+      }
+      if (message === "Unsupported question type") {
         res.status(400).send(message);
+        return;
+      }
       res.status(500).send(message);
     }
   },
