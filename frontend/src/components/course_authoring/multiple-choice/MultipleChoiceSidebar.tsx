@@ -6,11 +6,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import IOSSwitch from "../common/form/IOSSwitch";
-
-export const MultipleChoiceMainEditor = () => {
-  return <></>;
-};
+import IOSSwitch from "../../common/form/IOSSwitch";
 
 interface MultipleChoiceEditorSidebarProps {
   hasImage: boolean;
@@ -22,7 +18,7 @@ interface MultipleChoiceEditorSidebarProps {
   setHint: (value: string) => void;
 }
 
-export const MultipleChoiceEditorSidebar = ({
+export default function MultipleChoiceEditorSidebar({
   hasImage,
   setHasImage,
   hasAdditionalContext,
@@ -30,7 +26,7 @@ export const MultipleChoiceEditorSidebar = ({
   onAddQuestionOption,
   hint,
   setHint,
-}: MultipleChoiceEditorSidebarProps) => {
+}: MultipleChoiceEditorSidebarProps) {
   const boxHeight = "calc(100vh - 68px)";
   const theme = useTheme();
   return (
@@ -233,10 +229,9 @@ export const MultipleChoiceEditorSidebar = ({
               </Typography>
             </Box>
             <TextField
-              label="Include question hint"
+              placeholder="Include question hint"
               multiline
-              minRows={5}
-              maxRows={5}
+              rows={5}
               value={hint}
               onChange={(e) => setHint(e.target.value)}
               sx={{ width: "100%" }}
@@ -246,4 +241,4 @@ export const MultipleChoiceEditorSidebar = ({
       </Box>
     </Box>
   );
-};
+}

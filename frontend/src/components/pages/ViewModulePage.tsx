@@ -28,7 +28,8 @@ import {
   isLessonPage,
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
-import { MultipleChoiceEditorSidebar } from "../course_authoring/MultipleChoiceEditor";
+import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
+import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
@@ -342,9 +343,7 @@ const ViewModulePage = () => {
                 height="100%"
                 width="100%"
               >
-                <Typography>
-                  Activity Page for {currentPageObject.title}
-                </Typography>
+                <MultipleChoiceMainEditor />
               </Box>
             )}
             {isDidYouLikeTheContentPage && <SurveySlides />}
@@ -418,16 +417,20 @@ const ViewModulePage = () => {
             </Button>
           </Box>
         </Box>
-        <Divider orientation="vertical" flexItem />
-        <MultipleChoiceEditorSidebar
-          hasImage={hasImage}
-          setHasImage={setHasImage}
-          hasAdditionalContext={hasAdditionalContext}
-          setHasAdditionalContext={setHasAdditionalContext}
-          onAddQuestionOption={onAddQuestionOption}
-          hint={hint}
-          setHint={setHint}
-        />
+        {currentPageObject && isActivityPage(currentPageObject) && (
+          <>
+            <Divider orientation="vertical" flexItem />
+            <MultipleChoiceEditorSidebar
+              hasImage={hasImage}
+              setHasImage={setHasImage}
+              hasAdditionalContext={hasAdditionalContext}
+              setHasAdditionalContext={setHasAdditionalContext}
+              onAddQuestionOption={onAddQuestionOption}
+              hint={hint}
+              setHint={setHint}
+            />
+          </>
+        )}
       </Box>
       <NeedHelpModal
         open={isHelpModalOpen}
