@@ -8,7 +8,14 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -21,6 +28,7 @@ import {
   isLessonPage,
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
+import { MultipleChoiceEditorSidebar } from "../course_authoring/MultipleChoiceEditor";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
@@ -60,12 +68,13 @@ const ViewModulePage = () => {
   const numPages = module?.pages.length || 0;
 
   const isDidYouLikeTheContentPage = currentPage === numPages;
-  // const isHowEasyWasTheModulePage = currentPage === numPages + 1;
-  // const isWhatDidYouThinkOfTheModulePage = currentPage === numPages + 2;
-  // const isThanksForTheFeedbackPage = currentPage === numPages + 3;
-  // const isCongratulationsPage = currentPage === numPages + 4;
 
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  const [hasImage, setHasImage] = useState(false);
+  const [hasAdditionalContext, setHasAdditionalContext] = useState(false);
+  const onAddQuestionOption = () => {};
+  const [hint, setHint] = useState("");
 
   const fetchModule = useCallback(async () => {
     const fetchedModule = await CourseAPIClient.getModuleById(
@@ -409,6 +418,16 @@ const ViewModulePage = () => {
             </Button>
           </Box>
         </Box>
+        <Divider orientation="vertical" flexItem />
+        <MultipleChoiceEditorSidebar
+          hasImage={hasImage}
+          setHasImage={setHasImage}
+          hasAdditionalContext={hasAdditionalContext}
+          setHasAdditionalContext={setHasAdditionalContext}
+          onAddQuestionOption={onAddQuestionOption}
+          hint={hint}
+          setHint={setHint}
+        />
       </Box>
       <NeedHelpModal
         open={isHelpModalOpen}
