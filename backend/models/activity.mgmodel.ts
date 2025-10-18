@@ -94,12 +94,17 @@ const MultipleChoiceActivitySchema = new Schema({
   correctAnswer: {
     type: Number,
     required: true,
-    validate: {
-      validator(this: MultipleChoiceActivity, correctAnswer: number) {
-        return correctAnswer >= 0 && correctAnswer < this.options.length;
-      },
-      message: "Correct answer must be a valid option index",
-    },
+    // validate: {
+    //   validator(this: MultipleChoiceActivity, correctAnswer: number) {
+    //     console.log(
+    //       "Validating correctAnswer:",
+    //       correctAnswer,
+    //       JSON.stringify(this.options),
+    //     );
+    //     return correctAnswer >= 0 && correctAnswer < this.options.length;
+    //   },
+    //   message: "Correct answer must be a valid option index",
+    // },
   },
 });
 

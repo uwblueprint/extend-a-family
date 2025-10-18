@@ -8,7 +8,14 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -19,8 +26,13 @@ import {
   CourseModule,
   isActivityPage,
   isLessonPage,
+  isMultipleChoiceActivity,
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
+import MultipleChoiceMainEditor, {
+  MultipleChoiceEditorRef,
+} from "../course_authoring/multiple-choice/MultipleChoiceEditor";
+import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
@@ -60,12 +72,16 @@ const ViewModulePage = () => {
   const numPages = module?.pages.length || 0;
 
   const isDidYouLikeTheContentPage = currentPage === numPages;
-  // const isHowEasyWasTheModulePage = currentPage === numPages + 1;
-  // const isWhatDidYouThinkOfTheModulePage = currentPage === numPages + 2;
-  // const isThanksForTheFeedbackPage = currentPage === numPages + 3;
-  // const isCongratulationsPage = currentPage === numPages + 4;
 
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  const [hasImage, setHasImage] = useState(false);
+  const [hasAdditionalContext, setHasAdditionalContext] = useState(false);
+  const multipleChoiceEditorRef = useRef<MultipleChoiceEditorRef>(null);
+  const onAddQuestionOption = () => {
+    multipleChoiceEditorRef.current?.addOption();
+  };
+  const [hint, setHint] = useState("");
 
   const fetchModule = useCallback(async () => {
     const fetchedModule = await CourseAPIClient.getModuleById(
@@ -333,9 +349,12 @@ const ViewModulePage = () => {
                 height="100%"
                 width="100%"
               >
-                <Typography>
-                  Activity Page for {currentPageObject.title}
-                </Typography>
+                {isMultipleChoiceActivity(currentPageObject) && (
+                  <MultipleChoiceMainEditor
+                    ref={multipleChoiceEditorRef}
+                    activity={currentPageObject}
+                  />
+                )}
               </Box>
             )}
             {isDidYouLikeTheContentPage && <SurveySlides />}
@@ -409,6 +428,20 @@ const ViewModulePage = () => {
             </Button>
           </Box>
         </Box>
+        {currentPageObject && isActivityPage(currentPageObject) && (
+          <>
+            <Divider orientation="vertical" flexItem />
+            <MultipleChoiceEditorSidebar
+              hasImage={hasImage}
+              setHasImage={setHasImage}
+              hasAdditionalContext={hasAdditionalContext}
+              setHasAdditionalContext={setHasAdditionalContext}
+              onAddQuestionOption={onAddQuestionOption}
+              hint={hint}
+              setHint={setHint}
+            />
+          </>
+        )}
       </Box>
       <NeedHelpModal
         open={isHelpModalOpen}
