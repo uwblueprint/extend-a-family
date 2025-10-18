@@ -10,7 +10,7 @@ export const mongo = {
       await mongoose.connect(encodeURI(process.env.MG_DATABASE_URL!), {
         dbName,
       });
-      
+
       /* eslint-disable-next-line no-console */
       console.info(`Successfully connected to MongoDB (${dbName})!`);
     } catch (error) {
