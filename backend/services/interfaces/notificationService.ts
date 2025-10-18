@@ -1,7 +1,7 @@
 import { Schema, UpdateWriteOpResult } from "mongoose";
 import {
-  NotificationDTO,
   CreateNotificationDTO,
+  NotificationDTO,
   NotificationsResponseDTO,
   UpdateNotificationDTO,
 } from "../../types/notificationTypes";
@@ -38,10 +38,16 @@ interface INotificationService {
   ): Promise<NotificationDTO>;
 
   /**
-   * Marks all unread notifications as read
+   * Marks all unseen notifications as seen
    * @param userId the user that the notifications need to be updated
    */
-  markReadNotifications(userId: string): Promise<UpdateWriteOpResult>;
+  markSeenNotifications(userId: string): Promise<UpdateWriteOpResult>;
+
+  /**
+   * Marks a notification as read
+   * @param notificationId the notification to be marked as read
+   */
+  markNotificationRead(notificationId: string): Promise<NotificationDTO>;
 }
 
 export default INotificationService;

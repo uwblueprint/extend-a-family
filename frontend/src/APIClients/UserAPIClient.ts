@@ -1,6 +1,6 @@
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { Role } from "../types/AuthTypes";
-import { User, Bookmark } from "../types/UserTypes";
+import { Bookmark, User } from "../types/UserTypes";
 import {
   getLocalStorageObjProperty,
   setLocalStorageObjProperty,
@@ -29,6 +29,21 @@ const getUsers = async (): Promise<User[]> => {
   )}`;
   try {
     const { data } = await baseAPIClient.get(`/users/`, {
+      headers: { Authorization: bearerToken },
+    });
+    return data;
+  } catch (error) {
+    return [];
+  }
+};
+
+const facilitatorGetLearners = async (): Promise<User[]> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.get(`/users/facilitator/myLearners`, {
       headers: { Authorization: bearerToken },
     });
     return data;
@@ -192,6 +207,7 @@ const getCurrentUser = async (): Promise<User & { bookmarks: Bookmark[] }> => {
 export default {
   getUsersByRole,
   getUsers,
+  facilitatorGetLearners,
   updateUserDetails,
   deleteUser,
   addBookmark,

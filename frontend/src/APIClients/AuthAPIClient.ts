@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { AuthenticatedUser, AuthError, Role, Status } from "../types/AuthTypes";
-import { Administrator } from "../types/UserTypes";
+import { Administrator, Learner } from "../types/UserTypes";
 import {
   getLocalStorageObjProperty,
   setLocalStorageObjProperty,
@@ -215,6 +215,28 @@ const inviteAdmin = async (
   }
 };
 
+const inviteLearner = async (
+  firstName: string,
+  lastName: string,
+  email: string,
+): Promise<Learner | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+
+  try {
+    const { data } = await baseAPIClient.post(
+      `/auth/inviteLearner`,
+      { firstName, lastName, email },
+      { headers: { Authorization: bearerToken } },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default {
   login,
   logout,
@@ -226,4 +248,5 @@ export default {
   refresh,
   isUserVerified,
   inviteAdmin,
+  inviteLearner,
 };

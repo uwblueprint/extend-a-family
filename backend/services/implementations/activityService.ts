@@ -44,8 +44,6 @@ class ActivityService {
         activityData = baseActivity;
       }
 
-      console.log("Creating activity with data:", activityData);
-
       const activityDocs = await (Model as typeof mongoose.Model).create(
         [activityData],
         { session },
