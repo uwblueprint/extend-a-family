@@ -73,7 +73,12 @@ ActivitySchema.set("toObject", {
   },
 });
 
-// Create combined schemas for each specific activity type
+// Base model
+// const ActivityModel =
+//   mongoose.models.Activity ||
+//   mongoose.model<Activity>("Activity", ActivitySchema);
+
+// Multiple choice specific schema
 const MultipleChoiceActivitySchema = new Schema({
   ...ActivitySchema.obj, // inherit base fields from ActivitySchema
   options: {

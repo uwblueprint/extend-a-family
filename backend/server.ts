@@ -20,6 +20,7 @@ import helpRequestRouter from "./rest/helpRequestRoutes";
 import notificationRouter from "./rest/notificationRoutes";
 import courseRouter from "./rest/courseRoutes";
 import feedbackRouter from "./rest/feedbackRoutes";
+import activityRouter from "./rest/activityRoutes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -73,6 +74,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(limiter);
 
+app.use("/activities", activityRouter);
 app.use("/auth", authRouter);
 app.use("/entities", entityRouter);
 app.use("/users", userRouter);
