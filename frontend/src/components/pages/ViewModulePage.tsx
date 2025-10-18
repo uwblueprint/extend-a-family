@@ -26,9 +26,12 @@ import {
   CourseModule,
   isActivityPage,
   isLessonPage,
+  isMultipleChoiceActivity,
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
-import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
+import MultipleChoiceMainEditor, {
+  MultipleChoiceEditorRef,
+} from "../course_authoring/multiple-choice/MultipleChoiceEditor";
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
@@ -74,7 +77,10 @@ const ViewModulePage = () => {
 
   const [hasImage, setHasImage] = useState(false);
   const [hasAdditionalContext, setHasAdditionalContext] = useState(false);
-  const onAddQuestionOption = () => {};
+  const multipleChoiceEditorRef = useRef<MultipleChoiceEditorRef>(null);
+  const onAddQuestionOption = () => {
+    multipleChoiceEditorRef.current?.addOption();
+  };
   const [hint, setHint] = useState("");
 
   const fetchModule = useCallback(async () => {
@@ -343,7 +349,12 @@ const ViewModulePage = () => {
                 height="100%"
                 width="100%"
               >
-                <MultipleChoiceMainEditor />
+                {isMultipleChoiceActivity(currentPageObject) && (
+                  <MultipleChoiceMainEditor
+                    ref={multipleChoiceEditorRef}
+                    activity={currentPageObject}
+                  />
+                )}
               </Box>
             )}
             {isDidYouLikeTheContentPage && <SurveySlides />}

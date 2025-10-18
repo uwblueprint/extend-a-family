@@ -21,20 +21,30 @@ class ActivityService {
 
       const baseActivity = {
         questionType,
-        activityNumber: "",
-        questionText: "",
-        instruction: "",
-        options: [],
+        title: "New Activity",
+        activityNumber: "1",
+        questionText: "Enter your question here",
+        instruction: "Please select the correct answer",
       };
 
       let activityData;
       if (questionType === QuestionType.MultipleChoice) {
-        activityData = { ...baseActivity, correctOption: "" };
+        activityData = {
+          ...baseActivity,
+          correctAnswer: 0,
+          options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+        };
       } else if (questionType === QuestionType.MultiSelect) {
-        activityData = { ...baseActivity, correctAnswers: [] };
+        activityData = {
+          ...baseActivity,
+          correctAnswers: [0],
+          options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+        };
       } else {
         activityData = baseActivity;
       }
+
+      console.log("Creating activity with data:", activityData);
 
       const activityDocs = await (Model as typeof mongoose.Model).create(
         [activityData],
