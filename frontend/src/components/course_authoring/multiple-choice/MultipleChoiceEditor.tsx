@@ -10,7 +10,6 @@ import {
   MultiSelectActivity,
 } from "../../../types/CourseTypes";
 import TitleEditor from "../editorComponents/TitleEditor";
-import MultipleChoiceOption from "./MultipleChoiceOption";
 
 const MultipleChoiceMainEditor = ({
   activity,
