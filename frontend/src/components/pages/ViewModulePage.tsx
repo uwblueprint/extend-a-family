@@ -21,17 +21,18 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import * as Routes from "../../constants/Routes";
+import useActivity from "../../hooks/useActivity";
 import useQueryParams from "../../hooks/useQueryParams";
 import {
+  Activity,
   CourseModule,
   isActivityPage,
   isLessonPage,
   isMultipleChoiceActivity,
+  isMultiSelectActivity,
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
-import MultipleChoiceMainEditor, {
-  MultipleChoiceEditorRef,
-} from "../course_authoring/multiple-choice/MultipleChoiceEditor";
+import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
@@ -75,13 +76,40 @@ const ViewModulePage = () => {
 
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
-  const [hasImage, setHasImage] = useState(false);
+  const [hasImage, setHasImage] = useState(
+    (currentPageObject &&
+      isActivityPage(currentPageObject) &&
+      !!currentPageObject.imageUrl) ||
+      false,
+  );
   const [hasAdditionalContext, setHasAdditionalContext] = useState(false);
-  const multipleChoiceEditorRef = useRef<MultipleChoiceEditorRef>(null);
-  const onAddQuestionOption = () => {
-    multipleChoiceEditorRef.current?.addOption();
-  };
-  const [hint, setHint] = useState("");
+
+  const { activity, setActivity } = useActivity<Activity>(undefined);
+
+  useEffect(() => {
+    if (currentPageObject && isActivityPage(currentPageObject)) {
+      setActivity(currentPageObject);
+      if (currentPageObject.imageUrl) {
+        setHasImage(true);
+      }
+      if (currentPageObject.additionalContext) {
+        setHasAdditionalContext(true);
+      }
+    }
+  }, [currentPageObject, setActivity]);
+
+  useEffect(() => {
+    setModule((prevModule) => {
+      if (!prevModule) return prevModule;
+      const updatedPages = prevModule.pages.map((page) => {
+        if (isActivityPage(page) && activity && page.id === activity.id) {
+          return activity;
+        }
+        return page;
+      });
+      return { ...prevModule, pages: updatedPages };
+    });
+  }, [activity]);
 
   const fetchModule = useCallback(async () => {
     const fetchedModule = await CourseAPIClient.getModuleById(
@@ -349,12 +377,16 @@ const ViewModulePage = () => {
                 height="100%"
                 width="100%"
               >
-                {isMultipleChoiceActivity(currentPageObject) && (
-                  <MultipleChoiceMainEditor
-                    ref={multipleChoiceEditorRef}
-                    activity={currentPageObject}
-                  />
-                )}
+                {activity &&
+                  (isMultipleChoiceActivity(activity) ||
+                    isMultiSelectActivity(activity)) && (
+                    <MultipleChoiceMainEditor
+                      activity={activity}
+                      setActivity={setActivity}
+                      hasImage={hasImage}
+                      hasAdditionalContext={hasAdditionalContext}
+                    />
+                  )}
               </Box>
             )}
             {isDidYouLikeTheContentPage && <SurveySlides />}
@@ -428,20 +460,43 @@ const ViewModulePage = () => {
             </Button>
           </Box>
         </Box>
-        {currentPageObject && isActivityPage(currentPageObject) && (
-          <>
-            <Divider orientation="vertical" flexItem />
-            <MultipleChoiceEditorSidebar
-              hasImage={hasImage}
-              setHasImage={setHasImage}
-              hasAdditionalContext={hasAdditionalContext}
-              setHasAdditionalContext={setHasAdditionalContext}
-              onAddQuestionOption={onAddQuestionOption}
-              hint={hint}
-              setHint={setHint}
-            />
-          </>
-        )}
+        {currentPageObject &&
+          (isMultipleChoiceActivity(currentPageObject) ||
+            isMultiSelectActivity(currentPageObject)) && (
+            <>
+              <Divider orientation="vertical" flexItem />
+              <MultipleChoiceEditorSidebar
+                hasImage={hasImage}
+                setHasImage={(newHasImage) => {
+                  setHasImage(newHasImage);
+                  if (!newHasImage) {
+                    setActivity((prev) => prev && { ...prev, imageUrl: "" });
+                  }
+                }}
+                hasAdditionalContext={hasAdditionalContext}
+                setHasAdditionalContext={(newHasAdditionalContext) => {
+                  setHasAdditionalContext(newHasAdditionalContext);
+                  if (!newHasAdditionalContext) {
+                    setActivity(
+                      (prev) => prev && { ...prev, additionalContext: "" },
+                    );
+                  }
+                }}
+                onAddQuestionOption={() =>
+                  setActivity(
+                    (prev) =>
+                      prev && { ...prev, options: [...prev.options, ""] },
+                  )
+                }
+                hint={currentPageObject.hint || ""}
+                setHint={(newHint: string) => {
+                  setActivity((prev) => prev && { ...prev, hint: newHint });
+                }}
+                isMultiSelect={isMultiSelectActivity(currentPageObject)}
+                isAddOptionDisabled={currentPageObject.options.length >= 4}
+              />
+            </>
+          )}
       </Box>
       <NeedHelpModal
         open={isHelpModalOpen}

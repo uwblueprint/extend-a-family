@@ -1,47 +1,29 @@
-import express, { Request, Response, NextFunction, Router } from "express";
+import express, { Request, Response, Router } from "express";
+import multer from "multer";
 import { isAuthorizedByRole } from "../middlewares/auth";
-import CourseModuleModel from "../models/coursemodule.mgmodel";
-import { QuestionType } from "../types/activityTypes";
-import { ModuleStatus } from "../types/courseTypes";
+import {
+  checkModuleEditable,
+  uploadPictureValidator,
+} from "../middlewares/validators/activityValidators";
 import activityService from "../services/implementations/activityService";
+import FileStorageService from "../services/implementations/fileStorageService";
+import IFileStorageService from "../services/interfaces/fileStorageService";
+import { QuestionType } from "../types/activityTypes";
+import { getErrorMessage } from "../utilities/errorUtils";
 
 const activityRouter: Router = express.Router();
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-// Middleware: ensure module status is Draft or Unpublished
-const checkModuleEditable = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  try {
-    const moduleDoc = await CourseModuleModel.findById(
-      req.params.moduleId,
-    ).lean();
-    if (!moduleDoc) {
-      res.status(404).send("Module not found");
-      return;
-    }
-    if (
-      ![ModuleStatus.Draft, ModuleStatus.Unpublished].includes(
-        moduleDoc.status as ModuleStatus,
-      )
-    ) {
-      res.status(403).send("Module not editable in its current state");
-      return;
-    }
-    next();
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Server error";
-    res.status(500).send(message);
-  }
-};
+const firebaseStorageService: IFileStorageService = new FileStorageService(
+  process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
+);
 
 /**
  * Create Activity (Transactional)
  * POST /activities/:moduleId/:questionType
  * Optional body: { index?: number }
  */
-
 activityRouter.post(
   "/:moduleId/:questionType",
   isAuthorizedByRole(new Set(["Administrator"])),
@@ -148,6 +130,35 @@ activityRouter.patch(
     } catch (e) {
       const message = e instanceof Error ? e.message : "Server error";
       res.status(500).send(message);
+    }
+  },
+);
+
+activityRouter.patch(
+  "/:activityId/:questionType/UpdateMainPicture",
+  upload.single("uploadedImage"),
+  isAuthorizedByRole(new Set(["Administrator"])),
+  uploadPictureValidator,
+  async (req, res) => {
+    const imageData = req.file!.buffer!; // Non-null assertion as validated by middleware
+    const contentType = req.file!.mimetype!;
+    const { activityId, questionType } = req.params;
+    const imageName = `activity/imageData/${activityId}`;
+
+    try {
+      const imageUrl: string = await firebaseStorageService.uploadImage(
+        imageName,
+        imageData,
+        contentType,
+      );
+      const updatedActivity = await activityService.updateActivity(
+        activityId,
+        questionType as QuestionType,
+        { imageUrl },
+      );
+      res.status(200).json(updatedActivity);
+    } catch (error: unknown) {
+      res.status(500).send(getErrorMessage(error));
     }
   },
 );

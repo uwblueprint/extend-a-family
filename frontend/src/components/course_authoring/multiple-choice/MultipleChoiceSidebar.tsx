@@ -16,6 +16,8 @@ interface MultipleChoiceEditorSidebarProps {
   onAddQuestionOption: () => void;
   hint: string;
   setHint: (value: string) => void;
+  isMultiSelect: boolean;
+  isAddOptionDisabled: boolean;
 }
 
 export default function MultipleChoiceEditorSidebar({
@@ -26,6 +28,8 @@ export default function MultipleChoiceEditorSidebar({
   onAddQuestionOption,
   hint,
   setHint,
+  isMultiSelect,
+  isAddOptionDisabled,
 }: MultipleChoiceEditorSidebarProps) {
   const boxHeight = "calc(100vh - 68px)";
   const theme = useTheme();
@@ -40,6 +44,7 @@ export default function MultipleChoiceEditorSidebar({
         overflowY: "auto",
         gapY: "24px",
         maxWidth: "400px",
+        width: "fit-content",
         paddingBottom: "24px",
         flexDirection: "column",
         alignItems: "flex-start",
@@ -66,7 +71,7 @@ export default function MultipleChoiceEditorSidebar({
           }}
         >
           <Typography variant="titleLarge" sx={{ flex: "1 0 0" }}>
-            Select one
+            {isMultiSelect ? "Multi Select" : "Select One"}
           </Typography>
         </Box>
       </Box>
@@ -185,6 +190,7 @@ export default function MultipleChoiceEditorSidebar({
                 border: "1px solid #1D1B201F",
               }}
               onClick={onAddQuestionOption}
+              disabled={isAddOptionDisabled}
             >
               <Typography
                 variant="labelLarge"
