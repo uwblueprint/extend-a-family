@@ -4,9 +4,14 @@ import {
   RadioButtonUncheckedOutlined,
 } from "@mui/icons-material";
 import { Box, Button, TextField, Typography, useTheme } from "@mui/material";
-import { forwardRef, useImperativeHandle } from "react";
-import useActivity from "../../../hooks/useActivity";
-import { MultipleChoiceActivity } from "../../../types/CourseTypes";
+import { VisuallyHidden } from "@reach/visually-hidden";
+import React from "react";
+import ActivityAPIClient from "../../../APIClients/ActivityAPIClient";
+import {
+  Activity,
+  isMultipleChoiceActivity,
+  MultipleChoiceActivity,
+} from "../../../types/CourseTypes";
 
 const TitleEditor = ({
   title,
@@ -98,7 +103,7 @@ const MultipleChoiceOption = ({
               color: theme.palette.Neutral[600],
               padding: "2px 6px",
               borderRadius: "2px",
-              zIndex: 9999,
+              zIndex: 1,
             }}
           >
             Correct answer
@@ -215,28 +220,18 @@ const MultipleChoiceOption = ({
   );
 };
 
-export interface MultipleChoiceEditorRef {
-  addOption: () => void;
-}
-
-const MultipleChoiceMainEditor = forwardRef<
-  MultipleChoiceEditorRef,
-  {
-    activity: MultipleChoiceActivity;
-  }
->(({ activity: initialActivity }, ref) => {
+const MultipleChoiceMainEditor = ({
+  activity,
+  setActivity,
+  hasImage,
+  hasAdditionalContext,
+}: {
+  activity: MultipleChoiceActivity;
+  setActivity: React.Dispatch<React.SetStateAction<Activity | undefined>>;
+  hasImage: boolean;
+  hasAdditionalContext: boolean;
+}) => {
   const theme = useTheme();
-  const { activity, setActivity } =
-    useActivity<MultipleChoiceActivity>(initialActivity);
-
-  useImperativeHandle(ref, () => ({
-    addOption: () => {
-      setActivity((prev) => ({
-        ...prev,
-        options: [...prev.options, ""], // Add empty option
-      }));
-    },
-  }));
 
   return (
     <Box
@@ -276,7 +271,7 @@ const MultipleChoiceMainEditor = forwardRef<
           <TitleEditor
             title={activity.title}
             setTitle={(newTitle) => {
-              setActivity((prev) => ({ ...prev, title: newTitle }));
+              setActivity((prev) => prev && { ...prev, title: newTitle });
             }}
           />
           <Typography
@@ -294,47 +289,49 @@ const MultipleChoiceMainEditor = forwardRef<
             alignSelf: "stretch",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              width: "250px",
-              minWidth: "250px",
-              maxWidth: "300px",
-              minHeight: "250px",
-              maxHeight: "300px",
-              padding: "24px 16px",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "24px",
-              alignSelf: "stretch",
-              aspectRatio: "1 / 1",
-
-              border: "1px dashed #000",
-            }}
-          >
-            <Button
+          {hasImage && (
+            <Box
               sx={{
                 display: "flex",
-                height: "40px",
+                width: "250px",
+                minWidth: "250px",
+                maxWidth: "300px",
+                minHeight: "250px",
+                maxHeight: "300px",
+                padding: "24px 16px",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                gap: "8px",
+                gap: "24px",
+                alignSelf: "stretch",
+                aspectRatio: "1 / 1",
+
+                border: "1px dashed #000",
+                ...(activity.imageUrl
+                  ? {
+                      backgroundImage: `url(${activity.imageUrl})`,
+                      backgroundSize: "cover",
+                    }
+                  : {}),
               }}
             >
-              <Box
+              <Button
+                component="label"
                 sx={{
                   display: "flex",
                   padding: "10px 24px 10px 16px",
                   justifyContent: "center",
                   alignItems: "center",
                   gap: "8px",
-                  flex: "1 0 0",
-                  alignSelf: "stretch",
-
                   borderRadius: "4px",
                   border: "1px solid #6F797B",
+                  backgroundColor: "transparent",
+                  textTransform: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                  "&:hover": {
+                    backgroundColor: "rgba(0, 0, 0, 0.04)",
+                  },
                 }}
               >
                 <AddPhotoAlternate
@@ -350,76 +347,97 @@ const MultipleChoiceMainEditor = forwardRef<
                     color: theme.palette.Administrator.Dark.Default,
                   }}
                 >
-                  Add Image
+                  Add image
                 </Typography>
-              </Box>
-            </Button>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              padding: "12px 16px",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "8px",
-              flex: "1 0 0",
-              alignSelf: "stretch",
-
-              border: `1px solid ${theme.palette.Neutral[400]}`,
-              background: theme.palette.Neutral[100],
-            }}
-          >
-            <Typography
+                <VisuallyHidden>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file: File | undefined = e.target.files?.[0];
+                      if (file) {
+                        ActivityAPIClient.updateActivityMainPicture(
+                          activity.id,
+                          activity.type,
+                          file,
+                        ).then(setActivity);
+                      }
+                    }}
+                  />
+                </VisuallyHidden>
+              </Button>
+            </Box>
+          )}
+          {hasAdditionalContext && (
+            <Box
               sx={{
+                display: "flex",
+                padding: "12px 16px",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "8px",
+                flex: "1 0 0",
                 alignSelf: "stretch",
 
-                color: theme.palette.Neutral[700],
-                fontSize: "16px",
-                fontStyle: "normal",
-                fontWeight: 700,
-                lineHeight: "140%",
-                letterSpacing: "0.2px",
+                border: `1px solid ${theme.palette.Neutral[400]}`,
+                background: theme.palette.Neutral[100],
               }}
             >
-              Additional context:
-            </Typography>
-            <TextField
-              variant="outlined"
-              fullWidth
-              multiline
-              rows={9}
-              placeholder="Enter additional context here..."
-              value={activity.additionalContext || ""}
-              onChange={(e) => {
-                setActivity((prev) => ({
-                  ...prev,
-                  additionalContext: e.target.value,
-                }));
-              }}
-              sx={{
-                "& .MuiInputBase-input": {
-                  fontSize: "14px",
-                  fontWeight: 400,
+              <Typography
+                sx={{
+                  alignSelf: "stretch",
+
+                  color: theme.palette.Neutral[700],
+                  fontSize: "16px",
+                  fontStyle: "normal",
+                  fontWeight: 700,
                   lineHeight: "140%",
-                  letterSpacing: "0.32px",
-                  textTransform: "none",
-                  fontFamily: "Lexend Deca, sans-serif",
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  border: "none",
-                },
-                "& .MuiOutlinedInput-root": {
-                  padding: 0,
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                  letterSpacing: "0.2px",
+                }}
+              >
+                Additional context:
+              </Typography>
+              <TextField
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={9}
+                placeholder="Enter additional context here..."
+                value={activity.additionalContext || ""}
+                onChange={(e) => {
+                  setActivity(
+                    (prev) =>
+                      prev && {
+                        ...prev,
+                        additionalContext: e.target.value,
+                      },
+                  );
+                }}
+                sx={{
+                  "& .MuiInputBase-input": {
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    lineHeight: "140%",
+                    letterSpacing: "0.32px",
+                    textTransform: "none",
+                    fontFamily: "Lexend Deca, sans-serif",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
                     border: "none",
                   },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    border: "none",
+                  "& .MuiOutlinedInput-root": {
+                    padding: 0,
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      border: "none",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      border: "none",
+                    },
                   },
-                },
-              }}
-            />
-          </Box>
+                }}
+              />
+            </Box>
+          )}
         </Box>
         <Box
           sx={{
@@ -436,6 +454,7 @@ const MultipleChoiceMainEditor = forwardRef<
               optionText={option}
               onTextChange={(newOptionText) => {
                 setActivity((prev) => {
+                  if (!prev) return prev;
                   const newOptions = [...prev.options];
                   newOptions[index] = newOptionText;
                   return { ...prev, options: newOptions };
@@ -443,10 +462,13 @@ const MultipleChoiceMainEditor = forwardRef<
               }}
               isCorrectAnswer={index === activity.correctAnswer}
               onSetCorrectAnswer={() => {
-                setActivity((prev) => ({ ...prev, correctAnswer: index }));
+                setActivity(
+                  (prev) => prev && { ...prev, correctAnswer: index },
+                );
               }}
               onDelete={() => {
                 setActivity((prev) => {
+                  if (!prev || !isMultipleChoiceActivity(prev)) return prev;
                   const newOptions = prev.options.filter((_, i) => i !== index);
                   let newCorrectAnswer = prev.correctAnswer;
                   if (index === prev.correctAnswer) {
@@ -467,7 +489,7 @@ const MultipleChoiceMainEditor = forwardRef<
       </Box>
     </Box>
   );
-});
+};
 
 MultipleChoiceMainEditor.displayName = "MultipleChoiceMainEditor";
 

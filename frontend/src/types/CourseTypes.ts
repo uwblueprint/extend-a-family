@@ -25,7 +25,7 @@ export interface LessonPage extends CoursePage {
   pageIndex: number;
 }
 
-export interface Activity extends CoursePage {
+interface BaseActivity extends CoursePage {
   questionType: QuestionType;
   activityNumber: string;
   questionText: string;
@@ -35,17 +35,19 @@ export interface Activity extends CoursePage {
   userFeedback?: string;
 }
 
-export interface MultipleChoiceActivity extends Activity {
+export interface MultipleChoiceActivity extends BaseActivity {
   questionType: QuestionType.MultipleChoice;
   options: string[];
   correctAnswer: number;
 }
 
-export interface MultiSelectActivity extends Activity {
+export interface MultiSelectActivity extends BaseActivity {
   questionType: QuestionType.MultiSelect;
   options: string[];
   correctAnswers: number[];
 }
+
+export type Activity = MultipleChoiceActivity | MultiSelectActivity;
 
 export function isLessonPage(page: CoursePage): page is LessonPage {
   return page.type === "Lesson";
@@ -56,13 +58,13 @@ export function isActivityPage(page: CoursePage): page is Activity {
 }
 
 export function isMultipleChoiceActivity(
-  activity: Activity,
+  activity: BaseActivity,
 ): activity is MultipleChoiceActivity {
   return activity.questionType === QuestionType.MultipleChoice;
 }
 
 export function isMultiSelectActivity(
-  activity: Activity,
+  activity: BaseActivity,
 ): activity is MultiSelectActivity {
   return activity.questionType === QuestionType.MultiSelect;
 }
@@ -72,7 +74,7 @@ export type CourseModule = {
   displayIndex: number;
   title: string;
   imageURL?: string;
-  pages: [CoursePage];
+  pages: CoursePage[];
   unitId?: string;
 };
 

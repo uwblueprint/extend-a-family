@@ -40,6 +40,7 @@ export default function MultipleChoiceEditorSidebar({
         overflowY: "auto",
         gapY: "24px",
         maxWidth: "400px",
+        width: "fit-content",
         paddingBottom: "24px",
         flexDirection: "column",
         alignItems: "flex-start",
