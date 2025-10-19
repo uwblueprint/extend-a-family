@@ -1,6 +1,7 @@
 import {
   AddPhotoAlternate,
   Check,
+  CheckBoxOutlineBlank,
   RadioButtonUncheckedOutlined,
 } from "@mui/icons-material";
 import { Box, Button, TextField, Typography, useTheme } from "@mui/material";
@@ -9,8 +10,9 @@ import React from "react";
 import ActivityAPIClient from "../../../APIClients/ActivityAPIClient";
 import {
   Activity,
-  isMultipleChoiceActivity,
+  isMultiSelectActivity,
   MultipleChoiceActivity,
+  MultiSelectActivity,
 } from "../../../types/CourseTypes";
 
 const TitleEditor = ({
@@ -56,12 +58,14 @@ const MultipleChoiceOption = ({
   optionText,
   onTextChange,
   isCorrectAnswer,
+  isMultiSelect,
   onSetCorrectAnswer,
   onDelete,
 }: {
   optionText: string;
   onTextChange: (newOptionText: string) => void;
   isCorrectAnswer?: boolean;
+  isMultiSelect: boolean;
   onSetCorrectAnswer: () => void;
   onDelete: () => void;
 }) => {
@@ -126,7 +130,11 @@ const MultipleChoiceOption = ({
               alignItems: "center",
             }}
           >
-            <RadioButtonUncheckedOutlined />
+            {isMultiSelect ? (
+              <CheckBoxOutlineBlank />
+            ) : (
+              <RadioButtonUncheckedOutlined />
+            )}
           </Box>
         </Box>
         <TextField
@@ -176,7 +184,7 @@ const MultipleChoiceOption = ({
             ? theme.palette.Success.Dark.Default
             : "transparent",
         }}
-        onClick={() => !isCorrectAnswer && onSetCorrectAnswer()}
+        onClick={onSetCorrectAnswer}
       >
         <Check
           width="24"
@@ -226,12 +234,36 @@ const MultipleChoiceMainEditor = ({
   hasImage,
   hasAdditionalContext,
 }: {
-  activity: MultipleChoiceActivity;
+  activity: MultipleChoiceActivity | MultiSelectActivity;
   setActivity: React.Dispatch<React.SetStateAction<Activity | undefined>>;
   hasImage: boolean;
   hasAdditionalContext: boolean;
 }) => {
   const theme = useTheme();
+
+  const isCorrectAnswer = (index: number) => {
+    return isMultiSelectActivity(activity)
+      ? activity.correctAnswers.includes(index)
+      : index === activity.correctAnswer;
+  };
+
+  const onSetCorrectAnswer = (index: number) => {
+    if (isMultiSelectActivity(activity)) {
+      let newCorrectAnswers = [...activity.correctAnswers];
+      if (newCorrectAnswers.includes(index)) {
+        newCorrectAnswers = newCorrectAnswers.filter((i) => i !== index);
+      } else {
+        newCorrectAnswers.push(index);
+      }
+      setActivity((prev) =>
+        prev && isMultiSelectActivity(prev)
+          ? { ...prev, correctAnswers: newCorrectAnswers }
+          : prev,
+      );
+    } else {
+      setActivity((prev) => prev && { ...prev, correctAnswer: index });
+    }
+  };
 
   return (
     <Box
@@ -278,7 +310,9 @@ const MultipleChoiceMainEditor = ({
             variant="bodyMedium"
             sx={{ color: theme.palette.Neutral[500] }}
           >
-            Pick the correct answer
+            {isMultiSelectActivity(activity)
+              ? "Pick all the answers that are correct. There can be more than 1 correct answer."
+              : "Pick the correct answer"}
           </Typography>
         </Box>
         <Box
@@ -460,16 +494,24 @@ const MultipleChoiceMainEditor = ({
                   return { ...prev, options: newOptions };
                 });
               }}
-              isCorrectAnswer={index === activity.correctAnswer}
-              onSetCorrectAnswer={() => {
-                setActivity(
-                  (prev) => prev && { ...prev, correctAnswer: index },
-                );
-              }}
-              onDelete={() => {
+              isCorrectAnswer={isCorrectAnswer(index)}
+              isMultiSelect={isMultiSelectActivity(activity)}
+              onSetCorrectAnswer={() => onSetCorrectAnswer(index)}
+              onDelete={() =>
+                activity.options.length > 2 &&
                 setActivity((prev) => {
-                  if (!prev || !isMultipleChoiceActivity(prev)) return prev;
+                  if (!prev) return prev;
                   const newOptions = prev.options.filter((_, i) => i !== index);
+                  if (isMultiSelectActivity(prev)) {
+                    const newCorrectAnswers = prev.correctAnswers
+                      .filter((i) => i !== index)
+                      .map((i) => (i > index ? i - 1 : i));
+                    return {
+                      ...prev,
+                      options: newOptions,
+                      correctAnswers: newCorrectAnswers,
+                    };
+                  }
                   let newCorrectAnswer = prev.correctAnswer;
                   if (index === prev.correctAnswer) {
                     newCorrectAnswer = -1; // No correct answer
@@ -481,8 +523,8 @@ const MultipleChoiceMainEditor = ({
                     options: newOptions,
                     correctAnswer: newCorrectAnswer,
                   };
-                });
-              }}
+                })
+              }
             />
           ))}
         </Box>

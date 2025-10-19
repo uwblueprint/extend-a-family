@@ -29,6 +29,7 @@ import {
   isActivityPage,
   isLessonPage,
   isMultipleChoiceActivity,
+  isMultiSelectActivity,
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
 import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
@@ -82,15 +83,18 @@ const ViewModulePage = () => {
       false,
   );
   const [hasAdditionalContext, setHasAdditionalContext] = useState(false);
-  const [hint, setHint] = useState("");
 
   const { activity, setActivity } = useActivity<Activity>(undefined);
 
   useEffect(() => {
     if (currentPageObject && isActivityPage(currentPageObject)) {
       setActivity(currentPageObject);
-      // setHasImage(!!currentPageObject.imageUrl);
-      // setHasAdditionalContext(!!currentPageObject.additionalContext);
+      if (currentPageObject.imageUrl) {
+        setHasImage(true);
+      }
+      if (currentPageObject.additionalContext) {
+        setHasAdditionalContext(true);
+      }
     }
   }, [currentPageObject, setActivity]);
 
@@ -373,14 +377,16 @@ const ViewModulePage = () => {
                 height="100%"
                 width="100%"
               >
-                {activity && isMultipleChoiceActivity(activity) && (
-                  <MultipleChoiceMainEditor
-                    activity={activity}
-                    setActivity={setActivity}
-                    hasImage={hasImage}
-                    hasAdditionalContext={hasAdditionalContext}
-                  />
-                )}
+                {activity &&
+                  (isMultipleChoiceActivity(activity) ||
+                    isMultiSelectActivity(activity)) && (
+                    <MultipleChoiceMainEditor
+                      activity={activity}
+                      setActivity={setActivity}
+                      hasImage={hasImage}
+                      hasAdditionalContext={hasAdditionalContext}
+                    />
+                  )}
               </Box>
             )}
             {isDidYouLikeTheContentPage && <SurveySlides />}
@@ -454,36 +460,43 @@ const ViewModulePage = () => {
             </Button>
           </Box>
         </Box>
-        {currentPageObject && isActivityPage(currentPageObject) && (
-          <>
-            <Divider orientation="vertical" flexItem />
-            <MultipleChoiceEditorSidebar
-              hasImage={hasImage}
-              setHasImage={(newHasImage) => {
-                setHasImage(newHasImage);
-                if (!newHasImage) {
-                  setActivity((prev) => prev && { ...prev, imageUrl: "" });
-                }
-              }}
-              hasAdditionalContext={hasAdditionalContext}
-              setHasAdditionalContext={(newHasAdditionalContext) => {
-                setHasAdditionalContext(newHasAdditionalContext);
-                if (!newHasAdditionalContext) {
+        {currentPageObject &&
+          (isMultipleChoiceActivity(currentPageObject) ||
+            isMultiSelectActivity(currentPageObject)) && (
+            <>
+              <Divider orientation="vertical" flexItem />
+              <MultipleChoiceEditorSidebar
+                hasImage={hasImage}
+                setHasImage={(newHasImage) => {
+                  setHasImage(newHasImage);
+                  if (!newHasImage) {
+                    setActivity((prev) => prev && { ...prev, imageUrl: "" });
+                  }
+                }}
+                hasAdditionalContext={hasAdditionalContext}
+                setHasAdditionalContext={(newHasAdditionalContext) => {
+                  setHasAdditionalContext(newHasAdditionalContext);
+                  if (!newHasAdditionalContext) {
+                    setActivity(
+                      (prev) => prev && { ...prev, additionalContext: "" },
+                    );
+                  }
+                }}
+                onAddQuestionOption={() =>
                   setActivity(
-                    (prev) => prev && { ...prev, additionalContext: "" },
-                  );
+                    (prev) =>
+                      prev && { ...prev, options: [...prev.options, ""] },
+                  )
                 }
-              }}
-              onAddQuestionOption={() =>
-                setActivity(
-                  (prev) => prev && { ...prev, options: [...prev.options, ""] },
-                )
-              }
-              hint={hint}
-              setHint={setHint}
-            />
-          </>
-        )}
+                hint={currentPageObject.hint || ""}
+                setHint={(newHint: string) => {
+                  setActivity((prev) => prev && { ...prev, hint: newHint });
+                }}
+                isMultiSelect={isMultiSelectActivity(currentPageObject)}
+                isAddOptionDisabled={currentPageObject.options.length >= 4}
+              />
+            </>
+          )}
       </Box>
       <NeedHelpModal
         open={isHelpModalOpen}

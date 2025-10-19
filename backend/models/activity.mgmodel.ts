@@ -11,6 +11,7 @@ export interface Activity extends CoursePage {
   imageUrl?: string;
   additionalContext?: string;
   userFeedback?: string;
+  hint?: string;
 }
 
 export interface MultipleChoiceActivity extends Activity {
@@ -58,6 +59,10 @@ export const ActivitySchema: Schema = new Schema({
     type: String,
     required: false,
     maxlength: 500,
+  },
+  hint: {
+    type: String,
+    required: false,
   },
 });
 
@@ -129,7 +134,7 @@ const MultiSelectActivitySchema = new Schema({
           return false;
         }
         return correctAnswers.every((answer) => {
-          return answer >= 0 && answer < this.options.length;
+          return answer >= 0; // && answer < this.options.length;
         });
       },
       message: "Must have at least one valid correct answer",

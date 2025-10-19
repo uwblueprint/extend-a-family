@@ -14,18 +14,19 @@ export enum QuestionType {
 
 export type PageType = "Lesson" | QuestionType;
 
-export interface CoursePage {
+export interface CoursePageBase {
   id: string;
   title: string;
   type: PageType;
 }
 
-export interface LessonPage extends CoursePage {
+export interface LessonPage extends CoursePageBase {
+  type: "Lesson";
   source: string;
   pageIndex: number;
 }
 
-interface BaseActivity extends CoursePage {
+interface ActivityBase extends CoursePageBase {
   questionType: QuestionType;
   activityNumber: string;
   questionText: string;
@@ -33,15 +34,18 @@ interface BaseActivity extends CoursePage {
   imageUrl?: string;
   additionalContext?: string;
   userFeedback?: string;
+  hint?: string;
 }
 
-export interface MultipleChoiceActivity extends BaseActivity {
+export interface MultipleChoiceActivity extends ActivityBase {
+  type: QuestionType.MultipleChoice;
   questionType: QuestionType.MultipleChoice;
   options: string[];
   correctAnswer: number;
 }
 
-export interface MultiSelectActivity extends BaseActivity {
+export interface MultiSelectActivity extends ActivityBase {
+  type: QuestionType.MultiSelect;
   questionType: QuestionType.MultiSelect;
   options: string[];
   correctAnswers: number[];
@@ -49,24 +53,26 @@ export interface MultiSelectActivity extends BaseActivity {
 
 export type Activity = MultipleChoiceActivity | MultiSelectActivity;
 
-export function isLessonPage(page: CoursePage): page is LessonPage {
+export type CoursePage = LessonPage | Activity;
+
+export function isLessonPage(page: CoursePageBase): page is LessonPage {
   return page.type === "Lesson";
 }
 
-export function isActivityPage(page: CoursePage): page is Activity {
+export function isActivityPage(page: CoursePageBase): page is Activity {
   return Object.values(QuestionType).includes(page.type as QuestionType);
 }
 
 export function isMultipleChoiceActivity(
-  activity: BaseActivity,
+  activity: CoursePage,
 ): activity is MultipleChoiceActivity {
-  return activity.questionType === QuestionType.MultipleChoice;
+  return activity.type === QuestionType.MultipleChoice;
 }
 
 export function isMultiSelectActivity(
-  activity: BaseActivity,
+  activity: CoursePage,
 ): activity is MultiSelectActivity {
-  return activity.questionType === QuestionType.MultiSelect;
+  return activity.type === QuestionType.MultiSelect;
 }
 
 export type CourseModule = {
