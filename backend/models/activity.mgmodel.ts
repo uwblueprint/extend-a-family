@@ -33,7 +33,7 @@ export interface Media {
 
 export interface MatchingActivity extends Activity {
   questionType: QuestionType.Matching;
-  media: Map<string, Media[]>; // key: column number
+  media: Map<'1' | '2' | '3', Media[]>; // key: column number
   correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
   rows: number;
 }
@@ -42,7 +42,7 @@ export interface TableActivity extends Activity {
   questionType: QuestionType.Table;
   columnLabels: string[];
   rowLabels: Map<string, string | undefined>; // key: label, value: image url
-  correctAnswers: number[][]; // list of table cords which represent answers [row, col]
+  correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
 }
 
 export const ActivitySchema: Schema = new Schema(
@@ -116,7 +116,7 @@ const MatchingActivitySchema = new Schema({
         const keys = Array.from(mediaMap.keys());
         return keys.every((k) => ["1", "2", "3"].includes(k));
       },
-      message: "Media map keys must be 1, 2, or 3",
+      message: "Media map keys must be the strings '1', '2', or '3'",
     },
   },
   correctAnswers: {
