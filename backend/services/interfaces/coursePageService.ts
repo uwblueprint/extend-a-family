@@ -1,5 +1,5 @@
 import {
-  CoursePageDTO,
+  CoursePageDTOBase,
   CreateCoursePageDTO,
   UpdateCoursePageDTO,
 } from "../../types/courseTypes";
@@ -10,14 +10,17 @@ interface ICoursePageService {
    * @param courseModuleId the id of the module we want to fetch the pages of
    * @throws Error if course pages were not successfully fetched
    */
-  getCoursePages(courseModuleId: string): Promise<Array<CoursePageDTO>>;
+  getCoursePages(courseModuleId: string): Promise<Array<CoursePageDTOBase>>;
 
   /**
    * Returns 1 course page
    * @param coursePageId the id of the page we want to fetch
    * @throwsError if course page was not successfully fetched or not found
    */
-  getCoursePage(coursePageId: string, lean?: boolean): Promise<CoursePageDTO>;
+  getCoursePage(
+    coursePageId: string,
+    lean?: boolean,
+  ): Promise<CoursePageDTOBase>;
 
   /**
    * Creates a course page, appended as the last page in the module (for now)
@@ -28,7 +31,7 @@ interface ICoursePageService {
   createCoursePage(
     courseModuleId: string,
     coursePageDTO: CreateCoursePageDTO,
-  ): Promise<CoursePageDTO>;
+  ): Promise<CoursePageDTOBase>;
 
   /**
    * Updates 1 specific course page
@@ -39,7 +42,7 @@ interface ICoursePageService {
   updateCoursePage(
     coursePageId: string,
     coursePageDTO: UpdateCoursePageDTO,
-  ): Promise<CoursePageDTO>;
+  ): Promise<CoursePageDTOBase>;
 
   /**
    * Deletes 1 course page

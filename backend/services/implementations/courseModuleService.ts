@@ -6,6 +6,7 @@ import MgCourseModule, {
   CourseModule,
 } from "../../models/coursemodule.mgmodel";
 import CoursePageModel, {
+  CoursePage,
   LessonPageModel,
 } from "../../models/coursepage.mgmodel";
 import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
@@ -72,9 +73,17 @@ class CourseModuleService implements ICourseModuleService {
     }
   }
 
-  async getCourseModule(
-    courseModuleId: string,
-  ): Promise<CourseModuleDTO | null> {
+  private static async fetchPage(
+    page: Schema.Types.ObjectId,
+  ): Promise<CoursePage> {
+    const pageObject = await CoursePageModel.findById(page).lean().exec();
+    if (!pageObject) {
+      throw new Error(`Page with id ${page} not found.`);
+    }
+    return pageObject;
+  }
+
+  async getCourseModule(courseModuleId: string): Promise<CourseModuleDTO> {
     try {
       const courseModule: CourseModule | null = await MgCourseModule.findById(
         courseModuleId,
@@ -101,14 +110,9 @@ class CourseModuleService implements ICourseModuleService {
       const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
         `course/pdfs/module-${courseModuleId}.pdf`,
       );
-      const fetchPage = async (page: Schema.Types.ObjectId) => {
-        const pageObject = await CoursePageModel.findById(page).lean().exec();
-        if (!pageObject) {
-          throw new Error(`Page with id ${page} not found.`);
-        }
-        return pageObject;
-      };
-      const pageObjects = Promise.all(courseModule.pages.map(fetchPage));
+      const pageObjects = Promise.all(
+        courseModule.pages.map(CourseModuleService.fetchPage),
+      );
       return {
         ...courseModule,
         unitId: courseUnit._id.toString(), // eslint-disable-line no-underscore-dangle

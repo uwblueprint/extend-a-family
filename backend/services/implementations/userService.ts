@@ -1,11 +1,10 @@
 import * as firebaseAdmin from "firebase-admin";
 import { Model, ObjectId } from "mongoose";
-import IUserService from "../interfaces/userService";
 import MgUser, {
-  Learner,
-  User,
-  LearnerModel,
   FacilitatorModel,
+  Learner,
+  LearnerModel,
+  User,
 } from "../../models/user.mgmodel";
 import {
   CreateUserDTO,
@@ -18,8 +17,14 @@ import {
 import { AuthErrorCodes } from "../../types/authTypes";
 import { getErrorCode, getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
+import IUserService from "../interfaces/userService";
+import CourseModuleService from "./courseModuleService";
+import CourseUnitService from "./courseUnitService";
+import courseunitMgmodel from "../../models/courseunit.mgmodel";
 
 const Logger = logger(__filename);
+const courseModuleService = new CourseModuleService();
+const courseUnitService = new CourseUnitService();
 
 const getMongoUserByAuthId = async (authId: string): Promise<User> => {
   const user: User | null = await MgUser.findOne({ authId });
@@ -359,6 +364,131 @@ class UserService implements IUserService {
       );
       throw error;
     }
+  }
+
+  async addActivityToProgress(
+    learnerId: string,
+    unitId: string,
+    moduleId: string,
+    activityId: string,
+  ): Promise<Learner | null> {
+    const updatedUser = await LearnerModel.findByIdAndUpdate(
+      learnerId,
+      {
+        $addToSet: {
+          [`activitiesCompleted.${unitId}.${moduleId}`]: activityId,
+        },
+      },
+      { new: true },
+    );
+    return updatedUser;
+  }
+
+  async getCompletedModules(learner: LearnerDTO): Promise<Set<string>> {
+    const completedModules = new Set<string>();
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const unitsMap of learner.activitiesCompleted.values()) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [
+        moduleId,
+        activitiesCompletedInModule,
+      ] of unitsMap.entries()) {
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const module = await courseModuleService.getCourseModule(moduleId);
+          const moduleActivities = module.pages.filter(
+            (page) => page.type === "Activity",
+          );
+          if (activitiesCompletedInModule.length === moduleActivities.length) {
+            completedModules.add(moduleId);
+          }
+          // eslint-disable-next-line no-empty
+        } catch (error) {}
+      }
+    }
+
+    return completedModules;
+  }
+
+  async deleteActivityFromProgress(
+    unitId: string,
+    moduleId: string,
+    activityId: string,
+  ): Promise<number> {
+    const { modifiedCount } = await LearnerModel.updateMany(
+      {},
+      {
+        $pull: { [`activitiesCompleted.${unitId}.${moduleId}`]: activityId },
+      },
+    );
+    return modifiedCount;
+  }
+
+  private async getNextPage(
+    unitId: string,
+    moduleId: string,
+    pageId: string,
+  ): Promise<string | null> {
+    const curModule = await courseModuleService.getCourseModule(moduleId);
+    const curPageIndex = curModule.pages.findIndex(
+      (page) => page.id === pageId,
+    );
+    const nextPage = curModule.pages[curPageIndex + 1];
+    if (nextPage) {
+      return nextPage.id;
+    }
+    const unit = await courseUnitService.getCourseUnit(unitId);
+    const curModuleIndex = unit.modules.findIndex(
+      (module) => module === moduleId,
+    );
+    const nextModuleId = unit.modules[curModuleIndex + 1];
+    if (nextModuleId) {
+      try {
+        const nextModule = await courseModuleService.getCourseModule(
+          nextModuleId,
+        );
+        if (nextModule && nextModule.pages.length > 0) {
+          return nextModule.pages[0].id;
+        }
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
+    }
+    const nextUnit = await courseunitMgmodel.findOne({
+      displayIndex: unit.displayIndex + 1,
+    });
+    if (nextUnit) {
+      const nextModule = await courseModuleService.getCourseModule(
+        nextUnit.modules[0].toString(),
+      );
+      if (nextModule && nextModule.pages.length > 0) {
+        return nextModule.pages[0].id;
+      }
+    }
+    return null;
+  }
+
+  async updateNextPage(
+    learnerId: string,
+    justViewed: { unitId: string; moduleId: string; pageId: string },
+  ): Promise<Learner | null> {
+    const nextPageId = await this.getNextPage(
+      justViewed.unitId,
+      justViewed.moduleId,
+      justViewed.pageId,
+    );
+    if (!nextPageId) {
+      Logger.warn(
+        `No next page found for learner ${learnerId} after viewing ${justViewed.pageId} in module ${justViewed.moduleId} of unit ${justViewed.unitId}`,
+      );
+      return null;
+    }
+    const updatedUser = await LearnerModel.findByIdAndUpdate(
+      learnerId,
+      { nextPage: nextPageId },
+      { new: true },
+    );
+    return updatedUser;
   }
 }
 

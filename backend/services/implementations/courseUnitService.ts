@@ -35,7 +35,9 @@ class CourseUnitService implements ICourseUnitService {
   async getCourseUnit(
     unitId: string,
   ): Promise<CourseUnitDTO & { modules: string[] }> {
-    const courseUnit: CourseUnit | null = await MgCourseUnit.findById(unitId);
+    const courseUnit: CourseUnit | null = await MgCourseUnit.findById(unitId)
+      .lean()
+      .exec();
 
     if (!courseUnit) {
       throw new Error(`Course unit with id ${unitId} not found.`);

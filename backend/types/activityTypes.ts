@@ -1,30 +1,12 @@
-import { CoursePageDTO } from "./courseTypes";
+import { ActivityPageDTO, QuestionType } from "./courseTypes";
 
-export enum QuestionType {
-  MultipleChoice = "MultipleChoice",
-  MultiSelect = "MultiSelect",
-  Matching = "Matching",
-  Table = "Table",
-  Custom = "Custom",
-}
-
-export interface ActivityDTO extends CoursePageDTO {
-  questionType: QuestionType;
-  activityNumber: string;
-  questionText: string;
-  instruction: string;
-  imageUrl?: string;
-  additionalContext?: string;
-  userFeedback?: string;
-}
-
-export interface MultipleChoiceActivityDTO extends ActivityDTO {
+export interface MultipleChoiceActivityDTO extends ActivityPageDTO {
   questionType: QuestionType.MultipleChoice;
   options: string[];
   correctAnswer: number;
 }
 
-export interface MultiSelectActivityDTO extends ActivityDTO {
+export interface MultiSelectActivityDTO extends ActivityPageDTO {
   questionType: QuestionType.MultiSelect;
   options: string[];
   correctAnswers: number[];

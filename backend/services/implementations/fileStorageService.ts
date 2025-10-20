@@ -8,7 +8,7 @@ import IFileStorageService from "../interfaces/fileStorageService";
 const Logger = logger(__filename);
 
 class FileStorageService implements IFileStorageService {
-  bucketName: string;
+  public readonly bucketName: string;
 
   constructor(bucketName: string) {
     this.bucketName = bucketName;
@@ -34,7 +34,7 @@ class FileStorageService implements IFileStorageService {
   async createFile(
     fileName: string,
     filePath: string,
-    contentType: string | null = null,
+    contentType?: string,
     allowOverwrite = false,
   ): Promise<void> {
     try {
@@ -45,7 +45,7 @@ class FileStorageService implements IFileStorageService {
       }
       await bucket.upload(filePath, {
         destination: fileName,
-        metadata: { contentType },
+        metadata: contentType ? { contentType } : undefined,
       });
     } catch (error: unknown) {
       Logger.error(`Failed to upload file. Reason = ${getErrorMessage(error)}`);
@@ -56,7 +56,7 @@ class FileStorageService implements IFileStorageService {
   async updateFile(
     fileName: string,
     filePath: string,
-    contentType: string | null = null,
+    contentType?: string,
   ): Promise<void> {
     try {
       const bucket = storage().bucket(this.bucketName);
@@ -66,7 +66,7 @@ class FileStorageService implements IFileStorageService {
       }
       await bucket.upload(filePath, {
         destination: fileName,
-        metadata: { contentType },
+        metadata: contentType ? { contentType } : undefined,
       });
     } catch (error: unknown) {
       Logger.error(`Failed to update file. Reason = ${getErrorMessage(error)}`);
@@ -91,13 +91,13 @@ class FileStorageService implements IFileStorageService {
   async uploadImage(
     fileName: string,
     fileData: Buffer | null = null,
-    contentType: string | null = null,
+    contentType?: string,
   ): Promise<string> {
     try {
       const bucket = storage().bucket(this.bucketName);
       if (fileData) {
         await bucket.file(fileName).save(fileData, {
-          metadata: { contentType },
+          metadata: contentType ? { contentType } : undefined,
         });
       }
       return await this.getFile(fileName);
