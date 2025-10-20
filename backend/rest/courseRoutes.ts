@@ -15,6 +15,7 @@ import CoursePageService from "../services/implementations/coursePageService";
 import CourseUnitService from "../services/implementations/courseUnitService";
 import FileStorageService from "../services/implementations/fileStorageService";
 import { getErrorMessage } from "../utilities/errorUtils";
+import { CourseUnitDTO } from "../types/courseTypes";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -58,6 +59,50 @@ courseRouter.post(
       res.status(200).json(imageURL);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.put(
+  "/rearangeUnits",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator"])),
+  async (req, res) => {
+    try {
+      const arangement: Map<string, number> = new Map<string, number>(
+        Object.entries(req.body.arangement),
+      );
+      const courseUnits = await courseUnitService.getCourseUnits();
+      const updatedUnits: CourseUnitDTO[] = [];
+      const maxIndex: number = courseUnits.length;
+      const testSet: Set<number> = new Set();
+      arangement.forEach((value, key) => {
+        if (value > maxIndex || value < 1) {
+          throw Error("invalid arangement");
+        }
+        const unit: CourseUnitDTO | undefined = courseUnits.find(
+          (units) => units.id === key,
+        );
+        if (unit) {
+          unit.displayIndex = value;
+          updatedUnits.push(unit);
+        } else {
+          throw Error("invalid arangement");
+        }
+      });
+      courseUnits.forEach((unit) => {
+        testSet.add(unit.displayIndex);
+      });
+      if (testSet.size !== maxIndex) {
+        throw Error("invalid arangement");
+      }
+      await Promise.all(
+        updatedUnits.map((unit) =>
+          courseUnitService.updateCourseUnit(unit.id, unit),
+        ),
+      );
+      res.status(200).send("success");
+    } catch (error: unknown) {
+      res.status(500).send(getErrorMessage(error));
     }
   },
 );

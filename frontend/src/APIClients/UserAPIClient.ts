@@ -1,6 +1,6 @@
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
 import { Role } from "../types/AuthTypes";
-import { User, Bookmark } from "../types/UserTypes";
+import { Bookmark, User } from "../types/UserTypes";
 import {
   getLocalStorageObjProperty,
   setLocalStorageObjProperty,
@@ -37,12 +37,28 @@ const getUsers = async (): Promise<User[]> => {
   }
 };
 
+const facilitatorGetLearners = async (): Promise<User[]> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.get(`/users/facilitator/myLearners`, {
+      headers: { Authorization: bearerToken },
+    });
+    return data;
+  } catch (error) {
+    return [];
+  }
+};
+
 const updateUserDetails = async (
   firstName: string,
   lastName: string,
   role: Role,
   status: string,
   bio?: string,
+  emailPrefrence?: number,
 ): Promise<User> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -57,6 +73,7 @@ const updateUserDetails = async (
         role,
         status,
         bio,
+        emailPrefrence,
       },
       {
         headers: { Authorization: bearerToken },
@@ -66,10 +83,15 @@ const updateUserDetails = async (
     setLocalStorageObjProperty(AUTHENTICATED_USER_KEY, "lastName", lastName);
     if (role === "Facilitator" && bio) {
       setLocalStorageObjProperty(AUTHENTICATED_USER_KEY, "bio", bio);
+      setLocalStorageObjProperty(
+        AUTHENTICATED_USER_KEY,
+        "emailPrefrence",
+        emailPrefrence,
+      );
     }
     return data;
   } catch (error) {
-    throw new Error("Failed to update user details");
+    throw new Error(`Failed to update user details: ${error}`);
   }
 };
 
@@ -185,6 +207,7 @@ const getCurrentUser = async (): Promise<User & { bookmarks: Bookmark[] }> => {
 export default {
   getUsersByRole,
   getUsers,
+  facilitatorGetLearners,
   updateUserDetails,
   deleteUser,
   addBookmark,

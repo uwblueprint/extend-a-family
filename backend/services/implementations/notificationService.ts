@@ -1,18 +1,18 @@
 /* eslint-disable class-methods-use-this */
 import { Schema, UpdateWriteOpResult } from "mongoose";
-import {
-  NotificationDTO,
-  CreateNotificationDTO,
-  NotificationsResponseDTO,
-  UserNotification,
-  UpdateNotificationDTO,
-} from "../../types/notificationTypes";
-import INotificationService from "../interfaces/notificationService";
 import MgNotification, {
   Notification,
 } from "../../models/notification.mgmodel";
-import logger from "../../utilities/logger";
+import {
+  CreateNotificationDTO,
+  NotificationDTO,
+  NotificationsResponseDTO,
+  UpdateNotificationDTO,
+  UserNotification,
+} from "../../types/notificationTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
+import logger from "../../utilities/logger";
+import INotificationService from "../interfaces/notificationService";
 
 const Logger = logger(__filename);
 
@@ -26,20 +26,44 @@ class NotificationService implements INotificationService {
     let totalNumberOfNotifications: number;
     let numberOfUnseenNotifications: number;
     try {
-      const foundNotifications = await MgNotification.find({ user })
+      const foundNotifications = await MgNotification.find({
+        user,
+        read: false,
+      })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
-      notifications = foundNotifications.map((notification) => {
-        return {
-          id: notification.id,
-          message: notification.message,
-          read: notification.read,
-          createdAt: notification.createdAt,
-          link: notification.link,
-        };
-      });
+      notifications = await Promise.all(
+        foundNotifications.map(async (notification) => {
+          let populatedNotification: UserNotification =
+            await notification.populate("helpRequest");
+          populatedNotification = await notification.populate(
+            "helpRequest.learner",
+          );
+          populatedNotification = await notification.populate(
+            "helpRequest.unit",
+            "title",
+          );
+          populatedNotification = await notification.populate(
+            "helpRequest.module",
+            "title",
+          );
+          populatedNotification = await notification.populate(
+            "helpRequest.page",
+            "title",
+          );
+          return {
+            id: populatedNotification.id,
+            message: populatedNotification.message,
+            seen: populatedNotification.seen,
+            read: populatedNotification.read,
+            createdAt: populatedNotification.createdAt,
+            link: populatedNotification.link,
+            helpRequest: populatedNotification.helpRequest,
+          };
+        }),
+      );
 
       totalNumberOfNotifications = await MgNotification.where({
         user,
@@ -47,7 +71,7 @@ class NotificationService implements INotificationService {
 
       numberOfUnseenNotifications = await MgNotification.where({
         user,
-        read: false,
+        seen: false,
       }).countDocuments();
     } catch (error) {
       Logger.error(
@@ -82,6 +106,7 @@ class NotificationService implements INotificationService {
       id: newNotification.id,
       user: newNotification.user,
       message: newNotification.message,
+      seen: newNotification.seen,
       read: newNotification.read,
       createdAt: newNotification.createdAt,
       link: newNotification.link,
@@ -132,13 +157,13 @@ class NotificationService implements INotificationService {
     };
   }
 
-  async markReadNotifications(userId: string): Promise<UpdateWriteOpResult> {
+  async markSeenNotifications(userId: string): Promise<UpdateWriteOpResult> {
     let updates: UpdateWriteOpResult | null;
     try {
       updates = await MgNotification.updateMany(
-        { user: userId, read: false },
+        { user: userId, seen: false },
         {
-          read: true,
+          seen: true,
         },
       );
     } catch (error) {
@@ -148,6 +173,25 @@ class NotificationService implements INotificationService {
       throw error;
     }
     return updates;
+  }
+
+  async markNotificationRead(notificationId: string): Promise<NotificationDTO> {
+    try {
+      const updatedNotification = await this.updateNotification(
+        notificationId,
+        {
+          read: true,
+        },
+      );
+      return updatedNotification;
+    } catch (error) {
+      Logger.error(
+        `Failed to mark notification as read. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
   }
 }
 

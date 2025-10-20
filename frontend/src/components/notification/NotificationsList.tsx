@@ -1,54 +1,74 @@
-import React from "react";
-import { Box, ListItem, ListItemButton } from "@mui/material";
-import { useHistory } from "react-router-dom";
-import { FixedSizeList, ListChildComponentProps } from "react-window";
+import { Box, Divider, Typography, useTheme } from "@mui/material";
 import { Notification } from "../../types/NotificationTypes";
 import NotificationItem from "./NotificationItem";
+import NotificationsEmpty from "./NotificationsEmpty";
+import NotifiactionsFetchError from "./NotificationsFetchError";
 
-interface NotificationListProps {
+export default function NotificationList({
+  notifications,
+  refreshNotifs,
+  errorFetchNotifs,
+}: {
   notifications: Notification[];
-}
-
-const NotificationRow = (props: ListChildComponentProps<Notification[]>) => {
-  const { style, index, data } = props;
-  const history = useHistory();
-
-  return (
-    <ListItem style={style} key={index} component="div" disablePadding>
-      <ListItemButton
-        sx={{ width: "100%", height: "100%" }}
-        onClick={() => history.push({ pathname: data[index].link })}
-      >
-        <NotificationItem notification={data[index]} />
-      </ListItemButton>
-    </ListItem>
-  );
-};
-
-const NotificationsList = (props: NotificationListProps) => {
-  const { notifications } = props;
-
+  refreshNotifs: () => void;
+  errorFetchNotifs: boolean;
+}) {
+  const theme = useTheme();
   return (
     <Box
       sx={{
-        width: "100%",
-        height: 400,
-        maxWidth: 360,
-        bgcolor: "background.paper",
+        display: "flex",
+        width: "360px",
+        height: "500px",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        flexShrink: 0,
       }}
     >
-      <FixedSizeList
-        height={400}
-        width={360}
-        itemSize={100}
-        itemCount={notifications.length}
-        itemData={notifications}
-        overscanCount={2}
+      <Box
+        sx={{
+          display: "flex",
+          padding: "16px",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: "8px",
+          alignSelf: "stretch",
+        }}
       >
-        {NotificationRow}
-      </FixedSizeList>
+        <Box
+          sx={{
+            display: "flex",
+            padding: "8px 0",
+            alignItems: "center",
+            flex: "1 0 0",
+            alignSelf: "stretch",
+          }}
+        >
+          <Typography variant="titleLarge">Messages</Typography>
+        </Box>
+      </Box>
+      <Divider
+        sx={{
+          display: "flex",
+          height: "0.5px",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          alignSelf: "stretch",
+          color: theme.palette.Neutral[500],
+        }}
+      />
+      {notifications.map((message) => (
+        <NotificationItem
+          key={message.id}
+          notification={message}
+          refreshNotifs={refreshNotifs}
+        />
+      ))}
+      {errorFetchNotifs && <NotifiactionsFetchError />}
+      {notifications.length === 0 && !errorFetchNotifs && (
+        <NotificationsEmpty />
+      )}
     </Box>
   );
-};
-
-export default NotificationsList;
+}

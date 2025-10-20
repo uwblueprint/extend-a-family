@@ -1,11 +1,11 @@
 import { Theme } from "@mui/material/styles";
-import { CourseModule, CoursePage } from "../../../types/CourseTypes";
+import { CourseModule, CoursePageBase } from "../../../types/CourseTypes";
 
 export interface NeedHelpModalProps {
   open: boolean;
   onClose: () => void;
   module: (CourseModule & { lessonPdfUrl: string }) | null;
-  currentPage: CoursePage | null;
+  currentPage: CoursePageBase | null;
 }
 
 export type ModalScreen = "home" | "content" | "confirmation" | "error";

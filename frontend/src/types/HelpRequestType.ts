@@ -3,7 +3,7 @@ import { Facilitator, Learner } from "./UserTypes";
 export interface HelpRequest {
   id: string;
   message: string;
-  learner: Pick<Learner, "id" | "firstName" | "lastName">;
+  learner: Learner;
   facilitator: Pick<Facilitator, "id">;
   unit: {
     id: string;

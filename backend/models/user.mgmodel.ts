@@ -30,6 +30,7 @@ export interface Learner extends User {
 export interface Facilitator extends User {
   learners: Array<ObjectId>;
   bio?: string;
+  emailPrefrence: number;
 }
 
 const options = {
@@ -111,6 +112,10 @@ const FacilitatorSchema = new Schema(
     bio: {
       type: String,
       required: false,
+    },
+    emailPrefrence: {
+      type: Number,
+      required: true,
     },
   },
   options,
