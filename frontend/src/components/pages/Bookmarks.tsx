@@ -165,6 +165,9 @@ const Bookmarks = (): React.ReactElement => {
           error={error}
           hasBookmarks={hasBookmarks}
           selectedUnitId={selectedUnitId}
+          onBookmarkDeleted={(pageId) =>
+            setBookmarks((prev) => prev.filter((b) => b.pageId !== pageId))
+          }
         />
       </Box>
     </Box>

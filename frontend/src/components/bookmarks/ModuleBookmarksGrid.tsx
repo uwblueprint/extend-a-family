@@ -11,9 +11,13 @@ interface ModuleBookmarksGridProps {
     moduleId: string;
     pageId: string;
   }>;
+  onBookmarkDeleted?: (pageId: string) => void;
 }
 
-const ModuleBookmarksGrid: React.FC<ModuleBookmarksGridProps> = ({ bookmarks }) => {
+const ModuleBookmarksGrid: React.FC<ModuleBookmarksGridProps> = ({
+  bookmarks,
+  onBookmarkDeleted,
+}) => {
   return (
     <Box
       sx={{
@@ -27,7 +31,11 @@ const ModuleBookmarksGrid: React.FC<ModuleBookmarksGridProps> = ({ bookmarks }) 
       }}
     >
       {bookmarks.map((bookmark) => (
-        <BookmarkItem key={bookmark.id} bookmark={bookmark} />
+        <BookmarkItem
+          key={bookmark.id}
+          bookmark={bookmark}
+          onDeleteSuccess={onBookmarkDeleted}
+        />
       ))}
     </Box>
   );

@@ -7,20 +7,37 @@ import { Bookmark } from "../../types/UserTypes";
 import { buildViewPageUrl } from "../../utils/routeBuilders";
 import DeleteBookmarkButton from "./DeleteBookmarkButton";
 import DeleteBookmarkModal from "./DeleteBookmarkModal";
+import UserAPIClient from "../../APIClients/UserAPIClient";
 
 interface BookmarkItemProps {
   bookmark: Bookmark;
+  onDeleteSuccess?: (pageId: string) => void; // optional callback to refresh UI
 }
 
-const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
+const BookmarkItem: React.FC<BookmarkItemProps> = ({
+  bookmark,
+  onDeleteSuccess,
+}) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+
   const isSlide = bookmark.type === "Lesson";
   const to = buildViewPageUrl({
     unitId: bookmark.unitId,
     moduleId: bookmark.moduleId,
     pageId: bookmark.pageId,
   });
+
+  const handleDelete = async () => {
+    try {
+      await UserAPIClient.deleteBookmark(bookmark.pageId);
+      setOpen(false);
+      if (onDeleteSuccess) onDeleteSuccess(bookmark.pageId);
+    } catch (error) {
+      console.error("Failed to delete bookmark:", error);
+      alert("Something went wrong while deleting the bookmark.");
+    }
+  };
 
   return (
     <>
@@ -83,19 +100,12 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
         </Box>
 
         {/* Type (Slide or Activity) with icon */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-          }}
-        >
+        <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
           {isSlide ? (
             <WidthWideOutlinedIcon sx={{ width: "14px", height: "14px" }} />
           ) : (
             <PanToolAltOutlinedIcon sx={{ width: "14px", height: "14px" }} />
           )}
-
           <Typography
             sx={{
               color: theme.palette.Neutral[600],
@@ -117,11 +127,11 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark }) => {
         </Typography>
       </Box>
 
-      {/* Modal */}
+      {/* Delete confirmation modal */}
       <DeleteBookmarkModal
         open={open}
         onClose={() => setOpen(false)}
-        onDelete={() => setOpen(false)}
+        onDelete={handleDelete}
       />
     </>
   );

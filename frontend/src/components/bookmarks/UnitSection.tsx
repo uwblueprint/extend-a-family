@@ -18,9 +18,14 @@ interface UnitSectionProps {
       }>;
     };
   };
+  onBookmarkDeleted?: (pageId: string) => void;
 }
 
-const UnitSection: React.FC<UnitSectionProps> = ({ unit, modules }) => {
+const UnitSection: React.FC<UnitSectionProps> = ({
+  unit,
+  modules,
+  onBookmarkDeleted,
+}) => {
   const theme = useTheme();
 
   return (
@@ -45,6 +50,7 @@ const UnitSection: React.FC<UnitSectionProps> = ({ unit, modules }) => {
           key={moduleGroup.module.id}
           module={moduleGroup.module}
           bookmarks={moduleGroup.bookmarks}
+          onBookmarkDeleted={onBookmarkDeleted}
         />
       ))}
     </Box>

@@ -21,13 +21,18 @@ interface ModuleSectionProps {
     moduleId: string;
     pageId: string;
   }>;
+  onBookmarkDeleted?: (pageId: string) => void;
 }
 
-const ModuleSection: React.FC<ModuleSectionProps> = ({ module, bookmarks }) => {
+const ModuleSection: React.FC<ModuleSectionProps> = ({
+  module,
+  bookmarks,
+  onBookmarkDeleted,
+}) => {
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
 
-  // Count slides and activities 
+  // Count slides and activities
   const slideCount = bookmarks.filter((b) => b.type === "Lesson").length;
   const activityCount = bookmarks.filter((b) => b.type !== "Lesson").length;
 
@@ -59,7 +64,9 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({ module, bookmarks }) => {
         }
         sx={{
           width: "100%",
-          backgroundColor: expanded ? "var(--Surface-Hover, #F5F5F5)" : "transparent",
+          backgroundColor: expanded
+            ? "var(--Surface-Hover, #F5F5F5)"
+            : "transparent",
           padding: "30px 32px",
           display: "flex",
           alignItems: "center",
@@ -78,7 +85,8 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({ module, bookmarks }) => {
             Module {module.displayIndex}: {module.title}
           </Typography>
           <Typography sx={{ ...theme.typography.labelLarge }}>
-            {activityCount} bookmarked {activityLabel}, {slideCount} bookmarked {slideLabel}
+            {activityCount} bookmarked {activityLabel}, {slideCount} bookmarked{" "}
+            {slideLabel}
           </Typography>
         </Box>
       </AccordionSummary>
@@ -89,7 +97,10 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({ module, bookmarks }) => {
           padding: "32px 32px 42px 32px",
         }}
       >
-        <ModuleBookmarksGrid bookmarks={bookmarks} />
+        <ModuleBookmarksGrid
+          bookmarks={bookmarks}
+          onBookmarkDeleted={onBookmarkDeleted}
+        />{" "}
       </AccordionDetails>
     </Accordion>
   );

@@ -26,6 +26,7 @@ interface BookmarksContentProps {
   error: string | null;
   hasBookmarks: boolean;
   selectedUnitId: string | null;
+  onBookmarkDeleted?: (pageId: string) => void;
 }
 
 const BookmarksContent: React.FC<BookmarksContentProps> = ({
@@ -34,6 +35,7 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
   error,
   hasBookmarks,
   selectedUnitId,
+  onBookmarkDeleted,
 }) => {
   const theme = useTheme();
 
@@ -88,6 +90,7 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
           key={unitGroup.unit.id}
           unit={unitGroup.unit}
           modules={unitGroup.modules}
+          onBookmarkDeleted={onBookmarkDeleted}
         />
       ))}
     </Box>
