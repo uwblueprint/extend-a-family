@@ -16,11 +16,11 @@ import {
 import React, { useContext, useState } from "react";
 import { Redirect, useHistory } from "react-router-dom";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
-import { 
+import {
   LANDING_PAGE,
   SIGNUP_APPROVED_PAGE,
   SIGNUP_PENDING_PAGE,
-  WELCOME_PAGE
+  WELCOME_PAGE,
 } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import {
