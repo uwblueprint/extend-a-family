@@ -91,6 +91,7 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
           unit={unitGroup.unit}
           modules={unitGroup.modules}
           onBookmarkDeleted={onBookmarkDeleted}
+          showHeader={selectedUnitId === null}
         />
       ))}
     </Box>

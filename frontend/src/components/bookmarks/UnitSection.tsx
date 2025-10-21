@@ -19,40 +19,42 @@ interface UnitSectionProps {
     };
   };
   onBookmarkDeleted?: (pageId: string) => void;
+  showHeader?: boolean;
 }
 
 const UnitSection: React.FC<UnitSectionProps> = ({
   unit,
   modules,
   onBookmarkDeleted,
+  showHeader,
 }) => {
   const theme = useTheme();
 
   return (
     <Box sx={{ marginBottom: "80px" }}>
       {/* Unit Header */}
-      <Typography
-        variant="titleLarge"
-        sx={{
-          marginBottom: "40px",
-          color: theme.palette.Learner.Default,
-          borderBottom: `3px solid ${theme.palette.Learner.Default}`,
-          paddingBottom: "20px",
-          fontWeight: 700,
-        }}
-      >
-        Unit {unit.displayIndex}: {unit.title}
-      </Typography>
-
+      {showHeader && (
+        <Typography
+          sx={{
+            color: "#000",
+            font: theme.typography.headlineLarge,
+            marginBottom: "32px",
+          }}
+        >
+          Unit {unit.displayIndex}: {unit.title}
+        </Typography>
+      )}
       {/* Modules */}
-      {Object.values(modules).map((moduleGroup) => (
-        <ModuleSection
-          key={moduleGroup.module.id}
-          module={moduleGroup.module}
-          bookmarks={moduleGroup.bookmarks}
-          onBookmarkDeleted={onBookmarkDeleted}
-        />
-      ))}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+        {Object.values(modules).map((moduleGroup) => (
+          <ModuleSection
+            key={moduleGroup.module.id}
+            module={moduleGroup.module}
+            bookmarks={moduleGroup.bookmarks}
+            onBookmarkDeleted={onBookmarkDeleted}
+          />
+        ))}
+      </Box>
     </Box>
   );
 };
