@@ -135,6 +135,7 @@ const ManageUserPage = (): React.ReactElement => {
 
   const handleAddAdmin = async () => {
     if (firstName && lastName && email) {
+      
       const admin = await AuthAPIClient.inviteAdmin(firstName, lastName, email);
       if (admin) {
         setAddSnackbarName(`${admin.firstName} ${admin.lastName}`);
