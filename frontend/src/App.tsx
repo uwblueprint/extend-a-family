@@ -78,17 +78,15 @@ const App = (): React.ReactElement => {
               <Switch>
                 <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
                 <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
-                <PrivateRoute
+                <Route
                   exact
                   path={Routes.SIGNUP_APPROVED_PAGE}
                   component={SignupApproved}
-                  allowedRoles={["Facilitator"]}
                 />
-                <PrivateRoute
+                <Route
                   exact
                   path={Routes.SIGNUP_PENDING_PAGE}
                   component={SignupPending}
-                  allowedRoles={["Facilitator"]}
                 />
                 <Route
                   exact
