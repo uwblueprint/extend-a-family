@@ -5,7 +5,7 @@ import IAuthService from "../interfaces/authService";
 import IEmailService from "../interfaces/emailService";
 import IUserService from "../interfaces/userService";
 import { AuthDTO, Token } from "../../types/authTypes";
-import { Role } from "../../types/userTypes";
+import { Role, Status } from "../../types/userTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import FirebaseRestClient from "../../utilities/firebaseRestClient";
 import logger from "../../utilities/logger";
@@ -296,6 +296,13 @@ class AuthService implements IAuthService {
       Logger.error(`Failed to retrieve a userId from this accessToken`);
       throw error;
     }
+  }
+
+  async getStatusByEmail(requestedEmail: string): Promise<Status> {
+    if (requestedEmail.endsWith("@eafwr.on.ca")) {
+      return "Active";
+    }
+    return "PendingApproval";
   }
 }
 
