@@ -26,55 +26,128 @@ export interface MultiSelectActivity extends Activity {
   correctAnswers: number[];
 }
 
-export const ActivitySchema: Schema = new Schema({
-  questionType: {
-    type: String,
-    required: true,
-    enum: Object.values(QuestionType),
+export interface Media {
+  id: string;
+  mediaType: "text" | "media";
+  context: string;
+}
+
+export interface MatchingActivity extends Activity {
+  questionType: QuestionType.Matching;
+  media: Map<'1' | '2' | '3', Media[]>; // key: column number
+  correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
+  rows: number;
+}
+
+export interface TableActivity extends Activity {
+  questionType: QuestionType.Table;
+  columnLabels: string[];
+  rowLabels: Map<string, string | undefined>; // key: label, value: image url
+  correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
+}
+
+const options2 = {
+  discriminatorKey: "role",
+  timestamps: true,
+  toObject: {
+    virtuals: true,
+    versionKey: false,
+    transform: (_doc: Document, ret: Record<string, unknown>) => {
+      // eslint-disable-next-line no-underscore-dangle, no-param-reassign
+      delete ret._id;
+      // eslint-disable-next-line no-param-reassign
+      delete ret.createdAt;
+      // eslint-disable-next-line no-param-reassign
+      delete ret.updatedAt;
+    },
   },
-  activityNumber: {
-    type: String,
-    required: true,
+}
+
+export const ActivitySchema: Schema = new Schema(
+  {
+    questionType: {
+      type: String,
+      required: true,
+      enum: Object.values(QuestionType),
+    },
+    activityNumber: {
+      type: String,
+      required: true,
+    },
+    questionText: {
+      type: String,
+      required: true,
+      maxlength: 1000,
+    },
+    instruction: {
+      type: String,
+      required: true,
+      maxlength: 200,
+    },
+    imageUrl: {
+      type: String,
+      required: false,
+    },
+    additionalContext: {
+      type: String,
+      required: false,
+      maxlength: 500,
+    },
+    userFeedback: {
+      type: String,
+      required: false,
+      maxlength: 500,
+    },
+    hint: {
+      type: String,
+      required: false,
+    },
   },
-  questionText: {
-    type: String,
-    required: true,
-    maxlength: 1000,
-  },
-  instruction: {
-    type: String,
-    required: true,
-    maxlength: 200,
-  },
-  imageUrl: {
-    type: String,
-    required: false,
-  },
-  additionalContext: {
-    type: String,
-    required: false,
-    maxlength: 500,
-  },
-  userFeedback: {
-    type: String,
-    required: false,
-    maxlength: 500,
-  },
-  hint: {
-    type: String,
-    required: false,
-  },
+  options2
+);
+
+// Create combined schemas for each specific activity type
+
+const MediaSchema = new Schema({
+  id: { type: String, required: true },
+  mediaType: { type: String, enum: ["text", "media"], required: true },
+  context: { type: String, required: true },
 });
 
-/* eslint-disable no-param-reassign */
-ActivitySchema.set("toObject", {
-  virtuals: true,
-  versionKey: false,
-  transform: (_doc: Document, ret: Record<string, unknown>) => {
-    // eslint-disable-next-line no-underscore-dangle
-    delete ret._id;
-    delete ret.createdAt;
-    delete ret.updatedAt;
+const MatchingActivitySchema = new Schema({
+  ...ActivitySchema.obj,
+  media: {
+    type: Map,
+    of: [MediaSchema],
+    required: true,
+    validate: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      validator: (mediaMap: Map<string, any[]>) => {
+        const keys = Array.from(mediaMap.keys());
+        return keys.every((k) => ["1", "2", "3"].includes(k));
+      },
+      message: "Media map keys must be the strings '1', '2', or '3'",
+    },
+  },
+  correctAnswers: {
+    type: [[String]],
+    required: true,
+    set: (val: string[][]) => val.map((arr) => Array.from(new Set(arr))), // ensures uniqueness
+    validate: {
+      validator: (value: string[][]) =>
+        value.every((arr) => arr.length === 3 || arr.length === 2),
+      message: "Each answer set must have exactly 2 or 3 unique elements",
+    },
+  },
+  rows: {
+    type: Number,
+    required: true,
+    validate: {
+      validator: (value: number) => {
+        return value >= 2 && value <= 6;
+      },
+      message: "Must have between 2 and 6 rows",
+    },
   },
 });
 
@@ -142,27 +215,35 @@ const MultiSelectActivitySchema = new Schema({
   },
 });
 
-MultipleChoiceActivitySchema.set("toObject", {
-  virtuals: true,
-  versionKey: false,
-  transform: (_doc: Document, ret: Record<string, unknown>) => {
-    // eslint-disable-next-line no-underscore-dangle
-    delete ret._id;
-    delete ret.createdAt;
-    delete ret.updatedAt;
+const TableActivitySchema = new Schema({
+  ...ActivitySchema.obj,
+  columnLabels: {
+    type: [String],
+    required: true,
+  },
+  rowLabels: {
+    type: Map,
+    of: {
+      type: String,
+      required: false,
+    },
+    required: true,
+  },
+  correctAnswers: {
+    type: [[Number]],
+    required: true,
+    validate: {
+      validator: (value: number[][]) =>
+        value.every((pair) => pair.length === 2),
+      message: "Each coordinate must be a pair of numbers [row, col]",
+    },
   },
 });
 
-MultiSelectActivitySchema.set("toObject", {
-  virtuals: true,
-  versionKey: false,
-  transform: (_doc: Document, ret: Record<string, unknown>) => {
-    // eslint-disable-next-line no-underscore-dangle
-    delete ret._id;
-    delete ret.createdAt;
-    delete ret.updatedAt;
-  },
-});
+const MatchingActivityModel = CoursePageModel.discriminator<MatchingActivity>(
+  QuestionType.Matching,
+  MatchingActivitySchema,
+);
 
 const MultipleChoiceActivityModel =
   CoursePageModel.discriminator<MultipleChoiceActivity>(
@@ -176,4 +257,14 @@ const MultiSelectActivityModel =
     MultiSelectActivitySchema,
   );
 
-export { MultipleChoiceActivityModel, MultiSelectActivityModel };
+const TableActivityModel = CoursePageModel.discriminator<TableActivity>(
+  QuestionType.Table,
+  TableActivitySchema,
+);
+
+export {
+  MatchingActivityModel,
+  MultipleChoiceActivityModel,
+  MultiSelectActivityModel,
+  TableActivityModel,
+};
