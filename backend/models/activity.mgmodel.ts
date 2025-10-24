@@ -46,6 +46,23 @@ export interface TableActivity extends Activity {
   correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
 }
 
+const options = {
+  discriminatorKey: "role",
+  timestamps: true,
+  toObject: {
+    virtuals: true,
+    versionKey: false,
+    transform: (_doc: Document, ret: Record<string, unknown>) => {
+      // eslint-disable-next-line no-underscore-dangle, no-param-reassign
+      delete ret._id;
+      // eslint-disable-next-line no-param-reassign
+      delete ret.createdAt;
+      // eslint-disable-next-line no-param-reassign
+      delete ret.updatedAt;
+    },
+  },
+}
+
 export const ActivitySchema: Schema = new Schema(
   {
     questionType: {
@@ -78,27 +95,16 @@ export const ActivitySchema: Schema = new Schema(
     },
     userFeedback: {
       type: String,
-      required: false
+      required: false,
       maxlength: 500,
     },
     hint: {
       type: String,
       required: false,
     },
-  { discriminatorKey: "questionType", timestamps: true },
+    options
+  }
 );
-
-/* eslint-disable no-param-reassign */
-ActivitySchema.set("toObject", {
-  virtuals: true,
-  versionKey: false,
-  transform: (_doc: Document, ret: Record<string, unknown>) => {
-    // eslint-disable-next-line no-underscore-dangle
-    delete ret._id;
-    delete ret.createdAt;
-    delete ret.updatedAt;
-  },
-});
 
 // Create combined schemas for each specific activity type
 
