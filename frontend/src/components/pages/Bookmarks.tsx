@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
+import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
@@ -109,7 +110,7 @@ const Bookmarks = (): React.ReactElement => {
     : null;
 
   return (
-    <Box display="flex" width="100%">
+    <Box display="flex" width="100%" minHeight="100vh">
       {/* Sidebar */}
       <BookmarksSidebar
         units={unitsWithBookmarks}
@@ -151,11 +152,14 @@ const Bookmarks = (): React.ReactElement => {
                 />
               </Button>
             )}
-            <Typography variant="headlineLarge" display="inline">
-              {selectedUnit
-                ? `Unit ${selectedUnit.displayIndex}: ${selectedUnit.title}`
-                : "Bookmarks"}
-            </Typography>
+            <Box display="flex" alignItems="center" gap="12px">
+              <BookmarkBorderOutlinedIcon sx={{ width: "48px", height: "48px", fill: "#000"}} />
+              <Typography variant="displayLarge">
+                {selectedUnit
+                  ? `Unit ${selectedUnit.displayIndex} Bookmarks`
+                  : "Bookmarks"}
+              </Typography>
+            </Box>
           </Box>
         )}
 

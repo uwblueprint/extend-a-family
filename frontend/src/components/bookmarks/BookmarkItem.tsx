@@ -73,14 +73,7 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
           sx={{
             position: "relative",
             display: "flex",
-            height: "226.923px",
-            minWidth: "250px",
-            maxWidth: "400px",
-            minHeight: "199.997px",
-            maxHeight: "319.994px",
-            flexDirection: "column",
-            alignItems: "center",
-            alignSelf: "stretch",
+            width: "100%",
             aspectRatio: "283.66 / 226.92",
             borderRadius: "7.252px",
             backgroundImage:

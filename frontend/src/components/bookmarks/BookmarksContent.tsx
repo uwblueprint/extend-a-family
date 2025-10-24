@@ -83,7 +83,7 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
   }
 
   return (
-    <Box sx={{ maxWidth: "1200px", margin: "0 auto" }}>
+    <Box sx={{ width: "100%", boxSizing: "border-box" }}>
       {/* Unit Sections */}
       {Object.values(filteredBookmarks).map((unitGroup) => (
         <UnitSection
