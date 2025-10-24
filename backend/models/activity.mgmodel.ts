@@ -46,7 +46,7 @@ export interface TableActivity extends Activity {
   correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
 }
 
-const options = {
+const options2 = {
   discriminatorKey: "role",
   timestamps: true,
   toObject: {
@@ -102,8 +102,8 @@ export const ActivitySchema: Schema = new Schema(
       type: String,
       required: false,
     },
-    options
-  }
+  },
+  options2
 );
 
 // Create combined schemas for each specific activity type
