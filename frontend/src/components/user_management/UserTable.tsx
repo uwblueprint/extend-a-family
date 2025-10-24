@@ -38,6 +38,8 @@ interface UserTableProps {
     firstName: string,
     deleteName: string,
   ) => void;
+  handleApproveFacilitator?: (userId: string) => void;
+  handleRejectFacilitator?: (userId: string) => void;
 }
 
 const UserTable: React.FC<UserTableProps> = ({
@@ -48,6 +50,8 @@ const UserTable: React.FC<UserTableProps> = ({
   handleChangePage,
   handleChangeRowsPerPage,
   handleOpenDeleteUserModal,
+  handleApproveFacilitator,
+  handleRejectFacilitator,
 }) => {
   const theme = useTheme();
   const { role } = useUser();
@@ -161,26 +165,59 @@ const UserTable: React.FC<UserTableProps> = ({
                     >
                       {user.role.toUpperCase()}
                     </Typography>
-                    <Button
-                      variant="outlined"
-                      startIcon={<Delete />}
-                      sx={{
-                        height: "40px",
-                        padding: "4px 16px",
-                        borderRadius: "4px",
-                        borderColor: theme.palette.Neutral[500],
-                        color: theme.palette.Error.Dark.Default,
-                      }}
-                      onClick={() =>
-                        handleOpenDeleteUserModal(
-                          user.id,
-                          user.firstName,
-                          user.lastName,
-                        )
-                      }
-                    >
-                      <Typography variant="labelLarge">DELETE USER</Typography>
-                    </Button>
+                    {user.status === "PendingApproval" &&
+                    user.role === "Facilitator" ? (
+                      <>
+                        <Button
+                          variant="outlined"
+                          sx={{
+                            height: "40px",
+                            padding: "4px 16px",
+                            borderRadius: "4px",
+                            borderColor: theme.palette.Success.Dark.Default,
+                            color: theme.palette.Success.Dark.Default,
+                            marginRight: "8px",
+                          }}
+                          onClick={() => handleApproveFacilitator?.(user.id)}
+                        >
+                          <Typography variant="labelLarge">APPROVE</Typography>
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          sx={{
+                            height: "40px",
+                            padding: "4px 16px",
+                            borderRadius: "4px",
+                            borderColor: theme.palette.Error.Dark.Default,
+                            color: theme.palette.Error.Dark.Default,
+                          }}
+                          onClick={() => handleRejectFacilitator?.(user.id)}
+                        >
+                          <Typography variant="labelLarge">REJECT</Typography>
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="outlined"
+                        startIcon={<Delete />}
+                        sx={{
+                          height: "40px",
+                          padding: "4px 16px",
+                          borderRadius: "4px",
+                          borderColor: theme.palette.Neutral[500],
+                          color: theme.palette.Error.Dark.Default,
+                        }}
+                        onClick={() =>
+                          handleOpenDeleteUserModal(
+                            user.id,
+                            user.firstName,
+                            user.lastName,
+                          )
+                        }
+                      >
+                        <Typography variant="labelLarge">DELETE USER</Typography>
+                      </Button>
+                    )}
                   </>
                 )}
               </TableCell>
