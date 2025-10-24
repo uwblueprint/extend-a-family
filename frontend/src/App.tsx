@@ -5,6 +5,8 @@ import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import Signup from "./components/auth/SignupPage";
+import SignupApproved from "./components/auth/SignupApprovedPage";
+import SignupPending from "./components/auth/SignupPendingPage";
 import Welcome from "./components/auth/WelcomePage";
 import Home from "./components/pages/Home";
 import Bookmarks from "./components/pages/Bookmarks";
@@ -76,6 +78,16 @@ const App = (): React.ReactElement => {
               <Switch>
                 <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
                 <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
+                <Route
+                  exact
+                  path={Routes.SIGNUP_APPROVED_PAGE}
+                  component={SignupApproved}
+                />
+                <Route
+                  exact
+                  path={Routes.SIGNUP_PENDING_PAGE}
+                  component={SignupPending}
+                />
                 <Route
                   exact
                   path={Routes.FORGOT_PASSWORD_PAGE}

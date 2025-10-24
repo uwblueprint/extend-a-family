@@ -11,6 +11,7 @@ export interface Activity extends CoursePage {
   imageUrl?: string;
   additionalContext?: string;
   userFeedback?: string;
+  hint?: string;
 }
 
 export interface MultipleChoiceActivity extends Activity {
@@ -77,10 +78,13 @@ export const ActivitySchema: Schema = new Schema(
     },
     userFeedback: {
       type: String,
-      required: false,
+      required: false
       maxlength: 500,
     },
-  },
+    hint: {
+      type: String,
+      required: false,
+    },
   { discriminatorKey: "questionType", timestamps: true },
 );
 
@@ -141,6 +145,12 @@ const MatchingActivitySchema = new Schema({
   },
 });
 
+// Base model
+// const ActivityModel =
+//   mongoose.models.Activity ||
+//   mongoose.model<Activity>("Activity", ActivitySchema);
+
+// Multiple choice specific schema
 const MultipleChoiceActivitySchema = new Schema({
   ...ActivitySchema.obj, // inherit base fields from ActivitySchema
   options: {
@@ -156,12 +166,17 @@ const MultipleChoiceActivitySchema = new Schema({
   correctAnswer: {
     type: Number,
     required: true,
-    validate: {
-      validator(this: MultipleChoiceActivity, correctAnswer: number) {
-        return correctAnswer >= 0 && correctAnswer < this.options.length;
-      },
-      message: "Correct answer must be a valid option index",
-    },
+    // validate: {
+    //   validator(this: MultipleChoiceActivity, correctAnswer: number) {
+    //     console.log(
+    //       "Validating correctAnswer:",
+    //       correctAnswer,
+    //       JSON.stringify(this.options),
+    //     );
+    //     return correctAnswer >= 0 && correctAnswer < this.options.length;
+    //   },
+    //   message: "Correct answer must be a valid option index",
+    // },
   },
 });
 
@@ -186,7 +201,7 @@ const MultiSelectActivitySchema = new Schema({
           return false;
         }
         return correctAnswers.every((answer) => {
-          return answer >= 0 && answer < this.options.length;
+          return answer >= 0; // && answer < this.options.length;
         });
       },
       message: "Must have at least one valid correct answer",

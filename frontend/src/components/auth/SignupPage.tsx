@@ -14,9 +14,14 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useContext, useState } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
-import { LANDING_PAGE, WELCOME_PAGE } from "../../constants/Routes";
+import {
+  LANDING_PAGE,
+  SIGNUP_APPROVED_PAGE,
+  SIGNUP_PENDING_PAGE,
+  WELCOME_PAGE,
+} from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import {
   AuthErrorCodes,
@@ -31,6 +36,7 @@ import PasswordCheck from "./PasswordCheck";
 import { getSignUpPath, getSignUpPrompt } from "./WelcomePage";
 
 const Signup = (): React.ReactElement => {
+  const history = useHistory();
   const { authenticatedUser } = useContext(AuthContext);
   const theme = useTheme();
   const [firstName, setFirstName] = useState("");
@@ -49,7 +55,7 @@ const Signup = (): React.ReactElement => {
     setErrorData(null);
 
     try {
-      await AuthAPIClient.signup(
+      const signedUpUser = await AuthAPIClient.signup(
         firstName,
         lastName,
         email,
@@ -58,6 +64,12 @@ const Signup = (): React.ReactElement => {
       );
       // eslint-disable-next-line no-alert
       alert("Signup successful, verification link was sent to your email.");
+
+      if (signedUpUser?.status === "Active") {
+        history.push(SIGNUP_APPROVED_PAGE);
+      } else if (signedUpUser?.status === "PendingApproval") {
+        history.push(SIGNUP_PENDING_PAGE);
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         switch (error.message) {
