@@ -20,18 +20,20 @@ interface UnitSectionProps {
   };
   onBookmarkDeleted?: (pageId: string) => void;
   showHeader?: boolean;
+  expandAll?: boolean;
 }
 
 const UnitSection: React.FC<UnitSectionProps> = ({
   unit,
   modules,
   onBookmarkDeleted,
-  showHeader,
+  showHeader = true,
+  expandAll = false,
 }) => {
   const theme = useTheme();
 
   return (
-    <Box sx={{ marginBottom: "80px" }}>
+    <Box sx={{ width: "100%", marginBottom: "80px", boxSizing: "border-box" }}>
       {/* Unit Header */}
       {showHeader && (
         <Typography
@@ -44,14 +46,16 @@ const UnitSection: React.FC<UnitSectionProps> = ({
           Unit {unit.displayIndex}: {unit.title}
         </Typography>
       )}
+
       {/* Modules */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "32px", width: "100%" }}>
         {Object.values(modules).map((moduleGroup) => (
           <ModuleSection
             key={moduleGroup.module.id}
             module={moduleGroup.module}
             bookmarks={moduleGroup.bookmarks}
             onBookmarkDeleted={onBookmarkDeleted}
+            expandAll={expandAll}
           />
         ))}
       </Box>

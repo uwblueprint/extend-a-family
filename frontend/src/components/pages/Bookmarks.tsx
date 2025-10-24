@@ -7,7 +7,7 @@ import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import { Bookmark } from "../../types/UserTypes";
 import { CourseUnit, CourseModule } from "../../types/CourseTypes";
 import useBookmarksFilter from "../../hooks/useBookmarksFilter";
-import { BookmarksSidebar, BookmarksContent } from "../bookmarks";
+import { BookmarksSidebar, BookmarksContent, ExpandCollapseButton } from "../bookmarks";
 
 const Bookmarks = (): React.ReactElement => {
   const theme = useTheme();
@@ -19,6 +19,7 @@ const Bookmarks = (): React.ReactElement => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [allExpanded, setAllExpanded] = useState(false);
 
   // Use the custom hook for filtering
   const {
@@ -104,6 +105,11 @@ const Bookmarks = (): React.ReactElement => {
     setSidebarOpen(false);
   };
 
+  // Toggle expand/collapse all
+  const handleToggleAll = () => {
+    setAllExpanded((prev) => !prev);
+  };
+
   // Get the selected unit for title display
   const selectedUnit = selectedUnitId
     ? units.find((u) => u.id === selectedUnitId)
@@ -126,6 +132,7 @@ const Bookmarks = (): React.ReactElement => {
           <Box
             display="flex"
             alignItems="center"
+            justifyContent="space-between"
             paddingLeft="10px"
             marginBottom="32px"
           >
@@ -160,6 +167,9 @@ const Bookmarks = (): React.ReactElement => {
                   : "Bookmarks"}
               </Typography>
             </Box>
+
+            {/* Expand/Collapse all button */}
+            <ExpandCollapseButton allExpanded={allExpanded} onToggle={handleToggleAll} />
           </Box>
         )}
 
@@ -169,6 +179,7 @@ const Bookmarks = (): React.ReactElement => {
           error={error}
           hasBookmarks={hasBookmarks}
           selectedUnitId={selectedUnitId}
+          allExpanded={allExpanded}
           onBookmarkDeleted={(pageId) =>
             setBookmarks((prev) => prev.filter((b) => b.pageId !== pageId))
           }

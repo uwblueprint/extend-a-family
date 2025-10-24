@@ -26,6 +26,7 @@ interface BookmarksContentProps {
   error: string | null;
   hasBookmarks: boolean;
   selectedUnitId: string | null;
+  allExpanded?: boolean;
   onBookmarkDeleted?: (pageId: string) => void;
 }
 
@@ -35,6 +36,7 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
   error,
   hasBookmarks,
   selectedUnitId,
+  allExpanded = false,
   onBookmarkDeleted,
 }) => {
   const theme = useTheme();
@@ -92,6 +94,7 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
           modules={unitGroup.modules}
           onBookmarkDeleted={onBookmarkDeleted}
           showHeader={selectedUnitId === null}
+          expandAll={allExpanded}
         />
       ))}
     </Box>

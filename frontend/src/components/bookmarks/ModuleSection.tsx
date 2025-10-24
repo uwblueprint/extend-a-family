@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -22,15 +22,22 @@ interface ModuleSectionProps {
     pageId: string;
   }>;
   onBookmarkDeleted?: (pageId: string) => void;
+  expandAll?: boolean;
 }
 
 const ModuleSection: React.FC<ModuleSectionProps> = ({
   module,
   bookmarks,
   onBookmarkDeleted,
+  expandAll = false,
 }) => {
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
+
+  // Sync expanded state when global expandAll changes
+  useEffect(() => {
+    setExpanded(Boolean(expandAll));
+  }, [expandAll]);
 
   // Count slides and activities
   const slideCount = bookmarks.filter((b) => b.type === "Lesson").length;
@@ -100,7 +107,7 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
         <ModuleBookmarksGrid
           bookmarks={bookmarks}
           onBookmarkDeleted={onBookmarkDeleted}
-        />{" "}
+        />
       </AccordionDetails>
     </Accordion>
   );
