@@ -181,6 +181,25 @@ const ManageUserPage = (): React.ReactElement => {
     }
   };
 
+  // Approval handlers
+  const handleApproveFacilitator = async (userId: string) => {
+    try {
+      await UserAPIClient.approveFacilitator(userId);
+      await getUsers(); // Refresh the user list
+    } catch (error) {
+      // Handle error silently
+    }
+  };
+
+  const handleRejectFacilitator = async (userId: string) => {
+    try {
+      await UserAPIClient.rejectFacilitator(userId);
+      await getUsers(); // Refresh the user list
+    } catch (error) {
+      // Handle error silently
+    }
+  };
+
   const addAction = (
     <>
       <Button
@@ -355,6 +374,8 @@ const ManageUserPage = (): React.ReactElement => {
           handleChangePage={handleChangePage}
           handleChangeRowsPerPage={handleChangeRowsPerPage}
           handleOpenDeleteUserModal={handleOpenDeleteUserModal}
+          handleApproveFacilitator={handleApproveFacilitator}
+          handleRejectFacilitator={handleRejectFacilitator}
         />
       </Stack>
     </Box>

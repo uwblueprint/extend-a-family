@@ -118,6 +118,21 @@ interface IUserService {
    * @param newStatus status to update to
    */
   changeUserStatus(accessToken: string, newStatus: Status): Promise<void>;
+
+  /**
+   * Approve a facilitator by updating their status to Active
+   * @param userId the user's id
+   * @returns a UserDTO with the approved user's information
+   * @throws Error if user approval fails
+   */
+  approveFacilitator(userId: string): Promise<UserDTO>;
+
+  /**
+   * Reject a facilitator by deleting their account
+   * @param userId the user's id
+   * @throws Error if user rejection fails
+   */
+  rejectFacilitator(userId: string): Promise<void>;
 }
 
 export default IUserService;
