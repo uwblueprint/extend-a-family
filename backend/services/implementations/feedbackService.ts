@@ -1,15 +1,14 @@
 import { ObjectId } from "mongoose";
-import IFeedbackService from "../interfaces/feedbackService";
 import MgFeedback from "../../models/feedback.mgmodel";
-import { FeedbackDTO, CreateFeedbackDTO } from "../../types/feedbackTypes";
+import { CreateFeedbackDTO, FeedbackDTO } from "../../types/feedbackTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
+import IFeedbackService from "../interfaces/feedbackService";
 
-import MgUser, { User } from "../../models/user.mgmodel";
-import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import MgCourseModule, {
   CourseModule,
 } from "../../models/coursemodule.mgmodel";
+import MgUser, { User } from "../../models/user.mgmodel";
 
 const Logger = logger(__filename);
 
@@ -40,9 +39,6 @@ class FeedbackService implements IFeedbackService {
       const moduleObject: CourseModule | null = await MgCourseModule.findById(
         feedback.moduleId,
       );
-      const unitObject: CourseUnit | null = await MgCourseUnit.findById(
-        feedback.unitId,
-      );
 
       if (!learnerObject) {
         throw new Error(`Learner with id ${feedback.learnerId} not found`);
@@ -50,14 +46,10 @@ class FeedbackService implements IFeedbackService {
       if (!moduleObject) {
         throw new Error(`Module with id ${feedback.moduleId} not found`);
       }
-      if (!unitObject) {
-        throw new Error(`Unit with id ${feedback.unitId} not found`);
-      }
 
       newFeedback = await MgFeedback.create({
         learnerId: learnerObject.id,
         moduleId: moduleObject.id,
-        unitId: unitObject.id,
         isLiked: feedback.isLiked,
         difficulty: feedback.difficulty,
         message: feedback.message,
@@ -66,7 +58,6 @@ class FeedbackService implements IFeedbackService {
         id: newFeedback.id,
         learnerId: newFeedback.learnerId,
         moduleId: newFeedback.moduleId,
-        unitId: newFeedback.unitId,
         isLiked: newFeedback.isLiked,
         difficulty: newFeedback.difficulty,
         message: newFeedback.message,
