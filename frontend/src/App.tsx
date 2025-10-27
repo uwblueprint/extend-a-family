@@ -35,6 +35,7 @@ import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ManageUserPage from "./components/user_management/ManageUserPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import ViewModulePage from "./components/pages/ViewModulePage";
+import TeamMembersPage from "./pages/TeamMembersPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -74,6 +75,7 @@ const App = (): React.ReactElement => {
           <SocketProvider id={authenticatedUser?.id}>
             <Router>
               <Switch>
+                <Route exact path={Routes.TEAM_MEMBERS} component={TeamMembersPage} />
                 <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
                 <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
                 <Route

@@ -37,3 +37,5 @@ export const UPLOAD_THUMBNAIL = "/module-thumbnail";
 export const LESSON_UPLOAD = "/lesson-upload";
 
 export const VIEW_PAGE = "/view-page";
+
+export const TEAM_MEMBERS = "/team-members"; 

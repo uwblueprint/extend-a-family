@@ -7,6 +7,19 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 const Logger = logger(__filename);
 
 class TeamMemberService implements ITeamMemberService {
+
+    // whenever result will contain additional fields auto added by mongo
+    // formats query result to match exactly shape of TeamMemberDTO
+    // due to extra fields from mongo _id and __v
+    function getTeamMemberObjectFromQueryResult(res: TeamMemberDTO,) : TeamMemberDTO {
+        return {
+            id: res.id;
+            firstName: res.firstName;
+            lastName: res.lastName;
+            teamRole: res.teamRole;
+        }
+    }
+
     getTeamMembers = async (): Promise<TeamMemberDTO[]> => {
         try {
             const teamMembers: TeamMemberDTO[] = await MgTeamMember.find();
