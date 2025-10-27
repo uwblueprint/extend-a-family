@@ -1,0 +1,28 @@
+import mongoose, { Schema, Document } from "mongoose";
+
+import { TeamRole } from "../types";
+
+export interface TeamMember extends Document {
+  id: string;
+  firstName: string;
+  lastName: string;
+  teamRole: TeamRole;
+}
+
+const TeamMemberSchema: Schema = new Schema({
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+  },
+  teamRole: {
+    type: String,
+    required: true,
+    enum: ["PM", "DESIGNER", "PL", "DEVELOPER"] // or teamRoleValues if following Solution #2
+  },
+});
+
+export default mongoose.model<TeamMember>("TeamMember", TeamMemberSchema);

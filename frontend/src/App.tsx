@@ -35,6 +35,7 @@ import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
 import ManageUserPage from "./components/user_management/ManageUserPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import ViewModulePage from "./components/pages/ViewModulePage";
+import TeamMembersPage from "./components/pages/TeamMembersPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -133,6 +134,11 @@ const App = (): React.ReactElement => {
                   path={Routes.MANAGE_USERS_PAGE}
                   component={ManageUserPage}
                   allowedRoles={["Administrator", "Facilitator"]}
+                />
+                <Route
+                  exact
+                  path={Routes.TEAM_MEMBERS}
+                  component={TeamMembersPage}
                 />
                 <PrivateRoute
                   exact

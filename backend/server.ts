@@ -20,6 +20,7 @@ import helpRequestRouter from "./rest/helpRequestRoutes";
 import notificationRouter from "./rest/notificationRoutes";
 import courseRouter from "./rest/courseRoutes";
 import feedbackRouter from "./rest/feedbackRoutes";
+import teamMemberRouter from "./rest/teamMemberRoutes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -81,6 +82,7 @@ app.use("/notifications", notificationRouter);
 app.use("/course", courseRouter);
 app.use("/feedbacks", feedbackRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/team-member", teamMemberRouter);
 app.set("io", io);
 
 mongo.connect();
