@@ -215,7 +215,9 @@ const UserTable: React.FC<UserTableProps> = ({
                           )
                         }
                       >
-                        <Typography variant="labelLarge">DELETE USER</Typography>
+                        <Typography variant="labelLarge">
+                          DELETE USER
+                        </Typography>
                       </Button>
                     )}
                   </>
