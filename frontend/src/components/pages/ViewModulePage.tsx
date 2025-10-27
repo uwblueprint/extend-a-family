@@ -30,10 +30,12 @@ import {
   isLessonPage,
   isMultipleChoiceActivity,
   isMultiSelectActivity,
+  isTableActivity,
 } from "../../types/CourseTypes";
 import { padNumber } from "../../utils/StringUtils";
 import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
+import TableMainEditor from "../course_authoring/table/TableEditor";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
@@ -387,6 +389,12 @@ const ViewModulePage = () => {
                       hasAdditionalContext={hasAdditionalContext}
                     />
                   )}
+                {activity && isTableActivity(activity) && (
+                  <TableMainEditor
+                    activity={activity}
+                    setActivity={setActivity}
+                  />
+                )}
               </Box>
             )}
             {isDidYouLikeTheContentPage && <SurveySlides />}
@@ -485,7 +493,13 @@ const ViewModulePage = () => {
                 onAddQuestionOption={() =>
                   setActivity(
                     (prev) =>
-                      prev && { ...prev, options: [...prev.options, ""] },
+                      prev && {
+                        ...prev,
+                        ...(isMultipleChoiceActivity(prev) ||
+                        isMultiSelectActivity(prev)
+                          ? { options: [...prev.options, ""] }
+                          : {}),
+                      },
                   )
                 }
                 hint={currentPageObject.hint || ""}
