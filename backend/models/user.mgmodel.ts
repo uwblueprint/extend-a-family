@@ -116,6 +116,7 @@ const FacilitatorSchema = new Schema(
     emailPrefrence: {
       type: Number,
       required: true,
+      default: 1, // Default to daily email notifications
     },
   },
   options,
