@@ -54,4 +54,25 @@ const updateActivityMainPicture = async (
   }
 };
 
-export default { updateActivity, updateActivityMainPicture };
+const sendFeedback = async (feedback: {
+  learnerId: string;
+  moduleId: string;
+  isLiked?: boolean;
+  difficulty?: number;
+  message?: string;
+}) => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(`/feedbacks/`, feedback, {
+      headers: { Authorization: bearerToken },
+    });
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+export default { updateActivity, updateActivityMainPicture, sendFeedback };

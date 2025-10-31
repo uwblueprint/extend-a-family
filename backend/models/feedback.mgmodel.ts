@@ -1,10 +1,9 @@
-import mongoose, { Schema, Document, ObjectId } from "mongoose";
+import mongoose, { Document, ObjectId, Schema } from "mongoose";
 
 export interface Feedback extends Document {
   id: ObjectId;
   learnerId: ObjectId;
   moduleId: ObjectId;
-  unitId: ObjectId;
   isLiked: boolean;
   difficulty: number;
   message: string;
@@ -20,11 +19,6 @@ export const FeedbackSchema: Schema = new Schema(
     moduleId: {
       type: Schema.Types.ObjectId,
       ref: "CourseModule",
-      required: true,
-    },
-    unitId: {
-      type: Schema.Types.ObjectId,
-      ref: "CourseUnit",
       required: true,
     },
     isLiked: {

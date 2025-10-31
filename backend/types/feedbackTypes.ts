@@ -4,7 +4,6 @@ export type FeedbackDTO = {
   id: ObjectId;
   learnerId: ObjectId;
   moduleId: ObjectId;
-  unitId: ObjectId;
   isLiked?: boolean;
   difficulty?: number;
   message?: string;
