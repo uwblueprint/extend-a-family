@@ -383,7 +383,7 @@ const ManageUserPage = (): React.ReactElement => {
               variant="headlineMedium"
               sx={{ marginBottom: "16px", fontWeight: 700 }}
             >
-              Pending Facilitator Approvals
+              New Facilitator Account(s) (Pending Approval)
             </Typography>
             <UserTable
               filteredUsers={pendingApprovalFacilitators}
