@@ -1,4 +1,9 @@
-import { Delete, MarkUnreadChatAltOutlined } from "@mui/icons-material";
+import {
+  Check,
+  Close,
+  Delete,
+  MarkUnreadChatAltOutlined,
+} from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -38,6 +43,8 @@ interface UserTableProps {
     firstName: string,
     deleteName: string,
   ) => void;
+  handleApproveFacilitator?: (userId: string) => void;
+  handleRejectFacilitator?: (userId: string) => void;
 }
 
 const UserTable: React.FC<UserTableProps> = ({
@@ -48,6 +55,8 @@ const UserTable: React.FC<UserTableProps> = ({
   handleChangePage,
   handleChangeRowsPerPage,
   handleOpenDeleteUserModal,
+  handleApproveFacilitator,
+  handleRejectFacilitator,
 }) => {
   const theme = useTheme();
   const { role } = useUser();
@@ -149,38 +158,75 @@ const UserTable: React.FC<UserTableProps> = ({
                   ))}
                 {role === "Administrator" && (
                   <>
-                    <Typography
-                      variant="labelMedium"
-                      sx={{
-                        marginRight: "16px",
-                        display: "inline-block",
-                        backgroundColor: theme.palette[user.role].Light.Default,
-                        color: theme.palette[user.role].Dark.Default,
-                        padding: "4px 8px",
-                      }}
-                    >
-                      {user.role.toUpperCase()}
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      startIcon={<Delete />}
-                      sx={{
-                        height: "40px",
-                        padding: "4px 16px",
-                        borderRadius: "4px",
-                        borderColor: theme.palette.Neutral[500],
-                        color: theme.palette.Error.Dark.Default,
-                      }}
-                      onClick={() =>
-                        handleOpenDeleteUserModal(
-                          user.id,
-                          user.firstName,
-                          user.lastName,
-                        )
-                      }
-                    >
-                      <Typography variant="labelLarge">DELETE USER</Typography>
-                    </Button>
+                    {user.status === "PendingApproval" &&
+                    user.role === "Facilitator" ? (
+                      <>
+                        <Button
+                          variant="outlined"
+                          sx={{
+                            height: "40px",
+                            padding: "10px 24px 10px 16px",
+                            borderRadius: "4px",
+                            backgroundColor: "#FFF3EF",
+                            borderColor: "#8F4C34",
+                            color: "#8F4C34",
+                            marginRight: "8px",
+                            gap: "8px",
+                            "&:hover": {
+                              backgroundColor: "#FCC4B1",
+                              borderColor: "#663625",
+                            },
+                          }}
+                          onClick={() => handleApproveFacilitator?.(user.id)}
+                        >
+                          <Check sx={{ width: "18px", height: "18px" }} />
+                          <Typography variant="labelLarge">APPROVE</Typography>
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          sx={{
+                            height: "40px",
+                            padding: "10px 24px 10px 16px",
+                            borderRadius: "4px",
+                            backgroundColor: "#FFEFEF",
+                            borderColor: "#AD2323",
+                            color: "#AD2323",
+                            gap: "8px",
+                            "&:hover": {
+                              backgroundColor: "#FFE0E0",
+                              borderColor: "#801313",
+                            },
+                          }}
+                          onClick={() => handleRejectFacilitator?.(user.id)}
+                        >
+                          <Close sx={{ width: "18px", height: "18px" }} />
+                          <Typography variant="labelLarge">REJECT</Typography>
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="outlined"
+                        startIcon={<Delete />}
+                        sx={{
+                          height: "40px",
+                          padding: "4px 16px",
+                          borderRadius: "4px",
+                          borderColor: theme.palette.Neutral[500],
+                          color: theme.palette.Error.Dark.Default,
+                        }}
+                        onClick={() =>
+                          handleOpenDeleteUserModal(
+                            user.id,
+                            user.firstName,
+                            user.lastName,
+                          )
+                        }
+                      >
+                        <Typography variant="labelLarge">
+                          DELETE USER
+                        </Typography>
+                      </Button>
+                    )}
                   </>
                 )}
               </TableCell>

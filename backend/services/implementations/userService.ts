@@ -360,6 +360,57 @@ class UserService implements IUserService {
       throw error;
     }
   }
+
+  async approveFacilitator(userId: string): Promise<UserDTO> {
+    try {
+      const user = await MgUser.findByIdAndUpdate(
+        userId,
+        { status: "Active" },
+        { new: true, runValidators: true },
+      );
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      Logger.info(`Facilitator ${userId} has been approved`);
+      return user.toObject() as unknown as UserDTO;
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to approve facilitator. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async rejectFacilitator(userId: string): Promise<void> {
+    try {
+      const user = await MgUser.findById(userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      // Delete from Firebase first
+      try {
+        await firebaseAdmin.auth().deleteUser(user.authId);
+      } catch (firebaseError: unknown) {
+        Logger.error(
+          `Failed to delete Firebase user: ${getErrorMessage(firebaseError)}`,
+        );
+        throw firebaseError;
+      }
+
+      // Then delete from MongoDB
+      await MgUser.findByIdAndDelete(userId);
+
+      Logger.info(`Facilitator ${userId} has been rejected and deleted`);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to reject facilitator. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
 }
 
 export default UserService;
