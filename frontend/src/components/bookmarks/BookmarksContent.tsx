@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Typography, CircularProgress, useTheme } from "@mui/material";
 import { CourseUnit, CourseModule } from "../../types/CourseTypes";
 import UnitSection from "./UnitSection";
@@ -87,7 +87,7 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
   return (
     <Box sx={{ width: "100%", boxSizing: "border-box" }}>
       {/* Unit Sections */}
-      {Object.values(filteredBookmarks).map((unitGroup) => (
+      {sortedUnitGroups.map((unitGroup) => (
         <UnitSection
           key={unitGroup.unit.id}
           unit={unitGroup.unit}

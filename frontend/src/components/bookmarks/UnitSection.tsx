@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { CourseUnit, CourseModule } from "../../types/CourseTypes";
 import ModuleSection from "./ModuleSection";
@@ -32,6 +32,13 @@ const UnitSection: React.FC<UnitSectionProps> = ({
 }) => {
   const theme = useTheme();
 
+  // Sort modules by displayIndex before rendering
+  const sortedModuleGroups = useMemo(() => {
+    return Object.values(modules).sort(
+      (a, b) => a.module.displayIndex - b.module.displayIndex,
+    );
+  }, [modules]);
+
   return (
     <Box sx={{ width: "100%", marginBottom: "80px", boxSizing: "border-box" }}>
       {/* Unit Header */}
@@ -56,7 +63,7 @@ const UnitSection: React.FC<UnitSectionProps> = ({
           width: "100%",
         }}
       >
-        {Object.values(modules).map((moduleGroup) => (
+        {sortedModuleGroups.map((moduleGroup) => (
           <ModuleSection
             key={moduleGroup.module.id}
             module={moduleGroup.module}

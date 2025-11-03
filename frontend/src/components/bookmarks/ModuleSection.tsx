@@ -105,9 +105,7 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
         }
         sx={{
           width: "100%",
-          backgroundColor: expanded
-            ? "#F5F5F5"
-            : "transparent",
+          backgroundColor: expanded ? "#F5F5F5" : "transparent",
           padding: "30px 32px",
           display: "flex",
           alignItems: "center",

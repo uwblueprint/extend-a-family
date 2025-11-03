@@ -72,9 +72,11 @@ const useBookmarksFilter = (
     };
   }, [groupedBookmarks, selectedUnitId]);
 
-  // Get units that have bookmarks
+  // Get units that have bookmarks, sorted by displayIndex
   const unitsWithBookmarks = useMemo(() => {
-    return units.filter((unit) => unitIdsWithBookmarks.includes(unit.id));
+    return units
+      .filter((unit) => unitIdsWithBookmarks.includes(unit.id))
+      .sort((a, b) => a.displayIndex - b.displayIndex);
   }, [units, unitIdsWithBookmarks]);
 
   const selectUnit = (unitId: string | null) => {
