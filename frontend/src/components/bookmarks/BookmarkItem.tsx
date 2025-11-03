@@ -1,20 +1,29 @@
 import React, { useState } from "react";
+import { Thumbnail } from "react-pdf";
 import { Box, Typography, useTheme } from "@mui/material";
 import WidthWideOutlinedIcon from "@mui/icons-material/WidthWideOutlined";
 import PanToolAltOutlinedIcon from "@mui/icons-material/PanToolAltOutlined";
 import { Link as RouterLink } from "react-router-dom";
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import { Bookmark } from "../../types/UserTypes";
+import {
+  CourseModule,
+  isActivityPage,
+  isLessonPage,
+} from "../../types/CourseTypes";
 import { buildViewPageUrl } from "../../utils/routeBuilders";
 import DeleteBookmarkButton from "./DeleteBookmarkButton";
 import DeleteBookmarkModal from "./DeleteBookmarkModal";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 
 interface BookmarkItemProps {
+  module: CourseModule;
   bookmark: Bookmark;
   onDeleteSuccess?: (pageId: string) => void; // optional callback to refresh UI
 }
 
 const BookmarkItem: React.FC<BookmarkItemProps> = ({
+  module,
   bookmark,
   onDeleteSuccess,
 }) => {
@@ -38,6 +47,8 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
       alert("Something went wrong while deleting the bookmark.");
     }
   };
+
+  const page = module.pages.find((p) => p.id === bookmark.pageId);
 
   return (
     <>
@@ -69,7 +80,7 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
           },
         }}
       >
-        {/* Image */}
+        {/* Thumbnail */}
         <Box
           sx={{
             position: "relative",
@@ -77,13 +88,59 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
             width: "100%",
             aspectRatio: "283.66 / 226.92",
             borderRadius: "7.252px",
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=200&q=80')", // TEMP
-            backgroundSize: "cover",
-            backgroundPosition: "center",
             overflow: "hidden",
+            backgroundColor: theme.palette.Neutral[200],
           }}
         >
+          {page && isActivityPage(page) && (
+            <PlayCircleOutlineIcon
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                fontSize: "60px",
+                zIndex: 1,
+                color: theme.palette.Neutral[500],
+              }}
+            />
+          )}
+          {page && isLessonPage(page) && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                overflow: "hidden",
+                "& .react-pdf__Page": {
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "100%",
+                  height: "100%",
+                },
+                "& .react-pdf__Page__canvas": {
+                  width: "100% !important",
+                  height: "100% !important",
+                  display: "block",
+                },
+              }}
+            >
+              <Thumbnail pageNumber={page.pageIndex} width={283} scale={1.66} />
+            </Box>
+          )}
+          {page && isActivityPage(page) && (
+            <Box
+              sx={{
+                height: "100%",
+                width: "100%",
+                backgroundColor: theme.palette.Neutral[200],
+              }}
+            />
+          )}
           {/* Delete button */}
           <DeleteBookmarkButton
             onClick={(e) => {

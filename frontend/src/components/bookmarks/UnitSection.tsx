@@ -48,7 +48,14 @@ const UnitSection: React.FC<UnitSectionProps> = ({
       )}
 
       {/* Modules */}
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "32px", width: "100%" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "32px",
+          width: "100%",
+        }}
+      >
         {Object.values(modules).map((moduleGroup) => (
           <ModuleSection
             key={moduleGroup.module.id}

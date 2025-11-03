@@ -1,8 +1,10 @@
 import React from "react";
 import { Box } from "@mui/material";
 import BookmarkItem from "./BookmarkItem";
+import { CourseModule } from "../../types/CourseTypes";
 
 interface ModuleBookmarksGridProps {
+  module: CourseModule;
   bookmarks: Array<{
     id: string;
     title: string;
@@ -15,6 +17,7 @@ interface ModuleBookmarksGridProps {
 }
 
 const ModuleBookmarksGrid: React.FC<ModuleBookmarksGridProps> = ({
+  module,
   bookmarks,
   onBookmarkDeleted,
 }) => {
@@ -33,6 +36,7 @@ const ModuleBookmarksGrid: React.FC<ModuleBookmarksGridProps> = ({
       {bookmarks.map((bookmark) => (
         <BookmarkItem
           key={bookmark.id}
+          module={module}
           bookmark={bookmark}
           onDeleteSuccess={onBookmarkDeleted}
         />
