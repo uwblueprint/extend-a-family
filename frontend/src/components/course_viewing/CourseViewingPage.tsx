@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
+import AddIcon from "@mui/icons-material/Add";
 import UnitSidebar from "./sidebar/UnitSidebar";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseModulesGrid from "./CourseModulesGrid";
@@ -66,6 +67,38 @@ export default function CourseUnitsPage() {
         ) : (
           <Typography>Loading units...</Typography>
         )}
+
+        <Button
+          type="button"
+          sx={{
+            position: "fixed",
+            bottom: "40px",
+            right: "40px",
+            display: "flex",
+            padding: "16px 20px 16px 16px",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "12px",
+            borderRadius: "16px",
+            background: theme.palette.Administrator.Light.Selected,
+            boxShadow: "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.30)"
+          }}
+          onClick={() => {}}
+        >
+          <AddIcon
+            sx={{
+              fontSize: "24px",
+              color: theme.palette.Administrator.Dark.Default
+            }}
+          />
+          <Typography 
+            variant="labelLarge" 
+            color={theme.palette.Administrator.Dark.Default} 
+            display="inline"
+            >
+            Create Module
+          </Typography>
+        </Button>
       </Box>
     </Box>
   );
