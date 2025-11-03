@@ -68,7 +68,8 @@ const DeleteBookmarkModal: React.FC<DeleteBookmarkModalProps> = ({
           alignItems: "flex-start",
           gap: "32px",
           borderRadius: "8px",
-          border: "1px solid #B2B3B5",
+          border: "1px solid",
+          borderColor: theme.palette.Neutral[400],
           background: "#FFF",
           boxShadow: 24,
         }}
@@ -80,7 +81,7 @@ const DeleteBookmarkModal: React.FC<DeleteBookmarkModalProps> = ({
             position: "absolute",
             top: "8px",
             right: "8px",
-            color: "#555759",
+            color: theme.palette.Neutral[700],
           }}
           aria-label="Close modal"
         >
@@ -92,7 +93,7 @@ const DeleteBookmarkModal: React.FC<DeleteBookmarkModalProps> = ({
           <Typography
             id="delete-bookmark-title"
             sx={{
-              color: "#555759",
+              color: theme.palette.Neutral[700],
               font: theme.typography.headlineMedium,
               marginBottom: "12px",
             }}
@@ -102,7 +103,7 @@ const DeleteBookmarkModal: React.FC<DeleteBookmarkModalProps> = ({
           <Typography
             id="delete-bookmark-description"
             sx={{
-              color: "#555759",
+              color: theme.palette.Neutral[700],
               font: theme.typography.bodyMedium,
             }}
           >
@@ -122,18 +123,17 @@ const DeleteBookmarkModal: React.FC<DeleteBookmarkModalProps> = ({
             variant="outlined"
             startIcon={
               <ArrowBackIosNewIcon
-                sx={{ width: "18px", height: "18px", color: "#006C7D" }}
+                sx={{ width: "18px", height: "18px", color: theme.palette.Learner.Dark.Default }}
               />
             }
             onClick={onClose}
             sx={{
               ...commonButtonStyles,
               width: "134px",
-              color: "#006C7D",
-              borderColor: "#B2B3B5",
+              color: theme.palette.Learner.Dark.Default,
+              borderColor: theme.palette.Neutral[400],
               "&:hover": {
-                backgroundColor: "rgba(0,0,0,0.03)",
-                borderColor: "#9b9c9e",
+                backgroundColor: theme.palette.Neutral[200],
               },
             }}
           >
@@ -149,10 +149,13 @@ const DeleteBookmarkModal: React.FC<DeleteBookmarkModalProps> = ({
             sx={{
               ...commonButtonStyles,
               width: "121px",
-              backgroundColor: "#AD2323",
+              backgroundColor: theme.palette.Error.Dark.Default,
               color: "#FFF",
               "&:hover": {
-                backgroundColor: "#911C1C",
+                backgroundColor: theme.palette.Error.Dark.Hover,
+              },
+              "&:active": {
+                backgroundColor: theme.palette.Error.Dark.Pressed,
               },
             }}
           >

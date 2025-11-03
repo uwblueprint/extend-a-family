@@ -53,7 +53,8 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
       expanded={expanded}
       onChange={(_, isExpanded) => setExpanded(isExpanded)}
       sx={{
-        border: "1px solid var(--Neutral-300, #D1D2D4)",
+        border: "1px solid",
+        borderColor: theme.palette.Neutral[300],
         borderRadius: "8px",
         boxShadow: "none",
       }}
@@ -72,7 +73,7 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
         sx={{
           width: "100%",
           backgroundColor: expanded
-            ? "var(--Surface-Hover, #F5F5F5)"
+            ? "#F5F5F5"
             : "transparent",
           padding: "30px 32px",
           display: "flex",

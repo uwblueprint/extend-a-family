@@ -36,34 +36,13 @@ const BookmarksSidebar: React.FC<BookmarksSidebarProps> = ({
         backgroundColor: theme.palette.Learner.Light.Hover,
       },
       backgroundColor: isSelected
-        ? "var(--Learner-Light-Selected, #ADEDF7)"
+        ? theme.palette.Learner.Light.Selected
         : "transparent",
     },
-    index: {
-      fontFamily: "Lexend Deca",
-      fontSize: "16px",
-      fontWeight: 400,
-      color: "var(--Neutral-700, #555759)",
-      mr: "20px",
-    },
-    text: {
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      fontFamily: "Lexend Deca",
-      fontStyle: "normal",
-      lineHeight: "140%",
-      letterSpacing: "0.2px",
-      ...(isSelected
-        ? {
-            fontSize: "16px",
-            fontWeight: 600,
-            color: "var(--Neutral-900, #1A1C1E)",
-          }
-        : {
-            fontSize: "16px",
-            fontWeight: 400,
-            color: "var(--Neutral-700, #555759)",
-          }),
+    textShared: {
+      font: theme.typography.bodyMedium,
+      color: theme.palette.Neutral[700],
+      fontWeight: isSelected ? 600 : 400,
     },
   });
 
@@ -75,7 +54,7 @@ const BookmarksSidebar: React.FC<BookmarksSidebarProps> = ({
         "& .MuiDrawer-paper": {
           boxSizing: "border-box",
           position: "relative",
-          background: "var(--Learner-Light-Default, #E3F9FC)",
+          background: theme.palette.Learner.Light.Default,
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -92,14 +71,14 @@ const BookmarksSidebar: React.FC<BookmarksSidebarProps> = ({
         <Box
           sx={{
             display: "flex",
-            padding: "12px 12px 12px 20px",
+            padding: "12px 12px 20px 20px",
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
           <Box
             sx={{
-              color: "var(--Neutral-700, #555759)",
+              color: theme.palette.Neutral[700],
               textAlign: "center",
               ...theme.typography.titleMedium,
             }}
@@ -119,11 +98,15 @@ const BookmarksSidebar: React.FC<BookmarksSidebarProps> = ({
                   onClick={handleAllBookmarksClick}
                   sx={styles.button}
                 >
-                  <Box sx={styles.index}>0.</Box>
+                  <Box sx={{ ...styles.textShared, mr: "20px" }}>0.</Box>
                   <ListItemText
                     disableTypography
                     primary="All Bookmarks"
-                    sx={styles.text}
+                    sx={{
+                      ...styles.textShared,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
                   />
                 </ListItemButton>
               );
@@ -140,11 +123,17 @@ const BookmarksSidebar: React.FC<BookmarksSidebarProps> = ({
                   onClick={() => handleUnitClick(unit.id)}
                   sx={styles.button}
                 >
-                  <Box sx={styles.index}>{unit.displayIndex}.</Box>
+                  <Box sx={{ ...styles.textShared, marginRight: "20px" }}>
+                    {unit.displayIndex}.
+                  </Box>
                   <ListItemText
                     disableTypography
                     primary={unit.title}
-                    sx={styles.text}
+                    sx={{
+                      ...styles.textShared,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
                   />
                 </ListItemButton>
               </ListItem>
