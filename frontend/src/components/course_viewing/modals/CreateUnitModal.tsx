@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
 import { ModeOutlined } from "@mui/icons-material";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Button,
@@ -11,6 +10,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { useState } from "react";
 import { useUser } from "../../../hooks/useUser";
 import StartAdornedTextField from "../../common/form/StartAdornedTextField";
 
@@ -107,7 +107,7 @@ export default function CreateUnitModal({
                   width: "100%",
                 }}
                 adornment={<ModeOutlined />}
-                focusedBorderColor={theme.palette.Administrator.Default}
+                focusedBorderColor={theme.palette.Administrator.Dark.Default}
               />
             </Box>
           </DialogContent>
@@ -129,14 +129,14 @@ export default function CreateUnitModal({
               height: "40px",
               gap: "8px",
               "&:hover": {
-                bgcolor: theme.palette[user.role].Hover,
+                bgcolor: theme.palette[user.role].Light.Hover,
               },
             }}
             onClick={handleCloseCreateUnitModal}
           >
             <Typography
               variant="labelLarge"
-              color={theme.palette[user.role].Default}
+              color={theme.palette[user.role].Dark.Default}
             >
               CANCEL
             </Typography>
@@ -147,9 +147,9 @@ export default function CreateUnitModal({
               display: "flex",
               height: "40px",
               gap: "8px",
-              backgroundColor: theme.palette[user.role].Default,
+              backgroundColor: theme.palette[user.role].Dark.Default,
               "&:hover": {
-                bgcolor: theme.palette[user.role].Default,
+                bgcolor: theme.palette[user.role].Dark.Default,
               },
             }}
             onClick={async () => {

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import CloseIcon from "@mui/icons-material/Close";
 import {
+  Box,
+  Button,
   Dialog,
   IconButton,
   Typography,
-  Button,
   useTheme,
-  Box,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import PasswordCheck from "../auth/PasswordCheck";
 
@@ -130,7 +130,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                 fontWeight: "300",
                 lineHeight: "120%",
                 letterSpacing: "0.7px",
-                color: theme.palette[`${user.role}`].Default,
+                color: theme.palette[`${user.role}`].Dark.Default,
               }}
             >
               Cancel
@@ -150,11 +150,11 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
               alignSelf: "stretch",
               borderRadius: "4px",
               backgroundColor: isFormValid
-                ? theme.palette[`${user.role}`].Default
+                ? theme.palette[`${user.role}`].Dark.Default
                 : "#ccc",
               "&:hover": {
                 background: isFormValid
-                  ? theme.palette[`${user.role}`].Pressed
+                  ? theme.palette[`${user.role}`].Dark.Pressed
                   : "#ccc",
               },
               padding: "10px 24px",

@@ -1,4 +1,3 @@
-import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -108,14 +107,14 @@ export default function CreateUnitModal(props: DeleteUnitModalProps) {
               height: "40px",
               gap: "8px",
               "&:hover": {
-                bgcolor: theme.palette[user.role].Hover,
+                bgcolor: theme.palette[user.role].Light.Hover,
               },
             }}
             onClick={handleCloseDeleteUnitModal}
           >
             <Typography
               variant="labelLarge"
-              color={theme.palette[user.role].Default}
+              color={theme.palette[user.role].Dark.Default}
             >
               GO BACK
             </Typography>
@@ -126,9 +125,9 @@ export default function CreateUnitModal(props: DeleteUnitModalProps) {
               display: "flex",
               height: "40px",
               gap: "8px",
-              backgroundColor: theme.palette.Error.Default,
+              backgroundColor: theme.palette.Error.Dark.Default,
               "&:hover": {
-                bgcolor: theme.palette.Error.Default,
+                bgcolor: theme.palette.Error.Dark.Default,
               },
             }}
             onClick={async () => {

@@ -1,6 +1,6 @@
-import React from "react";
-import { DialogContent, Typography, Box } from "@mui/material";
+import { Box, DialogContent, Typography } from "@mui/material";
 import { Theme } from "@mui/material/styles";
+import React from "react";
 
 interface HomeScreenContentProps {
   handleContentClick: () => void;
@@ -55,11 +55,11 @@ const HomeScreenContent: React.FC<HomeScreenContentProps> = ({
               gap: "8px",
               alignSelf: "stretch",
               borderRadius: "4px",
-              border: `1px dashed ${theme.palette.Learner.Default}`,
-              background: theme.palette.Learner.Light,
+              border: `1px dashed ${theme.palette.Learner.Dark.Default}`,
+              background: theme.palette.Learner.Light.Default,
               cursor: "pointer",
               "&:hover": {
-                background: theme.palette.Learner.Hover,
+                background: theme.palette.Learner.Light.Hover,
               },
               minHeight: "fit-content",
             }}
@@ -68,7 +68,7 @@ const HomeScreenContent: React.FC<HomeScreenContentProps> = ({
               variant="bodySmall"
               sx={{
                 alignSelf: "stretch",
-                color: theme.palette.Learner.Default,
+                color: theme.palette.Learner.Dark.Default,
               }}
             >
               Help me with
@@ -77,7 +77,7 @@ const HomeScreenContent: React.FC<HomeScreenContentProps> = ({
               variant="headlineMedium"
               sx={{
                 alignSelf: "stretch",
-                color: theme.palette.Learner.Default,
+                color: theme.palette.Learner.Dark.Default,
               }}
             >
               Content
@@ -105,11 +105,11 @@ const HomeScreenContent: React.FC<HomeScreenContentProps> = ({
               gap: "8px",
               alignSelf: "stretch",
               borderRadius: "4px",
-              border: `1px dashed ${theme.palette.Learner.Default}`,
-              background: theme.palette.Learner.Light,
+              border: `1px dashed ${theme.palette.Learner.Dark.Default}`,
+              background: theme.palette.Learner.Light.Default,
               cursor: "pointer",
               "&:hover": {
-                background: theme.palette.Learner.Hover,
+                background: theme.palette.Learner.Light.Hover,
               },
               minHeight: "fit-content",
             }}
@@ -118,7 +118,7 @@ const HomeScreenContent: React.FC<HomeScreenContentProps> = ({
               variant="bodySmall"
               sx={{
                 alignSelf: "stretch",
-                color: theme.palette.Learner.Default,
+                color: theme.palette.Learner.Dark.Default,
               }}
             >
               Help me with
@@ -127,7 +127,7 @@ const HomeScreenContent: React.FC<HomeScreenContentProps> = ({
               variant="headlineMedium"
               sx={{
                 alignSelf: "stretch",
-                color: theme.palette.Learner.Default,
+                color: theme.palette.Learner.Dark.Default,
               }}
             >
               Navigating

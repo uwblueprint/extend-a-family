@@ -33,7 +33,7 @@ const BookmarksSidebar: React.FC<BookmarksSidebarProps> = ({
       px: "32px",
       py: "15px",
       "&:hover": {
-        backgroundColor: theme.palette.Learner.Hover,
+        backgroundColor: theme.palette.Learner.Light.Hover,
       },
       backgroundColor: isSelected
         ? "var(--Learner-Light-Selected, #ADEDF7)"

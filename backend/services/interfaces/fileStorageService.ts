@@ -43,6 +43,18 @@ interface IFileStorageService {
    * @throws Error if file is not deleted
    */
   deleteFile(fileName: string): Promise<void>;
+
+  /**
+   * Uploads image
+   * @param fileName name of file
+   * @param fileData raw buffer data of file
+   * @param contentType the file's content type
+   */
+  uploadImage(
+    fileName: string,
+    fileData: Buffer | null,
+    contentType: string | null,
+  ): Promise<string>;
 }
 
 export default IFileStorageService;

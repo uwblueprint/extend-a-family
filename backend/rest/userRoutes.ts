@@ -79,6 +79,7 @@ userRouter.put(
   updateUserAccountValidator,
   async (req, res) => {
     const accessToken = getAccessToken(req);
+
     try {
       if (!accessToken) {
         throw new Error("Unauthorized: No access token provided");
@@ -86,12 +87,16 @@ userRouter.put(
       const userId = await authService.getUserIdFromAccessToken(accessToken);
 
       const oldUser: UserDTO = await userService.getUserById(userId.toString());
-      const updatedUser = await userService.updateUserById(userId.toString(), {
-        ...oldUser,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        bio: req.body.bio,
-      });
+      const updatedUser: UpdateUserDTO = await userService.updateUserById(
+        userId.toString(),
+        {
+          ...oldUser,
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          bio: req.body.bio,
+          emailPrefrence: req.body.emailPrefrence,
+        },
+      );
       res.status(200).json(updatedUser);
     } catch (error: unknown) {
       res.status(500).send(getErrorMessage(error));

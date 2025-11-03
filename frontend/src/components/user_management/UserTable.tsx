@@ -1,22 +1,25 @@
-import React from "react";
+import { Delete, MarkUnreadChatAltOutlined } from "@mui/icons-material";
 import {
-  TableContainer,
-  Paper,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
   Avatar,
   Box,
-  Typography,
+  Button,
+  IconButton,
+  Paper,
+  Popover,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableFooter,
   TablePagination,
-  Button,
+  TableRow,
+  Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { Delete } from "@mui/icons-material";
+import React from "react";
+import { useUser } from "../../hooks/useUser";
 import { User } from "../../types/UserTypes";
-import placeholderImage from "../assets/placeholder_profile.png";
+import ChatWithLearner from "./chat-with-learner/ChatWithLearner";
 
 interface UserTableProps {
   filteredUsers: User[];
@@ -47,6 +50,15 @@ const UserTable: React.FC<UserTableProps> = ({
   handleOpenDeleteUserModal,
 }) => {
   const theme = useTheme();
+  const { role } = useUser();
+
+  const [chatPopoverAnchorEl, setChatPopoverAnchorEl] =
+    React.useState<HTMLButtonElement | null>(null);
+  const chatPopoverOpen = Boolean(chatPopoverAnchorEl);
+  const chatPopoverId = chatPopoverOpen ? "chat-popover" : undefined;
+
+  const [chatWithUser, setChatWithUser] = React.useState<User | null>(null);
+
   return (
     <TableContainer
       component={Paper}
@@ -79,7 +91,7 @@ const UserTable: React.FC<UserTableProps> = ({
                   flexDirection: "row",
                 }}
               >
-                <Avatar src={placeholderImage} alt={user.firstName} />
+                <Avatar src={user.profilePicture} alt={user.firstName} />
                 <Box
                   sx={{
                     marginLeft: "16px",
@@ -96,37 +108,81 @@ const UserTable: React.FC<UserTableProps> = ({
                 </Box>
               </TableCell>
               <TableCell sx={{ textAlign: "right", paddingRight: "0px" }}>
-                <Typography
-                  variant="labelMedium"
-                  sx={{
-                    marginRight: "16px",
-                    display: "inline-block",
-                    backgroundColor: theme.palette[user.role].Light,
-                    color: theme.palette[user.role].Default,
-                  }}
-                >
-                  {user.role.toUpperCase()}
-                </Typography>
-                <Button
-                  variant="outlined"
-                  startIcon={<Delete />}
-                  sx={{
-                    height: "40px",
-                    padding: "4px 16px",
-                    borderRadius: "4px",
-                    borderColor: theme.palette.Neutral[500],
-                    color: theme.palette.Error.Default,
-                  }}
-                  onClick={() =>
-                    handleOpenDeleteUserModal(
-                      user.id,
-                      user.firstName,
-                      user.lastName,
-                    )
-                  }
-                >
-                  <Typography variant="labelLarge">DELETE USER</Typography>
-                </Button>
+                {role === "Facilitator" &&
+                  (user.status === "Active" ? (
+                    <>
+                      <IconButton
+                        size="large"
+                        aria-label="show messages with learner"
+                        onClick={(event) => {
+                          setChatPopoverAnchorEl(event.currentTarget);
+                          setChatWithUser(user);
+                        }}
+                      >
+                        <MarkUnreadChatAltOutlined
+                          sx={{
+                            width: "24px",
+                            height: "24px",
+                            color: theme.palette.Facilitator.Dark.Selected,
+                          }}
+                        />
+                      </IconButton>
+                      <Typography
+                        variant="labelMedium"
+                        sx={{ marginLeft: "16px" }}
+                      >
+                        X% COMPLETE
+                      </Typography>
+                    </>
+                  ) : (
+                    <Typography
+                      variant="labelMedium"
+                      sx={{
+                        display: "inline-block",
+                        backgroundColor: "#F6F6F6",
+                        color: theme.palette.Neutral[700],
+                        padding: "4px 8px",
+                      }}
+                    >
+                      ACCOUNT PENDING
+                    </Typography>
+                  ))}
+                {role === "Administrator" && (
+                  <>
+                    <Typography
+                      variant="labelMedium"
+                      sx={{
+                        marginRight: "16px",
+                        display: "inline-block",
+                        backgroundColor: theme.palette[user.role].Light.Default,
+                        color: theme.palette[user.role].Dark.Default,
+                        padding: "4px 8px",
+                      }}
+                    >
+                      {user.role.toUpperCase()}
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Delete />}
+                      sx={{
+                        height: "40px",
+                        padding: "4px 16px",
+                        borderRadius: "4px",
+                        borderColor: theme.palette.Neutral[500],
+                        color: theme.palette.Error.Dark.Default,
+                      }}
+                      onClick={() =>
+                        handleOpenDeleteUserModal(
+                          user.id,
+                          user.firstName,
+                          user.lastName,
+                        )
+                      }
+                    >
+                      <Typography variant="labelLarge">DELETE USER</Typography>
+                    </Button>
+                  </>
+                )}
               </TableCell>
             </TableRow>
           ))}
@@ -156,6 +212,19 @@ const UserTable: React.FC<UserTableProps> = ({
           </TableRow>
         </TableFooter>
       </Table>
+      <Popover
+        id={chatPopoverId}
+        open={chatPopoverOpen}
+        anchorEl={chatPopoverAnchorEl}
+        onClose={() => setChatPopoverAnchorEl(null)}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        sx={{ borderRadius: "8px" }}
+      >
+        {chatWithUser && <ChatWithLearner learner={chatWithUser} />}
+      </Popover>
     </TableContainer>
   );
 };

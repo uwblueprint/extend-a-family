@@ -1,6 +1,6 @@
-import React from "react";
-import { Typography, Button, useTheme } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { Button, Typography, useTheme } from "@mui/material";
+import React from "react";
 import { useHistory } from "react-router-dom";
 import { LANDING_PAGE } from "../../constants/Routes";
 import { useUser } from "../../hooks/useUser";
@@ -17,7 +17,9 @@ const MainPageButton = (): React.ReactElement => {
         variant="text"
         onClick={navigateTo}
         startIcon={
-          <ChevronLeftIcon sx={{ color: theme.palette[user.role].Default }} />
+          <ChevronLeftIcon
+            sx={{ color: theme.palette[user.role].Dark.Default }}
+          />
         }
         sx={{
           display: "flex",
@@ -36,7 +38,7 @@ const MainPageButton = (): React.ReactElement => {
         <Typography
           variant="labelLarge"
           sx={{
-            color: theme.palette[user.role].Default,
+            color: theme.palette[user.role].Dark.Default,
           }}
         >
           Back

@@ -3,15 +3,15 @@ import { CookieOptions, Router } from "express";
 import { generate } from "generate-password";
 import {
   getAccessToken,
-  isAuthorizedByUserId,
   isAuthorizedByRole,
+  isAuthorizedByUserId,
   isFirstTimeInvitedUser,
 } from "../middlewares/auth";
 import {
+  forgotPasswordRequestValidator,
+  inviteUserRequestValidator,
   loginRequestValidator,
   signupRequestValidator,
-  inviteUserRequestValidator,
-  forgotPasswordRequestValidator,
   updateTemporaryPasswordRequestValidator,
   updateUserStatusRequestValidator,
 } from "../middlewares/validators/authValidators";
@@ -22,8 +22,9 @@ import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import IEmailService from "../services/interfaces/emailService";
 import IUserService from "../services/interfaces/userService";
-import { getErrorMessage } from "../utilities/errorUtils";
 import { AuthError, AuthErrorCodes } from "../types/authTypes";
+import { Status } from "../types/userTypes";
+import { getErrorMessage } from "../utilities/errorUtils";
 
 const authRouter: Router = Router();
 const userService: IUserService = new UserService();
@@ -90,13 +91,15 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
 /* Signup a user, returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
 authRouter.post("/signup", signupRequestValidator, async (req, res) => {
   try {
+    const userStatus = await authService.getStatusByEmail(req.body.email);
+
     await userService.createUser({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
       role: req.body.role,
       password: req.body.password,
-      status: "Active",
+      status: userStatus as Status,
     });
 
     const authDTO = await authService.generateToken(
@@ -204,6 +207,10 @@ authRouter.post(
   inviteUserRequestValidator,
   isAuthorizedByRole(new Set(["Facilitator"])),
   async (req, res) => {
+    const accessToken = getAccessToken(req)!;
+    const facilitatorId = await authService.getUserIdFromAccessToken(
+      accessToken,
+    );
     try {
       const temporaryPassword = generate({
         length: 20,
@@ -218,7 +225,7 @@ authRouter.post(
           password: temporaryPassword,
           status: "Invited",
         },
-        req.body.facilitatorId,
+        facilitatorId.toString(),
       );
       await authService.sendLearnerInvite(
         req.body.firstName,

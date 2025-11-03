@@ -100,5 +100,10 @@ const LessonPageModel = CoursePageModel.discriminator(
   LessonPageSchema,
 );
 
+// const ActivityPageModel = CoursePageModel.discriminator(
+//   "ActivityPage",
+//   ActivityPageSchema,
+// );
+
 export { LessonPageModel };
 export default CoursePageModel;
