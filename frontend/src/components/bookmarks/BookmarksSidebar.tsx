@@ -5,165 +5,151 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  Button,
   Drawer,
   useTheme,
 } from "@mui/material";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { CourseUnit } from "../../types/CourseTypes";
 
 interface BookmarksSidebarProps {
   units: CourseUnit[];
   selectedUnitId: string | null;
   onUnitSelect: (unitId: string | null) => void;
-  open: boolean;
-  onClose: () => void;
 }
 
 const BookmarksSidebar: React.FC<BookmarksSidebarProps> = ({
   units,
   selectedUnitId,
   onUnitSelect,
-  open,
-  onClose,
 }) => {
   const theme = useTheme();
 
-  const handleAllBookmarksClick = () => {
-    onUnitSelect(null);
-  };
+  const handleAllBookmarksClick = () => onUnitSelect(null);
+  const handleUnitClick = (unitId: string) => onUnitSelect(unitId);
 
-  const handleUnitClick = (unitId: string) => {
-    onUnitSelect(unitId);
-  };
+  const getItemStyles = (isSelected: boolean) => ({
+    button: {
+      display: "flex",
+      alignItems: "center",
+      px: "32px",
+      py: "15px",
+      "&:hover": {
+        backgroundColor: theme.palette.Learner.Hover,
+      },
+      backgroundColor: isSelected
+        ? "var(--Learner-Light-Selected, #ADEDF7)"
+        : "transparent",
+    },
+    index: {
+      fontFamily: "Lexend Deca",
+      fontSize: "16px",
+      fontWeight: 400,
+      color: "var(--Neutral-700, #555759)",
+      mr: "20px",
+    },
+    text: {
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      fontFamily: "Lexend Deca",
+      fontStyle: "normal",
+      lineHeight: "140%",
+      letterSpacing: "0.2px",
+      ...(isSelected
+        ? {
+            fontSize: "16px",
+            fontWeight: 600,
+            color: "var(--Neutral-900, #1A1C1E)",
+          }
+        : {
+            fontSize: "16px",
+            fontWeight: 400,
+            color: "var(--Neutral-700, #555759)",
+          }),
+    },
+  });
 
   return (
     <Drawer
       sx={{
-        maxWidth: "301px",
-        width: "100%",
+        width: 300,
         flexShrink: 0,
         "& .MuiDrawer-paper": {
           boxSizing: "border-box",
           position: "relative",
+          background: "var(--Learner-Light-Default, #E3F9FC)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "8px 0",
         },
-        display: open ? "block" : "none",
       }}
       variant="persistent"
       anchor="left"
-      open={open}
+      open
     >
-      <Box
-        height="100%"
-        sx={{
-          backgroundColor: theme.palette.Learner.Light,
-          overflowX: "hidden",
-        }}
-      >
+      <Box width="100%">
         {/* Header */}
         <Box
-          height="59px"
-          display="flex"
-          p="12px"
-          paddingLeft="20px"
-          alignItems="center"
-          justifyContent="space-between"
-          fontWeight="700"
-          fontSize="16px"
+          sx={{
+            display: "flex",
+            padding: "12px 12px 12px 20px",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
         >
-          Bookmarks
-          <Button
-            type="button"
+          <Box
             sx={{
-              p: "8px",
-              fontSize: "12px",
-              color: theme.palette.Neutral[700],
-              lineHeight: "1.5",
+              color: "var(--Neutral-700, #555759)",
+              textAlign: "center",
+              ...theme.typography.titleMedium,
             }}
-            endIcon={<MenuOpenIcon />}
-            onClick={onClose}
           >
-            Close
-          </Button>
+            Bookmarks by Unit
+          </Box>
         </Box>
 
-        {/* Navigation List */}
-        <List sx={{ width: "100%" }}>
-          {/* All Bookmarks Item */}
-          <ListItem
-            disablePadding
-            sx={{
-              borderBottom: 1,
-              borderColor: units.length > 0 ? "#DBE4E7" : "transparent",
-            }}
-          >
-            <ListItemButton
-              onClick={handleAllBookmarksClick}
-              selected={selectedUnitId === null}
-              sx={{
-                py: "15px",
-                px: "32px",
-                backgroundColor:
-                  selectedUnitId === null
-                    ? theme.palette.Learner.Hover
-                    : "transparent",
-                "&:hover": {
-                  backgroundColor: theme.palette.Learner.Hover,
-                },
-              }}
-            >
-              <BookmarkIcon sx={{ marginRight: "12px", fontSize: "20px" }} />
-              <ListItemText
-                disableTypography
-                primary="All Bookmarks"
-                sx={
-                  selectedUnitId === null
-                    ? theme.typography.titleMedium
-                    : theme.typography.bodyLarge
-                }
-              />
-            </ListItemButton>
+        {/* Unit List */}
+        <List disablePadding>
+          {/* All Bookmarks */}
+          <ListItem disablePadding>
+            {(() => {
+              const styles = getItemStyles(selectedUnitId === null);
+              return (
+                <ListItemButton
+                  onClick={handleAllBookmarksClick}
+                  sx={styles.button}
+                >
+                  <Box sx={styles.index}>0.</Box>
+                  <ListItemText
+                    disableTypography
+                    primary="All Bookmarks"
+                    sx={styles.text}
+                  />
+                </ListItemButton>
+              );
+            })()}
           </ListItem>
 
-          {/* Unit Items */}
-          {units.map((unit, index) => (
-            <ListItem
-              key={unit.id}
-              disablePadding
-              sx={{
-                borderBottom: 1,
-                borderColor:
-                  index !== units.length - 1 ? "#DBE4E7" : "transparent",
-              }}
-            >
-              <ListItemButton
-                onClick={() => handleUnitClick(unit.id)}
-                selected={selectedUnitId === unit.id}
-                sx={{
-                  py: "15px",
-                  px: "32px",
-                  backgroundColor:
-                    selectedUnitId === unit.id
-                      ? theme.palette.Learner.Hover
-                      : "transparent",
-                  "&:hover": {
-                    backgroundColor: theme.palette.Learner.Hover,
-                  },
-                }}
-              >
-                <ListItemText
-                  disableTypography
-                  primary={`${unit.displayIndex}. ${unit.title}`}
-                  sx={
-                    selectedUnitId === unit.id
-                      ? theme.typography.titleMedium
-                      : theme.typography.bodyLarge
-                  }
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {/* Individual Units */}
+          {units.map((unit) => {
+            const isSelected = selectedUnitId === unit.id;
+            const styles = getItemStyles(isSelected);
+            return (
+              <ListItem key={unit.id} disablePadding>
+                <ListItemButton
+                  onClick={() => handleUnitClick(unit.id)}
+                  sx={styles.button}
+                >
+                  <Box sx={styles.index}>{unit.displayIndex}.</Box>
+                  <ListItemText
+                    disableTypography
+                    primary={unit.title}
+                    sx={styles.text}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
       </Box>
     </Drawer>

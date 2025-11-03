@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import { Bookmark } from "../../types/UserTypes";
@@ -10,15 +9,11 @@ import useBookmarksFilter from "../../hooks/useBookmarksFilter";
 import { BookmarksSidebar, BookmarksContent, ExpandCollapseButton } from "../bookmarks";
 
 const Bookmarks = (): React.ReactElement => {
-  const theme = useTheme();
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [units, setUnits] = useState<CourseUnit[]>([]);
-  const [modules, setModules] = useState<{ [unitId: string]: CourseModule[] }>(
-    {},
-  );
+  const [modules, setModules] = useState<{ [unitId: string]: CourseModule[] }>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [allExpanded, setAllExpanded] = useState(false);
 
   // Use the custom hook for filtering
@@ -97,14 +92,6 @@ const Bookmarks = (): React.ReactElement => {
     selectUnit(unitId);
   };
 
-  const handleDrawerOpen = () => {
-    setSidebarOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setSidebarOpen(false);
-  };
-
   // Toggle expand/collapse all
   const handleToggleAll = () => {
     setAllExpanded((prev) => !prev);
@@ -122,8 +109,6 @@ const Bookmarks = (): React.ReactElement => {
         units={unitsWithBookmarks}
         selectedUnitId={selectedUnitId}
         onUnitSelect={handleUnitSelect}
-        open={sidebarOpen}
-        onClose={handleDrawerClose}
       />
 
       {/* Main Content */}
@@ -136,31 +121,10 @@ const Bookmarks = (): React.ReactElement => {
             paddingLeft="10px"
             marginBottom="32px"
           >
-            {!sidebarOpen && (
-              <Button
-                type="button"
-                sx={{
-                  color: theme.palette.Neutral[700],
-                  backgroundColor: theme.palette.Neutral[200],
-                  borderRadius: "4px",
-                  width: "34px",
-                  minWidth: "34px",
-                  height: "34px",
-                  padding: 0,
-                  marginRight: "12px",
-                }}
-                onClick={handleDrawerOpen}
-              >
-                <MenuOpenIcon
-                  sx={{
-                    fontSize: "18px",
-                    transform: "scaleX(-1)",
-                  }}
-                />
-              </Button>
-            )}
             <Box display="flex" alignItems="center" gap="12px">
-              <BookmarkBorderOutlinedIcon sx={{ width: "48px", height: "48px", fill: "#000"}} />
+              <BookmarkBorderOutlinedIcon
+                sx={{ width: "48px", height: "48px", fill: "#000" }}
+              />
               <Typography variant="displayLarge">
                 {selectedUnit
                   ? `Unit ${selectedUnit.displayIndex} Bookmarks`
@@ -169,7 +133,10 @@ const Bookmarks = (): React.ReactElement => {
             </Box>
 
             {/* Expand/Collapse all button */}
-            <ExpandCollapseButton allExpanded={allExpanded} onToggle={handleToggleAll} />
+            <ExpandCollapseButton
+              allExpanded={allExpanded}
+              onToggle={handleToggleAll}
+            />
           </Box>
         )}
 
