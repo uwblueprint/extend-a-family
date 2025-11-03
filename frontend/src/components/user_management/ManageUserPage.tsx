@@ -387,11 +387,11 @@ const ManageUserPage = (): React.ReactElement => {
             </Typography>
             <UserTable
               filteredUsers={pendingApprovalFacilitators}
-              usersPerPage={pendingApprovalFacilitators.length}
-              page={0}
-              emptyRows={0}
-              handleChangePage={() => {}}
-              handleChangeRowsPerPage={() => {}}
+              usersPerPage={usersPerPage}
+              page={page}
+              emptyRows={emptyRows}
+              handleChangePage={handleChangePage}
+              handleChangeRowsPerPage={handleChangeRowsPerPage}
               handleOpenDeleteUserModal={handleOpenDeleteUserModal}
               handleApproveFacilitator={handleApproveFacilitator}
               handleRejectFacilitator={handleRejectFacilitator}
