@@ -37,6 +37,7 @@ interface ModuleSectionProps {
   }>;
   onBookmarkDeleted?: (pageId: string) => void;
   expandAll?: boolean;
+  onToggle?: (isOpen: boolean) => void;
 }
 
 const ModuleSection: React.FC<ModuleSectionProps> = ({
@@ -44,6 +45,7 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
   bookmarks,
   onBookmarkDeleted,
   expandAll = false,
+  onToggle,
 }) => {
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
@@ -84,7 +86,10 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
     <Accordion
       disableGutters
       expanded={expanded}
-      onChange={(_, isExpanded) => setExpanded(isExpanded)}
+      onChange={(_, isExpanded) => {
+        setExpanded(isExpanded);
+        if (onToggle) onToggle(isExpanded); // notify parent when user manually toggles
+      }}
       sx={{
         border: "1px solid",
         borderColor: theme.palette.Neutral[300],

@@ -28,6 +28,7 @@ interface BookmarksContentProps {
   selectedUnitId: string | null;
   allExpanded?: boolean;
   onBookmarkDeleted?: (pageId: string) => void;
+  onAllModulesExpandedChange?: (unitId: string, allExpanded: boolean) => void;
 }
 
 const BookmarksContent: React.FC<BookmarksContentProps> = ({
@@ -38,6 +39,7 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
   selectedUnitId,
   allExpanded = false,
   onBookmarkDeleted,
+  onAllModulesExpandedChange,
 }) => {
   const theme = useTheme();
 
@@ -86,6 +88,9 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
           onBookmarkDeleted={onBookmarkDeleted}
           showHeader={selectedUnitId === null}
           expandAll={allExpanded}
+          onAllModulesExpandedChange={(all) =>
+            onAllModulesExpandedChange?.(unitGroup.unit.id, all)
+          } // forward per-unit status
         />
       ))}
     </Box>

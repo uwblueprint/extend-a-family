@@ -15,6 +15,7 @@ const Bookmarks = (): React.ReactElement => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [allExpanded, setAllExpanded] = useState(false);
+  const [unitAllExpandedMap, setUnitAllExpandedMap] = useState<Record<string, boolean>>({});
 
   // Use the custom hook for filtering
   const {
@@ -92,10 +93,32 @@ const Bookmarks = (): React.ReactElement => {
     selectUnit(unitId);
   };
 
-  // Toggle expand/collapse all
+  // Toggle expand/collapse all (button)
   const handleToggleAll = () => {
-    setAllExpanded((prev) => !prev);
+    setAllExpanded((prev) => {
+      const next = !prev;
+      // Sync unit map for currently visible units so children receive the intent immediately
+      const newMap = unitsWithBookmarks.reduce((acc, u) => {
+        acc[u.id] = next;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setUnitAllExpandedMap(newMap);
+      return next;
+    });
   };
+
+  // Handler to receive per-unit all-expanded updates from UnitSection
+  const handleUnitAllExpandedChange = (unitId: string, allExpandedForUnit: boolean) => {
+    // Only update the map for the reporting unit; don't directly set allExpanded here
+    setUnitAllExpandedMap((prev) => ({ ...prev, [unitId]: allExpandedForUnit }));
+  };
+
+  // Derive overall allExpanded from per-unit map so manual toggles update the button
+  useEffect(() => {
+    const keys = Object.keys(unitAllExpandedMap);
+    const overallAll = keys.length > 0 && Object.values(unitAllExpandedMap).every(Boolean);
+    setAllExpanded(overallAll);
+  }, [unitAllExpandedMap]);
 
   // Get the selected unit for title display
   const selectedUnit = selectedUnitId
@@ -150,6 +173,7 @@ const Bookmarks = (): React.ReactElement => {
           onBookmarkDeleted={(pageId) =>
             setBookmarks((prev) => prev.filter((b) => b.pageId !== pageId))
           }
+          onAllModulesExpandedChange={handleUnitAllExpandedChange}
         />
       </Box>
     </Box>

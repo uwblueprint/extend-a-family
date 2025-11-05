@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { CourseUnit, CourseModule } from "../../types/CourseTypes";
 import ModuleSection from "./ModuleSection";
@@ -21,6 +21,7 @@ interface UnitSectionProps {
   onBookmarkDeleted?: (pageId: string) => void;
   showHeader?: boolean;
   expandAll?: boolean;
+  onAllModulesExpandedChange?: (allExpanded: boolean) => void;
 }
 
 const UnitSection: React.FC<UnitSectionProps> = ({
@@ -29,6 +30,7 @@ const UnitSection: React.FC<UnitSectionProps> = ({
   onBookmarkDeleted,
   showHeader = true,
   expandAll = false,
+  onAllModulesExpandedChange,
 }) => {
   const theme = useTheme();
 
@@ -38,6 +40,40 @@ const UnitSection: React.FC<UnitSectionProps> = ({
       (a, b) => a.module.displayIndex - b.module.displayIndex,
     );
   }, [modules]);
+
+  // Track open/closed state per module to determine "all opened/closed"
+  const [moduleOpenState, setModuleOpenState] = useState<Record<string, boolean>>(
+    () =>
+      sortedModuleGroups.reduce((acc, mg) => {
+        acc[mg.module.id] = !!expandAll;
+        return acc;
+      }, {} as Record<string, boolean>),
+  );
+
+  // When expandAll or modules change, sync moduleOpenState to reflect expandAll for all modules
+  useEffect(() => {
+    const newState = sortedModuleGroups.reduce((acc, mg) => {
+      acc[mg.module.id] = !!expandAll;
+      return acc;
+    }, {} as Record<string, boolean>);
+    setModuleOpenState(newState);
+  }, [sortedModuleGroups, expandAll]);
+
+  // Notify parent whenever the "all open" status changes
+  useEffect(() => {
+    if (onAllModulesExpandedChange) {
+      const allOpen = Object.keys(moduleOpenState).length > 0 && Object.values(moduleOpenState).every(Boolean);
+      onAllModulesExpandedChange(allOpen);
+    }
+  }, [moduleOpenState, onAllModulesExpandedChange]);
+
+  // Handler to be passed to ModuleSection so manual toggles update moduleOpenState
+  const handleModuleToggle = useCallback((moduleId: string, isOpen: boolean) => {
+    setModuleOpenState((prev) => {
+      const next = { ...prev, [moduleId]: isOpen };
+      return next;
+    });
+  }, []);
 
   return (
     <Box sx={{ width: "100%", marginBottom: "80px", boxSizing: "border-box" }}>
@@ -70,6 +106,7 @@ const UnitSection: React.FC<UnitSectionProps> = ({
             bookmarks={moduleGroup.bookmarks}
             onBookmarkDeleted={onBookmarkDeleted}
             expandAll={expandAll}
+            onToggle={(isOpen: boolean) => handleModuleToggle(moduleGroup.module.id, isOpen)} // pass toggle handler
           />
         ))}
       </Box>
