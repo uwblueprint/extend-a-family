@@ -21,6 +21,7 @@ const CircularProgressWithLabel: React.FC<CircularProgressWithLabelProps> = ({
       alignItems="center"
       justifyContent="center"
       width={235}
+      height={300}
     >
       <Box position="relative" display="inline-flex">
         <CircularProgress // background track
@@ -64,7 +65,7 @@ const CircularProgressWithLabel: React.FC<CircularProgressWithLabelProps> = ({
         </Box>
       </Box>
 
-      <Typography variant="labelMedium" marginTop={5}>
+      <Typography variant="labelMedium" marginTop={5} textAlign="center">
         {percentComplete}% Course content completed!
       </Typography>
     </Box>
