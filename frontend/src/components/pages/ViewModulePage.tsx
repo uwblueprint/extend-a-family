@@ -277,6 +277,7 @@ const ViewModulePage = () => {
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
               thumbnailRefs={thumbnailRefs}
+              isBookmarked={isPageBookmarked(page.id)}
             >
               {isActivityPage(page) && (
                 <PlayCircleOutlineIcon
@@ -319,7 +320,14 @@ const ViewModulePage = () => {
           )}
       </Box>
     ),
-    [currentPage, isFullScreen, module?.pages, numPages, theme.palette.Neutral],
+    [
+      currentPage,
+      isFullScreen,
+      module?.pages,
+      numPages,
+      theme.palette.Neutral,
+      isPageBookmarked,
+    ],
   );
 
   return (
