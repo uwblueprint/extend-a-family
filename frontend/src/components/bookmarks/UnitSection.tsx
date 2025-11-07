@@ -22,7 +22,10 @@ interface UnitSectionProps {
   showHeader?: boolean;
   expandAll?: boolean;
   expandAllStamp?: number;
-  onModuleOpenStateChange?: (unitId: string, state: Record<string, boolean>) => void;
+  onModuleOpenStateChange?: (
+    unitId: string,
+    state: Record<string, boolean>,
+  ) => void;
 }
 
 const UnitSection: React.FC<UnitSectionProps> = ({
@@ -60,7 +63,7 @@ const UnitSection: React.FC<UnitSectionProps> = ({
       return acc;
     }, {} as Record<string, boolean>);
     setModuleOpenState(newState);
-  }, [sortedModuleGroups, expandAllStamp]); // Use stamp so button presses always trigger
+  }, [sortedModuleGroups, expandAllStamp, expandAll]); // Use stamp so button presses always trigger
 
   // Report the full per-module open/closed map to parent (for global checks)
   useEffect(() => {

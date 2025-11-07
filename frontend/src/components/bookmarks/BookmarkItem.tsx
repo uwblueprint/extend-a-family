@@ -43,8 +43,10 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
       setOpen(false);
       if (onDeleteSuccess) onDeleteSuccess(bookmark.pageId);
     } catch (error) {
+      /* eslint-disable-next-line no-console */
       console.error("Failed to delete bookmark:", error);
-      alert("Something went wrong while deleting the bookmark.");
+      /* eslint-disable-next-line no-alert */
+      alert("Failed to delete bookmark");
     }
   };
 

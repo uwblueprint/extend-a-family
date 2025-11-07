@@ -6,7 +6,9 @@ interface DeleteBookmarkButtonProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-const DeleteBookmarkButton: React.FC<DeleteBookmarkButtonProps> = ({ onClick }) => {
+const DeleteBookmarkButton: React.FC<DeleteBookmarkButtonProps> = ({
+  onClick,
+}) => {
   return (
     <Box
       className="delete-btn"

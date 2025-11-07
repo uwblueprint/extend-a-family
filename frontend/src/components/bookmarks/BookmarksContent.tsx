@@ -28,7 +28,10 @@ interface BookmarksContentProps {
   selectedUnitId: string | null;
   allExpanded?: boolean;
   expandAllStamp?: number;
-  onModuleOpenStateChange?: (unitId: string, state: Record<string, boolean>) => void;
+  onModuleOpenStateChange?: (
+    unitId: string,
+    state: Record<string, boolean>,
+  ) => void;
   onBookmarkDeleted?: (pageId: string) => void;
 }
 

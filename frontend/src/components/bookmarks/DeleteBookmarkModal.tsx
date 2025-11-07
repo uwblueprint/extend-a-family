@@ -107,7 +107,8 @@ const DeleteBookmarkModal: React.FC<DeleteBookmarkModalProps> = ({
               font: theme.typography.bodyMedium,
             }}
           >
-            Are you sure you want to delete this bookmark? This action can’t be undone.
+            Are you sure you want to delete this bookmark? This action can’t be
+            undone.
           </Typography>
         </Box>
 
@@ -123,7 +124,11 @@ const DeleteBookmarkModal: React.FC<DeleteBookmarkModalProps> = ({
             variant="outlined"
             startIcon={
               <ArrowBackIosNewIcon
-                sx={{ width: "18px", height: "18px", color: theme.palette.Learner.Dark.Default }}
+                sx={{
+                  width: "18px",
+                  height: "18px",
+                  color: theme.palette.Learner.Dark.Default,
+                }}
               />
             }
             onClick={onClose}
