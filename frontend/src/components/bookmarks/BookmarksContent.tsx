@@ -45,13 +45,18 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
 
   const sortedUnitGroups = useMemo(() => {
     return Object.values(filteredBookmarks).sort(
-      (a, b) => a.unit.displayIndex - b.unit.displayIndex
+      (a, b) => a.unit.displayIndex - b.unit.displayIndex,
     );
   }, [filteredBookmarks]);
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
         <CircularProgress />
       </Box>
     );
@@ -59,7 +64,12 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
 
   if (error) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
         <Typography color="error" variant="bodyLarge">
           {error}
         </Typography>
@@ -69,7 +79,12 @@ const BookmarksContent: React.FC<BookmarksContentProps> = ({
 
   if (!hasBookmarks) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
         <Typography variant="bodyLarge" color={theme.palette.Neutral[500]}>
           No bookmarks found. Start bookmarking pages while viewing modules!
         </Typography>
