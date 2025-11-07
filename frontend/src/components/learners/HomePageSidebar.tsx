@@ -96,7 +96,13 @@ export default function LearnerUnitSidebar() {
             );
           })}
         </List>
-        <Box mt="auto" display="flex" justifyContent="center">
+        <Box
+          position="fixed"
+          width="300px"
+          bottom="0px"
+          display="flex"
+          justifyContent="center"
+        >
           <CircularProgressWithLabel value={75} />
         </Box>
       </Box>
