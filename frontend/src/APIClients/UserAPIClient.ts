@@ -204,6 +204,44 @@ const getCurrentUser = async (): Promise<User & { bookmarks: Bookmark[] }> => {
   }
 };
 
+const approveFacilitator = async (userId: string): Promise<User> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(
+      `/users/${userId}/approve`,
+      {},
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    throw new Error("Failed to approve facilitator");
+  }
+};
+
+const rejectFacilitator = async (userId: string): Promise<boolean> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    await baseAPIClient.post(
+      `/users/${userId}/reject`,
+      {},
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
 export default {
   getUsersByRole,
   getUsers,
@@ -214,4 +252,6 @@ export default {
   deleteBookmark,
   getCurrentUser,
   uploadProfilePicture,
+  approveFacilitator,
+  rejectFacilitator,
 };

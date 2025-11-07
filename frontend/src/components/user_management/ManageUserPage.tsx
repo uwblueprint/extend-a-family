@@ -89,6 +89,17 @@ const ManageUserPage = (): React.ReactElement => {
         isCaseInsensitiveSubstring(user.lastName, searchQuery.split(" ")[1])),
   );
 
+  // Separate pending approval facilitators
+  const pendingApprovalFacilitators = filteredUsers.filter(
+    (user) => user.status === "PendingApproval" && user.role === "Facilitator",
+  );
+
+  // Regular users (excluding pending approval facilitators)
+  const regularUsers = filteredUsers.filter(
+    (user) =>
+      !(user.status === "PendingApproval" && user.role === "Facilitator"),
+  );
+
   // Pagination handlers
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -178,6 +189,25 @@ const ManageUserPage = (): React.ReactElement => {
         setOpenAddUserSnackbar(true);
         await getUsers();
       }
+    }
+  };
+
+  // Approval handlers
+  const handleApproveFacilitator = async (userId: string) => {
+    try {
+      await UserAPIClient.approveFacilitator(userId);
+      await getUsers(); // Refresh the user list
+    } catch (error) {
+      // Handle error silently
+    }
+  };
+
+  const handleRejectFacilitator = async (userId: string) => {
+    try {
+      await UserAPIClient.rejectFacilitator(userId);
+      await getUsers(); // Refresh the user list
+    } catch (error) {
+      // Handle error silently
     }
   };
 
@@ -338,7 +368,7 @@ const ManageUserPage = (): React.ReactElement => {
         setEmail={setLearnerEmail}
         handleAddLearner={handleAddLearner}
       />
-      <Stack direction="column" spacing={2} margin="2rem">
+      <Stack direction="column" spacing={4} margin="2rem">
         <TopToolBar
           searchQuery={searchQuery}
           handleSearch={handleSearch}
@@ -347,15 +377,46 @@ const ManageUserPage = (): React.ReactElement => {
           handleOpenAddAdminModal={handleOpenAddAdminModal}
           handleOpenAddLearnerModal={handleOpenAddLearnerModal}
         />
-        <UserTable
-          filteredUsers={filteredUsers}
-          usersPerPage={usersPerPage}
-          page={page}
-          emptyRows={emptyRows}
-          handleChangePage={handleChangePage}
-          handleChangeRowsPerPage={handleChangeRowsPerPage}
-          handleOpenDeleteUserModal={handleOpenDeleteUserModal}
-        />
+        {pendingApprovalFacilitators.length > 0 && (
+          <Box>
+            <Typography
+              variant="headlineMedium"
+              sx={{ marginBottom: "16px", fontWeight: 700 }}
+            >
+              New Facilitator Account(s) (Pending Approval)
+            </Typography>
+            <UserTable
+              filteredUsers={pendingApprovalFacilitators}
+              usersPerPage={usersPerPage}
+              page={page}
+              emptyRows={emptyRows}
+              handleChangePage={handleChangePage}
+              handleChangeRowsPerPage={handleChangeRowsPerPage}
+              handleOpenDeleteUserModal={handleOpenDeleteUserModal}
+              handleApproveFacilitator={handleApproveFacilitator}
+              handleRejectFacilitator={handleRejectFacilitator}
+            />
+          </Box>
+        )}
+        <Box>
+          <Typography
+            variant="headlineMedium"
+            sx={{ marginBottom: "16px", fontWeight: 700 }}
+          >
+            All Users
+          </Typography>
+          <UserTable
+            filteredUsers={regularUsers}
+            usersPerPage={usersPerPage}
+            page={page}
+            emptyRows={emptyRows}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            handleOpenDeleteUserModal={handleOpenDeleteUserModal}
+            handleApproveFacilitator={handleApproveFacilitator}
+            handleRejectFacilitator={handleRejectFacilitator}
+          />
+        </Box>
       </Stack>
     </Box>
   );
