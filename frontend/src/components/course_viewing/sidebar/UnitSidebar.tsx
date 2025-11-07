@@ -224,10 +224,10 @@ export default function UnitSidebar({
                     px: "32px",
                     backgroundColor:
                       selectedIndex === index
-                        ? theme.palette[user.role].Dark.Hover
+                        ? theme.palette[user.role].Light.Selected
                         : "transparent",
                     "&:hover": {
-                      backgroundColor: theme.palette[user.role].Dark.Hover,
+                      backgroundColor: theme.palette[user.role].Light.Hover,
                     },
                   }}
                   onClick={(event) => handleListItemClick(event, index)}
@@ -237,8 +237,8 @@ export default function UnitSidebar({
                     primary={`${unit.displayIndex}. ${unit.title}`}
                     sx={
                       selectedIndex === index
-                        ? theme.typography.titleMedium
-                        : theme.typography.bodyLarge
+                        ? theme.typography.labelLargeProminent
+                        : theme.typography.bodyMedium
                     }
                   />
                   {isAdministrator(user) && (
