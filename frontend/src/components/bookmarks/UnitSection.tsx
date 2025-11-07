@@ -21,7 +21,11 @@ interface UnitSectionProps {
   onBookmarkDeleted?: (pageId: string) => void;
   showHeader?: boolean;
   expandAll?: boolean;
-  onAllModulesExpandedChange?: (allExpanded: boolean) => void;
+  expandAllStamp?: number;
+  onModuleOpenStateChange?: (
+    unitId: string,
+    state: Record<string, boolean>,
+  ) => void;
 }
 
 const UnitSection: React.FC<UnitSectionProps> = ({
@@ -30,7 +34,8 @@ const UnitSection: React.FC<UnitSectionProps> = ({
   onBookmarkDeleted,
   showHeader = true,
   expandAll = false,
-  onAllModulesExpandedChange,
+  expandAllStamp = 0,
+  onModuleOpenStateChange,
 }) => {
   const theme = useTheme();
 
@@ -51,24 +56,21 @@ const UnitSection: React.FC<UnitSectionProps> = ({
     }, {} as Record<string, boolean>),
   );
 
-  // When expandAll or modules change, sync moduleOpenState to reflect expandAll for all modules
+  // When expandAllCommandId changes or modules change, sync moduleOpenState to reflect expandAll for all modules
   useEffect(() => {
     const newState = sortedModuleGroups.reduce((acc, mg) => {
       acc[mg.module.id] = !!expandAll;
       return acc;
     }, {} as Record<string, boolean>);
     setModuleOpenState(newState);
-  }, [sortedModuleGroups, expandAll]);
+  }, [sortedModuleGroups, expandAllStamp, expandAll]); // Use stamp so button presses always trigger
 
-  // Notify parent whenever the "all open" status changes
+  // Report the full per-module open/closed map to parent (for global checks)
   useEffect(() => {
-    if (onAllModulesExpandedChange) {
-      const allOpen =
-        Object.keys(moduleOpenState).length > 0 &&
-        Object.values(moduleOpenState).every(Boolean);
-      onAllModulesExpandedChange(allOpen);
+    if (onModuleOpenStateChange) {
+      onModuleOpenStateChange(unit.id, moduleOpenState);
     }
-  }, [moduleOpenState, onAllModulesExpandedChange]);
+  }, [moduleOpenState, onModuleOpenStateChange, unit.id]);
 
   // Handler to be passed to ModuleSection so manual toggles update moduleOpenState
   const handleModuleToggle = useCallback(
@@ -112,6 +114,7 @@ const UnitSection: React.FC<UnitSectionProps> = ({
             bookmarks={moduleGroup.bookmarks}
             onBookmarkDeleted={onBookmarkDeleted}
             expandAll={expandAll}
+            expandAllStamp={expandAllStamp}
             onToggle={(isOpen: boolean) =>
               handleModuleToggle(moduleGroup.module.id, isOpen)
             } // pass toggle handler

@@ -43,8 +43,10 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
       setOpen(false);
       if (onDeleteSuccess) onDeleteSuccess(bookmark.pageId);
     } catch (error) {
+      /* eslint-disable-next-line no-console */
       console.error("Failed to delete bookmark:", error);
-      alert("Something went wrong while deleting the bookmark.");
+      /* eslint-disable-next-line no-alert */
+      alert("Failed to delete bookmark");
     }
   };
 
@@ -90,6 +92,9 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
             borderRadius: "7.252px",
             overflow: "hidden",
             backgroundColor: theme.palette.Neutral[200],
+            pointerEvents: "none",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           {page && isActivityPage(page) && (
@@ -109,11 +114,10 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
             <Box
               sx={{
                 position: "absolute",
-                top: 0,
-                left: 0,
                 width: "100%",
-                height: "100%",
                 overflow: "hidden",
+                alignItems: "center",
+                justifyContent: "center",
                 "& .react-pdf__Page": {
                   position: "absolute",
                   top: "50%",

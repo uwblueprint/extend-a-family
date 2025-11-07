@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Box, Typography } from "@mui/material";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import UserAPIClient from "../../APIClients/UserAPIClient";
@@ -6,16 +6,28 @@ import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import { Bookmark } from "../../types/UserTypes";
 import { CourseUnit, CourseModule } from "../../types/CourseTypes";
 import useBookmarksFilter from "../../hooks/useBookmarksFilter";
-import { BookmarksSidebar, BookmarksContent, ExpandCollapseButton } from "../bookmarks";
+import {
+  BookmarksSidebar,
+  BookmarksContent,
+  ExpandCollapseButton,
+} from "../bookmarks";
 
 const Bookmarks = (): React.ReactElement => {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [units, setUnits] = useState<CourseUnit[]>([]);
-  const [modules, setModules] = useState<{ [unitId: string]: CourseModule[] }>({});
+  const [modules, setModules] = useState<{ [unitId: string]: CourseModule[] }>(
+    {},
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [allExpanded, setAllExpanded] = useState(false);
-  const [unitAllExpandedMap, setUnitAllExpandedMap] = useState<Record<string, boolean>>({});
+  const [buttonState, setButtonState] = useState<"expand" | "collapse">(
+    "expand",
+  );
+  const [moduleOpenMap, setModuleOpenMap] = useState<
+    Record<string, Record<string, boolean>>
+  >({});
+  const [expandAllValue, setExpandAllValue] = useState(false);
+  const [expandAllStamp, setExpandAllStamp] = useState(0);
 
   // Use the custom hook for filtering
   const {
@@ -32,6 +44,7 @@ const Bookmarks = (): React.ReactElement => {
       const userData = await UserAPIClient.getCurrentUser();
       setBookmarks(userData.bookmarks || []);
     } catch (err) {
+      /* eslint-disable-next-line no-console */
       console.error("Failed to fetch bookmarks:", err);
       setError("Failed to load bookmarks");
     }
@@ -43,6 +56,7 @@ const Bookmarks = (): React.ReactElement => {
       const unitsData = await CourseAPIClient.getUnits();
       setUnits(unitsData);
     } catch (err) {
+      /* eslint-disable-next-line no-console */
       console.error("Failed to fetch units:", err);
       setError("Failed to load course units");
     }
@@ -57,6 +71,7 @@ const Bookmarks = (): React.ReactElement => {
         [unitId]: modulesData,
       }));
     } catch (err) {
+      /* eslint-disable-next-line no-console */
       console.error(`Failed to fetch modules for unit ${unitId}:`, err);
     }
   };
@@ -93,32 +108,80 @@ const Bookmarks = (): React.ReactElement => {
     selectUnit(unitId);
   };
 
+  // Handler to receive per-unit module open state map from UnitSection
+  const handleModuleOpenStateChange = (
+    unitId: string,
+    state: Record<string, boolean>,
+  ) => {
+    setModuleOpenMap((prev) => ({ ...prev, [unitId]: state }));
+  };
+
+  // Check if all modules are currently expanded
+  const allModulesExpanded = useMemo(() => {
+    // Determine which specific modules we expect to track (based on bookmarks)
+    const trackedModuleKeys = Array.from(
+      new Set(bookmarks.map((b) => `${b.unitId}:${b.moduleId}`)),
+    );
+    if (trackedModuleKeys.length === 0) return false;
+
+    // Flatten reported module keys from moduleOpenMap
+    const reportedKeys: string[] = [];
+    Object.entries(moduleOpenMap).forEach(([uId, modMap]) =>
+      Object.keys(modMap).forEach((mId) => reportedKeys.push(`${uId}:${mId}`)),
+    );
+
+    // Only decide "all expanded" when every tracked module has reported its state
+    if (reportedKeys.length < trackedModuleKeys.length) return false;
+
+    return trackedModuleKeys.every((key) => {
+      const [uId, mId] = key.split(":");
+      return !!moduleOpenMap[uId] && moduleOpenMap[uId][mId] === true;
+    });
+  }, [moduleOpenMap, bookmarks]);
+
+  // Check if all modules are currently collapsed
+  const allModulesCollapsed = useMemo(() => {
+    const trackedModuleKeys = Array.from(
+      new Set(bookmarks.map((b) => `${b.unitId}:${b.moduleId}`)),
+    );
+    if (trackedModuleKeys.length === 0) return false;
+
+    const reportedKeys: string[] = [];
+    Object.entries(moduleOpenMap).forEach(([uId, modMap]) =>
+      Object.keys(modMap).forEach((mId) => reportedKeys.push(`${uId}:${mId}`)),
+    );
+
+    // Only decide "all collapsed" when every tracked module has reported its state
+    if (reportedKeys.length < trackedModuleKeys.length) return false;
+
+    return trackedModuleKeys.every((key) => {
+      const [uId, mId] = key.split(":");
+      return !!moduleOpenMap[uId] && moduleOpenMap[uId][mId] === false;
+    });
+  }, [moduleOpenMap, bookmarks]);
+
+  // Update button state based on module states
+  useEffect(() => {
+    if (allModulesExpanded) {
+      setButtonState("collapse");
+    } else if (allModulesCollapsed) {
+      setButtonState("expand");
+    }
+    // If some are open and some are closed, keep the current button state
+  }, [allModulesExpanded, allModulesCollapsed]);
+
   // Toggle expand/collapse all (button)
   const handleToggleAll = () => {
-    setAllExpanded((prev) => {
-      const next = !prev;
-      // Sync unit map for currently visible units so children receive the intent immediately
-      const newMap = unitsWithBookmarks.reduce((acc, u) => {
-        acc[u.id] = next;
-        return acc;
-      }, {} as Record<string, boolean>);
-      setUnitAllExpandedMap(newMap);
-      return next;
-    });
+    if (buttonState === "collapse") {
+      setExpandAllValue(false);
+      setExpandAllStamp((s) => s + 1);
+      setButtonState("expand");
+    } else {
+      setExpandAllValue(true);
+      setExpandAllStamp((s) => s + 1);
+      setButtonState("collapse");
+    }
   };
-
-  // Handler to receive per-unit all-expanded updates from UnitSection
-  const handleUnitAllExpandedChange = (unitId: string, allExpandedForUnit: boolean) => {
-    // Only update the map for the reporting unit; don't directly set allExpanded here
-    setUnitAllExpandedMap((prev) => ({ ...prev, [unitId]: allExpandedForUnit }));
-  };
-
-  // Derive overall allExpanded from per-unit map so manual toggles update the button
-  useEffect(() => {
-    const keys = Object.keys(unitAllExpandedMap);
-    const overallAll = keys.length > 0 && Object.values(unitAllExpandedMap).every(Boolean);
-    setAllExpanded(overallAll);
-  }, [unitAllExpandedMap]);
 
   // Get the selected unit for title display
   const selectedUnit = selectedUnitId
@@ -157,7 +220,7 @@ const Bookmarks = (): React.ReactElement => {
 
             {/* Expand/Collapse all button */}
             <ExpandCollapseButton
-              allExpanded={allExpanded}
+              allExpanded={buttonState === "collapse"}
               onToggle={handleToggleAll}
             />
           </Box>
@@ -169,11 +232,12 @@ const Bookmarks = (): React.ReactElement => {
           error={error}
           hasBookmarks={hasBookmarks}
           selectedUnitId={selectedUnitId}
-          allExpanded={allExpanded}
+          allExpanded={expandAllValue}
+          expandAllStamp={expandAllStamp}
+          onModuleOpenStateChange={handleModuleOpenStateChange}
           onBookmarkDeleted={(pageId) =>
             setBookmarks((prev) => prev.filter((b) => b.pageId !== pageId))
           }
-          onAllModulesExpandedChange={handleUnitAllExpandedChange}
         />
       </Box>
     </Box>

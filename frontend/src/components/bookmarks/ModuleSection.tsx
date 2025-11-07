@@ -37,6 +37,7 @@ interface ModuleSectionProps {
   }>;
   onBookmarkDeleted?: (pageId: string) => void;
   expandAll?: boolean;
+  expandAllStamp?: number;
   onToggle?: (isOpen: boolean) => void;
 }
 
@@ -45,6 +46,7 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
   bookmarks,
   onBookmarkDeleted,
   expandAll = false,
+  expandAllStamp,
   onToggle,
 }) => {
   const theme = useTheme();
@@ -54,10 +56,12 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
     (CourseModule & { lessonPdfUrl: string }) | null
   >(null);
 
-  // Sync expanded state when global expandAll changes
+  // Sync when expandAll changes OR when a command id changes (button press)
   useEffect(() => {
+    // Respond to explicit expand/collapse commands (expandAllCommandId) or real value changes
     setExpanded(Boolean(expandAll));
-  }, [expandAll]);
+    // Stamp triggers this effect even if expandAll boolean didn't change
+  }, [expandAll, expandAllStamp]);
 
   // Fetch module details to get lesson PDF URL and populated pages for thumbnails
   useEffect(() => {
