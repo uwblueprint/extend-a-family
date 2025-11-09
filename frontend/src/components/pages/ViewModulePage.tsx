@@ -389,7 +389,9 @@ const ViewModulePage = () => {
                   )}
               </Box>
             )}
-            {isDidYouLikeTheContentPage && <SurveySlides />}
+            {isDidYouLikeTheContentPage && module && (
+              <SurveySlides moduleId={module.id} />
+            )}
           </Box>
           <Box
             height={isFullScreen ? "80px" : "48px"}

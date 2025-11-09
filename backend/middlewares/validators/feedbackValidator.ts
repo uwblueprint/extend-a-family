@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { validatePrimitive, getApiValidationError } from "./util";
+import { NextFunction, Request, Response } from "express";
+import { getApiValidationError, validatePrimitive } from "./util";
 
 export const createFeedbackDtoValidator = async (
   req: Request,
@@ -11,9 +11,6 @@ export const createFeedbackDtoValidator = async (
   }
   if (!validatePrimitive(req.body.moduleId, "string")) {
     return res.status(400).send(getApiValidationError("moduleId", "string"));
-  }
-  if (!validatePrimitive(req.body.unitId, "string")) {
-    return res.status(400).send(getApiValidationError("unitId", "string"));
   }
   if (!validatePrimitive(req.body.isLiked, "boolean")) {
     return res.status(400).send(getApiValidationError("isLiked", "boolean"));
