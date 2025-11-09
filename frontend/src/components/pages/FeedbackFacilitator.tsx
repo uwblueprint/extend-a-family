@@ -1,6 +1,5 @@
-import { ExpandMore, Search } from "@mui/icons-material";
+import { Search } from "@mui/icons-material";
 import {
-  Box,
   MenuItem,
   Stack,
   TextField,
@@ -10,6 +9,7 @@ import {
 import React, { useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
+import LearnerFeedbackBlock from "../feedback/LearnerFeedbackBlock";
 
 const FeedbackFacilitator = (): React.ReactElement => {
   const theme = useTheme();
@@ -58,7 +58,6 @@ const FeedbackFacilitator = (): React.ReactElement => {
           }
           focusedBorderColor={theme.palette[role].Dark.Default}
           sx={{
-            // minWidth: "400px",
             flex: "1 0 0",
             borderRadius: "8px",
             "& .MuiOutlinedInput-root": {
@@ -110,90 +109,8 @@ const FeedbackFacilitator = (): React.ReactElement => {
           margin: 0,
         }}
       />
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        padding="24px"
-        width="100%"
-        sx={{
-          borderRadius: "8px",
-          border: `1px solid ${theme.palette.Neutral[300]}`,
-          background: theme.palette.Facilitator.Light.Default,
-        }}
-      >
-        <Typography variant="titleMedium" color={theme.palette.Neutral[700]}>
-          Olivia C.
-        </Typography>
-        <Typography variant="titleMedium" color={theme.palette.Neutral[700]}>
-          Unit 1
-        </Typography>
-        <Stack
-          direction="column"
-          gap="24px"
-          paddingBottom="24px"
-          alignItems="flex-start"
-        >
-          <Stack direction="row" gap="64px">
-            <Stack direction="row" gap="16px">
-              <Stack direction="row" gap="8px" alignItems="center">
-                <Box
-                  sx={{
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    background: theme.palette.Facilitator.Dark.Default,
-                  }}
-                />
-                <Box
-                  sx={{
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    background: theme.palette.Facilitator.Dark.Default,
-                  }}
-                />
-                <Box
-                  sx={{
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    background: theme.palette.Neutral[400],
-                  }}
-                />
-                <Box
-                  sx={{
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    background: theme.palette.Neutral[400],
-                  }}
-                />
-                <Box
-                  sx={{
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    background: theme.palette.Neutral[400],
-                  }}
-                />
-              </Stack>
-              <Typography
-                variant="titleMedium"
-                color={theme.palette.Neutral[600]}
-              >
-                Easy
-              </Typography>
-            </Stack>
-            <Typography
-              variant="titleMedium"
-              color={theme.palette.Neutral[600]}
-            >
-              100% Liked
-            </Typography>
-            <ExpandMore />
-          </Stack>
-        </Stack>
-      </Stack>
+      <LearnerFeedbackBlock />
+      <LearnerFeedbackBlock />
     </Stack>
   );
 };
