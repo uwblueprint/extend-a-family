@@ -27,7 +27,7 @@ const firebaseStorageService: IFileStorageService = new FileStorageService(
  */
 activityRouter.post(
   "/:moduleId/:questionType",
-  //isAuthorizedByRole(new Set(["Administrator"])),
+  // isAuthorizedByRole(new Set(["Administrator"])),
   checkModuleEditable,
   async (req: Request, res: Response): Promise<void> => {
     const { moduleId, questionType } = req.params;
@@ -170,7 +170,7 @@ activityRouter.patch(
   isAuthorizedByRole(new Set(["Administrator"])),
   uploadPictureValidator,
   async (req, res) => {
-    const imageData = req.file!.buffer!; 
+    const imageData = req.file!.buffer!;
     const contentType = req.file!.mimetype!;
     const { activityId, questionType, rowLabel } = req.params;
     const imageName = `activity/imageData/${activityId}`;
@@ -181,12 +181,15 @@ activityRouter.patch(
         imageData,
         contentType,
       );
-      const activity = await activityService.getActivity(activityId, questionType as QuestionType) as TableActivity
-      let rowLabels = activity.rowLabels
+      const activity = (await activityService.getActivity(
+        activityId,
+        questionType as QuestionType,
+      )) as TableActivity;
+      const { rowLabels } = activity;
       if (rowLabels.has(rowLabel)) {
-        rowLabels.set(rowLabel, imageUrl)
+        rowLabels.set(rowLabel, imageUrl);
       } else {
-        res.status(500).send(rowLabel + " is not a key in row labels")
+        res.status(500).send(`${rowLabel} is not a key in row labels`);
       }
       const updatedActivity = await activityService.updateActivity(
         activityId,
