@@ -1,20 +1,11 @@
-import React from "react";
-
-const HomeContent = () => {
-  return (
-    <div>
-      <div>Currently under construction 🛠️</div>
-    </div>
-  );
-};
+import { Box } from "@mui/material";
+import LearnerUnitSidebar from "../learners/HomePageSidebar";
 
 const Home = (): React.ReactElement => {
   return (
-    <div style={{ textAlign: "center" }}>
-      <h1>Home Page</h1>
-      <div style={{ height: "2rem" }} />
-      <HomeContent />
-    </div>
+    <Box display="flex" width="100%">
+      <LearnerUnitSidebar />
+    </Box>
   );
 };
 

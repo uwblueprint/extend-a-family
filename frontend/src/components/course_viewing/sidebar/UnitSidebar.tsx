@@ -237,8 +237,8 @@ export default function UnitSidebar({
                     primary={`${unit.displayIndex}. ${unit.title}`}
                     sx={
                       selectedIndex === index
-                        ? theme.typography.titleMedium
-                        : theme.typography.bodyLarge
+                        ? theme.typography.labelLargeProminent
+                        : theme.typography.bodyMedium
                     }
                   />
                   {isAdministrator(user) && (
