@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Box, Typography } from "@mui/material";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import UserAPIClient from "../../APIClients/UserAPIClient";
@@ -28,6 +28,8 @@ const Bookmarks = (): React.ReactElement => {
   >({});
   const [expandAllValue, setExpandAllValue] = useState(false);
   const [expandAllStamp, setExpandAllStamp] = useState(0);
+
+  const fetchedUnitsRef = useRef<Set<string>>(new Set());
 
   // Use the custom hook for filtering
   const {
@@ -64,6 +66,10 @@ const Bookmarks = (): React.ReactElement => {
 
   // Fetch modules for a specific unit
   const fetchModulesForUnit = async (unitId: string) => {
+    // Prevent duplicate concurrent/repeated fetches for same unit
+    if (fetchedUnitsRef.current.has(unitId)) return;
+    fetchedUnitsRef.current.add(unitId);
+
     try {
       const modulesData = await CourseAPIClient.getModules(unitId);
       setModules((prev) => ({
@@ -73,6 +79,7 @@ const Bookmarks = (): React.ReactElement => {
     } catch (err) {
       /* eslint-disable-next-line no-console */
       console.error(`Failed to fetch modules for unit ${unitId}:`, err);
+      fetchedUnitsRef.current.delete(unitId);
     }
   };
 
@@ -93,16 +100,16 @@ const Bookmarks = (): React.ReactElement => {
 
   // Fetch modules for units that have bookmarks
   useEffect(() => {
-    const unitIdsWithBookmarks = bookmarks
-      .map((b) => b.unitId)
-      .filter((unitId, index, array) => array.indexOf(unitId) === index);
+    const unitIdsWithBookmarks = Array.from(
+      new Set(bookmarks.map((b) => b.unitId)),
+    );
 
     unitIdsWithBookmarks.forEach((unitId) => {
-      if (!modules[unitId]) {
+      if (!fetchedUnitsRef.current.has(unitId)) {
         fetchModulesForUnit(unitId);
       }
     });
-  }, [bookmarks, modules]);
+  }, [bookmarks]);
 
   const handleUnitSelect = (unitId: string | null) => {
     selectUnit(unitId);
