@@ -6,24 +6,24 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 
 const Logger = logger(__filename);
 
-class TeamMemberService implements ITeamMemberService {
+// whenever result will contain additional fields auto added by mongo
+// formats query result to match exactly shape of TeamMemberDTO
+// due to extra fields from mongo _id and __v
+getTeamMemberObjectFromQueryResult = (res: TeamMemberDTO): TeamMemberDTO => {
+  return {
+    id: queryResult.id,
+    firstName: queryResult.firstName,
+    lastName: queryResult.lastName,
+    teamRole: queryResult.teamRole,
+  };
+}
 
-    // whenever result will contain additional fields auto added by mongo
-    // formats query result to match exactly shape of TeamMemberDTO
-    // due to extra fields from mongo _id and __v
-    function getTeamMemberObjectFromQueryResult(res: TeamMemberDTO,) : TeamMemberDTO {
-        return {
-            id: res.id;
-            firstName: res.firstName;
-            lastName: res.lastName;
-            teamRole: res.teamRole;
-        }
-    }
+class TeamMemberService implements ITeamMemberService {
 
     getTeamMembers = async (): Promise<TeamMemberDTO[]> => {
         try {
             const teamMembers: TeamMemberDTO[] = await MgTeamMember.find();
-            return teamMembers;
+            return getTeamMemberObjectFromQueryResult(teamMembers); ;
         } catch (error: unknown) {
             Logger.error(`Failed to get team members. Reason = ${getErrorMessage(error)}`,);
             throw error; 
@@ -31,15 +31,18 @@ class TeamMemberService implements ITeamMemberService {
     }
 
     // not js teammemberdto bc create contains only the fields provided by client
-    createTeamMember = async ( teamMember: CreateTeamMemberDTO,) : Promise<TeamMemberDTO> => {
+    createTeamMember = async (
+        teamMember: CreateTeamMemberDTO,
+    ) : Promise<TeamMemberDTO> => {
         try {
            const newTeamMember = await MgTeamMember.create(teamMember,); 
-           return newTeamMember; 
+           return getTeamMemberObjectFromQueryResult(newTeamMember); 
+
         } catch (error: unknown) {
-            Logger.error('Failed to create new team members. Reason = ${getErrorMessage(error)}'); 
+            Logger.error(`Failed to create new team members. Reason = ${getErrorMessage(error)}`,); 
             throw error; 
         }
     }
 }
 
-export default TeamMemberService; 
+export default TeamMemberService;

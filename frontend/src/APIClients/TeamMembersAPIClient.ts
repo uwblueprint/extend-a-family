@@ -5,7 +5,7 @@ import baseAPIClient from "./BaseAPIClient";
 
 const get = async (): Promise<TeamMemberDTO[] | null> => {
     try {
-        const { data } = await baseAPIClient.get("team-memberes/");
+        const { data } = await baseAPIClient.get("team-members/");
         return data;
     } catch (error: unknown) {
         return null;

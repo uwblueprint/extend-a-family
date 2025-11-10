@@ -76,6 +76,18 @@ class FeedbackService implements IFeedbackService {
       throw error;
     }
   }
-}
 
+  async getAllFeedback(): Promise<FeedbackDTO[]> {
+    try {
+      const allFeedback = await MgFeedback.find();
+      if (allFeedback.length == 0) {
+        throw new Error(`Feedback not found`);
+      }
+      return allFeedback;
+    } catch (error) {
+      Logger.error(`Error getting all feedback: ${getErrorMessage(error)}`);
+      throw error;
+    }
+  }
+}
 export default FeedbackService;

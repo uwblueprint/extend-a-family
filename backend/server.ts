@@ -12,6 +12,7 @@ import { mongo } from "./models";
 import authRouter from "./rest/authRoutes";
 import entityRouter from "./rest/entityRoutes";
 import userRouter from "./rest/userRoutes";
+import teamMemberRouter from "./rest/teamMemberRoutes";
 import {
   registerNotificationHandlers,
   registerNotificationSchemaListener,
@@ -76,6 +77,7 @@ app.use(limiter);
 app.use("/auth", authRouter);
 app.use("/entities", entityRouter);
 app.use("/users", userRouter);
+app.use("/team-members", teamMemberRouter);
 app.use("/help-request", helpRequestRouter);
 app.use("/notifications", notificationRouter);
 app.use("/course", courseRouter);

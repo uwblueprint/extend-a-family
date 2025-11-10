@@ -9,7 +9,7 @@ const teamMemberRouter: Router = Router();
 
 teamMemberRouter.get("/", async (req, res) => {
     try {
-        const teamMembers = await teamMemberService.getTeamMembers();
+        const teamMembers = await TeamMemberService.getTeamMembers();
         res.status(200).json(teamMembers);
     } catch (error: unknown) {
         res.status(500).json({ error: getErrorMessage(error) });

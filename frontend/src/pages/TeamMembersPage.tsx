@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
+import React, { useEffect, useState } from "react";
 
 import {
-    VStack,
+    Box,
     Button,
-} from "@chakra-ui/react";
-import {
     Table,
-    Thead,
-    Tbody,
-    Tr,
-    Th,
-    Td,
+    TableBody,
+    TableCell,
     TableContainer,
-} from "@chakra-ui/table";
+    TableHead,
+    TableRow,
+    Typography,
+    Paper,
+} from "@mui/material";
 
 import teamMembersAPIClient from '../APIClients/TeamMembersAPIClient';
 import { TeamMemberDTO } from "../types/TeamMemberTypes";
 
-const TeamMembersPage = (): React.ReactElement {
+const TeamMembersPage = (): React.ReactElement => {
     const [teamMembers, setTeamMembers] = useState<TeamMemberDTO[] | null>(null);
     // get function
     const getTM = async () => {
@@ -38,32 +36,47 @@ const TeamMembersPage = (): React.ReactElement {
     }, []);
 
     return (
-        <VStack spacing="24px" style={{ margin: "24px auto" }}>
-            <h1>Team Members Page</h1>
-            <TableContainer>
-                <Table colorScheme="blue">
-                    <Thead>
-                        <Tr>
-                            <Th>First Name</Th>
-                            <Th>Last Name</Th>
-                            <Th>Team Role</Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
+       <Box 
+            sx={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                alignItems: "center", 
+                gap: "24px", 
+                margin: "24px auto",
+                padding: "24px"
+            }}
+        >
+            <Typography variant="headlineLarge">Team Members Page</Typography>
+            
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>First Name</TableCell>
+                            <TableCell>Last Name</TableCell>
+                            <TableCell>Team Role</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
                         {teamMembers?.map((teamMember, index) => (
-                            <Tr key={index}>
-                                <Td>{teamMember.firstName}</Td>
-                                <Td>{teamMember.lastName}</Td>
-                                <Td>{teamMember.teamRole}</Td>
-                            </Tr>
+                            <TableRow key={index}>
+                                <TableCell>{teamMember.firstName}</TableCell>
+                                <TableCell>{teamMember.lastName}</TableCell>
+                                <TableCell>{teamMember.teamRole}</TableCell>
+                            </TableRow>
                         ))}
-                    </Tbody>
+                    </TableBody>
                 </Table>
             </TableContainer>
-            <Button colorScheme="teal" onClick={addTM}>
+            
+            <Button 
+                variant="contained" 
+                color="primary"
+                onClick={addTM}
+            >
                 Add an onion
             </Button>
-        </VStack>
+        </Box>
     );
 };
 
