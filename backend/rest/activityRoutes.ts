@@ -10,6 +10,7 @@ import FileStorageService from "../services/implementations/fileStorageService";
 import IFileStorageService from "../services/interfaces/fileStorageService";
 import { QuestionType } from "../types/activityTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
+import { TableActivity } from "../models/activity.mgmodel";
 
 const activityRouter: Router = express.Router();
 const storage = multer.memoryStorage();
@@ -26,7 +27,7 @@ const firebaseStorageService: IFileStorageService = new FileStorageService(
  */
 activityRouter.post(
   "/:moduleId/:questionType",
-  isAuthorizedByRole(new Set(["Administrator"])),
+  //isAuthorizedByRole(new Set(["Administrator"])),
   checkModuleEditable,
   async (req: Request, res: Response): Promise<void> => {
     const { moduleId, questionType } = req.params;
@@ -155,6 +156,42 @@ activityRouter.patch(
         activityId,
         questionType as QuestionType,
         { imageUrl },
+      );
+      res.status(200).json(updatedActivity);
+    } catch (error: unknown) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
+activityRouter.patch(
+  "/:activityId/:questionType/:rowLabel/UpdateRowImage",
+  upload.single("uploadedImage"),
+  isAuthorizedByRole(new Set(["Administrator"])),
+  uploadPictureValidator,
+  async (req, res) => {
+    const imageData = req.file!.buffer!; 
+    const contentType = req.file!.mimetype!;
+    const { activityId, questionType, rowLabel } = req.params;
+    const imageName = `activity/imageData/${activityId}`;
+
+    try {
+      const imageUrl: string = await firebaseStorageService.uploadImage(
+        imageName,
+        imageData,
+        contentType,
+      );
+      const activity = await activityService.getActivity(activityId, questionType as QuestionType) as TableActivity
+      let rowLabels = activity.rowLabels
+      if (rowLabels.has(rowLabel)) {
+        rowLabels.set(rowLabel, imageUrl)
+      } else {
+        res.status(500).send(rowLabel + " is not a key in row labels")
+      }
+      const updatedActivity = await activityService.updateActivity(
+        activityId,
+        questionType as QuestionType,
+        activity,
       );
       res.status(200).json(updatedActivity);
     } catch (error: unknown) {

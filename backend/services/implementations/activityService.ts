@@ -1,5 +1,5 @@
 import mongoose, { ObjectId } from "mongoose";
-import { Activity } from "../../models/activity.mgmodel";
+import { Activity, TableActivityModel } from "../../models/activity.mgmodel";
 import CourseModuleModel from "../../models/coursemodule.mgmodel";
 import { QuestionType } from "../../types/activityTypes";
 import { activityModelMapper } from "../../utilities/activityModelMapper";
@@ -40,6 +40,13 @@ class ActivityService {
           correctAnswers: [0],
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
         };
+      } else if (questionType === QuestionType.Table) {
+        activityData = {
+          ...baseActivity,
+          columnLabels: ["Header", "Header", "Header", "Header", "Header"],
+          rowLabels: {"Row 1": undefined, "Row 2": undefined, "Row 3": undefined, "Row 4": undefined, "Row 5": undefined},
+          correctAnswers: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]
+        };
       } else {
         activityData = baseActivity;
       }
@@ -49,7 +56,7 @@ class ActivityService {
         { session },
       );
       const activity = activityDocs[0];
-
+      
       const pushOp =
         typeof index === "number"
           ? { $each: [activity.id], $position: index }
