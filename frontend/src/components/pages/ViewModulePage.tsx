@@ -39,6 +39,7 @@ import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/Surve
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import NeedHelpModal from "../help/NeedHelpModal";
 import "./ViewModulePage.css";
+import { COURSE_PAGE } from "../../constants/Routes";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -301,6 +302,7 @@ const ViewModulePage = () => {
                     justifyContent: "center",
                     alignItems: "center",
                   }}
+                  href={COURSE_PAGE}
                 >
                   <ArrowBackIosIcon sx={{ fontSize: "24px" }} />
                 </IconButton>
