@@ -70,7 +70,6 @@ export default function Navbar() {
           </Link>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", gap: "24px" }}>
-            <PageTabs />
             <IconButton
               size="large"
               aria-label="show new notifications"
@@ -87,6 +86,7 @@ export default function Navbar() {
                 />
               </Badge>
             </IconButton>
+            <PageTabs />
             <UserButton />
           </Box>
         </Toolbar>
