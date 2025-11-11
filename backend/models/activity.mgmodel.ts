@@ -45,6 +45,24 @@ export interface TableActivity extends Activity {
   rowLabels: Map<string, string | undefined>; // key: label, value: image url
   correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
 }
+export interface TextInputValidation {
+  mode?: "exact" | "numeric";
+  // exact mode
+  answers?: string[];
+  caseSensitive?: boolean;
+  // numeric mode
+  value?: number;
+  min?: number;
+  max?: number;
+  integerOnly?: boolean;
+}
+
+export interface TextInputActivity extends Activity {
+  questionType: QuestionType.TextInput;
+  placeholder?: string;
+  maxLength?: number;
+  validation?: TextInputValidation;
+}
 
 const options2 = {
   discriminatorKey: "role",
@@ -240,6 +258,34 @@ const TableActivitySchema = new Schema({
   },
 });
 
+const TextInputActivitySchema = new Schema({
+  ...ActivitySchema.obj,
+  placeholder: {
+    type: String,
+    required: false,
+  },
+  maxLength: {
+    type: Number,
+    required: false,
+    validate: {
+      validator: (v: number) => v > 0,
+      message: "maxLength must be a positive number",
+    },
+  },
+  validation: {
+    type: {
+      mode: { type: String, required: false, enum: ["exact", "numeric"] },
+      answers: { type: [String], required: false },
+      caseSensitive: { type: Boolean, required: false, default: false },
+      value: { type: Number, required: false },
+      min: { type: Number, required: false },
+      max: { type: Number, required: false },
+      integerOnly: { type: Boolean, required: false, default: false },
+    },
+    required: false,
+  },
+});
+
 const MatchingActivityModel = CoursePageModel.discriminator<MatchingActivity>(
   QuestionType.Matching,
   MatchingActivitySchema,
@@ -262,9 +308,15 @@ const TableActivityModel = CoursePageModel.discriminator<TableActivity>(
   TableActivitySchema,
 );
 
+const TextInputActivityModel = CoursePageModel.discriminator<TextInputActivity>(
+  QuestionType.TextInput,
+  TextInputActivitySchema,
+);
+
 export {
   MatchingActivityModel,
   MultipleChoiceActivityModel,
   MultiSelectActivityModel,
   TableActivityModel,
+  TextInputActivityModel,
 };

@@ -5,6 +5,7 @@ export enum QuestionType {
   MultiSelect = "MultiSelect",
   Matching = "Matching",
   Table = "Table",
+  TextInput = "TextInput",
   Custom = "Custom",
 }
 
@@ -48,6 +49,27 @@ export interface TableActivityDTO extends ActivityDTO {
   columnLabels: string[];
   rowLabels: Map<string, string | undefined>; // key is label, and value is image URL
   correctAnswers: number[][];
+}
+
+export type TextInputValidationDTO =
+  | {
+      mode: "exact";
+      answers: string[];
+      caseSensitive?: boolean;
+    }
+  | {
+      mode: "numeric";
+      value?: number;
+      min?: number;
+      max?: number;
+      integerOnly?: boolean;
+    };
+
+export interface TextInputActivityDTO extends ActivityDTO {
+  questionType: QuestionType.TextInput;
+  placeholder?: string;
+  maxLength?: number;
+  validation?: TextInputValidationDTO;
 }
 
 // Future question types would have their own specific fields
@@ -108,6 +130,19 @@ export type CreateActivityDTO =
       | "columnLabels"
       | "rowLabels"
       | "correctAnswers"
+    >
+  | Pick<
+      TextInputActivityDTO,
+      | "questionType"
+      | "activityNumber"
+      | "questionText"
+      | "instruction"
+      | "placeholder"
+      | "maxLength"
+      | "validation"
+      | "imageUrl"
+      | "additionalContext"
+      | "userFeedback"
     >;
 
 export type UpdateActivityDTO = CreateActivityDTO;
