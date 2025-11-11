@@ -21,8 +21,8 @@ feedbackRouter.get(
     } catch (error) {
       res.status(500).send(getErrorMessage(error));
     }
-  }
-)
+  },
+);
 
 /* 
 Get a Feedback by its ID 

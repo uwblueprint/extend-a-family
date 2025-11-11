@@ -80,7 +80,7 @@ class FeedbackService implements IFeedbackService {
   async getAllFeedback(): Promise<FeedbackDTO[]> {
     try {
       const allFeedback = await MgFeedback.find();
-      if (allFeedback.length == 0) {
+      if (allFeedback.length === 0) {
         throw new Error(`Feedback not found`);
       }
       return allFeedback;
