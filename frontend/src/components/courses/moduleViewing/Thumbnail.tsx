@@ -29,7 +29,7 @@ const ModuleSidebarThumbnail = ({
       }}
       sx={{
         color:
-          index + 1 === currentPage
+          index === currentPage
             ? theme.palette.Learner.Dark.Default
             : "black",
         cursor: "pointer",
@@ -53,7 +53,7 @@ const ModuleSidebarThumbnail = ({
         <Typography
           variant="labelSmall"
           sx={{
-            fontWeight: index + 1 === currentPage ? "700" : "300",
+            fontWeight: index === currentPage ? "700" : "300",
             display: "block",
           }}
         >
