@@ -10,5 +10,5 @@ export const activityModelMapper = {
   [QuestionType.MultipleChoice]: MultipleChoiceActivityModel,
   [QuestionType.MultiSelect]: MultiSelectActivityModel,
   [QuestionType.Table]: TableActivityModel,
-  [QuestionType.Matching]: MatchingActivityModel
+  [QuestionType.Matching]: MatchingActivityModel,
 };

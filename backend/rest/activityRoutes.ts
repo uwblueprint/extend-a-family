@@ -115,7 +115,6 @@ activityRouter.patch(
   "/:activityId/:questionType",
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req: Request, res: Response): Promise<void> => {
-    console.log("hereee")
     const { activityId, questionType } = req.params;
     try {
       const updated = await activityService.updateActivity(
@@ -127,7 +126,6 @@ activityRouter.patch(
         res.status(404).send("Activity not found");
         return;
       }
-      console.log("updated: ", updated)
       res.status(200).json(updated);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Server error";
@@ -173,7 +171,7 @@ activityRouter.patch(
   async (req, res) => {
     const imageData = req.file!.buffer!;
     const contentType = req.file!.mimetype!;
-    const { path } = req.body
+    const { path } = req.body;
 
     try {
       const imageUrl: string = await firebaseStorageService.uploadImage(

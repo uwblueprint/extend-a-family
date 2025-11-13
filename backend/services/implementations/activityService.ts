@@ -60,58 +60,65 @@ class ActivityService {
           ],
         };
       } else if (questionType === QuestionType.Matching) {
-        let media: Media[] = [
+        const media: Media[] = [
           {
-            "id": "1",
-            "mediaType": "text",
-            "context": "default1",
-          }, 
-          {
-            "id": "2",
-            "mediaType": "text",
-            "context": "default2",
+            id: "1",
+            mediaType: "text",
+            context: "default1",
           },
           {
-            "id": "3",
-            "mediaType": "text",
-            "context": "default3",
+            id: "2",
+            mediaType: "text",
+            context: "default2",
           },
           {
-            "id": "4",
-            "mediaType": "text",
-            "context": "default1",
-          }, 
-          {
-            "id": "5",
-            "mediaType": "text",
-            "context": "default2",
+            id: "3",
+            mediaType: "text",
+            context: "default3",
           },
           {
-            "id": "6",
-            "mediaType": "text",
-            "context": "default3",
+            id: "4",
+            mediaType: "text",
+            context: "default1",
           },
           {
-            "id": "7",
-            "mediaType": "text",
-            "context": "default1",
-          }, 
-          {
-            "id": "8",
-            "mediaType": "text",
-            "context": "default2",
+            id: "5",
+            mediaType: "text",
+            context: "default2",
           },
           {
-            "id": "9",
-            "mediaType": "text",
-            "context": "default3",
+            id: "6",
+            mediaType: "text",
+            context: "default3",
           },
-    
-        ]
+          {
+            id: "7",
+            mediaType: "text",
+            context: "default1",
+          },
+          {
+            id: "8",
+            mediaType: "text",
+            context: "default2",
+          },
+          {
+            id: "9",
+            mediaType: "text",
+            context: "default3",
+          },
+        ];
         activityData = {
-          media: {"1": [media[0], media[1], media[2]], "2": [media[3], media[4], media[5]], "3": [media[6], media[7], media[8]]},
-          correctAnswers:  [["1", "4", "7"], ["2", "5", "8"], ["3", "6", "9"]],
-          rows: 3
+          media: {
+            "1": [media[0], media[1], media[2]],
+            "2": [media[3], media[4], media[5]],
+            "3": [media[6], media[7], media[8]],
+          },
+          correctAnswers: [
+            ["1", "4", "7"],
+            ["2", "5", "8"],
+            ["3", "6", "9"],
+          ],
+          rows: 3,
         };
       } else {
         activityData = baseActivity;
