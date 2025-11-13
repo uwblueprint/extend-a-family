@@ -9,12 +9,14 @@ const ModuleSidebarThumbnail = ({
   setCurrentPage,
   thumbnailRefs,
   children,
+  isBookmarked,
 }: {
   index: number;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   thumbnailRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
   children: React.ReactNode;
+  isBookmarked?: boolean;
 }) => {
   const theme = useTheme();
 
@@ -27,7 +29,7 @@ const ModuleSidebarThumbnail = ({
       }}
       sx={{
         color:
-          index + 1 === currentPage
+          index === currentPage
             ? theme.palette.Learner.Dark.Default
             : "black",
         cursor: "pointer",
@@ -51,13 +53,13 @@ const ModuleSidebarThumbnail = ({
         <Typography
           variant="labelSmall"
           sx={{
-            fontWeight: index + 1 === currentPage ? "700" : "300",
+            fontWeight: index === currentPage ? "700" : "300",
             display: "block",
           }}
         >
           {padNumber(index + 1)}
         </Typography>
-        {index === currentPage && <BookmarkIcon sx={{ fontSize: "16px" }} />}
+        {isBookmarked && <BookmarkIcon sx={{ fontSize: "16px" }} />}
       </Box>
       <Box
         sx={{

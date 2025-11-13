@@ -20,9 +20,11 @@ import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import UserAPIClient from "../../APIClients/UserAPIClient";
 import * as Routes from "../../constants/Routes";
 import useActivity from "../../hooks/useActivity";
 import useQueryParams from "../../hooks/useQueryParams";
+import { Bookmark } from "../../types/UserTypes";
 import {
   Activity,
   CourseModule,
@@ -55,10 +57,12 @@ const ViewModulePage = () => {
   const { queryParams } = useQueryParams();
   const requestedModuleId = queryParams.get("moduleId") || "";
   const requestedPageId = queryParams.get("pageId") || "";
+  const requestedUnitId = queryParams.get("unitId") || "";
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [bookMarkedPages, setBookMarkedPages] = useState(new Set<number>());
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
   const [module, setModule] = useState<
     (CourseModule & { lessonPdfUrl: string }) | null
   >(null);
@@ -192,17 +196,62 @@ const ViewModulePage = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize, isFullScreen, pageHeight]);
 
-  const toggleBookmark = (pageNumber: number) => {
-    setBookMarkedPages((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(pageNumber)) {
-        newSet.delete(pageNumber);
+  const isCurrentPageBookmarked = useMemo(() => {
+    if (!module?.pages[currentPage]) return false;
+    const pageId = module.pages[currentPage].id;
+    return bookmarks.some((bookmark) => bookmark.pageId === pageId);
+  }, [bookmarks, module, currentPage]);
+
+  const isPageBookmarked = useCallback(
+    (pageId: string) => {
+      return bookmarks.some((bookmark) => bookmark.pageId === pageId);
+    },
+    [bookmarks],
+  );
+
+  const fetchBookmarks = useCallback(async () => {
+    try {
+      const userData = await UserAPIClient.getCurrentUser();
+      setBookmarks(userData.bookmarks || []);
+    } catch (error) {
+      /* eslint-disable-next-line no-console */
+      console.error("Failed to fetch bookmarks:", error);
+    }
+  }, []);
+
+  const toggleBookmark = async (pageNumber: number) => {
+    if (!module?.pages[pageNumber]) return;
+
+    const page = module.pages[pageNumber];
+    const pageId = page.id;
+    const isBookmarked = isPageBookmarked(pageId);
+
+    setIsBookmarkLoading(true);
+    try {
+      let updatedBookmarks: Bookmark[];
+
+      if (isBookmarked) {
+        updatedBookmarks = await UserAPIClient.deleteBookmark(pageId);
       } else {
-        newSet.add(pageNumber);
+        updatedBookmarks = await UserAPIClient.addBookmark(
+          requestedUnitId,
+          requestedModuleId,
+          pageId,
+        );
       }
-      return newSet;
-    });
+
+      setBookmarks(updatedBookmarks);
+    } catch (error) {
+      /* eslint-disable-next-line no-console */
+      console.error("Failed to toggle bookmark:", error);
+    } finally {
+      setIsBookmarkLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchBookmarks();
+  }, [fetchBookmarks]);
 
   const boxHeight = "calc(100vh - 68px)";
 
@@ -229,6 +278,7 @@ const ViewModulePage = () => {
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
               thumbnailRefs={thumbnailRefs}
+              isBookmarked={isPageBookmarked(page.id)}
             >
               {isActivityPage(page) && (
                 <PlayCircleOutlineIcon
@@ -271,7 +321,14 @@ const ViewModulePage = () => {
           )}
       </Box>
     ),
-    [currentPage, isFullScreen, module?.pages, numPages, theme.palette.Neutral],
+    [
+      currentPage,
+      isFullScreen,
+      module?.pages,
+      numPages,
+      theme.palette.Neutral,
+      isPageBookmarked,
+    ],
   );
 
   return (
@@ -332,8 +389,9 @@ const ViewModulePage = () => {
                     padding: "8px",
                   }}
                   onClick={() => toggleBookmark(currentPage)}
+                  disabled={isBookmarkLoading}
                 >
-                  {bookMarkedPages.has(currentPage) ? (
+                  {isCurrentPageBookmarked ? (
                     <BookmarkIcon
                       sx={{
                         fontSize: "24px",
@@ -408,6 +466,24 @@ const ViewModulePage = () => {
               alignItems: "center",
             }}
           >
+            <Button
+              sx={{
+                height: "48px",
+                paddingLeft: "16px",
+                paddingRight: "24px",
+                paddingY: "10px",
+                gap: "8px",
+                border: "1px solid",
+                borderColor: theme.palette.Neutral[500],
+                borderRadius: "4px",
+                color: theme.palette.Learner.Dark.Default,
+              }}
+              onClick={() => setIsFullScreen((prev) => !prev)}
+            >
+              <FullscreenIcon />
+              <Typography variant="labelLarge">Fullscreen</Typography>
+            </Button>
+
             <Box display="flex" gap="16px">
               <IconButton
                 disabled={currentPage <= 0}
