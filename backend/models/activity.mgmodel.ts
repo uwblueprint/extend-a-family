@@ -28,8 +28,8 @@ export interface MultiSelectActivity extends Activity {
 
 export interface Media {
   id: string;
-  mediaType: "text" | "media";
-  context: string;
+  mediaType: "text" | "image";
+  context: string; // firebase url if mediaType is image
 }
 
 export interface MatchingActivity extends Activity {

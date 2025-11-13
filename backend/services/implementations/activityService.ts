@@ -1,7 +1,7 @@
 import mongoose, { ObjectId } from "mongoose";
 import { Activity } from "../../models/activity.mgmodel";
 import CourseModuleModel from "../../models/coursemodule.mgmodel";
-import { QuestionType } from "../../types/activityTypes";
+import { Media, QuestionType } from "../../types/activityTypes";
 import { activityModelMapper } from "../../utilities/activityModelMapper";
 
 class ActivityService {
@@ -45,11 +45,11 @@ class ActivityService {
           ...baseActivity,
           columnLabels: ["Header", "Header", "Header", "Header", "Header"],
           rowLabels: {
-            "Row 1": undefined,
-            "Row 2": undefined,
-            "Row 3": undefined,
-            "Row 4": undefined,
-            "Row 5": undefined,
+            "Row 1": null,
+            "Row 2": null,
+            "Row 3": null,
+            "Row 4": null,
+            "Row 5": null,
           },
           correctAnswers: [
             [0, 0],
@@ -58,6 +58,60 @@ class ActivityService {
             [3, 0],
             [4, 0],
           ],
+        };
+      } else if (questionType === QuestionType.Matching) {
+        let media: Media[] = [
+          {
+            "id": "1",
+            "mediaType": "text",
+            "context": "default1",
+          }, 
+          {
+            "id": "2",
+            "mediaType": "text",
+            "context": "default2",
+          },
+          {
+            "id": "3",
+            "mediaType": "text",
+            "context": "default3",
+          },
+          {
+            "id": "4",
+            "mediaType": "text",
+            "context": "default1",
+          }, 
+          {
+            "id": "5",
+            "mediaType": "text",
+            "context": "default2",
+          },
+          {
+            "id": "6",
+            "mediaType": "text",
+            "context": "default3",
+          },
+          {
+            "id": "7",
+            "mediaType": "text",
+            "context": "default1",
+          }, 
+          {
+            "id": "8",
+            "mediaType": "text",
+            "context": "default2",
+          },
+          {
+            "id": "9",
+            "mediaType": "text",
+            "context": "default3",
+          },
+    
+        ]
+        activityData = {
+          media: {"1": [media[0], media[1], media[2]], "2": [media[3], media[4], media[5]], "3": [media[6], media[7], media[8]]},
+          correctAnswers:  [["1", "4", "7"], ["2", "5", "8"], ["3", "6", "9"]],
+          rows: 3
         };
       } else {
         activityData = baseActivity;
@@ -167,7 +221,7 @@ class ActivityService {
     const updated = await (Model as typeof mongoose.Model)
       .findByIdAndUpdate(activityId, update, {
         new: true,
-        runValidators: true,
+        validateModifiedOnly: true,
       })
       .lean();
     if (!updated) {

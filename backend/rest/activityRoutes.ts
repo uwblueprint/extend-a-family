@@ -10,7 +10,6 @@ import FileStorageService from "../services/implementations/fileStorageService";
 import IFileStorageService from "../services/interfaces/fileStorageService";
 import { QuestionType } from "../types/activityTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
-import { TableActivity } from "../models/activity.mgmodel";
 
 const activityRouter: Router = express.Router();
 const storage = multer.memoryStorage();
@@ -27,7 +26,7 @@ const firebaseStorageService: IFileStorageService = new FileStorageService(
  */
 activityRouter.post(
   "/:moduleId/:questionType",
-  // isAuthorizedByRole(new Set(["Administrator"])),
+  isAuthorizedByRole(new Set(["Administrator"])),
   checkModuleEditable,
   async (req: Request, res: Response): Promise<void> => {
     const { moduleId, questionType } = req.params;
@@ -116,6 +115,7 @@ activityRouter.patch(
   "/:activityId/:questionType",
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req: Request, res: Response): Promise<void> => {
+    console.log("hereee")
     const { activityId, questionType } = req.params;
     try {
       const updated = await activityService.updateActivity(
@@ -127,6 +127,7 @@ activityRouter.patch(
         res.status(404).send("Activity not found");
         return;
       }
+      console.log("updated: ", updated)
       res.status(200).json(updated);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Server error";
@@ -165,38 +166,23 @@ activityRouter.patch(
 );
 
 activityRouter.patch(
-  "/:activityId/:questionType/:rowLabel/UpdateRowImage",
+  "/UploadImage",
   upload.single("uploadedImage"),
   isAuthorizedByRole(new Set(["Administrator"])),
   uploadPictureValidator,
   async (req, res) => {
     const imageData = req.file!.buffer!;
     const contentType = req.file!.mimetype!;
-    const { activityId, questionType, rowLabel } = req.params;
-    const imageName = `activity/imageData/${activityId}`;
+    const { path } = req.body
 
     try {
       const imageUrl: string = await firebaseStorageService.uploadImage(
-        imageName,
+        path,
         imageData,
         contentType,
       );
-      const activity = (await activityService.getActivity(
-        activityId,
-        questionType as QuestionType,
-      )) as TableActivity;
-      const { rowLabels } = activity;
-      if (rowLabels.has(rowLabel)) {
-        rowLabels.set(rowLabel, imageUrl);
-      } else {
-        res.status(500).send(`${rowLabel} is not a key in row labels`);
-      }
-      const updatedActivity = await activityService.updateActivity(
-        activityId,
-        questionType as QuestionType,
-        activity,
-      );
-      res.status(200).json(updatedActivity);
+
+      res.status(200).json(imageUrl);
     } catch (error: unknown) {
       res.status(500).send(getErrorMessage(error));
     }
