@@ -34,7 +34,7 @@ export interface Media {
 
 export interface MatchingActivity extends Activity {
   questionType: QuestionType.Matching;
-  media: Map<'1' | '2' | '3', Media[]>; // key: column number
+  media: Map<"1" | "2" | "3", Media[]>; // key: column number
   correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
   rows: number;
 }
@@ -83,7 +83,7 @@ const options2 = {
       delete ret.updatedAt;
     },
   },
-}
+};
 
 export const ActivitySchema: Schema = new Schema(
   {
@@ -125,7 +125,7 @@ export const ActivitySchema: Schema = new Schema(
       required: false,
     },
   },
-  options2
+  options2,
 );
 
 // Create combined schemas for each specific activity type
