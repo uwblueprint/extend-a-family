@@ -53,16 +53,17 @@ export interface TableActivityDTO extends ActivityDTO {
 
 export type TextInputValidationDTO =
   | {
-      mode: "exact";
+      mode: "short_answer";
       answers: string[];
-      caseSensitive?: boolean;
     }
   | {
-      mode: "numeric";
-      value?: number;
-      min?: number;
+      mode: "numeric_set";
+      values: number[]; // list of acceptable numeric answers
+    }
+  | {
+      mode: "numeric_range";
+      min?: number; // at least one of min or max should be defined
       max?: number;
-      integerOnly?: boolean;
     };
 
 export interface TextInputActivityDTO extends ActivityDTO {

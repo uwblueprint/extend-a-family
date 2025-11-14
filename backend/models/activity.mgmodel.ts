@@ -45,17 +45,21 @@ export interface TableActivity extends Activity {
   rowLabels: Map<string, string | undefined>; // key: label, value: image url
   correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
 }
-export interface TextInputValidation {
-  mode?: "exact" | "numeric";
-  // exact mode
-  answers?: string[];
-  caseSensitive?: boolean;
-  // numeric mode
-  value?: number;
-  min?: number;
-  max?: number;
-  integerOnly?: boolean;
-}
+
+export type TextInputValidation =
+  | {
+      mode: "short_answer";
+      answers: string[];
+    }
+  | {
+      mode: "numeric_set";
+      values: number[];
+    }
+  | {
+      mode: "numeric_range";
+      min?: number;
+      max?: number;
+    };
 
 export interface TextInputActivity extends Activity {
   questionType: QuestionType.TextInput;
@@ -274,15 +278,20 @@ const TextInputActivitySchema = new Schema({
   },
   validation: {
     type: {
-      mode: { type: String, required: false, enum: ["exact", "numeric"] },
+      mode: {
+        type: String,
+        required: true,
+        enum: ["short_answer", "numeric_set", "numeric_range"],
+      },
+      // short_answer
       answers: { type: [String], required: false },
-      caseSensitive: { type: Boolean, required: false, default: false },
-      value: { type: Number, required: false },
+      // numeric_set
+      values: { type: [Number], required: false },
+      // numeric_range
       min: { type: Number, required: false },
       max: { type: Number, required: false },
-      integerOnly: { type: Boolean, required: false, default: false },
     },
-    required: false,
+    required: true,
   },
 });
 
