@@ -81,7 +81,7 @@ class FeedbackService implements IFeedbackService {
     try {
       const allFeedback = await MgFeedback.find();
       if (allFeedback.length === 0) {
-        throw new Error(`Feedback not found`);
+        return [];
       }
       return allFeedback;
     } catch (error) {
