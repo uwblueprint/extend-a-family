@@ -20,7 +20,7 @@ export interface ActivityDTO extends CoursePageDTO {
 
 export interface Media {
   id: string;
-  mediaType: "text" | "media";
+  mediaType: "text" | "image";
   context: string;
 }
 
