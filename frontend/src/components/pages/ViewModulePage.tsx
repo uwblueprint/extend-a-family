@@ -22,9 +22,9 @@ import "react-pdf/dist/Page/TextLayer.css";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import * as Routes from "../../constants/Routes";
+import { COURSE_PAGE } from "../../constants/Routes";
 import useActivity from "../../hooks/useActivity";
 import useQueryParams from "../../hooks/useQueryParams";
-import { Bookmark } from "../../types/UserTypes";
 import {
   Activity,
   CourseModule,
@@ -32,16 +32,19 @@ import {
   isLessonPage,
   isMultipleChoiceActivity,
   isMultiSelectActivity,
+  isTableActivity,
 } from "../../types/CourseTypes";
+import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
 import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
+import TableMainEditor from "../course_authoring/table/TableEditor";
+import TableSidebar from "../course_authoring/table/TableSidebar";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import NeedHelpModal from "../help/NeedHelpModal";
 import "./ViewModulePage.css";
-import { COURSE_PAGE } from "../../constants/Routes";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -331,6 +334,36 @@ const ViewModulePage = () => {
     ],
   );
 
+  const setNumColumns = (newNumColumns: number) => {
+    setActivity((prev) => {
+      if (!prev || !isTableActivity(prev)) return prev;
+      const currentNumColumns = prev.columnLabels.length;
+
+      let updatedColumnLabels = [...prev.columnLabels];
+      let updatedCorrectAnswers = [...prev.correctAnswers];
+
+      if (newNumColumns > currentNumColumns) {
+        // Add new columns
+        for (let i = currentNumColumns; i < newNumColumns; i += 1) {
+          updatedColumnLabels.push("");
+        }
+      } else if (newNumColumns < currentNumColumns) {
+        // Remove extra columns
+        updatedColumnLabels = updatedColumnLabels.slice(0, newNumColumns);
+        // Also need to remove any correct answers that reference removed columns
+        updatedCorrectAnswers = updatedCorrectAnswers.filter(
+          (coord) => coord[1] < newNumColumns,
+        );
+      }
+
+      return {
+        ...prev,
+        columnLabels: updatedColumnLabels,
+        correctAnswers: updatedCorrectAnswers,
+      };
+    });
+  };
+
   return (
     <Document file={module?.lessonPdfUrl || null} options={options}>
       <Box display="flex" flexDirection="row">
@@ -447,6 +480,12 @@ const ViewModulePage = () => {
                       hasAdditionalContext={hasAdditionalContext}
                     />
                   )}
+                {activity && isTableActivity(activity) && (
+                  <TableMainEditor
+                    activity={activity}
+                    setActivity={setActivity}
+                  />
+                )}
               </Box>
             )}
             {isDidYouLikeTheContentPage && module && (
@@ -540,11 +579,11 @@ const ViewModulePage = () => {
             </Button>
           </Box>
         </Box>
-        {currentPageObject &&
-          (isMultipleChoiceActivity(currentPageObject) ||
-            isMultiSelectActivity(currentPageObject)) && (
-            <>
-              <Divider orientation="vertical" flexItem />
+        {currentPageObject && (
+          <>
+            <Divider orientation="vertical" flexItem />
+            {(isMultipleChoiceActivity(currentPageObject) ||
+              isMultiSelectActivity(currentPageObject)) && (
               <MultipleChoiceEditorSidebar
                 hasImage={hasImage}
                 setHasImage={(newHasImage) => {
@@ -565,7 +604,13 @@ const ViewModulePage = () => {
                 onAddQuestionOption={() =>
                   setActivity(
                     (prev) =>
-                      prev && { ...prev, options: [...prev.options, ""] },
+                      prev && {
+                        ...prev,
+                        ...(isMultipleChoiceActivity(prev) ||
+                        isMultiSelectActivity(prev)
+                          ? { options: [...prev.options, ""] }
+                          : {}),
+                      },
                   )
                 }
                 hint={currentPageObject.hint || ""}
@@ -575,8 +620,31 @@ const ViewModulePage = () => {
                 isMultiSelect={isMultiSelectActivity(currentPageObject)}
                 isAddOptionDisabled={currentPageObject.options.length >= 4}
               />
-            </>
-          )}
+            )}
+            {isTableActivity(currentPageObject) && (
+              <TableSidebar
+                numColumns={currentPageObject.columnLabels.length}
+                setNumColumns={setNumColumns}
+                onAddRow={() =>
+                  setActivity((prev) => {
+                    if (!prev || !isTableActivity(prev)) return prev;
+                    return {
+                      ...prev,
+                      rowLabels: [...prev.rowLabels, [""]],
+                    };
+                  })
+                }
+                isAddRowDisabled={currentPageObject.rowLabels.length >= 6}
+                hint={currentPageObject.hint || ""}
+                setHint={(newHint: string) => {
+                  setActivity((prev) => prev && { ...prev, hint: newHint });
+                }}
+                // headerColumnIncludes={HeaderColumnIncludesTypes.TEXT}
+                // setHeaderColumnIncludes={() => {}}
+              />
+            )}
+          </>
+        )}
       </Box>
       <NeedHelpModal
         open={isHelpModalOpen}

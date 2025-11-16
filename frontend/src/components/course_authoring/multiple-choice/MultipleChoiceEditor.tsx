@@ -1,16 +1,29 @@
 import { AddPhotoAlternate } from "@mui/icons-material";
-import { Box, Button, TextField, Typography, useTheme } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { VisuallyHidden } from "@reach/visually-hidden";
 import React from "react";
 import ActivityAPIClient from "../../../APIClients/ActivityAPIClient";
 import {
   Activity,
+  isMultipleChoiceActivity,
   isMultiSelectActivity,
   MultipleChoiceActivity,
   MultiSelectActivity,
 } from "../../../types/CourseTypes";
 import TitleEditor from "../editorComponents/TitleEditor";
+import { BodySmallTextField } from "../editorComponents/TypographyTextField";
 import MultipleChoiceOption from "./MultipleChoiceOption";
+
+const isMcMsActivity = (
+  activity?: Activity,
+): activity is MultipleChoiceActivity | MultiSelectActivity => {
+  return (
+    (activity &&
+      (isMultipleChoiceActivity(activity) ||
+        isMultiSelectActivity(activity))) ||
+    false
+  );
+};
 
 const MultipleChoiceMainEditor = ({
   activity,
@@ -215,44 +228,20 @@ const MultipleChoiceMainEditor = ({
               >
                 Additional context:
               </Typography>
-              <TextField
-                variant="outlined"
-                fullWidth
-                multiline
-                rows={9}
-                placeholder="Enter additional context here..."
+
+              <BodySmallTextField
                 value={activity.additionalContext || ""}
-                onChange={(e) => {
+                onChange={(newValue) => {
                   setActivity(
                     (prev) =>
                       prev && {
                         ...prev,
-                        additionalContext: e.target.value,
+                        additionalContext: newValue,
                       },
                   );
                 }}
-                sx={{
-                  "& .MuiInputBase-input": {
-                    fontSize: "14px",
-                    fontWeight: 400,
-                    lineHeight: "140%",
-                    letterSpacing: "0.32px",
-                    textTransform: "none",
-                    fontFamily: "Lexend Deca, sans-serif",
-                  },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    border: "none",
-                  },
-                  "& .MuiOutlinedInput-root": {
-                    padding: 0,
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      border: "none",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      border: "none",
-                    },
-                  },
-                }}
+                placeholder="Add additional context..."
+                rows={9}
               />
             </Box>
           )}
@@ -272,7 +261,7 @@ const MultipleChoiceMainEditor = ({
               optionText={option}
               onTextChange={(newOptionText) => {
                 setActivity((prev) => {
-                  if (!prev) return prev;
+                  if (!isMcMsActivity(prev)) return prev;
                   const newOptions = [...prev.options];
                   newOptions[index] = newOptionText;
                   return { ...prev, options: newOptions };
@@ -284,7 +273,7 @@ const MultipleChoiceMainEditor = ({
               onDelete={() =>
                 activity.options.length > 2 &&
                 setActivity((prev) => {
-                  if (!prev) return prev;
+                  if (!isMcMsActivity(prev)) return prev;
                   const newOptions = prev.options.filter((_, i) => i !== index);
                   if (isMultiSelectActivity(prev)) {
                     const newCorrectAnswers = prev.correctAnswers
