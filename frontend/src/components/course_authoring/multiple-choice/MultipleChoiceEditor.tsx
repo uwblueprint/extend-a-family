@@ -10,8 +10,8 @@ import {
   MultipleChoiceActivity,
   MultiSelectActivity,
 } from "../../../types/CourseTypes";
-import BodySmallTextField from "../editorComponents/BodySmallTextField";
 import TitleEditor from "../editorComponents/TitleEditor";
+import { BodySmallTextField } from "../editorComponents/TypographyTextField";
 import MultipleChoiceOption from "./MultipleChoiceOption";
 
 const isMcMsActivity = (

@@ -18,7 +18,7 @@ export default function DeleteCircleButton({
         alignItems: "center",
         justifyContent: "center",
         ":hover": {
-          backgroundColor: theme.palette.Neutral[200],
+          backgroundColor: theme.palette.Neutral[300],
         },
       }}
       onClick={onClick}

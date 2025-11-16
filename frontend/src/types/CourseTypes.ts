@@ -67,7 +67,7 @@ export interface MatchingActivity extends ActivityBase {
 export interface TableActivity extends ActivityBase {
   questionType: QuestionType.Table;
   columnLabels: string[];
-  rowLabels: Map<string, string | undefined>; // key: label, value: image url
+  rowLabels: string[][]; // Each inner array: [labelText, optionalImageUrl]
   correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
 }
 

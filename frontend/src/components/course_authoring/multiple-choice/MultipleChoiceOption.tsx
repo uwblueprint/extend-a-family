@@ -4,8 +4,8 @@ import {
   RadioButtonUncheckedOutlined,
 } from "@mui/icons-material";
 import { Box, Typography, useTheme } from "@mui/material";
-import BodySmallTextField from "../editorComponents/BodySmallTextField";
 import DeleteCircleButton from "../editorComponents/DeleteCircleButton";
+import { BodySmallTextField } from "../editorComponents/TypographyTextField";
 
 export default function MultipleChoiceOption({
   optionText,

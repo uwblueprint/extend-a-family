@@ -42,7 +42,7 @@ export interface MatchingActivity extends Activity {
 export interface TableActivity extends Activity {
   questionType: QuestionType.Table;
   columnLabels: string[];
-  rowLabels: Map<string, string | undefined>; // key: label, value: image url
+  rowLabels: string[][]; // Each inner array: [labelText, optionalImageUrl]
   correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
 }
 
@@ -222,12 +222,15 @@ const TableActivitySchema = new Schema({
     required: true,
   },
   rowLabels: {
-    type: Map,
-    of: {
-      type: String,
-      required: false,
-    },
+    // Represented as array of arrays: [labelText, imageUrl?]
+    type: [[String]],
     required: true,
+    validate: {
+      validator: (rows: string[][]) =>
+        rows.every((row) => row.length >= 1 && row.length <= 2),
+      message:
+        "Each row label must have 1 (text) or 2 (text + imageUrl) elements",
+    },
   },
   correctAnswers: {
     type: [[Number]],
