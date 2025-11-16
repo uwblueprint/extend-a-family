@@ -25,6 +25,7 @@ import * as Routes from "../../constants/Routes";
 import { COURSE_PAGE } from "../../constants/Routes";
 import useActivity from "../../hooks/useActivity";
 import useQueryParams from "../../hooks/useQueryParams";
+import { useUser } from "../../hooks/useUser";
 import {
   Activity,
   CourseModule,
@@ -40,6 +41,7 @@ import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/Multip
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import TableMainEditor from "../course_authoring/table/TableEditor";
 import TableSidebar from "../course_authoring/table/TableSidebar";
+import MultipleChoiceViewer from "../course_viewing/multiple-choice/MultipleChoiceViewer";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
@@ -61,6 +63,7 @@ const ViewModulePage = () => {
   const requestedModuleId = queryParams.get("moduleId") || "";
   const requestedPageId = queryParams.get("pageId") || "";
   const requestedUnitId = queryParams.get("unitId") || "";
+  const { role } = useUser();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -472,14 +475,20 @@ const ViewModulePage = () => {
               >
                 {activity &&
                   (isMultipleChoiceActivity(activity) ||
-                    isMultiSelectActivity(activity)) && (
+                    isMultiSelectActivity(activity)) &&
+                  (role === "Administrator" ? (
                     <MultipleChoiceMainEditor
                       activity={activity}
                       setActivity={setActivity}
                       hasImage={hasImage}
                       hasAdditionalContext={hasAdditionalContext}
                     />
-                  )}
+                  ) : (
+                    <MultipleChoiceViewer
+                      activity={activity}
+                      key={activity.id}
+                    />
+                  ))}
                 {activity && isTableActivity(activity) && (
                   <TableMainEditor
                     activity={activity}
@@ -579,7 +588,7 @@ const ViewModulePage = () => {
             </Button>
           </Box>
         </Box>
-        {currentPageObject && (
+        {currentPageObject && role === "Administrator" && (
           <>
             <Divider orientation="vertical" flexItem />
             {(isMultipleChoiceActivity(currentPageObject) ||
