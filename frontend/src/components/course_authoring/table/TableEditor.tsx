@@ -104,7 +104,9 @@ const TableActivityRow = ({
         </Typography>
       </TableCell>
       {Array.from({ length: numColumns }).map((_, colIndex) => {
-        const isCorrect = correctAnswers.some((coord) => coord[1] === colIndex);
+        const isCorrect = correctAnswers.some(
+          (coord) => coord[0] === index && coord[1] === colIndex,
+        );
         return (
           <TableCell
             align="center"

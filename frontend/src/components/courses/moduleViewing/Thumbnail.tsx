@@ -29,9 +29,7 @@ const ModuleSidebarThumbnail = ({
       }}
       sx={{
         color:
-          index === currentPage
-            ? theme.palette.Learner.Dark.Default
-            : "black",
+          index === currentPage ? theme.palette.Learner.Dark.Default : "black",
         cursor: "pointer",
         marginBottom: "10px",
         borderRadius: "5px",

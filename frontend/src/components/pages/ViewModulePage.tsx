@@ -128,8 +128,6 @@ const ViewModulePage = () => {
 
   const currentPageId = module?.pages[currentPage]?.id;
 
-  // Removed debug console.log for lint compliance
-
   useEffect(() => {
     if (currentPageId) {
       window.history.pushState(

@@ -58,6 +58,7 @@ export interface MultiSelectActivity extends ActivityBase {
 }
 
 export interface MatchingActivity extends ActivityBase {
+  type: QuestionType.Matching;
   questionType: QuestionType.Matching;
   media: Map<"1" | "2" | "3", Media[]>; // key: column number
   correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
@@ -65,6 +66,7 @@ export interface MatchingActivity extends ActivityBase {
 }
 
 export interface TableActivity extends ActivityBase {
+  type: QuestionType.Table;
   questionType: QuestionType.Table;
   columnLabels: string[];
   rowLabels: string[][]; // Each inner array: [labelText, optionalImageUrl]
