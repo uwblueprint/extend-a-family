@@ -353,7 +353,6 @@ const ViewModulePage = () => {
         // Remove extra columns
         updatedColumnLabels = updatedColumnLabels.slice(0, newNumColumns);
         // Also need to remove any correct answers that reference removed columns
-        updatedCorrectAnswers = updatedCorrectAnswers.map((coord) => coord);
         updatedCorrectAnswers = updatedCorrectAnswers.filter(
           (coord) => coord[1] < newNumColumns,
         );
