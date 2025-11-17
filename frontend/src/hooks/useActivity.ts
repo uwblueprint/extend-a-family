@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ActivityAPIClient from "../APIClients/ActivityAPIClient";
 import { Activity } from "../types/CourseTypes";
 
-const DEBOUNCE_DELAY_MS = 3000;
+const DEBOUNCE_DELAY_MS = 2000;
 
 export default function useActivity<ActivityType extends Activity>(
   initialActivity?: ActivityType,
@@ -11,19 +11,33 @@ export default function useActivity<ActivityType extends Activity>(
     initialActivity,
   );
 
-  const sendActivityUpdate = useCallback(async () => {
-    if (activity) {
-      ActivityAPIClient.updateActivity(activity);
+  const activityRef = useRef<ActivityType | undefined>(initialActivity);
+  const lastSentActivityRef = useRef<ActivityType | undefined>(initialActivity);
+  const hasUnsavedChanges = useRef(false);
+
+  useEffect(() => {
+    activityRef.current = activity;
+    if (activity !== lastSentActivityRef.current) {
+      hasUnsavedChanges.current = true;
     }
   }, [activity]);
+
+  const sendActivityUpdate = useCallback(() => {
+    if (!hasUnsavedChanges.current || !activityRef.current) {
+      return;
+    }
+
+    ActivityAPIClient.updateActivity(activityRef.current);
+    lastSentActivityRef.current = activityRef.current;
+    hasUnsavedChanges.current = false;
+  }, []);
 
   useEffect(() => {
     const updateInterval = setInterval(() => {
       sendActivityUpdate();
     }, DEBOUNCE_DELAY_MS);
     return () => clearInterval(updateInterval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [sendActivityUpdate]);
 
   return { activity, setActivity };
 }

@@ -479,6 +479,7 @@ const ViewModulePage = () => {
                   (role === "Administrator" ? (
                     <MultipleChoiceMainEditor
                       activity={activity}
+                      key={activity.id}
                       setActivity={setActivity}
                       hasImage={hasImage}
                       hasAdditionalContext={hasAdditionalContext}
@@ -492,6 +493,7 @@ const ViewModulePage = () => {
                 {activity && isTableActivity(activity) && (
                   <TableMainEditor
                     activity={activity}
+                    key={activity.id}
                     setActivity={setActivity}
                   />
                 )}
@@ -594,6 +596,7 @@ const ViewModulePage = () => {
             {(isMultipleChoiceActivity(currentPageObject) ||
               isMultiSelectActivity(currentPageObject)) && (
               <MultipleChoiceEditorSidebar
+                key={currentPageObject.id}
                 hasImage={hasImage}
                 setHasImage={(newHasImage) => {
                   setHasImage(newHasImage);
@@ -632,6 +635,7 @@ const ViewModulePage = () => {
             )}
             {isTableActivity(currentPageObject) && (
               <TableSidebar
+                key={currentPageObject.id}
                 numColumns={currentPageObject.columnLabels.length}
                 setNumColumns={setNumColumns}
                 onAddRow={() =>
