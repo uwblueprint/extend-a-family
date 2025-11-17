@@ -171,7 +171,7 @@ const TableHeadCell = ({
       colSpan={colSpan}
     >
       <BodyMediumTextField
-        value={value}
+        defaultValue={value}
         onChange={onChange}
         color="white"
         placeholder="[HEADER]"

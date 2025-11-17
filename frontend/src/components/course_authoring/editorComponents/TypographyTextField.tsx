@@ -53,7 +53,7 @@ export const BodySmallTextField = ({
 };
 
 export const BodyMediumTextField = ({
-  value,
+  defaultValue,
   onChange,
   placeholder,
   minRows,
@@ -61,7 +61,7 @@ export const BodyMediumTextField = ({
   rows,
   color,
 }: {
-  value: string;
+  defaultValue: string;
   onChange: (newValue: string) => void;
   placeholder?: string;
   minRows?: number;
@@ -78,7 +78,7 @@ export const BodyMediumTextField = ({
       maxRows={maxRows}
       rows={rows}
       placeholder={placeholder}
-      value={value}
+      defaultValue={defaultValue}
       onChange={(e) => onChange(e.target.value)}
       sx={{
         "& .MuiInputBase-input": {
