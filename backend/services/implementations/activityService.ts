@@ -40,6 +40,16 @@ class ActivityService {
           correctAnswers: [0],
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
         };
+      } else if (questionType === QuestionType.TextInput) {
+        activityData = {
+          ...baseActivity,
+          placeholder: "Enter your answer here",
+          maxLength: 200,
+          validation: {
+            mode: "short_answer",
+            answers: [],
+          },
+        };
       } else {
         activityData = baseActivity;
       }

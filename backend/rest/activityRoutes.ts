@@ -4,6 +4,7 @@ import { isAuthorizedByRole } from "../middlewares/auth";
 import {
   checkModuleEditable,
   uploadPictureValidator,
+  checkActivityEditable,
 } from "../middlewares/validators/activityValidators";
 import activityService from "../services/implementations/activityService";
 import FileStorageService from "../services/implementations/fileStorageService";
@@ -114,6 +115,7 @@ activityRouter.get(
 activityRouter.patch(
   "/:activityId/:questionType",
   isAuthorizedByRole(new Set(["Administrator"])),
+  checkActivityEditable,
   async (req: Request, res: Response): Promise<void> => {
     const { activityId, questionType } = req.params;
     try {
@@ -138,6 +140,7 @@ activityRouter.patch(
   "/:activityId/:questionType/UpdateMainPicture",
   upload.single("uploadedImage"),
   isAuthorizedByRole(new Set(["Administrator"])),
+  checkActivityEditable,
   uploadPictureValidator,
   async (req, res) => {
     const imageData = req.file!.buffer!; // Non-null assertion as validated by middleware
