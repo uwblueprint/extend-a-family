@@ -230,7 +230,7 @@ const MultipleChoiceMainEditor = ({
               </Typography>
 
               <BodySmallTextField
-                value={activity.additionalContext || ""}
+                defaultValue={activity.additionalContext || ""}
                 onChange={(newValue) => {
                   setActivity(
                     (prev) =>

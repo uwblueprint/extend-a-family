@@ -89,7 +89,7 @@ const TableActivityRow = ({
       >
         <Typography variant="bodySmall">
           <BodySmallTextField
-            value={rowLabel}
+            defaultValue={rowLabel}
             placeholder="[Row Name]"
             onChange={(newValue) =>
               setActivity((prev) => {
@@ -171,7 +171,7 @@ const TableHeadCell = ({
       colSpan={colSpan}
     >
       <BodyMediumTextField
-        value={value}
+        defaultValue={value}
         onChange={onChange}
         color="white"
         placeholder="[HEADER]"

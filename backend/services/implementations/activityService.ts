@@ -108,6 +108,7 @@ class ActivityService {
           },
         ];
         activityData = {
+          ...baseActivity,
           media: {
             "1": [media[0], media[1], media[2]],
             "2": [media[3], media[4], media[5]],
