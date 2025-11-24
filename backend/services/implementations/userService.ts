@@ -34,7 +34,7 @@ class UserService implements IUserService {
   async getUserById(userId: string | ObjectId): Promise<UserDTO> {
     let user: User | null;
     try {
-      user = await MgUser.findById(userId);
+      user = await MgUser.findById(userId).populate("facilitator");
 
       if (!user) {
         throw new Error(`userId ${userId} not found.`);
