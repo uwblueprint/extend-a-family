@@ -5,11 +5,13 @@ import AddIcon from "@mui/icons-material/Add";
 import UnitSidebar from "./sidebar/UnitSidebar";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseModulesGrid from "./CourseModulesGrid";
+import CreateModuleModal from "./modals/CreateModuleModal";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
   const [selectedUnit, setSelectedUnit] = useState<CourseUnit | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     setSidebarOpen(true);
@@ -83,7 +85,7 @@ export default function CourseUnitsPage() {
             background: theme.palette.Administrator.Light.Selected,
             boxShadow: "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.30)"
           }}
-          onClick={() => {}}
+          onClick={() => setUploadModalOpen(true)}
         >
           <AddIcon
             sx={{
@@ -99,6 +101,10 @@ export default function CourseUnitsPage() {
             Create Module
           </Typography>
         </Button>
+        <CreateModuleModal
+          open={uploadModalOpen}
+          setUploadModalOpen={setUploadModalOpen}
+        />
       </Box>
     </Box>
   );
