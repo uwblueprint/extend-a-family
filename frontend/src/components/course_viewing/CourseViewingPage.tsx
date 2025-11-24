@@ -83,21 +83,22 @@ export default function CourseUnitsPage() {
             gap: "12px",
             borderRadius: "16px",
             background: theme.palette.Administrator.Light.Selected,
-            boxShadow: "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.30)"
+            boxShadow:
+              "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.30)",
           }}
           onClick={() => setUploadModalOpen(true)}
         >
           <AddIcon
             sx={{
               fontSize: "24px",
-              color: theme.palette.Administrator.Dark.Default
+              color: theme.palette.Administrator.Dark.Default,
             }}
           />
-          <Typography 
-            variant="labelLarge" 
-            color={theme.palette.Administrator.Dark.Default} 
+          <Typography
+            variant="labelLarge"
+            color={theme.palette.Administrator.Dark.Default}
             display="inline"
-            >
+          >
             Create Module
           </Typography>
         </Button>

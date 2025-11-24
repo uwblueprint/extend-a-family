@@ -1,7 +1,16 @@
 import CloseIcon from "@mui/icons-material/Close";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
-import ModeIcon from '@mui/icons-material/Mode';
-import { Box, Button, Dialog, IconButton, InputAdornment, TextField, Typography, useTheme } from "@mui/material";
+import ModeIcon from "@mui/icons-material/Mode";
+import {
+  Box,
+  Button,
+  Dialog,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { VisuallyHidden } from "@reach/visually-hidden";
 import React, {
   ChangeEvent,
@@ -51,7 +60,8 @@ const CreateModuleModal = ({
         "id",
       );
       if (userId) {
-        const uploadedImageUrl = await UserAPIClient.uploadProfilePicture( // TODO: call different API
+        const uploadedImageUrl = await UserAPIClient.uploadProfilePicture(
+          // TODO: call different API
           userId,
           file,
         );
@@ -78,7 +88,7 @@ const CreateModuleModal = ({
   const handleCreate = async () => {
     const params = {
       imageUrl: "", // TODO: use the URL returned on upload
-      moduleTitle
+      moduleTitle,
     };
     console.log("Calling create with params", params);
     // TODO: call the backend to create module
@@ -120,13 +130,14 @@ const CreateModuleModal = ({
             padding: "0px",
           }}
         >
-        <Typography variant="headlineMedium" color={theme.palette.Neutral[700]}>
-          Create new module
-        </Typography>
+          <Typography
+            variant="headlineMedium"
+            color={theme.palette.Neutral[700]}
+          >
+            Create new module
+          </Typography>
         </Box>
-        <IconButton
-          onClick={() => setUploadModalOpen(false)}
-        >
+        <IconButton onClick={() => setUploadModalOpen(false)}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -163,49 +174,67 @@ const CreateModuleModal = ({
             }}
           />
         </IconButton>
-        <Box style={{
+        <Box
+          style={{
             display: "flex",
             flexDirection: "column",
             gap: "8px",
-            alignItems: "center"
-        }}>
-            <Box style={{
+            alignItems: "center",
+          }}
+        >
+          <Box
+            style={{
               display: "flex",
               flexDirection: "row",
-              gap: "6px"
-            }}>
-              <Typography variant="bodySmall" color="black">
-                  Drag and drop or
-              </Typography>
-              <Typography
-                variant="bodySmall"
-                color={theme.palette.Administrator.Dark.Default}
-                style={{cursor: "pointer", textDecoration: "underline"}}
-                onClick={() => {
-                  const inputElem = document.getElementById("clickHereInput");
-                  inputElem?.click();
-                }}
-                >
-                  click here
-              </Typography>
-              <VisuallyHidden>
-                <input id="clickHereInput" type="file" onChange={(e) => handleFileUpload(e)} multiple />
-              </VisuallyHidden>
-              <Typography variant="bodySmall" color="black">
-                  to upload thumbnail
-              </Typography>
-            </Box>
-            <Typography variant="bodySmall" color={theme.palette.Administrator.Dark.Default}>
-                Recommended aspect ratio: 4:3 image
+              gap: "6px",
+            }}
+          >
+            <Typography variant="bodySmall" color="black">
+              Drag and drop or
             </Typography>
+            <Typography
+              variant="bodySmall"
+              color={theme.palette.Administrator.Dark.Default}
+              style={{ cursor: "pointer", textDecoration: "underline" }}
+              onClick={() => {
+                const inputElem = document.getElementById("clickHereInput");
+                inputElem?.click();
+              }}
+            >
+              click here
+            </Typography>
+            <VisuallyHidden>
+              <input
+                id="clickHereInput"
+                type="file"
+                onChange={(e) => handleFileUpload(e)}
+                multiple
+              />
+            </VisuallyHidden>
+            <Typography variant="bodySmall" color="black">
+              to upload thumbnail
+            </Typography>
+          </Box>
+          <Typography
+            variant="bodySmall"
+            color={theme.palette.Administrator.Dark.Default}
+          >
+            Recommended aspect ratio: 4:3 image
+          </Typography>
         </Box>
-        <Typography variant="labelSmall" color={theme.palette.Administrator.Dark.Default}>
-            Supported file types: .png, .jpg, .webp
+        <Typography
+          variant="labelSmall"
+          color={theme.palette.Administrator.Dark.Default}
+        >
+          Supported file types: .png, .jpg, .webp
         </Typography>
       </Box>
 
       <Typography
-        style={{display: imageStatus !== "" ? "flex" : "none", marginTop: "-16px"}}
+        style={{
+          display: imageStatus !== "" ? "flex" : "none",
+          marginTop: "-16px",
+        }}
         color={theme.palette.Administrator.Dark.Default}
       >
         {imageStatus}
@@ -215,39 +244,42 @@ const CreateModuleModal = ({
         label="Module Title"
         variant="outlined"
         style={{
-          display: "flex", 
+          display: "flex",
           padding: "4px 0",
-          flex: "1 0 0"
+          flex: "1 0 0",
         }}
-        onChange={e => setModuleTitle(e.target.value)}
+        onChange={(e) => setModuleTitle(e.target.value)}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <ModeIcon style={{display: "flex",
-              width: "40px", 
-              height: "40px",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "8px",
-              gap: "10px"
-          }}/>
+              <ModeIcon
+                style={{
+                  display: "flex",
+                  width: "40px",
+                  height: "40px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "8px",
+                  gap: "10px",
+                }}
+              />
             </InputAdornment>
-          )
+          ),
         }}
-        />
-      <Box style={{
-        display: "flex",
-        justifyContent: "flex-end",
-        gap: "12px"
-      }}>
-        <Button
-          variant="outlined"
-          onClick={() => setUploadModalOpen(false)}
-        >Cancel</Button>
-        <Button
-          variant="contained"
-          onClick={handleCreate}
-        >Create</Button>
+      />
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "12px",
+        }}
+      >
+        <Button variant="outlined" onClick={() => setUploadModalOpen(false)}>
+          Cancel
+        </Button>
+        <Button variant="contained" onClick={handleCreate}>
+          Create
+        </Button>
       </Box>
     </Dialog>
   );
