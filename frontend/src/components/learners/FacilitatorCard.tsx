@@ -3,11 +3,12 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+import { useTheme } from "@mui/material";
 import Typography from "@mui/material/Typography";
 
 type ProfileFieldProps = {
   label: string;
-  children: string;
+  children: React.ReactNode;
 };
 
 function ProfileField({ label, children }: ProfileFieldProps) {
@@ -25,7 +26,21 @@ function ProfileField({ label, children }: ProfileFieldProps) {
   );
 }
 
-export default function FacilitatorCard() {
+type FacilitatorCardProps = {
+  facilitator: {
+    firstName: string;
+    lastName: string;
+    pronouns?: string;
+    email: string;
+    bio?: string;
+    profilePic?: string;
+  };
+};
+
+export default function FacilitatorCard({ facilitator }: FacilitatorCardProps) {
+  const theme = useTheme();
+  const initials =
+    `${facilitator.firstName[0]}${facilitator.lastName[0]}`.toUpperCase();
   return (
     <Card variant="outlined" sx={{ width: 1045, height: 230 }}>
       <CardContent sx={{ height: "100%" }}>
@@ -37,15 +52,27 @@ export default function FacilitatorCard() {
           height="100%"
           p="20px"
         >
-          <Avatar sx={{ width: 155, height: 155 }} />
+          <Avatar
+            sx={{
+              width: 155,
+              height: 155,
+              bgcolor: theme.palette.Facilitator.Light.Default,
+              color: theme.palette.Facilitator.Dark.Default,
+              ...theme.typography.displayLarge,
+            }}
+            src={facilitator.profilePic}
+          >
+            {!facilitator.profilePic && initials} {/* fallback to initials */}
+          </Avatar>
           <Stack sx={{ gap: "15px" }}>
-            <ProfileField label="Name"> John Doe </ProfileField>
-            <ProfileField label="Pronouns"> he/him </ProfileField>
-            <ProfileField label="Email"> john.doe@email.com </ProfileField>
-            <ProfileField label="Bio">
-              Hello! My name is John Doe. I’m super excited to be your
-              facilitator and to work with you.
+            <ProfileField label="Name">
+              {facilitator.firstName} {facilitator.lastName}
             </ProfileField>
+            <ProfileField label="Pronouns">
+              {facilitator.pronouns || "N/A"}
+            </ProfileField>
+            <ProfileField label="Email"> {facilitator.email} </ProfileField>
+            <ProfileField label="Bio">{facilitator.bio || "N/A"}</ProfileField>
           </Stack>
         </Box>
       </CardContent>
