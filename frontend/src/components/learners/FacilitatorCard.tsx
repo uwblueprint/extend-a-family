@@ -13,10 +13,10 @@ type ProfileFieldProps = {
 
 function ProfileField({ label, children }: ProfileFieldProps) {
   return (
-    <Box display="flex" alignItems="center">
+    <Box display="flex" alignItems="flex-start">
       <Typography
         variant="labelLarge"
-        sx={{ minWidth: 100, paddingRight: "8px" }}
+        sx={{ minWidth: 100, marginRight: 1, paddingTop: "2.5px" }}
       >
         {label}:
       </Typography>
@@ -42,7 +42,10 @@ export default function FacilitatorCard({ facilitator }: FacilitatorCardProps) {
   const initials =
     `${facilitator.firstName[0]}${facilitator.lastName[0]}`.toUpperCase();
   return (
-    <Card variant="outlined" sx={{ width: 1045, height: 230 }}>
+    <Card
+      variant="outlined"
+      sx={{ width: 1045, height: 230, borderRadius: "10px" }}
+    >
       <CardContent sx={{ height: "100%" }}>
         <Box
           display="flex"
