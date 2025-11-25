@@ -71,11 +71,15 @@ export default function FacilitatorCard({ facilitator }: FacilitatorCardProps) {
             <ProfileField label="Name">
               {facilitator.firstName} {facilitator.lastName}
             </ProfileField>
-            <ProfileField label="Pronouns">
-              {facilitator.pronouns || "N/A"}
-            </ProfileField>
+            {facilitator.pronouns && (
+              <ProfileField label="Pronouns">
+                {facilitator.pronouns}
+              </ProfileField>
+            )}
             <ProfileField label="Email"> {facilitator.email} </ProfileField>
-            <ProfileField label="Bio">{facilitator.bio || "N/A"}</ProfileField>
+            <ProfileField label="Bio">
+              {facilitator.bio || "It's nice to meet you!"}
+            </ProfileField>
           </Stack>
         </Box>
       </CardContent>
