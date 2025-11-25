@@ -9,6 +9,7 @@ class ActivityService {
     moduleId: string,
     questionType: QuestionType,
     index?: number,
+    activityData?: Partial<Activity>,
   ): Promise<{ pages: string[] }> {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -27,21 +28,23 @@ class ActivityService {
         instruction: "Please select the correct answer",
       };
 
-      let activityData;
+      let activityDataToCreate;
       if (questionType === QuestionType.MultipleChoice) {
-        activityData = {
+        activityDataToCreate = {
           ...baseActivity,
           correctAnswer: 0,
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+          ...activityData,
         };
       } else if (questionType === QuestionType.MultiSelect) {
-        activityData = {
+        activityDataToCreate = {
           ...baseActivity,
           correctAnswers: [0],
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+          ...activityData,
         };
       } else if (questionType === QuestionType.TextInput) {
-        activityData = {
+        activityDataToCreate = {
           ...baseActivity,
           placeholder: "Enter your answer here",
           maxLength: 200,
@@ -49,13 +52,17 @@ class ActivityService {
             mode: "short_answer",
             answers: [],
           },
+          ...activityData,
         };
       } else {
-        activityData = baseActivity;
+        activityDataToCreate = {
+          ...baseActivity,
+          ...activityData,
+        };
       }
 
       const activityDocs = await (Model as typeof mongoose.Model).create(
-        [activityData],
+        [activityDataToCreate],
         { session },
       );
       const activity = activityDocs[0];

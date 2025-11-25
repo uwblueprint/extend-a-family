@@ -32,12 +32,14 @@ activityRouter.post(
   async (req: Request, res: Response): Promise<void> => {
     const { moduleId, questionType } = req.params;
     const { index } = req.body as { index?: number };
+    const activityData = req.body;
 
     try {
       const result = await activityService.createActivity(
         moduleId,
         questionType as QuestionType,
         index,
+        activityData,
       );
       res.status(200).json(result);
     } catch (e) {
