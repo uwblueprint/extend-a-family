@@ -30,7 +30,6 @@ export default function NavButton({
         padding: "20px",
         gap: "12px",
         width: 515,
-        // justifyContent: "flex-start",
         ...theme.typography.bodyLarge,
       }}
     >

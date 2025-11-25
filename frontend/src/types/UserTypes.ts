@@ -27,7 +27,11 @@ export type Facilitator = BaseUser & {
   bio?: string;
   emailPrefrence: number;
 };
-export type Learner = BaseUser & { facilitator: Facilitator };
+type PublicFacilitator = Pick<
+  Facilitator,
+  "id" | "firstName" | "lastName" | "email" | "bio" | "profilePicture"
+>;
+export type Learner = BaseUser & { facilitator: PublicFacilitator };
 
 export type User = Administrator | Facilitator | Learner;
 
