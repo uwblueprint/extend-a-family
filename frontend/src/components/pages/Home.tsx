@@ -34,8 +34,17 @@ const Home = (): React.ReactElement => {
     <Box display="flex" width="100%">
       <LearnerUnitSidebar />
 
-      <Box display="flex" flexGrow={1} justifyContent="center">
+      <Box display="flex" flexGrow={1} justifyContent="center" margin={4}>
         <Box display="flex" flexDirection="column">
+          <Typography variant="bodyLarge">
+            Hello, {learner.firstName}!
+          </Typography>
+          <Typography variant="displayLarge" sx={{ fontWeight: "bold" }}>
+            Continue with Unit 1 Module 5
+          </Typography>
+          <Typography variant="displaySmall">
+            Or get started with these modules
+          </Typography>
           <Stack
             direction="row"
             width="100%"
