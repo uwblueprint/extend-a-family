@@ -6,6 +6,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import LearnerUnitSidebar from "../learners/HomePageSidebar";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import { Learner } from "../../types/UserTypes";
+import CourseCard from "../learners/courseCard";
 import FacilitatorCard from "../learners/FacilitatorCard";
 import NavButton from "../learners/NavButton";
 import { BOOKMARKS_PAGE } from "../../constants/Routes";
@@ -39,17 +40,34 @@ const Home = (): React.ReactElement => {
           <Typography variant="bodyLarge">
             Hello, {learner.firstName}!
           </Typography>
-          <Typography variant="displayLarge" sx={{ fontWeight: "bold" }}>
+          <Typography variant="displayLarge" marginBottom="25px">
             Continue with Unit 1 Module 5
           </Typography>
-          <Typography variant="displaySmall">
+          <CourseCard size="large" />
+          <Typography
+            variant="displaySmall"
+            marginTop="70px"
+            marginBottom="35px"
+          >
             Or get started with these modules
           </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+            }}
+          >
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
+          </Box>
           <Stack
             direction="row"
             width="100%"
             justifyContent="space-between"
-            marginY="70px"
+            marginTop="25px"
+            marginBottom="70px"
           >
             <NavButton
               label="Bookmarks"
