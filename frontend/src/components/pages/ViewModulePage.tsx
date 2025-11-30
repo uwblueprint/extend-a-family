@@ -31,12 +31,16 @@ import {
   CourseModule,
   isActivityPage,
   isLessonPage,
+  isMatchingActivity,
   isMultipleChoiceActivity,
   isMultiSelectActivity,
   isTableActivity,
+  Media,
 } from "../../types/CourseTypes";
 import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
+import MatchingEditor from "../course_authoring/matching/MatchingEditor";
+import MatchingSidebar from "../course_authoring/matching/MatchingSidebar";
 import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import TableMainEditor from "../course_authoring/table/TableEditor";
@@ -479,6 +483,7 @@ const ViewModulePage = () => {
                   (role === "Administrator" ? (
                     <MultipleChoiceMainEditor
                       activity={activity}
+                      key={activity.id}
                       setActivity={setActivity}
                       hasImage={hasImage}
                       hasAdditionalContext={hasAdditionalContext}
@@ -492,6 +497,14 @@ const ViewModulePage = () => {
                 {activity && isTableActivity(activity) && (
                   <TableMainEditor
                     activity={activity}
+                    key={activity.id}
+                    setActivity={setActivity}
+                  />
+                )}
+                {activity && isMatchingActivity(activity) && (
+                  <MatchingEditor
+                    activity={activity}
+                    key={activity.id}
                     setActivity={setActivity}
                   />
                 )}
@@ -594,6 +607,7 @@ const ViewModulePage = () => {
             {(isMultipleChoiceActivity(currentPageObject) ||
               isMultiSelectActivity(currentPageObject)) && (
               <MultipleChoiceEditorSidebar
+                key={currentPageObject.id}
                 hasImage={hasImage}
                 setHasImage={(newHasImage) => {
                   setHasImage(newHasImage);
@@ -632,6 +646,7 @@ const ViewModulePage = () => {
             )}
             {isTableActivity(currentPageObject) && (
               <TableSidebar
+                key={currentPageObject.id}
                 numColumns={currentPageObject.columnLabels.length}
                 setNumColumns={setNumColumns}
                 onAddRow={() =>
@@ -650,6 +665,55 @@ const ViewModulePage = () => {
                 }}
                 // headerColumnIncludes={HeaderColumnIncludesTypes.TEXT}
                 // setHeaderColumnIncludes={() => {}}
+              />
+            )}
+            {isMatchingActivity(currentPageObject) && (
+              <MatchingSidebar
+                key={currentPageObject.id}
+                activity={currentPageObject}
+                setActivity={setActivity}
+                numColumns={Object.keys(currentPageObject.media).length}
+                setNumColumns={(newNumColumns: number) => {
+                  setActivity((prev) => {
+                    if (!prev || !isMatchingActivity(prev)) return prev;
+                    const updatedMedia = { ...prev.media };
+                    if (newNumColumns === 2) {
+                      delete updatedMedia["3"];
+                    } else if (newNumColumns === 3) {
+                      const newMediaArray: Media[] = Array.from(
+                        { length: prev.rows },
+                        () => ({ id: "-1", mediaType: "text", context: "" }),
+                      );
+                      updatedMedia["3"] = newMediaArray;
+                    }
+                    return {
+                      ...prev,
+                      media: updatedMedia,
+                    };
+                  });
+                }}
+                onAddRow={() =>
+                  setActivity((prev) => {
+                    if (!prev || !isMatchingActivity(prev)) return prev;
+                    const updatedMedia = { ...prev.media };
+                    Object.keys(updatedMedia).forEach((key) => {
+                      updatedMedia[key] = [
+                        ...updatedMedia[key],
+                        { id: "-1", mediaType: "text", context: "" },
+                      ];
+                    });
+                    return {
+                      ...prev,
+                      media: updatedMedia,
+                      rows: prev.rows + 1,
+                    };
+                  })
+                }
+                isAddRowDisabled={false}
+                hint={currentPageObject.hint || ""}
+                setHint={(newHint: string) => {
+                  setActivity((prev) => prev && { ...prev, hint: newHint });
+                }}
               />
             )}
           </>

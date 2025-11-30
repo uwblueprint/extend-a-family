@@ -28,7 +28,7 @@ export interface LessonPage extends CoursePageBase {
 
 export interface Media {
   id: string;
-  mediaType: "text" | "media";
+  mediaType: "text" | "image";
   context: string;
 }
 
@@ -60,7 +60,9 @@ export interface MultiSelectActivity extends ActivityBase {
 export interface MatchingActivity extends ActivityBase {
   type: QuestionType.Matching;
   questionType: QuestionType.Matching;
-  media: Map<"1" | "2" | "3", Media[]>; // key: column number
+  media: {
+    [key: string]: Media[]; // key: column number
+  };
   correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
   rows: number;
 }
