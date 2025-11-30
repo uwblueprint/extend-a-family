@@ -86,6 +86,7 @@ const TableActivityRow = ({
         >
           <VisuallyHiddenInput
             type="file"
+            accept="image/*"
             onChange={async (event) => {
               const file: File | undefined = event.target.files?.[0];
               const path = `activity/imageData/matching-${crypto.randomUUID()}`;

@@ -48,6 +48,7 @@ const MediaDisplay = ({
         <AddPhotoAlternateOutlined sx={{ color: theme.palette.Neutral[800] }} />
         <VisuallyHiddenInput
           type="file"
+          accept="image/*"
           onChange={async (event) => {
             const file: File | undefined = event.target.files?.[0];
             const path = `activity/imageData/matching-${crypto.randomUUID()}`;
@@ -66,7 +67,7 @@ const MediaDisplay = ({
     );
   }
 
-  // mediaItem.type === "text"
+  // mediaItem.mediaType === "text"
   return (
     <TextField
       sx={{ width: "231.8px", maxHeight: "64px" }}
@@ -133,7 +134,7 @@ const MatchingRow = ({
         {threeColumns && (
           <>
             <LongRightArrow
-              labelText={!threeColumns ? `Match ${rowNum + 1}` : undefined}
+              labelText={`Match ${rowNum + 1}`}
             />
             <MediaDisplay
               mediaItem={media["3"][rowNum]}
