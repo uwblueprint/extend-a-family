@@ -28,7 +28,7 @@ export interface LessonPage extends CoursePageBase {
 
 export interface Media {
   id: string;
-  mediaType: "text" | "media";
+  mediaType: "text" | "image";
   context: string;
 }
 

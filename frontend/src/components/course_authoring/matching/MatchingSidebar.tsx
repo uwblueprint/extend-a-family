@@ -13,8 +13,11 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { Activity, MatchingActivity } from "../../../types/CourseTypes";
 
 interface MatchingSidebarProps {
+  activity: MatchingActivity;
+  setActivity: React.Dispatch<React.SetStateAction<Activity | undefined>>;
   numColumns: number;
   setNumColumns: (value: number) => void;
   onAddRow: () => void;
@@ -24,6 +27,8 @@ interface MatchingSidebarProps {
 }
 
 export default function MatchingSidebar({
+  activity,
+  setActivity,
   numColumns,
   setNumColumns,
   onAddRow,
@@ -193,14 +198,18 @@ export default function MatchingSidebar({
               {Array.from({ length: numColumns }, (_, index) => index + 1).map(
                 (columnNumber) => (
                   <Stack
+                    key={columnNumber}
                     direction="row"
                     justifyContent="space-between"
                     alignItems="center"
                     width="100%"
                     alignSelf="stretch"
                   >
-                    <Typography variant="bodySmall">Column 1</Typography>
+                    <Typography variant="bodySmall">
+                      Column {columnNumber}
+                    </Typography>
                     <Select
+                      value={activity.media[String(columnNumber)][0]?.mediaType}
                       sx={{
                         display: "flex",
                         width: "116px",
@@ -215,6 +224,23 @@ export default function MatchingSidebar({
                           {selected}
                         </Typography>
                       )}
+                      onChange={(e) => {
+                        const newMediaType = e.target.value as "text" | "image";
+                        const updatedMedia: MatchingActivity["media"] = {
+                          ...activity.media,
+                          [String(columnNumber)]: activity.media[
+                            String(columnNumber)
+                          ].map((item) => ({
+                            ...item,
+                            mediaType: newMediaType,
+                            content:
+                              newMediaType === "image" ? "" : item.context,
+                          })),
+                        };
+                        setActivity((prev) =>
+                          prev ? { ...prev, media: updatedMedia } : prev,
+                        );
+                      }}
                     >
                       <MenuItem key="image" value="image">
                         <Stack direction="row" alignItems="center" gap="12px">

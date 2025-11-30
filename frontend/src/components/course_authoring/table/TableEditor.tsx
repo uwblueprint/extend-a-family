@@ -15,11 +15,13 @@ import {
   useTheme,
 } from "@mui/material";
 import React from "react";
+import ActivityAPIClient from "../../../APIClients/ActivityAPIClient";
 import {
   Activity,
   isTableActivity,
   TableActivity,
 } from "../../../types/CourseTypes";
+import VisuallyHiddenInput from "../../common/form/VisuallyHiddenInput";
 import DeleteCircleButton from "../editorComponents/DeleteCircleButton";
 import TitleEditor from "../editorComponents/TitleEditor";
 import {
@@ -62,23 +64,51 @@ const TableActivityRow = ({
 
   return (
     <TableRow>
-      <TableCell align="center" sx={{ backgroundImage: `url(${imageURL})` }}>
-        {!imageURL && (
-          <Button
-            sx={{
-              width: 40,
-              height: 40,
-              minWidth: 40,
-              p: 0,
-              border: `1px solid ${theme.palette.Neutral[400]}`,
-              color: theme.palette.Neutral[800],
+      <TableCell
+        align="center"
+        sx={{
+          backgroundImage: `url(${imageURL})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <Button
+          component="label"
+          sx={{
+            width: 40,
+            height: 40,
+            minWidth: 40,
+            p: 0,
+            border: `1px solid ${theme.palette.Neutral[400]}`,
+            color: theme.palette.Neutral[800],
+          }}
+        >
+          <VisuallyHiddenInput
+            type="file"
+            onChange={async (event) => {
+              const file: File | undefined = event.target.files?.[0];
+              const path = `activity/imageData/matching-${crypto.randomUUID()}`;
+              if (file) {
+                const uploadedImagePath = await ActivityAPIClient.uploadImage(
+                  path,
+                  file,
+                );
+                if (uploadedImagePath) {
+                  setActivity((prev) => {
+                    if (!prev || !isTableActivity(prev)) return prev;
+                    const newRowLabels = [...prev.rowLabels];
+                    newRowLabels[index][1] = uploadedImagePath;
+                    return { ...prev, rowLabels: newRowLabels };
+                  });
+                }
+              }
             }}
-          >
-            <AddPhotoAlternateOutlined
-              sx={{ color: theme.palette.Neutral[800] }}
-            />
-          </Button>
-        )}
+          />
+          <AddPhotoAlternateOutlined
+            sx={{ color: theme.palette.Neutral[800] }}
+          />
+        </Button>
       </TableCell>
       <TableCell
         align="center"

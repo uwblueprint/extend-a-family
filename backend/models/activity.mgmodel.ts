@@ -110,7 +110,7 @@ export const ActivitySchema: Schema = new Schema(
 
 const MediaSchema = new Schema({
   id: { type: String, required: true },
-  mediaType: { type: String, enum: ["text", "media"], required: true },
+  mediaType: { type: String, enum: ["text", "image"], required: true },
   context: { type: String, required: true },
 });
 

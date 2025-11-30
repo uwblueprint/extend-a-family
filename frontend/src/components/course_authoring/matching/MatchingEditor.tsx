@@ -93,6 +93,7 @@ const MatchingEditor = ({
                   };
                 })
               }
+              setActivity={setActivity}
             />
           ))}
         </Stack>

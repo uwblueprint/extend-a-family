@@ -670,6 +670,8 @@ const ViewModulePage = () => {
             {isMatchingActivity(currentPageObject) && (
               <MatchingSidebar
                 key={currentPageObject.id}
+                activity={currentPageObject}
+                setActivity={setActivity}
                 numColumns={Object.keys(currentPageObject.media).length}
                 setNumColumns={(newNumColumns: number) => {
                   setActivity((prev) => {
