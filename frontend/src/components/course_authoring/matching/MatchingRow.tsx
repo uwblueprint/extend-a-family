@@ -133,9 +133,7 @@ const MatchingRow = ({
         />
         {threeColumns && (
           <>
-            <LongRightArrow
-              labelText={`Match ${rowNum + 1}`}
-            />
+            <LongRightArrow labelText={`Match ${rowNum + 1}`} />
             <MediaDisplay
               mediaItem={media["3"][rowNum]}
               onChange={handleChange("3")}
