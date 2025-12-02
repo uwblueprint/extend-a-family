@@ -83,12 +83,14 @@ export type Activity =
 
 export type CoursePage = LessonPage | Activity;
 
-export function isLessonPage(page: CoursePageBase): page is LessonPage {
+export function isLessonPage(page: CoursePage): page is LessonPage {
   return page.type === "Lesson";
 }
 
-export function isActivityPage(page: CoursePageBase): page is Activity {
-  return Object.values(QuestionType).includes(page.type as QuestionType);
+export function isActivityPage(page?: CoursePage): page is Activity {
+  return !!(
+    page && Object.values(QuestionType).includes(page.type as QuestionType)
+  );
 }
 
 export function isMultipleChoiceActivity(

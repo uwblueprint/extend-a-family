@@ -1,6 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { CheckCircleOutline } from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -527,23 +528,45 @@ const ViewModulePage = () => {
               alignItems: "center",
             }}
           >
-            <Button
-              sx={{
-                height: "48px",
-                paddingLeft: "16px",
-                paddingRight: "24px",
-                paddingY: "10px",
-                gap: "8px",
-                border: "1px solid",
-                borderColor: theme.palette.Neutral[500],
-                borderRadius: "4px",
-                color: theme.palette.Learner.Dark.Default,
-              }}
-              onClick={() => setIsFullScreen((prev) => !prev)}
-            >
-              <FullscreenIcon />
-              <Typography variant="labelLarge">Fullscreen</Typography>
-            </Button>
+            <Box display="flex" gap="12px">
+              {role === "Learner" && isActivityPage(currentPageObject) && (
+                <Button
+                  sx={{
+                    height: "48px",
+                    paddingLeft: "16px",
+                    paddingRight: "24px",
+                    paddingY: "10px",
+                    gap: "8px",
+                    border: "1px solid",
+                    borderColor: theme.palette.Neutral[500],
+                    borderRadius: "4px",
+                    backgroundColor: theme.palette.Learner.Dark.Default,
+                    color: "white",
+                  }}
+                  onClick={() => {}}
+                >
+                  <CheckCircleOutline />
+                  <Typography variant="labelLarge">Check Answer</Typography>
+                </Button>
+              )}
+              <Button
+                sx={{
+                  height: "48px",
+                  paddingLeft: "16px",
+                  paddingRight: "24px",
+                  paddingY: "10px",
+                  gap: "8px",
+                  border: "1px solid",
+                  borderColor: theme.palette.Neutral[500],
+                  borderRadius: "4px",
+                  color: theme.palette.Learner.Dark.Default,
+                }}
+                onClick={() => setIsFullScreen((prev) => !prev)}
+              >
+                <FullscreenIcon />
+                <Typography variant="labelLarge">Fullscreen</Typography>
+              </Button>
+            </Box>
 
             <Box display="flex" gap="16px">
               <IconButton
@@ -581,24 +604,6 @@ const ViewModulePage = () => {
                 <ArrowForwardIcon sx={{ fontSize: "16px" }} />
               </IconButton>
             </Box>
-
-            <Button
-              sx={{
-                height: "48px",
-                paddingLeft: "16px",
-                paddingRight: "24px",
-                paddingY: "10px",
-                gap: "8px",
-                border: "1px solid",
-                borderColor: theme.palette.Neutral[500],
-                borderRadius: "4px",
-                color: theme.palette.Learner.Dark.Default,
-              }}
-              onClick={() => setIsFullScreen((prev) => !prev)}
-            >
-              <FullscreenIcon />
-              <Typography variant="labelLarge">Fullscreen</Typography>
-            </Button>
           </Box>
         </Box>
         {currentPageObject && role === "Administrator" && (
