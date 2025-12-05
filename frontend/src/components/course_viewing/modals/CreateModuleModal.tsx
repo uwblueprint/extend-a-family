@@ -20,11 +20,9 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import useQueryParams from "../../../hooks/useQueryParams";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
-import AUTHENTICATED_USER_KEY from "../../../constants/AuthConstants";
 import AuthContext from "../../../contexts/AuthContext";
-import { getLocalStorageObjProperty } from "../../../utils/LocalStorageUtils";
+import useQueryParams from "../../../hooks/useQueryParams";
 
 interface CreateModuleModalProps {
   open: boolean;
@@ -60,17 +58,11 @@ const CreateModuleModal = ({
 
   const uploadFile = async (file: File | undefined) => {
     if (file) {
-      const userId: string | null = getLocalStorageObjProperty(
-        AUTHENTICATED_USER_KEY,
-        "id",
-      );
-      if (userId) {
-        const formData = new FormData();
-        formData.append("uploadedImage", file);
-        const uploadedImageUrl = URL.createObjectURL(file);
-        setImageUrl(uploadedImageUrl);
-        setImage(formData);
-      }
+      const formData = new FormData();
+      formData.append("uploadedImage", file);
+      const uploadedImageUrl = URL.createObjectURL(file);
+      setImageUrl(uploadedImageUrl);
+      setImage(formData);
     }
   };
 
