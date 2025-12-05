@@ -20,6 +20,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import useQueryParams from "../../../hooks/useQueryParams";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import AUTHENTICATED_USER_KEY from "../../../constants/AuthConstants";
 import AuthContext from "../../../contexts/AuthContext";
@@ -42,6 +43,8 @@ const CreateModuleModal = ({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   // const [imageStatus, setImageStatus] = useState("");
   const [moduleTitle, setModuleTitle] = useState("");
+
+  const { setQueryParams } = useQueryParams();
 
   let role: "Learner" | "Facilitator" | "Administrator";
   if (authenticatedUser?.role === "Learner") {
@@ -94,7 +97,11 @@ const CreateModuleModal = ({
       image as unknown as FormData,
     );
     setUploadModalOpen(false);
-    // window.location.reload();
+    try {
+      setQueryParams({ unitId });
+    } catch (e) {
+      window.location.reload();
+    }
   };
 
   useEffect(() => {

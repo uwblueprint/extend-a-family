@@ -48,6 +48,8 @@ export default function UnitSidebar({
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
 
+  const queryParams = new URLSearchParams(window.location.search);
+
   useEffect(() => {
     const getCouseUnits = async () => {
       const data = await CourseAPIClient.getUnits();
@@ -55,7 +57,26 @@ export default function UnitSidebar({
 
       // Set selectedUnit to the first unit if data is not empty
       if (data.length > 0) {
-        setSelectedUnit(data[0]);
+        if (queryParams.get("unitId")) {
+          const unitFromParams = data.find(
+            (unit) => unit.id === queryParams.get("unitId"),
+          );
+          if (unitFromParams) {
+            setSelectedUnit(unitFromParams);
+            const index = data.findIndex(
+              (unit) => unit.id === unitFromParams.id,
+            );
+            setSelectedIndex(index);
+          }
+
+          const newParams = new URLSearchParams(queryParams.toString());
+          newParams.delete("unitId");
+          const newSearch = newParams.toString();
+          const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "");
+          window.history.replaceState(null, "", newUrl);
+        } else {
+          setSelectedUnit(data[0]);
+        }
       }
     };
     getCouseUnits();
