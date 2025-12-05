@@ -41,7 +41,6 @@ const CreateModuleModal = ({
   const theme = useTheme();
   const [image, setImage] = useState<FormData | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  // const [imageStatus, setImageStatus] = useState("");
   const [moduleTitle, setModuleTitle] = useState("");
 
   const { setQueryParams } = useQueryParams();
@@ -69,12 +68,8 @@ const CreateModuleModal = ({
         const formData = new FormData();
         formData.append("uploadedImage", file);
         const uploadedImageUrl = URL.createObjectURL(file);
-        console.log(uploadedImageUrl);
-        // setImageStatus("Uploaded successfully!");
         setImageUrl(uploadedImageUrl);
         setImage(formData);
-      // } else {
-      //   setImageStatus("Cannot upload right now. Please try again later!");
       }
     }
   };
@@ -107,7 +102,6 @@ const CreateModuleModal = ({
   useEffect(() => {
     setImage(null);
     setImageUrl(null);
-    // setImageStatus("");
     setModuleTitle("");
   }, [open]);
 
@@ -250,16 +244,6 @@ const CreateModuleModal = ({
         </Typography>
       </Box>
       )}
-
-      {/* <Typography
-        style={{
-          display: imageStatus !== "" ? "flex" : "none",
-          marginTop: "-16px",
-        }}
-        color={theme.palette.Administrator.Dark.Default}
-      >
-        {imageStatus}
-      </Typography> */}
 
       <TextField
         label="Module Title"
