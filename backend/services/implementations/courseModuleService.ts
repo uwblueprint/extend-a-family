@@ -98,9 +98,18 @@ class CourseModuleService implements ICourseModuleService {
         );
       }
 
-      const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
-        `course/pdfs/module-${courseModuleId}.pdf`,
-      );
+      let lessonPdfUrl: string | undefined;
+      try {
+        lessonPdfUrl = await fileStorageService.getFile(
+          `course/pdfs/module-${courseModuleId}.pdf`,
+        );
+      } catch (error) {
+        // If the PDF does not exist, we can proceed without it
+        Logger.warn(
+          `Lesson PDF for module ${courseModuleId} not found in storage.`,
+        );
+        lessonPdfUrl = undefined;
+      }
       const fetchPage = async (page: Schema.Types.ObjectId) => {
         const pageObject = await CoursePageModel.findById(page).lean().exec();
         if (!pageObject) {
