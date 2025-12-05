@@ -21,7 +21,6 @@ import React, {
   useState,
 } from "react";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
-import UserAPIClient from "../../../APIClients/UserAPIClient";
 import AUTHENTICATED_USER_KEY from "../../../constants/AuthConstants";
 import AuthContext from "../../../contexts/AuthContext";
 import { getLocalStorageObjProperty } from "../../../utils/LocalStorageUtils";
@@ -39,8 +38,9 @@ const CreateModuleModal = ({
 }: CreateModuleModalProps) => {
   const { authenticatedUser } = useContext(AuthContext);
   const theme = useTheme();
-  // const [imageUrl, setImageUrl] = useState(null); // TODO: use when backend returns imageUrl
-  const [imageStatus, setImageStatus] = useState("");
+  const [image, setImage] = useState<FormData | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  // const [imageStatus, setImageStatus] = useState("");
   const [moduleTitle, setModuleTitle] = useState("");
 
   let role: "Learner" | "Facilitator" | "Administrator";
@@ -63,16 +63,15 @@ const CreateModuleModal = ({
         "id",
       );
       if (userId) {
-        const uploadedImageUrl = await UserAPIClient.uploadProfilePicture(
-          // TODO: call different API
-          userId,
-          file,
-        );
+        const formData = new FormData();
+        formData.append("uploadedImage", file);
+        const uploadedImageUrl = URL.createObjectURL(file);
         console.log(uploadedImageUrl);
-        setImageStatus("Uploaded successfully!");
-        // setImageUrl(uploadedImageUrl);
-      } else {
-        setImageStatus("Cannot upload right now. Please try again later!");
+        // setImageStatus("Uploaded successfully!");
+        setImageUrl(uploadedImageUrl);
+        setImage(formData);
+      // } else {
+      //   setImageStatus("Cannot upload right now. Please try again later!");
       }
     }
   };
@@ -89,22 +88,19 @@ const CreateModuleModal = ({
   };
 
   const handleCreate = async () => {
-    const params = {
-      imageUrl: "", // TODO: use the URL returned on upload
-      moduleTitle,
-    };
-    console.log("Calling create with params", params);
-    // TODO: call the backend to create module
-    await CourseAPIClient.createModule(unitId, moduleTitle, "");
-
-
+    const res = await CourseAPIClient.createModule(unitId, moduleTitle);
+    await CourseAPIClient.uploadThumbnail(
+      res.id,
+      image as unknown as FormData,
+    );
     setUploadModalOpen(false);
-    window.location.reload();
+    // window.location.reload();
   };
 
   useEffect(() => {
-    // setImageUrl("");
-    setImageStatus("");
+    setImage(null);
+    setImageUrl(null);
+    // setImageStatus("");
     setModuleTitle("");
   }, [open]);
 
@@ -146,7 +142,19 @@ const CreateModuleModal = ({
           <CloseIcon />
         </IconButton>
       </Box>
-      {/* TODO: display imageUrl instead of upload box when backend returns image blob */}
+      {imageUrl ? (
+        <Box
+          component="img"
+          src={imageUrl}
+          alt="Module Thumbnail"
+          sx={{
+            width: "100%",
+            height: "auto",
+            maxHeight: "297px",
+            borderRadius: "4px",
+          }}
+        />
+      ) : (
       <Box
         style={{
           width: "100%",
@@ -234,8 +242,9 @@ const CreateModuleModal = ({
           Supported file types: .png, .jpg, .webp
         </Typography>
       </Box>
+      )}
 
-      <Typography
+      {/* <Typography
         style={{
           display: imageStatus !== "" ? "flex" : "none",
           marginTop: "-16px",
@@ -243,7 +252,7 @@ const CreateModuleModal = ({
         color={theme.palette.Administrator.Dark.Default}
       >
         {imageStatus}
-      </Typography>
+      </Typography> */}
 
       <TextField
         label="Module Title"
