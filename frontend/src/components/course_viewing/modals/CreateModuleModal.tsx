@@ -20,6 +20,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import UserAPIClient from "../../../APIClients/UserAPIClient";
 import AUTHENTICATED_USER_KEY from "../../../constants/AuthConstants";
 import AuthContext from "../../../contexts/AuthContext";
@@ -28,11 +29,13 @@ import { getLocalStorageObjProperty } from "../../../utils/LocalStorageUtils";
 interface CreateModuleModalProps {
   open: boolean;
   setUploadModalOpen: Dispatch<SetStateAction<boolean>>;
+  unitId: string;
 }
 
 const CreateModuleModal = ({
   open,
   setUploadModalOpen,
+  unitId,
 }: CreateModuleModalProps) => {
   const { authenticatedUser } = useContext(AuthContext);
   const theme = useTheme();
@@ -92,6 +95,8 @@ const CreateModuleModal = ({
     };
     console.log("Calling create with params", params);
     // TODO: call the backend to create module
+    await CourseAPIClient.createModule(unitId, moduleTitle, "");
+
 
     setUploadModalOpen(false);
     window.location.reload();
@@ -277,7 +282,11 @@ const CreateModuleModal = ({
         <Button variant="outlined" onClick={() => setUploadModalOpen(false)}>
           Cancel
         </Button>
-        <Button variant="contained" onClick={handleCreate}>
+        <Button
+          variant="contained"
+          onClick={handleCreate}
+          disabled={moduleTitle.length === 0}
+        >
           Create
         </Button>
       </Box>

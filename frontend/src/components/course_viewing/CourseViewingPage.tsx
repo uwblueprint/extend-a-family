@@ -65,6 +65,11 @@ export default function CourseUnitsPage() {
               unitId={selectedUnit.id}
               isSidebarOpen={sidebarOpen}
             />
+            <CreateModuleModal
+              open={uploadModalOpen}
+              setUploadModalOpen={setUploadModalOpen}
+              unitId={selectedUnit.id}
+            />
           </Stack>
         ) : (
           <Typography>Loading units...</Typography>
@@ -102,10 +107,6 @@ export default function CourseUnitsPage() {
             Create Module
           </Typography>
         </Button>
-        <CreateModuleModal
-          open={uploadModalOpen}
-          setUploadModalOpen={setUploadModalOpen}
-        />
       </Box>
     </Box>
   );
