@@ -1,7 +1,11 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { CheckCircleOutline } from "@mui/icons-material";
+import {
+  CheckCircleOutline,
+  DeleteOutline,
+  VisibilityOutlined,
+} from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -40,13 +44,18 @@ import {
 } from "../../types/CourseTypes";
 import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
+import PreviewLearnerModal from "../course_authoring/editorComponents/PreviewLearnerModal";
 import MatchingEditor from "../course_authoring/matching/MatchingEditor";
 import MatchingSidebar from "../course_authoring/matching/MatchingSidebar";
 import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import TableMainEditor from "../course_authoring/table/TableEditor";
 import TableSidebar from "../course_authoring/table/TableSidebar";
-import MultipleChoiceViewer from "../course_viewing/multiple-choice/MultipleChoiceViewer";
+import WrongAnswerModal from "../course_viewing/modals/WrongAnswerModal";
+import MultipleChoiceViewer, {
+  ActivityViewerHandle,
+} from "../course_viewing/multiple-choice/MultipleChoiceViewer";
+import TableViewer from "../course_viewing/table/TableViewer";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
@@ -91,6 +100,8 @@ const ViewModulePage = () => {
   const isDidYouLikeTheContentPage = currentPage === numPages;
 
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [isWrongAnswerModalOpen, setIsWrongAnswerModalOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   const [hasImage, setHasImage] = useState(
     (currentPageObject &&
@@ -101,6 +112,8 @@ const ViewModulePage = () => {
   const [hasAdditionalContext, setHasAdditionalContext] = useState(false);
 
   const { activity, setActivity } = useActivity<Activity>(undefined);
+
+  const activityViewerRef = useRef<ActivityViewerHandle>(null);
 
   useEffect(() => {
     if (currentPageObject && isActivityPage(currentPageObject)) {
@@ -492,16 +505,27 @@ const ViewModulePage = () => {
                   ) : (
                     <MultipleChoiceViewer
                       activity={activity}
+                      onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
                       key={activity.id}
+                      ref={activityViewerRef}
                     />
                   ))}
-                {activity && isTableActivity(activity) && (
-                  <TableMainEditor
-                    activity={activity}
-                    key={activity.id}
-                    setActivity={setActivity}
-                  />
-                )}
+                {activity &&
+                  isTableActivity(activity) &&
+                  (role === "Administrator" ? (
+                    <TableMainEditor
+                      activity={activity}
+                      key={activity.id}
+                      setActivity={setActivity}
+                    />
+                  ) : (
+                    <TableViewer
+                      activity={activity}
+                      onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                      key={activity.id}
+                      ref={activityViewerRef}
+                    />
+                  ))}
                 {activity && isMatchingActivity(activity) && (
                   <MatchingEditor
                     activity={activity}
@@ -543,29 +567,71 @@ const ViewModulePage = () => {
                     backgroundColor: theme.palette.Learner.Dark.Default,
                     color: "white",
                   }}
-                  onClick={() => {}}
+                  onClick={() => activityViewerRef.current?.checkAnswer()}
                 >
                   <CheckCircleOutline />
                   <Typography variant="labelLarge">Check Answer</Typography>
                 </Button>
               )}
-              <Button
-                sx={{
-                  height: "48px",
-                  paddingLeft: "16px",
-                  paddingRight: "24px",
-                  paddingY: "10px",
-                  gap: "8px",
-                  border: "1px solid",
-                  borderColor: theme.palette.Neutral[500],
-                  borderRadius: "4px",
-                  color: theme.palette.Learner.Dark.Default,
-                }}
-                onClick={() => setIsFullScreen((prev) => !prev)}
-              >
-                <FullscreenIcon />
-                <Typography variant="labelLarge">Fullscreen</Typography>
-              </Button>
+              {role !== "Administrator" && (
+                <Button
+                  sx={{
+                    height: "48px",
+                    paddingLeft: "16px",
+                    paddingRight: "24px",
+                    paddingY: "10px",
+                    gap: "8px",
+                    border: "1px solid",
+                    borderColor: theme.palette.Neutral[500],
+                    borderRadius: "4px",
+                    color: theme.palette[role].Dark.Default,
+                  }}
+                  onClick={() => setIsFullScreen((prev) => !prev)}
+                >
+                  <FullscreenIcon />
+                  <Typography variant="labelLarge">Fullscreen</Typography>
+                </Button>
+              )}
+              {role === "Administrator" && (
+                <>
+                  <Button
+                    sx={{
+                      height: "48px",
+                      paddingLeft: "16px",
+                      paddingRight: "24px",
+                      paddingY: "10px",
+                      gap: "8px",
+                      border: "1px solid",
+                      borderColor: theme.palette.Neutral[500],
+                      borderRadius: "4px",
+                      backgroundColor: theme.palette[role].Dark.Default,
+                      color: "white",
+                    }}
+                    onClick={() => setIsPreviewModalOpen(true)}
+                  >
+                    <VisibilityOutlined />
+                    <Typography variant="labelLarge">Preview</Typography>
+                  </Button>
+                  <Button
+                    sx={{
+                      height: "48px",
+                      paddingLeft: "16px",
+                      paddingRight: "24px",
+                      paddingY: "10px",
+                      gap: "8px",
+                      border: "1px solid",
+                      borderColor: theme.palette.Error.Light.Default,
+                      borderRadius: "4px",
+                      backgroundColor: theme.palette.Error.Light.Default,
+                      color: theme.palette.Error.Dark.Default,
+                    }}
+                    onClick={() => {}}
+                  >
+                    <DeleteOutline />
+                    <Typography variant="labelLarge">Delete Page</Typography>
+                  </Button>
+                </>
+              )}
             </Box>
 
             <Box display="flex" gap="16px">
@@ -704,7 +770,11 @@ const ViewModulePage = () => {
                     Object.keys(updatedMedia).forEach((key) => {
                       updatedMedia[key] = [
                         ...updatedMedia[key],
-                        { id: "-1", mediaType: "text", context: "" },
+                        {
+                          id: "-1",
+                          mediaType: prev.media[key][0].mediaType,
+                          context: "",
+                        },
                       ];
                     });
                     return {
@@ -730,6 +800,18 @@ const ViewModulePage = () => {
         module={module}
         currentPage={currentPageObject || null}
       />
+      <WrongAnswerModal
+        open={isWrongAnswerModalOpen}
+        onClose={() => setIsWrongAnswerModalOpen(false)}
+        hint={isActivityPage(currentPageObject) ? currentPageObject.hint : ""}
+      />
+      {isActivityPage(currentPageObject) && (
+        <PreviewLearnerModal
+          activity={currentPageObject}
+          open={isPreviewModalOpen}
+          handleClose={() => setIsPreviewModalOpen(false)}
+        />
+      )}
     </Document>
   );
 };
