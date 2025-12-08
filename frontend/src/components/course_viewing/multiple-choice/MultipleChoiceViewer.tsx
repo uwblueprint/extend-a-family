@@ -14,6 +14,7 @@ type MultipleChoiceViewerProps = {
 
 export type ActivityViewerHandle = {
   checkAnswer: () => void;
+  onRetry?: () => void;
 };
 
 const MultipleChoiceViewer = React.forwardRef<

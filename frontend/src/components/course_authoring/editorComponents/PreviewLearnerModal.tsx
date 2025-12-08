@@ -14,6 +14,7 @@ import {
   isMultiSelectActivity,
   isTableActivity,
 } from "../../../types/CourseTypes";
+import MatchingViewer from "../../course_viewing/matching/MatchingViewer";
 import MultipleChoiceViewer from "../../course_viewing/multiple-choice/MultipleChoiceViewer";
 import TableViewer from "../../course_viewing/table/TableViewer";
 
@@ -68,7 +69,7 @@ const PreviewLearnerModal = ({
           <TableViewer activity={activity} onWrongAnswer={() => {}} />
         )}
         {isMatchingActivity(activity) && (
-          <Typography>Matching activity preview coming soon.</Typography>
+          <MatchingViewer activity={activity} onWrongAnswer={() => {}} />
         )}
       </Box>
     </Dialog>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckCircleOutline,
   DeleteOutline,
+  Refresh,
   VisibilityOutlined,
 } from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -51,6 +52,7 @@ import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/Multip
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import TableMainEditor from "../course_authoring/table/TableEditor";
 import TableSidebar from "../course_authoring/table/TableSidebar";
+import MatchingViewer from "../course_viewing/matching/MatchingViewer";
 import WrongAnswerModal from "../course_viewing/modals/WrongAnswerModal";
 import MultipleChoiceViewer, {
   ActivityViewerHandle,
@@ -526,13 +528,22 @@ const ViewModulePage = () => {
                       ref={activityViewerRef}
                     />
                   ))}
-                {activity && isMatchingActivity(activity) && (
-                  <MatchingEditor
-                    activity={activity}
-                    key={activity.id}
-                    setActivity={setActivity}
-                  />
-                )}
+                {activity &&
+                  isMatchingActivity(activity) &&
+                  (role === "Administrator" ? (
+                    <MatchingEditor
+                      activity={activity}
+                      key={activity.id}
+                      setActivity={setActivity}
+                    />
+                  ) : (
+                    <MatchingViewer
+                      activity={activity}
+                      onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                      key={activity.id}
+                      ref={activityViewerRef}
+                    />
+                  ))}
               </Box>
             )}
             {isDidYouLikeTheContentPage && module && (
@@ -567,10 +578,20 @@ const ViewModulePage = () => {
                     backgroundColor: theme.palette.Learner.Dark.Default,
                     color: "white",
                   }}
-                  onClick={() => activityViewerRef.current?.checkAnswer()}
+                  onClick={() => {
+                    if (isWrongAnswerModalOpen) {
+                      setIsWrongAnswerModalOpen(false);
+                      activityViewerRef.current?.onRetry?.();
+                    } else {
+                      activityViewerRef.current?.checkAnswer();
+                    }
+                  }}
                 >
-                  <CheckCircleOutline />
-                  <Typography variant="labelLarge">Check Answer</Typography>
+                  {!isWrongAnswerModalOpen && <CheckCircleOutline />}
+                  <Typography variant="labelLarge">
+                    {isWrongAnswerModalOpen ? "Retry" : "Check Answer"}
+                  </Typography>
+                  {isWrongAnswerModalOpen && <Refresh />}
                 </Button>
               )}
               {role !== "Administrator" && (
@@ -801,7 +822,7 @@ const ViewModulePage = () => {
         currentPage={currentPageObject || null}
       />
       <WrongAnswerModal
-        open={isWrongAnswerModalOpen}
+        open={isWrongAnswerModalOpen && !isMatchingActivity(currentPageObject)}
         onClose={() => setIsWrongAnswerModalOpen(false)}
         hint={isActivityPage(currentPageObject) ? currentPageObject.hint : ""}
       />

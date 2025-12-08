@@ -106,9 +106,9 @@ export function isMultiSelectActivity(
 }
 
 export function isMatchingActivity(
-  activity: CoursePage,
+  activity?: CoursePage,
 ): activity is MatchingActivity {
-  return activity.type === QuestionType.Matching;
+  return !!(activity && activity.type === QuestionType.Matching);
 }
 
 export function isTableActivity(
