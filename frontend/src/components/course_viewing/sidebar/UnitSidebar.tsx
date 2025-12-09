@@ -13,7 +13,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import { useUser } from "../../../hooks/useUser";
 import { CourseUnit, UnitSidebarModalType } from "../../../types/CourseTypes";
@@ -48,39 +48,48 @@ export default function UnitSidebar({
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
 
-  const queryParams = new URLSearchParams(window.location.search);
+  const didFetchUnitsRef = useRef(false);
 
   useEffect(() => {
-    const getCouseUnits = async () => {
+    if (didFetchUnitsRef.current) return;
+    didFetchUnitsRef.current = true;
+
+    const getCourseUnits = async () => {
       const data = await CourseAPIClient.getUnits();
       setCourseUnits(data);
 
       // Set selectedUnit to the first unit if data is not empty
       if (data.length > 0) {
-        if (queryParams.get("unitId")) {
-          const unitFromParams = data.find(
-            (unit) => unit.id === queryParams.get("unitId"),
-          );
-          if (unitFromParams) {
-            setSelectedUnit(unitFromParams);
-            const index = data.findIndex(
-              (unit) => unit.id === unitFromParams.id,
-            );
-            setSelectedIndex(index);
-          }
-
-          const newParams = new URLSearchParams(queryParams.toString());
-          newParams.delete("unitId");
-          const newSearch = newParams.toString();
-          const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "");
-          window.history.replaceState(null, "", newUrl);
-        } else {
-          setSelectedUnit(data[0]);
-        }
+        setSelectedUnit(data[0]);
       }
     };
-    getCouseUnits();
+
+    getCourseUnits();
   }, [setSelectedUnit]);
+
+  useEffect(() => {
+    if (!courseUnits || !courseUnits.length) return;
+
+    const queryParams = new URLSearchParams(window.location.search);
+    if (queryParams.get("unitId")) {
+      const unitFromParams = courseUnits.find(
+        (unit) => unit.id === queryParams.get("unitId"),
+      );
+      if (unitFromParams) {
+        setSelectedUnit(unitFromParams);
+        const index = courseUnits.findIndex(
+          (unit) => unit.id === unitFromParams.id,
+        );
+        setSelectedIndex(index);
+      }
+
+      const newParams = new URLSearchParams(queryParams.toString());
+      newParams.delete("unitId");
+      const newSearch = newParams.toString();
+      const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "");
+      window.history.replaceState(null, "", newUrl);
+    }
+  }, [courseUnits, setSelectedUnit]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleContextMenuOpen = (event: any, unit: CourseUnit) => {
