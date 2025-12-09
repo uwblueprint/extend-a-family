@@ -30,7 +30,7 @@ import { getLocalStorageObj } from "./utils/LocalStorageUtils";
 import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
-import UploadThumbnailPage from "./components/courses/UploadThumbnailPage";
+// import UploadThumbnailPage from "./components/courses/UploadThumbnailPage";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
 import LessonUpload from "./components/pages/LessonUpload";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
@@ -93,12 +93,12 @@ const App = (): React.ReactElement => {
                   path={Routes.FORGOT_PASSWORD_PAGE}
                   component={ForgotPasswordPage}
                 />
-                <PrivateRoute
+                {/* <PrivateRoute
                   exact
                   path={Routes.UPLOAD_THUMBNAIL}
                   component={UploadThumbnailPage}
-                  allowedRoles={["Administrator"]}
-                />
+                  allowedRoles={["Administrator", "Facilitator"]}
+                /> */}
                 <PrivateRoute
                   exact
                   path={Routes.LANDING_PAGE}

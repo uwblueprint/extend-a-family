@@ -57,11 +57,6 @@ export default function UnitSidebar({
     const getCourseUnits = async () => {
       const data = await CourseAPIClient.getUnits();
       setCourseUnits(data);
-
-      // Set selectedUnit to the first unit if data is not empty
-      if (data.length > 0) {
-        setSelectedUnit(data[0]);
-      }
     };
 
     getCourseUnits();
@@ -76,11 +71,11 @@ export default function UnitSidebar({
         (unit) => unit.id === queryParams.get("unitId"),
       );
       if (unitFromParams) {
-        setSelectedUnit(unitFromParams);
         const index = courseUnits.findIndex(
           (unit) => unit.id === unitFromParams.id,
         );
         setSelectedIndex(index);
+        setSelectedUnit(unitFromParams);
       }
 
       const newParams = new URLSearchParams(queryParams.toString());
@@ -88,6 +83,9 @@ export default function UnitSidebar({
       const newSearch = newParams.toString();
       const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "");
       window.history.replaceState(null, "", newUrl);
+    } else {
+      setSelectedUnit(courseUnits[0]);
+      setSelectedIndex(0);
     }
   }, [courseUnits, setSelectedUnit]);
 
