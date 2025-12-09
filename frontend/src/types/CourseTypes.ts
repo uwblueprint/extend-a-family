@@ -26,6 +26,12 @@ export interface LessonPage extends CoursePageBase {
   pageIndex: number;
 }
 
+export interface Media {
+  id: string;
+  mediaType: "text" | "image";
+  context: string;
+}
+
 interface ActivityBase extends CoursePageBase {
   questionType: QuestionType;
   activityNumber: string;
@@ -51,7 +57,29 @@ export interface MultiSelectActivity extends ActivityBase {
   correctAnswers: number[];
 }
 
-export type Activity = MultipleChoiceActivity | MultiSelectActivity;
+export interface MatchingActivity extends ActivityBase {
+  type: QuestionType.Matching;
+  questionType: QuestionType.Matching;
+  media: {
+    [key: string]: Media[]; // key: column number
+  };
+  correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
+  rows: number;
+}
+
+export interface TableActivity extends ActivityBase {
+  type: QuestionType.Table;
+  questionType: QuestionType.Table;
+  columnLabels: string[];
+  rowLabels: string[][]; // Each inner array: [labelText, optionalImageUrl]
+  correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
+}
+
+export type Activity =
+  | MultipleChoiceActivity
+  | MultiSelectActivity
+  | MatchingActivity
+  | TableActivity;
 
 export type CoursePage = LessonPage | Activity;
 
@@ -73,6 +101,18 @@ export function isMultiSelectActivity(
   activity: CoursePage,
 ): activity is MultiSelectActivity {
   return activity.type === QuestionType.MultiSelect;
+}
+
+export function isMatchingActivity(
+  activity: CoursePage,
+): activity is MatchingActivity {
+  return activity.type === QuestionType.Matching;
+}
+
+export function isTableActivity(
+  activity: CoursePage,
+): activity is TableActivity {
+  return activity.type === QuestionType.Table;
 }
 
 export type CourseModule = {

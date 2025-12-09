@@ -3,16 +3,30 @@ import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlin
 import HomeIcon from "@mui/icons-material/Home";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { Box, Button, useTheme } from "@mui/material";
+
 import { useHistory, useLocation } from "react-router-dom";
-import { BOOKMARKS_PAGE, HOME_PAGE } from "../../../constants/Routes";
+import {
+  BOOKMARKS_PAGE,
+  FEEDBACK_PAGE,
+  HOME_PAGE,
+  MANAGE_USERS_PAGE,
+} from "../../../constants/Routes";
+import { useUser } from "../../../hooks/useUser";
 
-const PageTabs = () => {
-  const theme = useTheme();
+const NavbarLink = ({
+  startIcon,
+  active,
+  href,
+  children,
+}: {
+  startIcon?: React.ReactNode;
+  active: boolean;
+  href: string;
+  children?: React.ReactNode;
+}) => {
   const history = useHistory();
-  const location = useLocation();
-
-  const isHome = location.pathname === HOME_PAGE;
-  const isBookmarks = location.pathname === BOOKMARKS_PAGE;
+  const theme = useTheme();
+  const { role } = useUser();
 
   const sharedStyle = {
     display: "flex",
@@ -29,66 +43,76 @@ const PageTabs = () => {
   };
 
   return (
+    <Button
+      onClick={() => history.push(href)}
+      startIcon={startIcon}
+      sx={{
+        ...sharedStyle,
+        backgroundColor: active
+          ? theme.palette[role].Light.Selected
+          : "transparent",
+        color: active
+          ? theme.palette[role].Dark.Selected
+          : theme.palette[role].Dark.Default,
+        "&:hover": {
+          backgroundColor: theme.palette[role].Light.Hover,
+          color: theme.palette[role].Dark.Hover,
+        },
+        "&:active": {
+          backgroundColor: theme.palette[role].Light.Default,
+          color: theme.palette[role].Dark.Pressed,
+        },
+      }}
+    >
+      {children}
+    </Button>
+  );
+};
+
+const PageTabs = () => {
+  const location = useLocation();
+
+  const isHome = location.pathname === HOME_PAGE;
+  const isBookmarks = location.pathname === BOOKMARKS_PAGE;
+  const isManageUsers = location.pathname === MANAGE_USERS_PAGE;
+  const isFeedbackPage = location.pathname.startsWith(FEEDBACK_PAGE);
+  const { role } = useUser();
+
+  return (
     <Box sx={{ display: "flex", gap: "12px" }}>
-      <Button
-        onClick={() => history.push(HOME_PAGE)}
-        startIcon={
-          isHome ? (
-            <HomeIcon sx={{ width: 24, height: 24 }} />
-          ) : (
-            <HomeOutlinedIcon sx={{ width: 24, height: 24 }} />
-          )
-        }
-        sx={{
-          ...sharedStyle,
-          backgroundColor: isHome
-            ? theme.palette.Learner.Light.Selected
-            : "transparent",
-          color: isHome
-            ? theme.palette.Learner.Dark.Selected
-            : theme.palette.Learner.Dark.Default,
-          "&:hover": {
-            backgroundColor: theme.palette.Learner.Light.Hover,
-            color: theme.palette.Learner.Dark.Hover,
-          },
-          "&:active": {
-            backgroundColor: theme.palette.Learner.Light.Default,
-            color: theme.palette.Learner.Dark.Pressed,
-          },
-        }}
+      <NavbarLink
+        active={isHome}
+        href={HOME_PAGE}
+        startIcon={isHome ? <HomeIcon /> : <HomeOutlinedIcon />}
       >
         Home
-      </Button>
-
-      <Button
-        onClick={() => history.push(BOOKMARKS_PAGE)}
-        startIcon={
-          isBookmarks ? (
-            <BookmarkIcon sx={{ width: 24, height: 24 }} />
-          ) : (
-            <BookmarkBorderOutlinedIcon sx={{ width: 24, height: 24 }} />
-          )
-        }
-        sx={{
-          ...sharedStyle,
-          backgroundColor: isBookmarks
-            ? theme.palette.Learner.Light.Selected
-            : "transparent",
-          color: isBookmarks
-            ? theme.palette.Learner.Dark.Selected
-            : theme.palette.Learner.Dark.Default,
-          "&:hover": {
-            backgroundColor: theme.palette.Learner.Light.Hover,
-            color: theme.palette.Learner.Dark.Hover,
-          },
-          "&:active": {
-            backgroundColor: theme.palette.Learner.Light.Pressed,
-            color: theme.palette.Learner.Dark.Pressed,
-          },
-        }}
-      >
-        Bookmarks
-      </Button>
+      </NavbarLink>
+      {role === "Learner" && (
+        <NavbarLink
+          active={isBookmarks}
+          href={BOOKMARKS_PAGE}
+          startIcon={
+            isBookmarks ? (
+              <BookmarkIcon sx={{ width: 24, height: 24 }} />
+            ) : (
+              <BookmarkBorderOutlinedIcon sx={{ width: 24, height: 24 }} />
+            )
+          }
+        >
+          Bookmarks
+        </NavbarLink>
+      )}
+      {(role === "Facilitator" || role === "Administrator") && (
+        <>
+          <NavbarLink active={isFeedbackPage} href={FEEDBACK_PAGE}>
+            Feedback
+          </NavbarLink>
+          <NavbarLink active={isManageUsers} href={MANAGE_USERS_PAGE}>
+            {role === "Facilitator" && "Learner List"}
+            {role === "Administrator" && "User List"}
+          </NavbarLink>
+        </>
+      )}
     </Box>
   );
 };

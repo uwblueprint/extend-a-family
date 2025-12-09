@@ -86,7 +86,7 @@ const getModules = async (unitId: string): Promise<CourseModule[]> => {
 };
 
 const createModule = async (unitId: string, title: string) => {
-    const bearerToken = `Bearer ${getLocalStorageObjProperty(
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
   )}`;

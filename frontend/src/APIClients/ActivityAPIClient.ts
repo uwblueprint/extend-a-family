@@ -54,4 +54,58 @@ const updateActivityMainPicture = async (
   }
 };
 
-export default { updateActivity, updateActivityMainPicture };
+const sendFeedback = async (feedback: {
+  learnerId: string;
+  moduleId: string;
+  isLiked?: boolean;
+  difficulty?: number;
+  message?: string;
+}) => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(`/feedbacks/`, feedback, {
+      headers: { Authorization: bearerToken },
+    });
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+const uploadImage = async (
+  path: string,
+  file: File,
+): Promise<string | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const formData = new FormData();
+    formData.append("uploadedImage", file);
+    formData.append("path", path);
+    const { data } = await baseAPIClient.patch(
+      `/activities/UploadImage`,
+      formData,
+      {
+        headers: {
+          Authorization: bearerToken,
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+export default {
+  updateActivity,
+  updateActivityMainPicture,
+  sendFeedback,
+  uploadImage,
+};

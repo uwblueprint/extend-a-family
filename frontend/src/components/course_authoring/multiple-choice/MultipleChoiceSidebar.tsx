@@ -238,7 +238,7 @@ export default function MultipleChoiceEditorSidebar({
               placeholder="Include question hint"
               multiline
               rows={5}
-              value={hint}
+              defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
               sx={{ width: "100%" }}
             />

@@ -81,7 +81,8 @@ export default function UnitSidebar({
       const newParams = new URLSearchParams(queryParams.toString());
       newParams.delete("unitId");
       const newSearch = newParams.toString();
-      const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : "");
+      const newUrl =
+        window.location.pathname + (newSearch ? `?${newSearch}` : "");
       window.history.replaceState(null, "", newUrl);
     } else {
       setSelectedUnit(courseUnits[0]);
@@ -252,10 +253,10 @@ export default function UnitSidebar({
                     px: "32px",
                     backgroundColor:
                       selectedIndex === index
-                        ? theme.palette[user.role].Dark.Hover
+                        ? theme.palette[user.role].Light.Selected
                         : "transparent",
                     "&:hover": {
-                      backgroundColor: theme.palette[user.role].Dark.Hover,
+                      backgroundColor: theme.palette[user.role].Light.Hover,
                     },
                   }}
                   onClick={(event) => handleListItemClick(event, index)}
@@ -265,8 +266,8 @@ export default function UnitSidebar({
                     primary={`${unit.displayIndex}. ${unit.title}`}
                     sx={
                       selectedIndex === index
-                        ? theme.typography.titleMedium
-                        : theme.typography.bodyLarge
+                        ? theme.typography.labelLargeProminent
+                        : theme.typography.bodyMedium
                     }
                   />
                   {isAdministrator(user) && (

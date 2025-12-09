@@ -79,10 +79,7 @@ const CreateModuleModal = ({
 
   const handleCreate = async () => {
     const res = await CourseAPIClient.createModule(unitId, moduleTitle);
-    await CourseAPIClient.uploadThumbnail(
-      res.id,
-      image as unknown as FormData,
-    );
+    await CourseAPIClient.uploadThumbnail(res.id, image as unknown as FormData);
     setUploadModalOpen(false);
     try {
       setQueryParams({ unitId });
@@ -148,93 +145,93 @@ const CreateModuleModal = ({
           }}
         />
       ) : (
-      <Box
-        style={{
-          width: "100%",
-          height: "auto",
-          backgroundImage: `repeating-linear-gradient(0deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px), repeating-linear-gradient(90deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px), repeating-linear-gradient(180deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px), repeating-linear-gradient(270deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px)`,
-          backgroundSize: "1px 100%, 100% 1px, 1px 100% , 100% 1px",
-          backgroundPosition: "0 0, 0 0, calc(100% - 1px) 0, 0 100%",
-          backgroundRepeat: "no-repeat",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "start",
-          alignItems: "center",
-          paddingTop: "60px",
-          paddingBottom: "60px",
-          paddingLeft: "90px",
-          paddingRight: "90px",
-          gap: "24px",
-          borderRadius: "4px",
-          backgroundColor: theme.palette.Administrator.Light.Default,
-        }}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-      >
-        <IconButton>
-          <FileUploadOutlinedIcon
-            sx={{
-              width: "48px",
-              height: "48px",
-              color: "black",
-            }}
-          />
-        </IconButton>
         <Box
           style={{
+            width: "100%",
+            height: "auto",
+            backgroundImage: `repeating-linear-gradient(0deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px), repeating-linear-gradient(90deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px), repeating-linear-gradient(180deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px), repeating-linear-gradient(270deg, ${theme.palette[role].Dark.Default}, ${theme.palette[role].Dark.Default} 12px, transparent 12px, transparent 19px, ${theme.palette[role].Dark.Default} 19px)`,
+            backgroundSize: "1px 100%, 100% 1px, 1px 100% , 100% 1px",
+            backgroundPosition: "0 0, 0 0, calc(100% - 1px) 0, 0 100%",
+            backgroundRepeat: "no-repeat",
             display: "flex",
             flexDirection: "column",
-            gap: "8px",
+            justifyContent: "start",
             alignItems: "center",
+            paddingTop: "60px",
+            paddingBottom: "60px",
+            paddingLeft: "90px",
+            paddingRight: "90px",
+            gap: "24px",
+            borderRadius: "4px",
+            backgroundColor: theme.palette.Administrator.Light.Default,
           }}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
         >
+          <IconButton>
+            <FileUploadOutlinedIcon
+              sx={{
+                width: "48px",
+                height: "48px",
+                color: "black",
+              }}
+            />
+          </IconButton>
           <Box
             style={{
               display: "flex",
-              flexDirection: "row",
-              gap: "6px",
+              flexDirection: "column",
+              gap: "8px",
+              alignItems: "center",
             }}
           >
-            <Typography variant="bodySmall" color="black">
-              Drag and drop or
-            </Typography>
+            <Box
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "6px",
+              }}
+            >
+              <Typography variant="bodySmall" color="black">
+                Drag and drop or
+              </Typography>
+              <Typography
+                variant="bodySmall"
+                color={theme.palette.Administrator.Dark.Default}
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+                onClick={() => {
+                  const inputElem = document.getElementById("clickHereInput");
+                  inputElem?.click();
+                }}
+              >
+                click here
+              </Typography>
+              <VisuallyHidden>
+                <input
+                  id="clickHereInput"
+                  type="file"
+                  onChange={(e) => handleFileUpload(e)}
+                  multiple
+                />
+              </VisuallyHidden>
+              <Typography variant="bodySmall" color="black">
+                to upload thumbnail
+              </Typography>
+            </Box>
             <Typography
               variant="bodySmall"
               color={theme.palette.Administrator.Dark.Default}
-              style={{ cursor: "pointer", textDecoration: "underline" }}
-              onClick={() => {
-                const inputElem = document.getElementById("clickHereInput");
-                inputElem?.click();
-              }}
             >
-              click here
-            </Typography>
-            <VisuallyHidden>
-              <input
-                id="clickHereInput"
-                type="file"
-                onChange={(e) => handleFileUpload(e)}
-                multiple
-              />
-            </VisuallyHidden>
-            <Typography variant="bodySmall" color="black">
-              to upload thumbnail
+              Recommended aspect ratio: 4:3 image
             </Typography>
           </Box>
           <Typography
-            variant="bodySmall"
+            variant="labelSmall"
             color={theme.palette.Administrator.Dark.Default}
           >
-            Recommended aspect ratio: 4:3 image
+            Supported file types: .png, .jpg, .webp
           </Typography>
         </Box>
-        <Typography
-          variant="labelSmall"
-          color={theme.palette.Administrator.Dark.Default}
-        >
-          Supported file types: .png, .jpg, .webp
-        </Typography>
-      </Box>
       )}
 
       <TextField

@@ -20,20 +20,32 @@ import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import UserAPIClient from "../../APIClients/UserAPIClient";
 import * as Routes from "../../constants/Routes";
+import { COURSE_PAGE } from "../../constants/Routes";
 import useActivity from "../../hooks/useActivity";
 import useQueryParams from "../../hooks/useQueryParams";
+import { useUser } from "../../hooks/useUser";
 import {
   Activity,
   CourseModule,
   isActivityPage,
   isLessonPage,
+  isMatchingActivity,
   isMultipleChoiceActivity,
   isMultiSelectActivity,
+  isTableActivity,
+  Media,
 } from "../../types/CourseTypes";
+import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
+import MatchingEditor from "../course_authoring/matching/MatchingEditor";
+import MatchingSidebar from "../course_authoring/matching/MatchingSidebar";
 import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
+import TableMainEditor from "../course_authoring/table/TableEditor";
+import TableSidebar from "../course_authoring/table/TableSidebar";
+import MultipleChoiceViewer from "../course_viewing/multiple-choice/MultipleChoiceViewer";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
@@ -54,10 +66,13 @@ const ViewModulePage = () => {
   const { queryParams } = useQueryParams();
   const requestedModuleId = queryParams.get("moduleId") || "";
   const requestedPageId = queryParams.get("pageId") || "";
+  const requestedUnitId = queryParams.get("unitId") || "";
+  const { role } = useUser();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [bookMarkedPages, setBookMarkedPages] = useState(new Set<number>());
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
   const [module, setModule] = useState<
     (CourseModule & { lessonPdfUrl: string }) | null
   >(null);
@@ -191,17 +206,62 @@ const ViewModulePage = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize, isFullScreen, pageHeight]);
 
-  const toggleBookmark = (pageNumber: number) => {
-    setBookMarkedPages((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(pageNumber)) {
-        newSet.delete(pageNumber);
+  const isCurrentPageBookmarked = useMemo(() => {
+    if (!module?.pages[currentPage]) return false;
+    const pageId = module.pages[currentPage].id;
+    return bookmarks.some((bookmark) => bookmark.pageId === pageId);
+  }, [bookmarks, module, currentPage]);
+
+  const isPageBookmarked = useCallback(
+    (pageId: string) => {
+      return bookmarks.some((bookmark) => bookmark.pageId === pageId);
+    },
+    [bookmarks],
+  );
+
+  const fetchBookmarks = useCallback(async () => {
+    try {
+      const userData = await UserAPIClient.getCurrentUser();
+      setBookmarks(userData.bookmarks || []);
+    } catch (error) {
+      /* eslint-disable-next-line no-console */
+      console.error("Failed to fetch bookmarks:", error);
+    }
+  }, []);
+
+  const toggleBookmark = async (pageNumber: number) => {
+    if (!module?.pages[pageNumber]) return;
+
+    const page = module.pages[pageNumber];
+    const pageId = page.id;
+    const isBookmarked = isPageBookmarked(pageId);
+
+    setIsBookmarkLoading(true);
+    try {
+      let updatedBookmarks: Bookmark[];
+
+      if (isBookmarked) {
+        updatedBookmarks = await UserAPIClient.deleteBookmark(pageId);
       } else {
-        newSet.add(pageNumber);
+        updatedBookmarks = await UserAPIClient.addBookmark(
+          requestedUnitId,
+          requestedModuleId,
+          pageId,
+        );
       }
-      return newSet;
-    });
+
+      setBookmarks(updatedBookmarks);
+    } catch (error) {
+      /* eslint-disable-next-line no-console */
+      console.error("Failed to toggle bookmark:", error);
+    } finally {
+      setIsBookmarkLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchBookmarks();
+  }, [fetchBookmarks]);
 
   const boxHeight = "calc(100vh - 68px)";
 
@@ -228,6 +288,7 @@ const ViewModulePage = () => {
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
               thumbnailRefs={thumbnailRefs}
+              isBookmarked={isPageBookmarked(page.id)}
             >
               {isActivityPage(page) && (
                 <PlayCircleOutlineIcon
@@ -270,8 +331,45 @@ const ViewModulePage = () => {
           )}
       </Box>
     ),
-    [currentPage, isFullScreen, module?.pages, numPages, theme.palette.Neutral],
+    [
+      currentPage,
+      isFullScreen,
+      module?.pages,
+      numPages,
+      theme.palette.Neutral,
+      isPageBookmarked,
+    ],
   );
+
+  const setNumColumns = (newNumColumns: number) => {
+    setActivity((prev) => {
+      if (!prev || !isTableActivity(prev)) return prev;
+      const currentNumColumns = prev.columnLabels.length;
+
+      let updatedColumnLabels = [...prev.columnLabels];
+      let updatedCorrectAnswers = [...prev.correctAnswers];
+
+      if (newNumColumns > currentNumColumns) {
+        // Add new columns
+        for (let i = currentNumColumns; i < newNumColumns; i += 1) {
+          updatedColumnLabels.push("");
+        }
+      } else if (newNumColumns < currentNumColumns) {
+        // Remove extra columns
+        updatedColumnLabels = updatedColumnLabels.slice(0, newNumColumns);
+        // Also need to remove any correct answers that reference removed columns
+        updatedCorrectAnswers = updatedCorrectAnswers.filter(
+          (coord) => coord[1] < newNumColumns,
+        );
+      }
+
+      return {
+        ...prev,
+        columnLabels: updatedColumnLabels,
+        correctAnswers: updatedCorrectAnswers,
+      };
+    });
+  };
 
   return (
     <Document file={module?.lessonPdfUrl || null} options={options}>
@@ -301,6 +399,7 @@ const ViewModulePage = () => {
                     justifyContent: "center",
                     alignItems: "center",
                   }}
+                  href={COURSE_PAGE}
                 >
                   <ArrowBackIosIcon sx={{ fontSize: "24px" }} />
                 </IconButton>
@@ -330,8 +429,9 @@ const ViewModulePage = () => {
                     padding: "8px",
                   }}
                   onClick={() => toggleBookmark(currentPage)}
+                  disabled={isBookmarkLoading}
                 >
-                  {bookMarkedPages.has(currentPage) ? (
+                  {isCurrentPageBookmarked ? (
                     <BookmarkIcon
                       sx={{
                         fontSize: "24px",
@@ -379,17 +479,40 @@ const ViewModulePage = () => {
               >
                 {activity &&
                   (isMultipleChoiceActivity(activity) ||
-                    isMultiSelectActivity(activity)) && (
+                    isMultiSelectActivity(activity)) &&
+                  (role === "Administrator" ? (
                     <MultipleChoiceMainEditor
                       activity={activity}
+                      key={activity.id}
                       setActivity={setActivity}
                       hasImage={hasImage}
                       hasAdditionalContext={hasAdditionalContext}
                     />
-                  )}
+                  ) : (
+                    <MultipleChoiceViewer
+                      activity={activity}
+                      key={activity.id}
+                    />
+                  ))}
+                {activity && isTableActivity(activity) && (
+                  <TableMainEditor
+                    activity={activity}
+                    key={activity.id}
+                    setActivity={setActivity}
+                  />
+                )}
+                {activity && isMatchingActivity(activity) && (
+                  <MatchingEditor
+                    activity={activity}
+                    key={activity.id}
+                    setActivity={setActivity}
+                  />
+                )}
               </Box>
             )}
-            {isDidYouLikeTheContentPage && <SurveySlides />}
+            {isDidYouLikeTheContentPage && module && (
+              <SurveySlides moduleId={module.id} />
+            )}
           </Box>
           <Box
             height={isFullScreen ? "80px" : "48px"}
@@ -404,6 +527,24 @@ const ViewModulePage = () => {
               alignItems: "center",
             }}
           >
+            <Button
+              sx={{
+                height: "48px",
+                paddingLeft: "16px",
+                paddingRight: "24px",
+                paddingY: "10px",
+                gap: "8px",
+                border: "1px solid",
+                borderColor: theme.palette.Neutral[500],
+                borderRadius: "4px",
+                color: theme.palette.Learner.Dark.Default,
+              }}
+              onClick={() => setIsFullScreen((prev) => !prev)}
+            >
+              <FullscreenIcon />
+              <Typography variant="labelLarge">Fullscreen</Typography>
+            </Button>
+
             <Box display="flex" gap="16px">
               <IconButton
                 disabled={currentPage <= 0}
@@ -460,12 +601,13 @@ const ViewModulePage = () => {
             </Button>
           </Box>
         </Box>
-        {currentPageObject &&
-          (isMultipleChoiceActivity(currentPageObject) ||
-            isMultiSelectActivity(currentPageObject)) && (
-            <>
-              <Divider orientation="vertical" flexItem />
+        {currentPageObject && role === "Administrator" && (
+          <>
+            <Divider orientation="vertical" flexItem />
+            {(isMultipleChoiceActivity(currentPageObject) ||
+              isMultiSelectActivity(currentPageObject)) && (
               <MultipleChoiceEditorSidebar
+                key={currentPageObject.id}
                 hasImage={hasImage}
                 setHasImage={(newHasImage) => {
                   setHasImage(newHasImage);
@@ -485,7 +627,13 @@ const ViewModulePage = () => {
                 onAddQuestionOption={() =>
                   setActivity(
                     (prev) =>
-                      prev && { ...prev, options: [...prev.options, ""] },
+                      prev && {
+                        ...prev,
+                        ...(isMultipleChoiceActivity(prev) ||
+                        isMultiSelectActivity(prev)
+                          ? { options: [...prev.options, ""] }
+                          : {}),
+                      },
                   )
                 }
                 hint={currentPageObject.hint || ""}
@@ -495,8 +643,81 @@ const ViewModulePage = () => {
                 isMultiSelect={isMultiSelectActivity(currentPageObject)}
                 isAddOptionDisabled={currentPageObject.options.length >= 4}
               />
-            </>
-          )}
+            )}
+            {isTableActivity(currentPageObject) && (
+              <TableSidebar
+                key={currentPageObject.id}
+                numColumns={currentPageObject.columnLabels.length}
+                setNumColumns={setNumColumns}
+                onAddRow={() =>
+                  setActivity((prev) => {
+                    if (!prev || !isTableActivity(prev)) return prev;
+                    return {
+                      ...prev,
+                      rowLabels: [...prev.rowLabels, [""]],
+                    };
+                  })
+                }
+                isAddRowDisabled={currentPageObject.rowLabels.length >= 6}
+                hint={currentPageObject.hint || ""}
+                setHint={(newHint: string) => {
+                  setActivity((prev) => prev && { ...prev, hint: newHint });
+                }}
+                // headerColumnIncludes={HeaderColumnIncludesTypes.TEXT}
+                // setHeaderColumnIncludes={() => {}}
+              />
+            )}
+            {isMatchingActivity(currentPageObject) && (
+              <MatchingSidebar
+                key={currentPageObject.id}
+                activity={currentPageObject}
+                setActivity={setActivity}
+                numColumns={Object.keys(currentPageObject.media).length}
+                setNumColumns={(newNumColumns: number) => {
+                  setActivity((prev) => {
+                    if (!prev || !isMatchingActivity(prev)) return prev;
+                    const updatedMedia = { ...prev.media };
+                    if (newNumColumns === 2) {
+                      delete updatedMedia["3"];
+                    } else if (newNumColumns === 3) {
+                      const newMediaArray: Media[] = Array.from(
+                        { length: prev.rows },
+                        () => ({ id: "-1", mediaType: "text", context: "" }),
+                      );
+                      updatedMedia["3"] = newMediaArray;
+                    }
+                    return {
+                      ...prev,
+                      media: updatedMedia,
+                    };
+                  });
+                }}
+                onAddRow={() =>
+                  setActivity((prev) => {
+                    if (!prev || !isMatchingActivity(prev)) return prev;
+                    const updatedMedia = { ...prev.media };
+                    Object.keys(updatedMedia).forEach((key) => {
+                      updatedMedia[key] = [
+                        ...updatedMedia[key],
+                        { id: "-1", mediaType: "text", context: "" },
+                      ];
+                    });
+                    return {
+                      ...prev,
+                      media: updatedMedia,
+                      rows: prev.rows + 1,
+                    };
+                  })
+                }
+                isAddRowDisabled={false}
+                hint={currentPageObject.hint || ""}
+                setHint={(newHint: string) => {
+                  setActivity((prev) => prev && { ...prev, hint: newHint });
+                }}
+              />
+            )}
+          </>
+        )}
       </Box>
       <NeedHelpModal
         open={isHelpModalOpen}

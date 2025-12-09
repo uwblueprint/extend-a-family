@@ -481,4 +481,34 @@ userRouter.put(
   },
 );
 
+/* Approve a facilitator */
+userRouter.post(
+  "/:userId/approve",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    try {
+      const approvedUser = await userService.approveFacilitator(
+        req.params.userId,
+      );
+      res.status(200).json(approvedUser);
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+/* Reject a facilitator */
+userRouter.post(
+  "/:userId/reject",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    try {
+      await userService.rejectFacilitator(req.params.userId);
+      res.status(204).send();
+    } catch (error: unknown) {
+      res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
 export default userRouter;

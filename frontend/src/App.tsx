@@ -4,17 +4,17 @@ import React, { useEffect, useReducer, useState } from "react";
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import PrivateRoute from "./components/auth/PrivateRoute";
-import Signup from "./components/auth/SignupPage";
 import SignupApproved from "./components/auth/SignupApprovedPage";
+import Signup from "./components/auth/SignupPage";
 import SignupPending from "./components/auth/SignupPendingPage";
 import Welcome from "./components/auth/WelcomePage";
-import Home from "./components/pages/Home";
 import Bookmarks from "./components/pages/Bookmarks";
 import CreateModulePage from "./components/pages/CreateModulePage";
 import Default from "./components/pages/Default";
-import MyAccount from "./components/profile/MyAccountPage";
+import Home from "./components/pages/Home";
 import NotAuthorized from "./components/pages/NotAuthorized";
 import NotFound from "./components/pages/NotFound";
+import MyAccount from "./components/profile/MyAccountPage";
 import AUTHENTICATED_USER_KEY from "./constants/AuthConstants";
 import * as Routes from "./constants/Routes";
 import AuthContext from "./contexts/AuthContext";
@@ -31,12 +31,13 @@ import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
 // import UploadThumbnailPage from "./components/courses/UploadThumbnailPage";
+import FeedbackFacilitator from "./components/pages/FeedbackFacilitator";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
 import LessonUpload from "./components/pages/LessonUpload";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
-import ManageUserPage from "./components/user_management/ManageUserPage";
 import ViewHelpRequestsPage from "./components/pages/ViewHelpRequestsPage";
 import ViewModulePage from "./components/pages/ViewModulePage";
+import ManageUserPage from "./components/user_management/ManageUserPage";
 
 const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
@@ -178,9 +179,15 @@ const App = (): React.ReactElement => {
                 />
                 <PrivateRoute
                   exact
-                  path={`${Routes.VIEW_PAGE}`}
+                  path={Routes.VIEW_PAGE}
                   component={ViewModulePage}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.FEEDBACK_PAGE}
+                  component={FeedbackFacilitator}
+                  allowedRoles={["Administrator", "Facilitator"]}
                 />
                 <Route exact path="*" component={NotFound} />
               </Switch>
