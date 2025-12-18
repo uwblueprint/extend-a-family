@@ -1,22 +1,10 @@
 import Button from "@mui/material/Button";
 
-import * as React from "react";
-import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import * as React from "react";
 
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
-
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
+import VisuallyHiddenInput from "../common/form/VisuallyHiddenInput";
 
 const LessonUpload = (): React.ReactElement => {
   const [files, setFiles] = React.useState<FileList | null>(null);

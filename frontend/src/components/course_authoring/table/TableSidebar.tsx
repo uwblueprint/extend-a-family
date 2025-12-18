@@ -15,7 +15,7 @@ export enum HeaderColumnIncludesTypes {
   IMAGE_AND_TEXT = "image_and_text",
 }
 
-interface MultipleChoiceEditorSidebarProps {
+interface TableSidebarProps {
   numColumns: number;
   setNumColumns: (value: number) => void;
   // headerColumnIncludes: HeaderColumnIncludesTypes;
@@ -35,7 +35,7 @@ export default function TableSidebar({
   isAddRowDisabled,
   hint,
   setHint,
-}: MultipleChoiceEditorSidebarProps) {
+}: TableSidebarProps) {
   const boxHeight = "calc(100vh - 68px)";
   const theme = useTheme();
   return (
@@ -241,7 +241,7 @@ export default function TableSidebar({
               placeholder="Include question hint"
               multiline
               rows={5}
-              value={hint}
+              defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
               sx={{ width: "100%" }}
             />
