@@ -1,4 +1,4 @@
-export type MultiMessagePartialProps = {
+export type MultiMessageProps = {
   learnerProfilePicture: string;
   learnerName: string;
   messageDate: string;
@@ -11,8 +11,8 @@ export type MultiMessagePartialProps = {
   respondLink: string;
 };
 
-export function buildMultiMessagePartial(
-  props: MultiMessagePartialProps
+export function buildMultiMessage(
+  props: MultiMessageProps
 ): string {
   return `
 <table
@@ -115,6 +115,7 @@ export function buildMultiMessagePartial(
                 color: #4f549e;
                 text-decoration: none;
                 font-weight: 400;
+                text-transform: uppercase;
               "
             >
               MODULE ${props.moduleNumber}: ${props.moduleName} &gt; ${props.modulePage}

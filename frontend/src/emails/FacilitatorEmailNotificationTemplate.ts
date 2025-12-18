@@ -1,7 +1,7 @@
 export type FacilitatorEmailNotificationTemplateProps = {
   EAFLogo: string;
   facilitatorName: string;
-  learnerName: string;
+  introSentence: string;
   emailSettingsLink: string;
   messageBlock: string;
 };
@@ -58,7 +58,7 @@ export function buildFacilitatorEmailNotificationTemplate(
           <p style="margin: 0 0 20px">Hi ${props.facilitatorName},</p>
 
           <p style="margin: 0 0 32px">
-            You have one new message from ${props.learnerName}.
+            ${props.introSentence}.
           </p>
 
           ${props.messageBlock}

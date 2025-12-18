@@ -1,4 +1,4 @@
-export type SingleMessagePartialProps = {
+export type SingleMessageProps = {
   messageBody: string;
   moduleLink: string;
   moduleNumber: string;
@@ -9,8 +9,8 @@ export type SingleMessagePartialProps = {
   respondLink: string;
 };
 
-export function buildSingleMessagePartial(
-  props: SingleMessagePartialProps
+export function buildSingleMessage(
+  props: SingleMessageProps
 ): string {
   return `
 <table
@@ -55,6 +55,7 @@ export function buildSingleMessagePartial(
                 color: #4f549e;
                 text-decoration: none;
                 font-weight: 400;
+                text-transform: uppercase;
               "
             >
               MODULE ${props.moduleNumber}: ${props.moduleName} &gt; ${props.modulePage}
