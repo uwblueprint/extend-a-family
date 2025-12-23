@@ -7,13 +7,41 @@ import {
 } from "../../../types/CourseTypes";
 import MultipleChoiceViewOption from "./MultipleChoiceViewOption";
 
-const MultipleChoiceViewer = ({
-  activity,
-}: {
+type MultipleChoiceViewerProps = {
   activity: MultipleChoiceActivity | MultiSelectActivity;
-}) => {
+  onWrongAnswer: () => void;
+};
+
+export type ActivityViewerHandle = {
+  checkAnswer: () => void;
+  onRetry?: () => void;
+};
+
+const MultipleChoiceViewer = React.forwardRef<
+  ActivityViewerHandle,
+  MultipleChoiceViewerProps
+>(({ activity, onWrongAnswer }, ref) => {
   const theme = useTheme();
   const [selectedOptions, setSelectedOptions] = React.useState<number[]>([]);
+  const [isCompleted, setIsCompleted] = React.useState(false);
+
+  const checkAnswer = () => {
+    const correctOptions = isMultiSelectActivity(activity)
+      ? activity.correctAnswers
+      : [activity.correctAnswer];
+    const isCorrect =
+      selectedOptions.length === correctOptions.length &&
+      selectedOptions.every((value) => correctOptions.includes(value));
+    if (!isCorrect) {
+      onWrongAnswer();
+    } else {
+      setIsCompleted(true);
+    }
+  };
+
+  React.useImperativeHandle(ref, () => ({
+    checkAnswer,
+  }));
 
   return (
     <Box
@@ -144,8 +172,16 @@ const MultipleChoiceViewer = ({
               key={index}
               optionText={option}
               selected={selectedOptions.includes(index)}
+              displayCorrect={
+                isCompleted &&
+                (isMultiSelectActivity(activity)
+                  ? activity.correctAnswers
+                  : [activity.correctAnswer]
+                ).includes(index)
+              }
               isMultiSelect={isMultiSelectActivity(activity)}
               onClick={() => {
+                if (isCompleted) return;
                 if (isMultiSelectActivity(activity)) {
                   if (selectedOptions.includes(index)) {
                     setSelectedOptions(
@@ -164,6 +200,8 @@ const MultipleChoiceViewer = ({
       </Box>
     </Box>
   );
-};
+});
+
+MultipleChoiceViewer.displayName = "MultipleChoiceViewer";
 
 export default MultipleChoiceViewer;
