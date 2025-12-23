@@ -12,19 +12,14 @@ import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import {
   CourseModuleDTO,
   CreateCourseModuleDTO,
-  UpdateCourseModuleDTO,
   ModuleStatus,
+  UpdateCourseModuleDTO,
 } from "../../types/courseTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ICourseModuleService from "../interfaces/courseModuleService";
-import IFileStorageService from "../interfaces/fileStorageService";
 import FileStorageService from "./fileStorageService";
 
-const defaultBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
-const fileStorageService: IFileStorageService = new FileStorageService(
-  defaultBucket,
-);
 const Logger = logger(__filename);
 
 /**
@@ -98,18 +93,6 @@ class CourseModuleService implements ICourseModuleService {
         );
       }
 
-      let lessonPdfUrl: string | undefined;
-      try {
-        lessonPdfUrl = await fileStorageService.getFile(
-          `course/pdfs/module-${courseModuleId}.pdf`,
-        );
-      } catch (error) {
-        // If the PDF does not exist, we can proceed without it
-        Logger.warn(
-          `Lesson PDF for module ${courseModuleId} not found in storage.`,
-        );
-        lessonPdfUrl = undefined;
-      }
       const fetchPage = async (page: Schema.Types.ObjectId) => {
         const pageObject = await CoursePageModel.findById(page).lean().exec();
         if (!pageObject) {
@@ -121,9 +104,8 @@ class CourseModuleService implements ICourseModuleService {
       return {
         ...courseModule,
         unitId: courseUnit._id.toString(), // eslint-disable-line no-underscore-dangle
-        lessonPdfUrl,
         pages: await pageObjects,
-      } as CourseModuleDTO;
+      };
     } catch (error) {
       Logger.error(
         `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(

@@ -69,6 +69,10 @@ const LessonPageSchema: Schema = new Schema({
     type: Number,
     required: true,
   },
+  pdfUrl: {
+    type: String,
+    required: true,
+  },
 });
 
 // const ActivityPageSchema: Schema = new Schema({

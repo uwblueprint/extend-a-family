@@ -22,7 +22,6 @@ export type CourseModuleDTO = {
   title: string;
   imageURL?: string;
   pages: CoursePageDTO[];
-  lessonPdfUrl?: string;
   unitId?: string;
   status: ModuleStatus;
 };
