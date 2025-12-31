@@ -35,9 +35,16 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
 
     const NavbarWrappedComponent: React.FC<PrivateRouteProps> = () => {
       return (
-        <Box sx={{ height: "100vh", display: "flex", flexFlow: "column" }}>
+        <Box
+          sx={{
+            height: "100vh",
+            display: "flex",
+            flexFlow: "column",
+            overflow: "hidden",
+          }}
+        >
           <Navbar />
-          <Box sx={{ height: "100%", flexGrow: 1 }}>
+          <Box sx={{ height: "100%", flexGrow: 1, overflow: "hidden" }}>
             <Component />
           </Box>
         </Box>

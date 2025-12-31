@@ -1,4 +1,5 @@
 import { Grid, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import useCourseModules from "../../hooks/useCourseModules";
 import { useUser } from "../../hooks/useUser";
 import { CourseModule } from "../../types/CourseTypes";
@@ -14,8 +15,25 @@ export default function CourseModulesGrid({
   unitId,
   isSidebarOpen,
 }: ModuleGridProps) {
-  const { courseModules, loading, error } = useCourseModules(unitId);
+  const {
+    courseModules: initialModules,
+    loading,
+    error,
+  } = useCourseModules(unitId);
+  const [courseModules, setCourseModules] = useState<CourseModule[]>([]);
   const { role } = useUser();
+
+  useEffect(() => {
+    setCourseModules(initialModules);
+  }, [initialModules]);
+
+  const handleModuleUpdate = (updatedModule: CourseModule) => {
+    setCourseModules((prev) =>
+      prev.map((module) =>
+        module.id === updatedModule.id ? updatedModule : module,
+      ),
+    );
+  };
 
   if (loading)
     return <Typography paddingLeft="10px">Loading modules...</Typography>;
@@ -28,7 +46,8 @@ export default function CourseModulesGrid({
           <ModuleCardAdmin
             key={module.id}
             module={module}
-            isSidebarOpen={isSidebarOpen}
+            unitId={unitId}
+            onModuleUpdate={handleModuleUpdate}
           />
         ) : (
           <ModuleCardLearner

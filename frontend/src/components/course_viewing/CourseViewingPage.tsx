@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import AddIcon from "@mui/icons-material/Add";
-import UnitSidebar from "./sidebar/UnitSidebar";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
+import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
+import { useState } from "react";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseModulesGrid from "./CourseModulesGrid";
 import CreateModuleModal from "./modals/CreateModuleModal";
+import UnitSidebar from "./sidebar/UnitSidebar";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
@@ -22,7 +22,7 @@ export default function CourseUnitsPage() {
   };
 
   return (
-    <Box display="flex" width="100%">
+    <Box display="flex" width="100%" height="100vh" overflow="hidden">
       <UnitSidebar
         setSelectedUnit={setSelectedUnit}
         handleClose={handleDrawerClose}
@@ -30,7 +30,7 @@ export default function CourseUnitsPage() {
         selectedUnit={selectedUnit}
       />
 
-      <Box sx={{ flexGrow: 1, p: "48px" }}>
+      <Box sx={{ flexGrow: 1, p: "48px", mb: "48px", overflowY: "scroll" }}>
         {selectedUnit ? (
           <Stack spacing="14px">
             <Box display="flex" alignItems="center" paddingLeft="10px">

@@ -13,7 +13,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import { useUser } from "../../../hooks/useUser";
 import { CourseUnit, UnitSidebarModalType } from "../../../types/CourseTypes";
@@ -196,10 +196,10 @@ export default function UnitSidebar({
       open={open}
     >
       <Box
-        height="100vh"
         sx={{
           backgroundColor: theme.palette[user.role].Light.Default,
           overflowX: "hidden",
+          height: "100%",
         }}
       >
         <Box

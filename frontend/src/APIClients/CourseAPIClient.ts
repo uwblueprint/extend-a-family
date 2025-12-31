@@ -164,6 +164,27 @@ const getModuleById = async (
   }
 };
 
+const editModule = async (
+  unitId: string,
+  moduleId: string,
+  title: string,
+): Promise<CourseModule | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.put(
+      `/course/${unitId}/${moduleId}`,
+      { title },
+      { headers: { Authorization: bearerToken } },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default {
   getUnits,
   createUnit,
@@ -174,4 +195,5 @@ export default {
   uploadThumbnail,
   lessonUpload,
   getModuleById,
+  editModule,
 };
