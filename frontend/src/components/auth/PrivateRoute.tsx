@@ -1,12 +1,12 @@
-import React, { useContext } from "react";
-import { Route, Redirect } from "react-router-dom";
 import { Box } from "@mui/material";
-import AuthContext from "../../contexts/AuthContext";
+import React, { useContext } from "react";
+import { Redirect, Route } from "react-router-dom";
 import {
   CREATE_PASSWORD_PAGE,
   NOT_AUTHORIZED_PAGE,
   WELCOME_PAGE,
 } from "../../constants/Routes";
+import AuthContext from "../../contexts/AuthContext";
 import { Role } from "../../types/AuthTypes";
 import Navbar from "../common/navbar/Navbar";
 

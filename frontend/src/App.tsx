@@ -1,7 +1,12 @@
 import { CssBaseline } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useEffect, useReducer, useState } from "react";
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
+import {
+  Redirect,
+  Route,
+  BrowserRouter as Router,
+  Switch,
+} from "react-router-dom";
 import authAPIClient from "./APIClients/AuthAPIClient";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import SignupApproved from "./components/auth/SignupApprovedPage";
@@ -10,7 +15,6 @@ import SignupPending from "./components/auth/SignupPendingPage";
 import Welcome from "./components/auth/WelcomePage";
 import Bookmarks from "./components/pages/Bookmarks";
 import CreateModulePage from "./components/pages/CreateModulePage";
-import Default from "./components/pages/Default";
 import Home from "./components/pages/Home";
 import NotAuthorized from "./components/pages/NotAuthorized";
 import NotFound from "./components/pages/NotFound";
@@ -94,23 +98,26 @@ const App = (): React.ReactElement => {
                   path={Routes.FORGOT_PASSWORD_PAGE}
                   component={ForgotPasswordPage}
                 />
-                {/* <PrivateRoute
-                  exact
-                  path={Routes.UPLOAD_THUMBNAIL}
-                  component={UploadThumbnailPage}
-                  allowedRoles={["Administrator", "Facilitator"]}
-                /> */}
                 <PrivateRoute
                   exact
                   path={Routes.LANDING_PAGE}
-                  component={Default}
+                  component={() => (
+                    <Redirect
+                      to={
+                        currentUser?.role === "Facilitator" ||
+                        currentUser?.role === "Administrator"
+                          ? Routes.COURSE_PAGE
+                          : Routes.HOME_PAGE
+                      }
+                    />
+                  )}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
                 <PrivateRoute
                   exact
                   path={Routes.HOME_PAGE}
                   component={Home}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  allowedRoles={["Learner"]}
                 />
                 <PrivateRoute
                   exact
