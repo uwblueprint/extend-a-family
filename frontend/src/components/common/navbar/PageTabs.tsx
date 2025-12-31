@@ -7,6 +7,7 @@ import { Box, Button, useTheme } from "@mui/material";
 import { useHistory, useLocation } from "react-router-dom";
 import {
   BOOKMARKS_PAGE,
+  COURSE_PAGE,
   FEEDBACK_PAGE,
   HOME_PAGE,
   MANAGE_USERS_PAGE,
@@ -75,35 +76,41 @@ const PageTabs = () => {
   const isHome = location.pathname === HOME_PAGE;
   const isBookmarks = location.pathname === BOOKMARKS_PAGE;
   const isManageUsers = location.pathname === MANAGE_USERS_PAGE;
+  const isLibraryPage = location.pathname === COURSE_PAGE;
   const isFeedbackPage = location.pathname.startsWith(FEEDBACK_PAGE);
   const { role } = useUser();
 
   return (
     <Box sx={{ display: "flex", gap: "12px" }}>
-      <NavbarLink
-        active={isHome}
-        href={HOME_PAGE}
-        startIcon={isHome ? <HomeIcon /> : <HomeOutlinedIcon />}
-      >
-        Home
-      </NavbarLink>
       {role === "Learner" && (
-        <NavbarLink
-          active={isBookmarks}
-          href={BOOKMARKS_PAGE}
-          startIcon={
-            isBookmarks ? (
-              <BookmarkIcon sx={{ width: 24, height: 24 }} />
-            ) : (
-              <BookmarkBorderOutlinedIcon sx={{ width: 24, height: 24 }} />
-            )
-          }
-        >
-          Bookmarks
-        </NavbarLink>
+        <>
+          <NavbarLink
+            active={isHome}
+            href={HOME_PAGE}
+            startIcon={isHome ? <HomeIcon /> : <HomeOutlinedIcon />}
+          >
+            Home
+          </NavbarLink>
+          <NavbarLink
+            active={isBookmarks}
+            href={BOOKMARKS_PAGE}
+            startIcon={
+              isBookmarks ? (
+                <BookmarkIcon sx={{ width: 24, height: 24 }} />
+              ) : (
+                <BookmarkBorderOutlinedIcon sx={{ width: 24, height: 24 }} />
+              )
+            }
+          >
+            Bookmarks
+          </NavbarLink>
+        </>
       )}
       {(role === "Facilitator" || role === "Administrator") && (
         <>
+          <NavbarLink active={isLibraryPage} href={COURSE_PAGE}>
+            Library
+          </NavbarLink>
           <NavbarLink active={isFeedbackPage} href={FEEDBACK_PAGE}>
             Feedback
           </NavbarLink>

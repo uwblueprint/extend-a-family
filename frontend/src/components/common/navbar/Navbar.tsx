@@ -70,22 +70,24 @@ export default function Navbar() {
           </Link>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", gap: "24px" }}>
-            <IconButton
-              size="large"
-              aria-label="show new notifications"
-              onClick={handleClick}
-              sx={{ color: theme.palette.Facilitator.Light.Hover }}
-            >
-              <Badge badgeContent={numUnseenNotifications} color="error">
-                <MessageOutlinedIcon
-                  sx={{
-                    width: "24px",
-                    height: "24px",
-                    color: theme.palette.Facilitator.Dark.Default,
-                  }}
-                />
-              </Badge>
-            </IconButton>
+            {user.role === "Facilitator" && (
+              <IconButton
+                size="large"
+                aria-label="show new notifications"
+                onClick={handleClick}
+                sx={{ color: theme.palette.Facilitator.Light.Hover }}
+              >
+                <Badge badgeContent={numUnseenNotifications} color="error">
+                  <MessageOutlinedIcon
+                    sx={{
+                      width: "24px",
+                      height: "24px",
+                      color: theme.palette.Facilitator.Dark.Default,
+                    }}
+                  />
+                </Badge>
+              </IconButton>
+            )}
             <PageTabs />
             <UserButton />
           </Box>

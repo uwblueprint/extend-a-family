@@ -117,6 +117,12 @@ export function isTableActivity(
   return activity.type === QuestionType.Table;
 }
 
+export enum ModuleStatus {
+  draft = "draft",
+  published = "published",
+  unpublished = "unpublished",
+}
+
 export type CourseModule = {
   id: string;
   displayIndex: number;
@@ -124,6 +130,7 @@ export type CourseModule = {
   imageURL?: string;
   pages: CoursePage[];
   unitId?: string;
+  status: ModuleStatus;
 };
 
 export enum InteractiveElementType {
