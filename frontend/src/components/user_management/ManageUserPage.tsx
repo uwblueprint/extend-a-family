@@ -340,7 +340,11 @@ const ManageUserPage = (): React.ReactElement => {
   return (
     <Box
       role="main"
-      sx={{ display: "flex", flexDirection: "column", padding: "25px" }}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        padding: "25px",
+      }}
     >
       <AddUserSnackbar />
       <DeleteUserSnackbar />
@@ -398,13 +402,8 @@ const ManageUserPage = (): React.ReactElement => {
             />
           </Box>
         )}
-        <Box>
-          <Typography
-            variant="headlineMedium"
-            sx={{ marginBottom: "16px", fontWeight: 700 }}
-          >
-            All Users
-          </Typography>
+        <Stack direction="column" gap="16px">
+          <Typography variant="headlineMedium">All Users</Typography>
           <UserTable
             filteredUsers={regularUsers}
             usersPerPage={usersPerPage}
@@ -416,7 +415,7 @@ const ManageUserPage = (): React.ReactElement => {
             handleApproveFacilitator={handleApproveFacilitator}
             handleRejectFacilitator={handleRejectFacilitator}
           />
-        </Box>
+        </Stack>
       </Stack>
     </Box>
   );
