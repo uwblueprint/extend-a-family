@@ -1,5 +1,4 @@
 /* eslint-disable class-methods-use-this */
-import fs from "fs/promises";
 import mongoose, { ClientSession, Schema, startSession } from "mongoose";
 import { PDFDocument } from "pdf-lib";
 import MgCourseModule, {
@@ -350,7 +349,8 @@ class CourseModuleService implements ICourseModuleService {
 
   async uploadLessons(
     moduleId: string,
-    pdfPath: string,
+    pdfBuffer: Buffer,
+    insertIdx?: number,
   ): Promise<CourseModuleDTO> {
     const session = await startSession();
     session.startTransaction();
@@ -365,20 +365,22 @@ class CourseModuleService implements ICourseModuleService {
       }
 
       // 2. Read and process the PDF
-      const pdfBytes = await fs.readFile(pdfPath);
-      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
       const numPages = pdfDoc.getPageCount();
 
       // 3. Upload PDF to Firebase Storage
-      const pdfFileName = `course/pdfs/module-${moduleId}.pdf`;
-      await this.fileStorageService.createFile(
+      const pdfFileName = `course/pdfs/module-${moduleId}-${Date.now()}.pdf`;
+      const pdfUrl = await this.fileStorageService.uploadFile(
         pdfFileName,
-        pdfPath,
+        pdfBuffer,
         "application/pdf",
         true,
       );
 
-      // 4. Create lesson pages using LessonPageModel
+      // 4. Determine insertion position and starting display index
+      const insertPosition = insertIdx ?? courseModule.pages.length;
+
+      // 5. Create lesson pages using LessonPageModel
       const createdPages: Array<string> = [];
       for (let i = 1; i <= numPages; i += 1) {
         // eslint-disable-next-line no-await-in-loop
@@ -387,10 +389,10 @@ class CourseModuleService implements ICourseModuleService {
             {
               // Note: Wrapped in array as per Mongoose v7+ requirements
               title: `Page ${i}`,
-              displayIndex: courseModule.pages.length + i,
               type: "Lesson",
               source: pdfFileName,
               pageIndex: i,
+              pdfUrl,
             },
           ],
           { session },
@@ -398,12 +400,22 @@ class CourseModuleService implements ICourseModuleService {
         createdPages.push(newPage[0].id); // Access first element and get _id
       }
 
-      // 5. Update module with new pages
+      // 6. Update module with new pages at the specified position
       const updatedModule = await MgCourseModule.findByIdAndUpdate(
         moduleId,
-        { $push: { pages: { $each: createdPages } } }, // createdPages is already array of IDs
+        {
+          $push: {
+            pages: {
+              $each: createdPages,
+              $position: insertPosition,
+            },
+          },
+        },
         { new: true, session },
-      );
+      )
+        .populate("pages")
+        .lean()
+        .exec();
 
       if (!updatedModule) {
         throw new Error(
@@ -413,12 +425,7 @@ class CourseModuleService implements ICourseModuleService {
 
       await session.commitTransaction();
 
-      return {
-        id: updatedModule.id,
-        displayIndex: updatedModule.displayIndex,
-        title: updatedModule.title,
-        status: updatedModule.status as ModuleStatus,
-      } as CourseModuleDTO;
+      return updatedModule as unknown as CourseModuleDTO;
     } catch (error) {
       await session.abortTransaction();
       Logger.error(

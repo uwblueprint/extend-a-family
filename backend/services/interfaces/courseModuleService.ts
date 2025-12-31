@@ -59,11 +59,11 @@ interface ICourseModuleService {
   /**
    * Uploads a PDF file and creates lesson pages for each page in the PDF
    * @param moduleId the id of the module to add the lessons to
-   * @param pdfPath the path to the temporary uploaded PDF file
+   * @param pdfBuffer the buffer of the uploaded PDF file
    * @returns Updated course module
    * @throws Error if upload fails or module not found
    */
-  uploadLessons(moduleId: string, pdfPath: string): Promise<CourseModuleDTO>;
+  uploadLessons(moduleId: string, pdfBuffer: Buffer): Promise<CourseModuleDTO>;
 
   /**
    * Publish a module (Draft → Published, or Unpublished → Published)

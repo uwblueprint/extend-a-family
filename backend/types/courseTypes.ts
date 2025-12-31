@@ -38,6 +38,8 @@ export type CoursePageDTO = {
 
 export type LessonPageDTO = CoursePageDTO & {
   source: string;
+  pageIndex: number;
+  pdfUrl: string;
 };
 
 export type ElementSkeleton = {

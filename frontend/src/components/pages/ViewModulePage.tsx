@@ -46,6 +46,10 @@ import {
 import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
 import PreviewLearnerModal from "../course_authoring/editorComponents/PreviewLearnerModal";
+import {
+  AddYourFirstPageSlide,
+  EmptyModuleLeftSidebar,
+} from "../course_authoring/EmptyModuleEditing";
 import MatchingEditor from "../course_authoring/matching/MatchingEditor";
 import MatchingSidebar from "../course_authoring/matching/MatchingSidebar";
 import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
@@ -62,6 +66,7 @@ import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import NeedHelpModal from "../help/NeedHelpModal";
+import DeletePageModal from "./DeletePageModal";
 import "./ViewModulePage.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -85,9 +90,9 @@ const ViewModulePage = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
-  const [module, setModule] = useState<
-    (CourseModule & { lessonPdfUrl: string }) | null
-  >(null);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [module, setModule] = useState<CourseModule | null>(null);
   const lessonPageRef = useRef<HTMLDivElement>(null);
   const lessonPageContainerRef = useRef<HTMLDivElement>(null);
   const [pageHeight, setPageHeight] = useState<number>(0);
@@ -99,7 +104,9 @@ const ViewModulePage = () => {
   const thumbnailRefs = useRef<(HTMLDivElement | null)[]>([]);
   const numPages = module?.pages.length || 0;
 
-  const isDidYouLikeTheContentPage = currentPage === numPages;
+  const isFeedbackSurveyPage = role === "Learner" && currentPage === numPages;
+  const isEmptyModuleEditing =
+    role === "Administrator" && module && numPages === 0;
 
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isWrongAnswerModalOpen, setIsWrongAnswerModalOpen] = useState(false);
@@ -279,6 +286,35 @@ const ViewModulePage = () => {
     fetchBookmarks();
   }, [fetchBookmarks]);
 
+  const handleDeletePage = async () => {
+    if (!module || !currentPageObject) return;
+
+    setIsDeleteLoading(true);
+    try {
+      const deletedPageId = await CourseAPIClient.deletePage(
+        module.id,
+        currentPageObject.id,
+      );
+
+      if (deletedPageId) {
+        const refreshedModule = await fetchModule();
+        setModule(refreshedModule);
+
+        setCurrentPage((prevPage) => {
+          const updatedPagesLength = refreshedModule?.pages.length || 0;
+          if (updatedPagesLength === 0) return 0;
+          return Math.min(prevPage, updatedPagesLength - 1);
+        });
+      }
+    } catch (error) {
+      /* eslint-disable-next-line no-console */
+      console.error("Failed to delete page", error);
+    } finally {
+      setIsDeleteLoading(false);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   const boxHeight = "calc(100vh - 68px)";
 
   const SideBar = useMemo(
@@ -296,6 +332,7 @@ const ViewModulePage = () => {
         }}
         className="no-scrollbar"
       >
+        {isEmptyModuleEditing && <EmptyModuleLeftSidebar />}
         {module?.pages
           .map((page, index) => (
             <ModuleSidebarThumbnail
@@ -306,53 +343,67 @@ const ViewModulePage = () => {
               thumbnailRefs={thumbnailRefs}
               isBookmarked={isPageBookmarked(page.id)}
             >
-              {isActivityPage(page) && (
-                <PlayCircleOutlineIcon
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    fontSize: "60px",
-                    zIndex: "1",
-                  }}
-                />
-              )}
               {isLessonPage(page) && (
-                <Thumbnail
-                  pageNumber={page.pageIndex}
-                  height={130}
-                  scale={1.66}
-                />
+                <Document
+                  file={page.pdfUrl}
+                  options={options}
+                  loading={
+                    <Typography variant="bodyMedium">Loading...</Typography>
+                  }
+                >
+                  <Thumbnail
+                    pageNumber={page.pageIndex}
+                    height={130}
+                    scale={1.66}
+                  />
+                </Document>
               )}
               {isActivityPage(page) && (
-                <Thumbnail
-                  pageNumber={1} // Placeholder for activity page thumbnail
-                  renderMode="custom"
-                  customRenderer={() => <Box height={215} width={280} />}
-                />
+                <>
+                  <PlayCircleOutlineIcon
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      fontSize: "60px",
+                      zIndex: "1",
+                    }}
+                  />
+                  <Box
+                    height={215}
+                    width={280}
+                    sx={{ backgroundColor: "white" }}
+                  />
+                </>
               )}
             </ModuleSidebarThumbnail>
           ))
           .concat(
-            <ModuleSidebarThumbnail
-              key="feedback_thumbnail"
-              index={numPages}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              thumbnailRefs={thumbnailRefs}
-            >
-              <FeedbackThumbnail />
-            </ModuleSidebarThumbnail>,
+            role === "Learner" ? (
+              <ModuleSidebarThumbnail
+                key="feedback_thumbnail"
+                index={numPages}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                thumbnailRefs={thumbnailRefs}
+              >
+                <FeedbackThumbnail />
+              </ModuleSidebarThumbnail>
+            ) : (
+              []
+            ),
           )}
       </Box>
     ),
     [
-      currentPage,
-      isFullScreen,
-      module?.pages,
-      numPages,
       theme.palette.Neutral,
+      isFullScreen,
+      isEmptyModuleEditing,
+      module?.pages,
+      role,
+      numPages,
+      currentPage,
       isPageBookmarked,
     ],
   );
@@ -388,7 +439,7 @@ const ViewModulePage = () => {
   };
 
   return (
-    <Document file={module?.lessonPdfUrl || null} options={options}>
+    <>
       <Box display="flex" flexDirection="row">
         {SideBar}
         <Box
@@ -476,14 +527,22 @@ const ViewModulePage = () => {
             bgcolor={isFullScreen ? "black" : "white"}
             ref={lessonPageContainerRef}
           >
-            {currentPageObject && isLessonPage(currentPageObject) && (
-              <Page
-                pageNumber={currentPageObject.pageIndex}
-                renderAnnotationLayer={false}
-                scale={getPageScale()}
-                onLoadSuccess={() => handleResize()}
-                inputRef={lessonPageRef}
+            {isEmptyModuleEditing && module && (
+              <AddYourFirstPageSlide
+                moduleId={module.id}
+                refreshModule={setModule}
               />
+            )}
+            {currentPageObject && isLessonPage(currentPageObject) && (
+              <Document file={currentPageObject.pdfUrl} options={options}>
+                <Page
+                  pageNumber={currentPageObject.pageIndex}
+                  renderAnnotationLayer={false}
+                  scale={getPageScale()}
+                  onLoadSuccess={() => handleResize()}
+                  inputRef={lessonPageRef}
+                />
+              </Document>
             )}
             {currentPageObject && isActivityPage(currentPageObject) && (
               <Box
@@ -546,7 +605,7 @@ const ViewModulePage = () => {
                   ))}
               </Box>
             )}
-            {isDidYouLikeTheContentPage && module && (
+            {isFeedbackSurveyPage && module && (
               <SurveySlides moduleId={module.id} />
             )}
           </Box>
@@ -646,10 +705,13 @@ const ViewModulePage = () => {
                       backgroundColor: theme.palette.Error.Light.Default,
                       color: theme.palette.Error.Dark.Default,
                     }}
-                    onClick={() => {}}
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    disabled={isDeleteLoading}
                   >
                     <DeleteOutline />
-                    <Typography variant="labelLarge">Delete Page</Typography>
+                    <Typography variant="labelLarge">
+                      {isDeleteLoading ? "Deleting..." : "Delete Page"}
+                    </Typography>
                   </Button>
                 </>
               )}
@@ -826,6 +888,12 @@ const ViewModulePage = () => {
         onClose={() => setIsWrongAnswerModalOpen(false)}
         hint={isActivityPage(currentPageObject) ? currentPageObject.hint : ""}
       />
+      <DeletePageModal
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeletePage}
+        isLoading={isDeleteLoading}
+      />
       {isActivityPage(currentPageObject) && (
         <PreviewLearnerModal
           activity={currentPageObject}
@@ -833,7 +901,7 @@ const ViewModulePage = () => {
           handleClose={() => setIsPreviewModalOpen(false)}
         />
       )}
-    </Document>
+    </>
   );
 };
 

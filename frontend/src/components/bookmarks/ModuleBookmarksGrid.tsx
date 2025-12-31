@@ -1,7 +1,7 @@
-import React from "react";
 import { Box } from "@mui/material";
-import BookmarkItem from "./BookmarkItem";
+import React from "react";
 import { CourseModule } from "../../types/CourseTypes";
+import BookmarkItem from "./BookmarkItem";
 
 interface ModuleBookmarksGridProps {
   module: CourseModule;

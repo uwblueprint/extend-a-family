@@ -126,24 +126,56 @@ class CoursePageService implements ICoursePageService {
     }
   }
 
-  async deleteCoursePage(coursePageId: string): Promise<string> {
+  async deleteCoursePage(
+    courseModuleId: string,
+    coursePageId: string,
+  ): Promise<string> {
+    const session = await startSession();
+    session.startTransaction();
     try {
+      const courseModule = await MgCourseModule.findById(
+        courseModuleId,
+      ).session(session);
+
+      if (!courseModule) {
+        throw new Error(`Course module with id ${courseModuleId} not found.`);
+      }
+
+      const pageIndex = courseModule.pages.findIndex(
+        (pageId) => pageId.toString() === coursePageId,
+      );
+
+      if (pageIndex === -1) {
+        throw new Error(
+          `Course page with id ${coursePageId} not found in module ${courseModuleId}.`,
+        );
+      }
+
       const deletedCoursePage = await MgCoursePage.findByIdAndDelete(
         coursePageId,
-      );
+      ).session(session);
 
       if (!deletedCoursePage) {
         throw new Error(`Course page with id ${coursePageId} not found.`);
       }
 
+      await MgCourseModule.findByIdAndUpdate(courseModuleId, {
+        $pull: { pages: coursePageId },
+      }).session(session);
+
+      await session.commitTransaction();
+
       return deletedCoursePage.id;
     } catch (error) {
+      await session.abortTransaction();
       Logger.error(
         `Failed to delete course page with id ${coursePageId}. Reason = ${getErrorMessage(
           error,
         )}`,
       );
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 }
