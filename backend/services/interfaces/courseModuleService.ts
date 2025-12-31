@@ -86,6 +86,20 @@ interface ICourseModuleService {
     courseUnitId: string,
     moduleId: string,
   ): Promise<CourseModuleDTO>;
+
+  /**
+   * Reorder pages within a module
+   * @param moduleId the id of the module containing the pages
+   * @param fromIndex the current index of the page to move (0-based)
+   * @param toIndex the target index where the page should be moved (0-based)
+   * @returns Updated course module with reordered pages
+   * @throws Error if module not found or indices are invalid
+   */
+  reorderPages(
+    moduleId: string,
+    fromIndex: number,
+    toIndex: number,
+  ): Promise<CourseModuleDTO>;
 }
 
 export default ICourseModuleService;

@@ -438,6 +438,69 @@ class CourseModuleService implements ICourseModuleService {
       session.endSession();
     }
   }
+
+  async reorderPages(
+    moduleId: string,
+    fromIndex: number,
+    toIndex: number,
+  ): Promise<CourseModuleDTO> {
+    try {
+      const courseModule: CourseModule | null = await MgCourseModule.findById(
+        moduleId,
+      );
+
+      if (!courseModule) {
+        throw new Error(`Course module with id ${moduleId} not found.`);
+      }
+
+      // Validate indices
+      if (
+        fromIndex < 0 ||
+        fromIndex >= courseModule.pages.length ||
+        toIndex < 0 ||
+        toIndex >= courseModule.pages.length
+      ) {
+        throw new Error(
+          `Invalid indices: fromIndex=${fromIndex}, toIndex=${toIndex}, pages.length=${courseModule.pages.length}`,
+        );
+      }
+
+      // If indices are the same, no reordering needed
+      if (fromIndex === toIndex) {
+        const result = await this.getCourseModule(moduleId);
+        return result as CourseModuleDTO;
+      }
+
+      // Reorder pages array
+      const pages = [...courseModule.pages];
+      const [movedPage] = pages.splice(fromIndex, 1);
+      pages.splice(toIndex, 0, movedPage);
+
+      // Update module with reordered pages
+      const updatedModule = await MgCourseModule.findByIdAndUpdate(
+        moduleId,
+        { pages },
+        { new: true },
+      );
+
+      if (!updatedModule) {
+        throw new Error(
+          `Failed to update course module with id ${moduleId} after reordering`,
+        );
+      }
+
+      // Return the fully populated module
+      const result = await this.getCourseModule(moduleId);
+      return result as CourseModuleDTO;
+    } catch (error) {
+      Logger.error(
+        `Failed to reorder pages for module ${moduleId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
 }
 
 export default CourseModuleService;

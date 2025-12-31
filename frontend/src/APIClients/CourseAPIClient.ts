@@ -127,6 +127,7 @@ const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
 const lessonUpload = async (
   lesson: File,
   moduleId: string,
+  insertIdx?: number,
 ): Promise<CourseModule> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -135,6 +136,9 @@ const lessonUpload = async (
   const formData = new FormData();
   formData.append("lessonPdf", lesson);
   formData.append("moduleId", moduleId);
+  if (insertIdx !== undefined) {
+    formData.append("insertIdx", insertIdx.toString());
+  }
   const { data } = await baseAPIClient.post("/course/uploadLessons", formData, {
     headers: { Authorization: bearerToken },
   });
@@ -200,6 +204,29 @@ const deletePage = async (
   }
 };
 
+const reorderPages = async (
+  moduleId: string,
+  fromIndex: number,
+  toIndex: number,
+): Promise<CourseModule | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.patch(
+      `/course/module/${moduleId}/reorder`,
+      { fromIndex, toIndex },
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default {
   getUnits,
   createUnit,
@@ -212,4 +239,5 @@ export default {
   getModuleById,
   editModule,
   deletePage,
+  reorderPages,
 };

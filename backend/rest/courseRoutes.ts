@@ -350,6 +350,36 @@ courseRouter.delete(
   },
 );
 
+courseRouter.patch(
+  "/module/:moduleId/reorder",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    const { moduleId } = req.params;
+    const { fromIndex, toIndex } = req.body;
+
+    try {
+      if (
+        typeof fromIndex !== "number" ||
+        typeof toIndex !== "number" ||
+        fromIndex < 0 ||
+        toIndex < 0
+      ) {
+        res.status(400).send("Invalid fromIndex or toIndex");
+        return;
+      }
+
+      const updatedModule = await courseModuleService.reorderPages(
+        moduleId,
+        fromIndex,
+        toIndex,
+      );
+      res.status(200).json(updatedModule);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
 courseRouter.delete(
   "/:unitId/:moduleId/:pageId",
   isAuthorizedByRole(new Set(["Administrator"])),
