@@ -2,6 +2,7 @@ import mongoose, { ObjectId } from "mongoose";
 import { Activity } from "../../models/activity.mgmodel";
 import CourseModuleModel from "../../models/coursemodule.mgmodel";
 import { Media, QuestionType } from "../../types/activityTypes";
+import { CourseModuleDTO } from "../../types/courseTypes";
 import { activityModelMapper } from "../../utilities/activityModelMapper";
 
 class ActivityService {
@@ -9,7 +10,7 @@ class ActivityService {
     moduleId: string,
     questionType: QuestionType,
     index?: number,
-  ): Promise<{ pages: string[] }> {
+  ): Promise<CourseModuleDTO> {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -44,13 +45,7 @@ class ActivityService {
         activityData = {
           ...baseActivity,
           columnLabels: ["Header", "Header", "Header", "Header", "Header"],
-          rowLabels: {
-            "Row 1": null,
-            "Row 2": null,
-            "Row 3": null,
-            "Row 4": null,
-            "Row 5": null,
-          },
+          rowLabels: [["Row 1"], ["Row 2"], ["Row 3"], ["Row 4"], ["Row 5"]],
           correctAnswers: [
             [0, 0],
             [1, 0],
@@ -64,47 +59,47 @@ class ActivityService {
           {
             id: "1",
             mediaType: "text",
-            context: "default1",
+            context: "",
           },
           {
             id: "2",
             mediaType: "text",
-            context: "default2",
+            context: "",
           },
           {
             id: "3",
             mediaType: "text",
-            context: "default3",
+            context: "",
           },
           {
             id: "4",
             mediaType: "text",
-            context: "default1",
+            context: "",
           },
           {
             id: "5",
             mediaType: "text",
-            context: "default2",
+            context: "",
           },
           {
             id: "6",
             mediaType: "text",
-            context: "default3",
+            context: "",
           },
           {
             id: "7",
             mediaType: "text",
-            context: "default1",
+            context: "",
           },
           {
             id: "8",
             mediaType: "text",
-            context: "default2",
+            context: "",
           },
           {
             id: "9",
             mediaType: "text",
-            context: "default3",
+            context: "",
           },
         ];
         activityData = {
@@ -140,16 +135,17 @@ class ActivityService {
         moduleId,
         { $push: { pages: pushOp } },
         { new: true, session },
-      ).lean();
+      )
+        .populate("pages")
+        .lean()
+        .exec();
 
       if (!updatedModule) {
         throw new Error("Module not found");
       }
 
       await session.commitTransaction();
-      return {
-        pages: updatedModule.pages.map((id: ObjectId) => id.toString()),
-      };
+      return updatedModule as unknown as CourseModuleDTO;
     } catch (e) {
       await session.abortTransaction();
       throw e;

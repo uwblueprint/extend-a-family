@@ -1,5 +1,6 @@
 import mongoose, { Document, ObjectId, Schema } from "mongoose";
 import mongooseLeanId from "mongoose-lean-id";
+import { ModuleStatus } from "../types/courseTypes";
 
 export interface CourseModule extends Document {
   id: string;
@@ -7,7 +8,7 @@ export interface CourseModule extends Document {
   title: string;
   pages: [ObjectId];
   imageURL: string;
-  status: "draft" | "published" | "unpublished";
+  status: ModuleStatus;
 }
 
 export const CourseModuleSchema: Schema = new Schema({

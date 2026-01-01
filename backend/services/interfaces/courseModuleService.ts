@@ -59,11 +59,11 @@ interface ICourseModuleService {
   /**
    * Uploads a PDF file and creates lesson pages for each page in the PDF
    * @param moduleId the id of the module to add the lessons to
-   * @param pdfPath the path to the temporary uploaded PDF file
+   * @param pdfBuffer the buffer of the uploaded PDF file
    * @returns Updated course module
    * @throws Error if upload fails or module not found
    */
-  uploadLessons(moduleId: string, pdfPath: string): Promise<CourseModuleDTO>;
+  uploadLessons(moduleId: string, pdfBuffer: Buffer): Promise<CourseModuleDTO>;
 
   /**
    * Publish a module (Draft → Published, or Unpublished → Published)
@@ -85,6 +85,20 @@ interface ICourseModuleService {
   unpublishCourseModule(
     courseUnitId: string,
     moduleId: string,
+  ): Promise<CourseModuleDTO>;
+
+  /**
+   * Reorder pages within a module
+   * @param moduleId the id of the module containing the pages
+   * @param fromIndex the current index of the page to move (0-based)
+   * @param toIndex the target index where the page should be moved (0-based)
+   * @returns Updated course module with reordered pages
+   * @throws Error if module not found or indices are invalid
+   */
+  reorderPages(
+    moduleId: string,
+    fromIndex: number,
+    toIndex: number,
   ): Promise<CourseModuleDTO>;
 }
 

@@ -9,7 +9,7 @@ export enum QuestionType {
   MultiSelect = "MultiSelect",
   Table = "Table",
   Matching = "Matching",
-  Custom = "Custom",
+  Input = "Input",
 }
 
 export type PageType = "Lesson" | QuestionType;
@@ -24,6 +24,7 @@ export interface LessonPage extends CoursePageBase {
   type: "Lesson";
   source: string;
   pageIndex: number;
+  pdfUrl: string;
 }
 
 export interface Media {

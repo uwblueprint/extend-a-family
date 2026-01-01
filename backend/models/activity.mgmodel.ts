@@ -1,9 +1,9 @@
 import { Document, Schema } from "mongoose";
 import { QuestionType } from "../types/activityTypes";
-import CoursePageModel, { CoursePage } from "./coursepage.mgmodel";
+import CoursePageModel, { CoursePageBase } from "./coursepage.mgmodel";
 
 // Base Activity Interface
-export interface Activity extends CoursePage {
+export interface Activity extends CoursePageBase {
   questionType: QuestionType;
   activityNumber: string;
   questionText: string;
@@ -133,7 +133,7 @@ export const ActivitySchema: Schema = new Schema(
 const MediaSchema = new Schema({
   id: { type: String, required: true },
   mediaType: { type: String, enum: ["text", "image"], required: true },
-  context: { type: String, required: true },
+  context: { type: String, required: false },
 });
 
 const MatchingActivitySchema = new Schema({

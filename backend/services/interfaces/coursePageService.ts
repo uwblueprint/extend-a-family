@@ -46,7 +46,10 @@ interface ICoursePageService {
    * @param coursePageId the id of the course page we want to delete
    * @throws Error if the page id does't exist in the database
    */
-  deleteCoursePage(coursePageId: string): Promise<string>;
+  deleteCoursePage(
+    courseModuleId: string,
+    coursePageId: string,
+  ): Promise<string>;
 }
 
 export default ICoursePageService;

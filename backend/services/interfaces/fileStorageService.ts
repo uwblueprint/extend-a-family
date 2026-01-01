@@ -55,6 +55,22 @@ interface IFileStorageService {
     fileData: Buffer | null,
     contentType: string | null,
   ): Promise<string>;
+
+  /**
+   * Uploads file from buffer
+   * @param fileName name of file
+   * @param fileData raw buffer data of file
+   * @param contentType MIME type of file
+   * @param allowOverwrite whether to allow overwriting existing files
+   * @returns URL to the uploaded file
+   * @throws Error if file is not uploaded
+   */
+  uploadFile(
+    fileName: string,
+    fileData: Buffer,
+    contentType: string | null,
+    allowOverwrite?: boolean,
+  ): Promise<string>;
 }
 
 export default IFileStorageService;

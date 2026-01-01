@@ -2,6 +2,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  Add,
+  ArrowCircleDown,
+  ArrowCircleUp,
   CheckCircleOutline,
   DeleteOutline,
   Refresh,
@@ -19,14 +22,22 @@ import {
   Button,
   Divider,
   IconButton,
+  Menu,
+  MenuItem,
+  Stack,
   Typography,
   useTheme,
 } from "@mui/material";
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+import ActivityAPIClient from "../../APIClients/ActivityAPIClient";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import UserAPIClient from "../../APIClients/UserAPIClient";
+import {
+  questionTypeIcons,
+  questionTypeLabels,
+} from "../../constants/ActivityLabels";
 import * as Routes from "../../constants/Routes";
 import { COURSE_PAGE } from "../../constants/Routes";
 import useActivity from "../../hooks/useActivity";
@@ -42,10 +53,15 @@ import {
   isMultiSelectActivity,
   isTableActivity,
   Media,
+  QuestionType,
 } from "../../types/CourseTypes";
 import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
 import PreviewLearnerModal from "../course_authoring/editorComponents/PreviewLearnerModal";
+import {
+  AddYourFirstPageSlide,
+  EmptyModuleLeftSidebar,
+} from "../course_authoring/EmptyModuleEditing";
 import MatchingEditor from "../course_authoring/matching/MatchingEditor";
 import MatchingSidebar from "../course_authoring/matching/MatchingSidebar";
 import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/MultipleChoiceEditor";
@@ -62,6 +78,7 @@ import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import NeedHelpModal from "../help/NeedHelpModal";
+import DeletePageModal from "./DeletePageModal";
 import "./ViewModulePage.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -85,9 +102,9 @@ const ViewModulePage = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
-  const [module, setModule] = useState<
-    (CourseModule & { lessonPdfUrl: string }) | null
-  >(null);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [module, setModule] = useState<CourseModule | null>(null);
   const lessonPageRef = useRef<HTMLDivElement>(null);
   const lessonPageContainerRef = useRef<HTMLDivElement>(null);
   const [pageHeight, setPageHeight] = useState<number>(0);
@@ -99,11 +116,22 @@ const ViewModulePage = () => {
   const thumbnailRefs = useRef<(HTMLDivElement | null)[]>([]);
   const numPages = module?.pages.length || 0;
 
-  const isDidYouLikeTheContentPage = currentPage === numPages;
+  const isFeedbackSurveyPage = role === "Learner" && currentPage === numPages;
+  const isEmptyModuleEditing =
+    role === "Administrator" && module && numPages === 0;
 
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isWrongAnswerModalOpen, setIsWrongAnswerModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+    pageIndex: number;
+  } | null>(null);
+  const [activityMenuAnchor, setActivityMenuAnchor] =
+    useState<null | HTMLElement>(null);
+  const [selectedPageIndexForActivity, setSelectedPageIndexForActivity] =
+    useState<number | null>(null);
 
   const [hasImage, setHasImage] = useState(
     (currentPageObject &&
@@ -116,6 +144,13 @@ const ViewModulePage = () => {
   const { activity, setActivity } = useActivity<Activity>(undefined);
 
   const activityViewerRef = useRef<ActivityViewerHandle>(null);
+
+  const fetchModule = useCallback(async () => {
+    const fetchedModule = await CourseAPIClient.getModuleById(
+      requestedModuleId,
+    );
+    return fetchedModule;
+  }, [requestedModuleId]);
 
   useEffect(() => {
     if (currentPageObject && isActivityPage(currentPageObject)) {
@@ -142,12 +177,129 @@ const ViewModulePage = () => {
     });
   }, [activity]);
 
-  const fetchModule = useCallback(async () => {
-    const fetchedModule = await CourseAPIClient.getModuleById(
-      requestedModuleId,
-    );
-    return fetchedModule;
-  }, [requestedModuleId]);
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>, pageIndex: number) => {
+      event.preventDefault();
+      setContextMenu((prev) =>
+        prev === null
+          ? {
+              mouseX: event.clientX + 2,
+              mouseY: event.clientY - 6,
+              pageIndex,
+            }
+          : null,
+      );
+    },
+    [],
+  );
+
+  const handleCloseContextMenu = useCallback(() => {
+    setContextMenu(null);
+  }, []);
+
+  const handleUploadPdfAbove = () => {
+    if (contextMenu === null) return;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".pdf";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file && module) {
+        try {
+          const updatedModule = await CourseAPIClient.lessonUpload(
+            file,
+            module.id,
+            contextMenu.pageIndex,
+          );
+          setModule(updatedModule);
+        } catch (error) {
+          /* eslint-disable-next-line no-console */
+          console.error("Failed to upload PDF:", error);
+        }
+      }
+    };
+    input.click();
+    handleCloseContextMenu();
+  };
+
+  const handleUploadPdfBelow = () => {
+    if (contextMenu === null) return;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".pdf";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file && module) {
+        try {
+          const updatedModule = await CourseAPIClient.lessonUpload(
+            file,
+            module.id,
+            contextMenu.pageIndex + 1,
+          );
+          setModule(updatedModule);
+        } catch (error) {
+          /* eslint-disable-next-line no-console */
+          console.error("Failed to upload PDF:", error);
+        }
+      }
+    };
+    input.click();
+    handleCloseContextMenu();
+  };
+
+  const handleCreateActivity = (event: React.MouseEvent<HTMLElement>) => {
+    if (contextMenu === null) return;
+    setSelectedPageIndexForActivity(contextMenu.pageIndex);
+    setActivityMenuAnchor(event.currentTarget);
+    handleCloseContextMenu();
+  };
+
+  const handleActivityTypeSelect = async (questionType: QuestionType) => {
+    if (selectedPageIndexForActivity === null || !module) return;
+    try {
+      const updatedModule = await ActivityAPIClient.createActivity(
+        module.id,
+        questionType,
+        selectedPageIndexForActivity + 1,
+      );
+      if (updatedModule) {
+        setModule(updatedModule);
+      }
+    } catch (error) {
+      /* eslint-disable-next-line no-console */
+      console.error("Failed to create activity:", error);
+    }
+    setActivityMenuAnchor(null);
+    setSelectedPageIndexForActivity(null);
+  };
+
+  const handleDeletePageFromContext = async () => {
+    if (contextMenu === null || !module) return;
+    const pageToDelete = module.pages[contextMenu.pageIndex];
+    if (!pageToDelete) return;
+
+    try {
+      const deletedPageId = await CourseAPIClient.deletePage(
+        module.id,
+        pageToDelete.id,
+      );
+
+      if (deletedPageId) {
+        const refreshedModule = await fetchModule();
+        setModule(refreshedModule);
+
+        setCurrentPage((prevPage) => {
+          const updatedPagesLength = refreshedModule?.pages.length || 0;
+          if (updatedPagesLength === 0) return 0;
+          return Math.min(prevPage, updatedPagesLength - 1);
+        });
+      }
+    } catch (error) {
+      /* eslint-disable-next-line no-console */
+      console.error("Failed to delete page:", error);
+    }
+    handleCloseContextMenu();
+  };
 
   const currentPageId = module?.pages[currentPage]?.id;
 
@@ -184,7 +336,7 @@ const ViewModulePage = () => {
         block: "center",
       });
     }
-  });
+  }, [currentPage]);
 
   const getPageScale = () => {
     if (
@@ -279,7 +431,112 @@ const ViewModulePage = () => {
     fetchBookmarks();
   }, [fetchBookmarks]);
 
+  const handleDeletePage = async () => {
+    if (!module || !currentPageObject) return;
+
+    setIsDeleteLoading(true);
+    try {
+      const deletedPageId = await CourseAPIClient.deletePage(
+        module.id,
+        currentPageObject.id,
+      );
+
+      if (deletedPageId) {
+        const refreshedModule = await fetchModule();
+        setModule(refreshedModule);
+
+        setCurrentPage((prevPage) => {
+          const updatedPagesLength = refreshedModule?.pages.length || 0;
+          if (updatedPagesLength === 0) return 0;
+          return Math.min(prevPage, updatedPagesLength - 1);
+        });
+      }
+    } catch (error) {
+      /* eslint-disable-next-line no-console */
+      console.error("Failed to delete page", error);
+    } finally {
+      setIsDeleteLoading(false);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   const boxHeight = "calc(100vh - 68px)";
+
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+
+  const handleDragStart = useCallback((index: number) => {
+    setDraggedIndex(index);
+  }, []);
+
+  const handleDragOver = useCallback(
+    (event: React.DragEvent<HTMLDivElement>, index: number) => {
+      event.preventDefault();
+      if (draggedIndex !== null && draggedIndex !== index) {
+        setHoverIndex(index);
+      }
+    },
+    [draggedIndex],
+  );
+
+  const handleDragLeave = useCallback(() => {
+    setHoverIndex(null);
+  }, []);
+
+  const handleDrop = useCallback(
+    async (dropIndex: number) => {
+      if (draggedIndex === null || !module) {
+        setDraggedIndex(null);
+        setHoverIndex(null);
+        return;
+      }
+
+      try {
+        // When dragging down, we need to adjust for the removal of the dragged item
+        // which shifts all subsequent indices down by 1
+        const adjustedDropIndex =
+          draggedIndex < dropIndex ? dropIndex - 1 : dropIndex;
+
+        // Don't proceed if trying to drop in the same position
+        if (draggedIndex === adjustedDropIndex) {
+          setDraggedIndex(null);
+          setHoverIndex(null);
+          return;
+        }
+
+        const updatedModule = await CourseAPIClient.reorderPages(
+          module.id,
+          draggedIndex,
+          adjustedDropIndex,
+        );
+        if (updatedModule) {
+          setModule(updatedModule);
+
+          // Update current page if needed
+          if (currentPage === draggedIndex) {
+            setCurrentPage(adjustedDropIndex);
+          } else if (
+            draggedIndex < currentPage &&
+            adjustedDropIndex >= currentPage
+          ) {
+            setCurrentPage(currentPage - 1);
+          } else if (
+            draggedIndex > currentPage &&
+            adjustedDropIndex <= currentPage
+          ) {
+            setCurrentPage(currentPage + 1);
+          }
+        }
+      } catch (error) {
+        /* eslint-disable-next-line no-console */
+        console.error("Failed to reorder pages:", error);
+      } finally {
+        setDraggedIndex(null);
+        setHoverIndex(null);
+      }
+    },
+    [draggedIndex, module, currentPage],
+  );
 
   const SideBar = useMemo(
     () => (
@@ -296,6 +553,7 @@ const ViewModulePage = () => {
         }}
         className="no-scrollbar"
       >
+        {isEmptyModuleEditing && <EmptyModuleLeftSidebar />}
         {module?.pages
           .map((page, index) => (
             <ModuleSidebarThumbnail
@@ -305,55 +563,123 @@ const ViewModulePage = () => {
               setCurrentPage={setCurrentPage}
               thumbnailRefs={thumbnailRefs}
               isBookmarked={isPageBookmarked(page.id)}
+              onContextMenu={
+                role === "Administrator" ? handleContextMenu : undefined
+              }
+              isDraggable={role === "Administrator"}
+              onDragStart={
+                role === "Administrator" ? handleDragStart : undefined
+              }
+              onDragOver={role === "Administrator" ? handleDragOver : undefined}
+              onDragLeave={
+                role === "Administrator" ? handleDragLeave : undefined
+              }
+              onDrop={role === "Administrator" ? handleDrop : undefined}
+              isDragging={draggedIndex === index}
+              isDropTarget={hoverIndex === index && draggedIndex !== null}
             >
-              {isActivityPage(page) && (
-                <PlayCircleOutlineIcon
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    fontSize: "60px",
-                    zIndex: "1",
-                  }}
-                />
-              )}
               {isLessonPage(page) && (
-                <Thumbnail
-                  pageNumber={page.pageIndex}
-                  height={130}
-                  scale={1.66}
-                />
+                <Document
+                  file={page.pdfUrl}
+                  options={options}
+                  loading={
+                    <Typography variant="bodyMedium">Loading...</Typography>
+                  }
+                >
+                  <Thumbnail
+                    pageNumber={page.pageIndex}
+                    height={130}
+                    scale={1.66}
+                  />
+                </Document>
               )}
               {isActivityPage(page) && (
-                <Thumbnail
-                  pageNumber={1} // Placeholder for activity page thumbnail
-                  renderMode="custom"
-                  customRenderer={() => <Box height={215} width={280} />}
-                />
+                <>
+                  <PlayCircleOutlineIcon
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      fontSize: "60px",
+                      zIndex: "1",
+                    }}
+                  />
+                  <Box
+                    height={215}
+                    width={280}
+                    sx={{ backgroundColor: "white" }}
+                  />
+                </>
               )}
             </ModuleSidebarThumbnail>
           ))
           .concat(
-            <ModuleSidebarThumbnail
-              key="feedback_thumbnail"
-              index={numPages}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              thumbnailRefs={thumbnailRefs}
-            >
-              <FeedbackThumbnail />
-            </ModuleSidebarThumbnail>,
+            role === "Learner" ? (
+              <ModuleSidebarThumbnail
+                key="feedback_thumbnail"
+                index={numPages}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                thumbnailRefs={thumbnailRefs}
+              >
+                <FeedbackThumbnail />
+              </ModuleSidebarThumbnail>
+            ) : (
+              []
+            ),
           )}
+        {role === "Administrator" && draggedIndex !== null && module?.pages && (
+          <Box
+            onDragOver={(e) => {
+              e.preventDefault();
+              setHoverIndex(module.pages.length);
+            }}
+            onDragLeave={() => setHoverIndex(null)}
+            onDrop={() => handleDrop(module.pages.length)}
+            sx={{
+              minHeight: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              marginTop: "-10px",
+              "&::before":
+                hoverIndex === module.pages.length
+                  ? {
+                      content: '""',
+                      position: "absolute",
+                      top: "0",
+                      left: 0,
+                      right: 0,
+                      height: "3px",
+                      backgroundColor: theme.palette.Learner.Dark.Default,
+                      borderRadius: "2px",
+                      zIndex: 10,
+                    }
+                  : {},
+            }}
+          />
+        )}
       </Box>
     ),
     [
-      currentPage,
-      isFullScreen,
-      module?.pages,
-      numPages,
       theme.palette.Neutral,
+      theme.palette.Learner.Dark.Default,
+      isFullScreen,
+      isEmptyModuleEditing,
+      module?.pages,
+      role,
+      numPages,
+      currentPage,
+      draggedIndex,
+      hoverIndex,
       isPageBookmarked,
+      handleContextMenu,
+      handleDragStart,
+      handleDragOver,
+      handleDragLeave,
+      handleDrop,
     ],
   );
 
@@ -388,7 +714,7 @@ const ViewModulePage = () => {
   };
 
   return (
-    <Document file={module?.lessonPdfUrl || null} options={options}>
+    <>
       <Box display="flex" flexDirection="row">
         {SideBar}
         <Box
@@ -476,14 +802,22 @@ const ViewModulePage = () => {
             bgcolor={isFullScreen ? "black" : "white"}
             ref={lessonPageContainerRef}
           >
-            {currentPageObject && isLessonPage(currentPageObject) && (
-              <Page
-                pageNumber={currentPageObject.pageIndex}
-                renderAnnotationLayer={false}
-                scale={getPageScale()}
-                onLoadSuccess={() => handleResize()}
-                inputRef={lessonPageRef}
+            {isEmptyModuleEditing && module && (
+              <AddYourFirstPageSlide
+                moduleId={module.id}
+                refreshModule={setModule}
               />
+            )}
+            {currentPageObject && isLessonPage(currentPageObject) && (
+              <Document file={currentPageObject.pdfUrl} options={options}>
+                <Page
+                  pageNumber={currentPageObject.pageIndex}
+                  renderAnnotationLayer={false}
+                  scale={getPageScale()}
+                  onLoadSuccess={() => handleResize()}
+                  inputRef={lessonPageRef}
+                />
+              </Document>
             )}
             {currentPageObject && isActivityPage(currentPageObject) && (
               <Box
@@ -546,7 +880,7 @@ const ViewModulePage = () => {
                   ))}
               </Box>
             )}
-            {isDidYouLikeTheContentPage && module && (
+            {isFeedbackSurveyPage && module && (
               <SurveySlides moduleId={module.id} />
             )}
           </Box>
@@ -646,10 +980,13 @@ const ViewModulePage = () => {
                       backgroundColor: theme.palette.Error.Light.Default,
                       color: theme.palette.Error.Dark.Default,
                     }}
-                    onClick={() => {}}
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    disabled={isDeleteLoading}
                   >
                     <DeleteOutline />
-                    <Typography variant="labelLarge">Delete Page</Typography>
+                    <Typography variant="labelLarge">
+                      {isDeleteLoading ? "Deleting..." : "Delete Page"}
+                    </Typography>
                   </Button>
                 </>
               )}
@@ -826,6 +1163,12 @@ const ViewModulePage = () => {
         onClose={() => setIsWrongAnswerModalOpen(false)}
         hint={isActivityPage(currentPageObject) ? currentPageObject.hint : ""}
       />
+      <DeletePageModal
+        open={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeletePage}
+        isLoading={isDeleteLoading}
+      />
       {isActivityPage(currentPageObject) && (
         <PreviewLearnerModal
           activity={currentPageObject}
@@ -833,7 +1176,64 @@ const ViewModulePage = () => {
           handleClose={() => setIsPreviewModalOpen(false)}
         />
       )}
-    </Document>
+      <Menu
+        open={contextMenu !== null}
+        onClose={handleCloseContextMenu}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
+      >
+        <MenuItem onClick={handleUploadPdfAbove}>
+          <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
+            <ArrowCircleUp /> Insert pages above
+          </Stack>
+        </MenuItem>
+        <MenuItem onClick={handleUploadPdfBelow}>
+          <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
+            <ArrowCircleDown /> Insert pages below
+          </Stack>
+        </MenuItem>
+        <MenuItem onClick={handleCreateActivity}>
+          <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
+            <Add /> Create activity
+          </Stack>
+        </MenuItem>
+        <MenuItem onClick={handleDeletePageFromContext}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            gap="12px"
+            color={theme.palette.Error.Dark.Default}
+            paddingY="8px"
+          >
+            <DeleteOutline /> Delete page
+          </Stack>
+        </MenuItem>
+      </Menu>
+      <Menu
+        id="activity-type-menu"
+        anchorEl={activityMenuAnchor}
+        open={Boolean(activityMenuAnchor)}
+        onClose={() => {
+          setActivityMenuAnchor(null);
+          setSelectedPageIndexForActivity(null);
+        }}
+        MenuListProps={{
+          "aria-labelledby": "activity-type-button",
+        }}
+      >
+        {Object.values(QuestionType).map((type) => (
+          <MenuItem key={type} onClick={() => handleActivityTypeSelect(type)}>
+            <Stack direction="row" alignItems="center" gap="8px">
+              {questionTypeIcons[type]} {questionTypeLabels[type]}
+            </Stack>
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
   );
 };
 

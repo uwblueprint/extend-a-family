@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { Thumbnail } from "react-pdf";
-import { Box, Typography, useTheme } from "@mui/material";
-import WidthWideOutlinedIcon from "@mui/icons-material/WidthWideOutlined";
 import PanToolAltOutlinedIcon from "@mui/icons-material/PanToolAltOutlined";
-import { Link as RouterLink } from "react-router-dom";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-import { Bookmark } from "../../types/UserTypes";
+import WidthWideOutlinedIcon from "@mui/icons-material/WidthWideOutlined";
+import { Box, Typography, useTheme } from "@mui/material";
+import React, { useState } from "react";
+import { Document, Thumbnail } from "react-pdf";
+import { Link as RouterLink } from "react-router-dom";
+import UserAPIClient from "../../APIClients/UserAPIClient";
 import {
   CourseModule,
   isActivityPage,
   isLessonPage,
 } from "../../types/CourseTypes";
+import { Bookmark } from "../../types/UserTypes";
 import { buildViewPageUrl } from "../../utils/routeBuilders";
 import DeleteBookmarkButton from "./DeleteBookmarkButton";
 import DeleteBookmarkModal from "./DeleteBookmarkModal";
-import UserAPIClient from "../../APIClients/UserAPIClient";
 
 interface BookmarkItemProps {
   module: CourseModule;
@@ -133,7 +133,18 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
                 },
               }}
             >
-              <Thumbnail pageNumber={page.pageIndex} width={283} scale={1.66} />
+              <Document
+                file={page.pdfUrl}
+                loading={
+                  <Typography variant="bodyMedium">Loading...</Typography>
+                }
+              >
+                <Thumbnail
+                  pageNumber={page.pageIndex}
+                  width={283}
+                  scale={1.66}
+                />
+              </Document>
             </Box>
           )}
           {page && isActivityPage(page) && (
