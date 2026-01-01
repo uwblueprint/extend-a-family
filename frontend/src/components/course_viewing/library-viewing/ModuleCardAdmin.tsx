@@ -3,7 +3,6 @@ import {
   DescriptionOutlined,
   EditOutlined,
   MoreHoriz,
-  MoveDown,
   OpenInNew,
   PlayCircleOutline,
   VisibilityOffOutlined,
@@ -22,28 +21,119 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useDrag, useDrop } from "react-dnd";
 import { useHistory } from "react-router-dom";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import * as Routes from "../../../constants/Routes";
 import { CourseModule, ModuleStatus } from "../../../types/CourseTypes";
 import BlankImg from "../../assets/blankSlide.png";
+import ChangeThumbnailModal from "../modals/ChangeThumbnailModal";
 import EditModuleModal from "../modals/EditModuleModal";
+
+const ItemType = "MODULE_CARD";
+
+interface DragItem {
+  index: number;
+  id: string;
+  type: string;
+}
 
 const ModuleCardAdmin = ({
   module,
   unitId,
+  index,
   onModuleUpdate,
+  moveModule,
 }: {
   module: CourseModule;
   unitId: string;
+  index: number;
   onModuleUpdate?: (updatedModule: CourseModule) => void;
+  moveModule: (dragIndex: number, hoverIndex: number) => void;
 }) => {
   const theme = useTheme();
   const history = useHistory();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openEditModuleModal, setOpenEditModuleModal] = useState(false);
+  const [openChangeThumbnailModal, setOpenChangeThumbnailModal] =
+    useState(false);
   const open = Boolean(anchorEl);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [{ handlerId }, drop] = useDrop<
+    DragItem,
+    void,
+    { handlerId: string | symbol | null }
+  >({
+    accept: ItemType,
+    collect(monitor) {
+      return {
+        handlerId: monitor.getHandlerId(),
+      };
+    },
+    hover(item: DragItem, monitor) {
+      if (!ref.current) {
+        return;
+      }
+      const dragIndex = item.index;
+      const hoverIndex = index;
+
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+
+      // Determine rectangle on screen
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+
+      // Get vertical middle
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset();
+
+      // Get pixels to the top
+      const hoverClientY = clientOffset!.y - hoverBoundingRect.top;
+
+      // Only perform the move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+
+      // Dragging downwards
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return;
+      }
+
+      // Dragging upwards
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return;
+      }
+
+      // Time to actually perform the action
+      moveModule(dragIndex, hoverIndex);
+
+      // Note: we're mutating the monitor item here!
+      // Generally it's better to avoid mutations,
+      // but it's good here for the sake of performance
+      // to avoid expensive index searches.
+      // eslint-disable-next-line no-param-reassign
+      item.index = hoverIndex;
+    },
+  });
+
+  const [{ isDragging }, drag] = useDrag({
+    type: ItemType,
+    item: () => {
+      return { id: module.id, index };
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  drag(drop(ref));
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -60,6 +150,21 @@ const ModuleCardAdmin = ({
 
   const handleCloseEditModuleModal = () => {
     setOpenEditModuleModal(false);
+  };
+
+  const handleOpenChangeThumbnailModal = () => {
+    setOpenChangeThumbnailModal(true);
+    handleMenuClose();
+  };
+
+  const handleCloseChangeThumbnailModal = () => {
+    setOpenChangeThumbnailModal(false);
+  };
+
+  const handleThumbnailUpdate = (newImageUrl: string) => {
+    if (onModuleUpdate) {
+      onModuleUpdate({ ...module, imageURL: newImageUrl });
+    }
   };
 
   const editModule = async (title: string) => {
@@ -93,6 +198,8 @@ const ModuleCardAdmin = ({
 
   return (
     <Stack
+      ref={ref}
+      data-handler-id={handlerId}
       direction="column"
       gap="12px"
       padding="16px"
@@ -103,6 +210,10 @@ const ModuleCardAdmin = ({
       borderRadius="8px"
       border={`1px solid ${theme.palette.Neutral[400]}`}
       bgcolor={theme.palette.Neutral[100]}
+      sx={{
+        opacity: isDragging ? 0.5 : 1,
+        cursor: "move",
+      }}
     >
       <CardMedia
         component="img"
@@ -170,7 +281,7 @@ const ModuleCardAdmin = ({
             <ListItemText>View Feedback</ListItemText>
           </MenuItem>
           <Divider sx={{ my: "0 !important", py: "4px !important" }} />
-          <MenuItem onClick={handleMenuClose}>
+          <MenuItem onClick={handleOpenChangeThumbnailModal}>
             <ListItemIcon>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -187,13 +298,6 @@ const ModuleCardAdmin = ({
               </svg>
             </ListItemIcon>
             <ListItemText>Change Thumbnail</ListItemText>
-          </MenuItem>
-          <Divider sx={{ my: "0 !important", py: "4px !important" }} />
-          <MenuItem onClick={handleMenuClose}>
-            <ListItemIcon>
-              <MoveDown />
-            </ListItemIcon>
-            <ListItemText>Move</ListItemText>
           </MenuItem>
           <Divider sx={{ my: "0 !important", py: "4px !important" }} />
           <MenuItem onClick={handleMenuClose}>
@@ -249,6 +353,13 @@ const ModuleCardAdmin = ({
         handleCloseEditModuleModal={handleCloseEditModuleModal}
         editModule={editModule}
         currentTitle={module.title}
+      />
+      <ChangeThumbnailModal
+        open={openChangeThumbnailModal}
+        onClose={handleCloseChangeThumbnailModal}
+        moduleId={module.id}
+        currentImageUrl={module.imageURL}
+        onThumbnailUpdate={handleThumbnailUpdate}
       />
     </Stack>
   );
