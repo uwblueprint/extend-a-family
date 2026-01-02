@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
-import { Box, Typography } from "@mui/material";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
-import UserAPIClient from "../../APIClients/UserAPIClient";
+import { Box, Typography } from "@mui/material";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
-import { Bookmark } from "../../types/UserTypes";
-import { CourseUnit, CourseModule } from "../../types/CourseTypes";
+import UserAPIClient from "../../APIClients/UserAPIClient";
 import useBookmarksFilter from "../../hooks/useBookmarksFilter";
+import { CourseModule, CourseUnit } from "../../types/CourseTypes";
+import { Bookmark } from "../../types/UserTypes";
 import {
-  BookmarksSidebar,
   BookmarksContent,
+  BookmarksSidebar,
   ExpandCollapseButton,
 } from "../bookmarks";
 
@@ -196,7 +196,13 @@ const Bookmarks = (): React.ReactElement => {
     : null;
 
   return (
-    <Box display="flex" width="100%" minHeight="100vh">
+    <Box
+      display="flex"
+      width="100%"
+      minHeight="100vh"
+      height="100vh"
+      overflow="hidden"
+    >
       {/* Sidebar */}
       <BookmarksSidebar
         units={unitsWithBookmarks}
@@ -205,7 +211,7 @@ const Bookmarks = (): React.ReactElement => {
       />
 
       {/* Main Content */}
-      <Box sx={{ flexGrow: 1, p: "48px" }}>
+      <Box sx={{ flexGrow: 1, p: "48px", mb: "48px", overflowY: "scroll" }}>
         {!loading && !error && hasBookmarks && (
           <Box
             display="flex"
