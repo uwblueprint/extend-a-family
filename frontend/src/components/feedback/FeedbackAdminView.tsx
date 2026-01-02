@@ -13,9 +13,11 @@ import { CourseUnit } from "../../types/CourseTypes";
 const FeedbackAdminUnitSidebarItem = ({
   open,
   onClick,
+  unit,
 }: {
   open: boolean;
   onClick: () => void;
+  unit: CourseUnit;
 }) => {
   const theme = useTheme();
 
@@ -31,26 +33,28 @@ const FeedbackAdminUnitSidebarItem = ({
       >
         <ListItemText>
           <Typography variant={open ? "labelLargeProminent" : "bodyMedium"}>
-            Unit 1: Money Basics
+            {unit.title}
           </Typography>
         </ListItemText>
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <ListItemButton sx={{ pl: "48px" }}>
-            <Stack
-              direction="row"
-              gap="8px"
-              alignItems="center"
-              alignSelf="stretch"
-            >
-              <Typography variant="bodyMedium">1.</Typography>
-              <Typography variant="bodyMedium">
-                Introduction to Needs and Wants
-              </Typography>
-            </Stack>
-          </ListItemButton>
+          {unit.modules.map((module) => (
+            <ListItemButton key={module.id} sx={{ pl: "48px" }}>
+              <Stack
+                direction="row"
+                gap="8px"
+                alignItems="center"
+                alignSelf="stretch"
+              >
+                <Typography variant="bodyMedium">
+                  {module.displayIndex}.
+                </Typography>
+                <Typography variant="bodyMedium">{module.title}</Typography>
+              </Stack>
+            </ListItemButton>
+          ))}
         </List>
       </Collapse>
     </>
@@ -114,6 +118,7 @@ const FeedbackAdminUnitSidebar = () => {
         {courseUnits.map((unit) => (
           <FeedbackAdminUnitSidebarItem
             key={unit.id}
+            unit={unit}
             open={open === unit.id}
             onClick={() =>
               setOpen((prevOpen) =>
