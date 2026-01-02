@@ -9,9 +9,9 @@ import {
 import React, { useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
-import LearnerFeedbackBlock from "../feedback/LearnerFeedbackBlock";
+import LearnerFeedbackBlock from "./LearnerFeedbackBlock";
 
-const FeedbackFacilitator = (): React.ReactElement => {
+const FeedbackFacilitatorView = (): React.ReactElement => {
   const theme = useTheme();
   const { role } = useUser();
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -115,4 +115,4 @@ const FeedbackFacilitator = (): React.ReactElement => {
   );
 };
 
-export default FeedbackFacilitator;
+export default FeedbackFacilitatorView;
