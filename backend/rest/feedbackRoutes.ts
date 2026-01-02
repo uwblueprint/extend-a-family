@@ -8,6 +8,22 @@ const feedbackRouter: Router = Router();
 
 const feedbackService = new FeedbackService();
 
+/*
+Get all feedback objects
+*/
+feedbackRouter.get(
+  "/",
+  isAuthorizedByRole(new Set(["Administrator", "Facilitator"])),
+  async (req, res) => {
+    try {
+      const data = await feedbackService.getAllFeedback();
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
 /* 
 Get a Feedback by its ID 
 - requires feedbackId in request params 
