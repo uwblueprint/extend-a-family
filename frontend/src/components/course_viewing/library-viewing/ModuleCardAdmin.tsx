@@ -358,7 +358,6 @@ const ModuleCardAdmin = ({
         open={openChangeThumbnailModal}
         onClose={handleCloseChangeThumbnailModal}
         moduleId={module.id}
-        currentImageUrl={module.imageURL}
         onThumbnailUpdate={handleThumbnailUpdate}
       />
     </Stack>
