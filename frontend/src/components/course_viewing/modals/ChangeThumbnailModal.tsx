@@ -3,6 +3,7 @@ import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   IconButton,
   Typography,
@@ -16,7 +17,6 @@ interface ChangeThumbnailModalProps {
   open: boolean;
   onClose: () => void;
   moduleId: string;
-  currentImageUrl: string | undefined;
   onThumbnailUpdate?: (newImageUrl: string) => void;
 }
 
@@ -24,12 +24,12 @@ const ChangeThumbnailModal = ({
   open,
   onClose,
   moduleId,
-  currentImageUrl,
   onThumbnailUpdate,
 }: ChangeThumbnailModalProps) => {
   const theme = useTheme();
   const [image, setImage] = useState<FormData | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -61,16 +61,20 @@ const ChangeThumbnailModal = ({
       return;
     }
 
-    const newImageUrl = await CourseAPIClient.uploadThumbnail(
-      moduleId,
-      image as unknown as FormData,
-    );
+    setIsUploading(true);
+    try {
+      const newImageUrl = await CourseAPIClient.uploadThumbnail(
+        moduleId,
+        image as unknown as FormData,
+      );
 
-    if (newImageUrl && onThumbnailUpdate) {
-      onThumbnailUpdate(newImageUrl);
+      if (newImageUrl && onThumbnailUpdate) {
+        onThumbnailUpdate(newImageUrl);
+      }
+    } finally {
+      setIsUploading(false);
+      onClose();
     }
-
-    onClose();
   };
 
   useEffect(() => {
@@ -131,20 +135,7 @@ const ChangeThumbnailModal = ({
           }}
         />
       )}
-      {!imageUrl && currentImageUrl && (
-        <Box
-          component="img"
-          src={currentImageUrl}
-          alt="Current Module Thumbnail"
-          sx={{
-            width: "100%",
-            height: "auto",
-            maxHeight: "297px",
-            borderRadius: "4px",
-          }}
-        />
-      )}
-      {!imageUrl && !currentImageUrl && (
+      {!imageUrl && (
         <Box
           style={{
             width: "100%",
@@ -246,11 +237,16 @@ const ChangeThumbnailModal = ({
           gap: "12px",
         }}
       >
-        <Button variant="outlined" onClick={onClose}>
+        <Button variant="outlined" onClick={onClose} disabled={isUploading}>
           Cancel
         </Button>
-        <Button variant="contained" onClick={handleUpload} disabled={!image}>
-          Upload
+        <Button
+          variant="contained"
+          onClick={handleUpload}
+          disabled={!image || isUploading}
+          startIcon={isUploading ? <CircularProgress size={20} /> : undefined}
+        >
+          {isUploading ? "Uploading..." : "Upload"}
         </Button>
       </Box>
     </Dialog>
