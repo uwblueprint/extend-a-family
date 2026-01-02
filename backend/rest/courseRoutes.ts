@@ -226,6 +226,52 @@ courseRouter.put(
 );
 
 courseRouter.put(
+  "/:unitId/reorderModules",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    const { unitId } = req.params;
+    try {
+      const orderedModuleIds: string[] = req.body.moduleIds;
+
+      if (!Array.isArray(orderedModuleIds)) {
+        throw Error("Invalid request: moduleIds must be an array");
+      }
+
+      const courseModules = await courseModuleService.getCourseModules(unitId);
+
+      // Validate that all modules belong to the unit and no duplicates
+      if (orderedModuleIds.length !== courseModules.length) {
+        throw Error("Invalid arrangement: module count mismatch");
+      }
+
+      const moduleIdSet = new Set(orderedModuleIds);
+      if (moduleIdSet.size !== orderedModuleIds.length) {
+        throw Error("Invalid arrangement: duplicate module IDs");
+      }
+
+      // Validate all modules belong to the unit
+      const invalidModule = orderedModuleIds.find(
+        (moduleId) => !courseModules.some((mod) => mod.id === moduleId),
+      );
+      if (invalidModule) {
+        throw Error(
+          `Invalid arrangement: module ${invalidModule} not found in unit`,
+        );
+      }
+
+      // Update the modules array in the unit to reflect new order
+      await courseUnitService.updateCourseUnit(unitId, {
+        modules: orderedModuleIds,
+      });
+
+      res.status(200).send("success");
+    } catch (error: unknown) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
+courseRouter.put(
   "/:unitId/:moduleId",
   isAuthorizedByRole(new Set(["Administrator"])),
   updateCourseUnitDtoValidator,

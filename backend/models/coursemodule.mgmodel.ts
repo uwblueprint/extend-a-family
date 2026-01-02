@@ -4,7 +4,6 @@ import { ModuleStatus } from "../types/courseTypes";
 
 export interface CourseModule extends Document {
   id: string;
-  displayIndex: number;
   title: string;
   pages: [ObjectId];
   imageURL: string;
@@ -14,10 +13,6 @@ export interface CourseModule extends Document {
 export const CourseModuleSchema: Schema = new Schema({
   title: {
     type: String,
-    required: true,
-  },
-  displayIndex: {
-    type: Number,
     required: true,
   },
   pages: [

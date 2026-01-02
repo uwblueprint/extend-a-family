@@ -204,6 +204,26 @@ const deletePage = async (
   }
 };
 
+const reorderModules = async (
+  unitId: string,
+  moduleIds: string[],
+): Promise<string | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.put(
+      `/course/${unitId}/reorderModules`,
+      { moduleIds },
+      { headers: { Authorization: bearerToken } },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
 const reorderPages = async (
   moduleId: string,
   fromIndex: number,
@@ -240,4 +260,5 @@ export default {
   editModule,
   deletePage,
   reorderPages,
+  reorderModules,
 };

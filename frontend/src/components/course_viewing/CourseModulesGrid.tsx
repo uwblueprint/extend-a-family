@@ -1,5 +1,8 @@
 import { Grid, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import useCourseModules from "../../hooks/useCourseModules";
 import { useUser } from "../../hooks/useUser";
 import { CourseModule } from "../../types/CourseTypes";
@@ -22,6 +25,7 @@ export default function CourseModulesGrid({
   } = useCourseModules(unitId);
   const [courseModules, setCourseModules] = useState<CourseModule[]>([]);
   const { role } = useUser();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setCourseModules(initialModules);
@@ -35,19 +39,57 @@ export default function CourseModulesGrid({
     );
   };
 
+  const saveModuleOrder = useCallback(
+    async (modules: CourseModule[]) => {
+      const moduleIds = modules.map((module) => module.id);
+
+      try {
+        await CourseAPIClient.reorderModules(unitId, moduleIds);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("Failed to save module order:", err);
+      }
+    },
+    [unitId],
+  );
+
+  const moveModule = useCallback(
+    (dragIndex: number, hoverIndex: number) => {
+      setCourseModules((prevModules) => {
+        const dragModule = prevModules[dragIndex];
+        const newModules = [...prevModules];
+        newModules.splice(dragIndex, 1);
+        newModules.splice(hoverIndex, 0, dragModule);
+
+        // Debounce the save operation
+        if (saveTimeoutRef.current) {
+          clearTimeout(saveTimeoutRef.current);
+        }
+        saveTimeoutRef.current = setTimeout(() => {
+          saveModuleOrder(newModules);
+        }, 1000);
+
+        return newModules;
+      });
+    },
+    [saveModuleOrder],
+  );
+
   if (loading)
     return <Typography paddingLeft="10px">Loading modules...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  return (
+  const content = (
     <Grid container gap={role === "Administrator" ? "30px" : 0}>
-      {courseModules.map((module: CourseModule) =>
+      {courseModules.map((module: CourseModule, index: number) =>
         role === "Administrator" ? (
           <ModuleCardAdmin
             key={module.id}
             module={module}
             unitId={unitId}
+            index={index}
             onModuleUpdate={handleModuleUpdate}
+            moveModule={moveModule}
           />
         ) : (
           <ModuleCardLearner
@@ -59,5 +101,11 @@ export default function CourseModulesGrid({
         ),
       )}
     </Grid>
+  );
+
+  return role === "Administrator" ? (
+    <DndProvider backend={HTML5Backend}>{content}</DndProvider>
+  ) : (
+    content
   );
 }

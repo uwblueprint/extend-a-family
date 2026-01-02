@@ -43,19 +43,19 @@ class CourseModuleService implements ICourseModuleService {
     courseUnitId: string,
   ): Promise<Array<CourseModuleDTO>> {
     try {
-      const courseUnit: CourseUnit | null = await MgCourseUnit.findById(
-        courseUnitId,
-      );
+      const courseUnit = await MgCourseUnit.findById(courseUnitId)
+        .populate("modules")
+        .lean()
+        .exec();
 
       if (!courseUnit) {
         throw new Error(`Course unit with id ${courseUnitId} not found.`);
       }
 
-      const courseModules: Array<CourseModule> = await MgCourseModule.find({
-        _id: { $in: courseUnit.modules },
-      });
+      const courseModules: Array<CourseModuleDTO> =
+        courseUnit.modules as unknown as Array<CourseModuleDTO>;
 
-      return courseModules.map((courseModule) => courseModule.toObject());
+      return courseModules;
     } catch (error) {
       Logger.error(
         `Failed to get course modules for course unit with id: ${courseUnitId}. Reason = ${getErrorMessage(
@@ -164,7 +164,6 @@ class CourseModuleService implements ICourseModuleService {
 
     return {
       id: newCourseModule.id,
-      displayIndex: newCourseModule.displayIndex,
       title: newCourseModule.title,
       status: newCourseModule.status as ModuleStatus,
     } as CourseModuleDTO;
@@ -197,7 +196,6 @@ class CourseModuleService implements ICourseModuleService {
     return {
       id: updatedModule.id,
       title: updatedModule.title,
-      displayIndex: updatedModule.displayIndex,
       status: updatedModule.status as ModuleStatus,
     } as CourseModuleDTO;
   }
@@ -246,11 +244,6 @@ class CourseModuleService implements ICourseModuleService {
       }
 
       deletedCourseModuleId = deletedCourseModule.id;
-      // get the index and update the ones behind it
-      await MgCourseModule.updateMany(
-        { displayIndex: { $gt: deletedCourseModule.displayIndex } },
-        { $inc: { displayIndex: -1 } },
-      ).session(session);
 
       if (!currSession) {
         await session.commitTransaction();
@@ -331,7 +324,6 @@ class CourseModuleService implements ICourseModuleService {
       return {
         id: module.id,
         title: module.title,
-        displayIndex: module.displayIndex,
         status: module.status as ModuleStatus,
       } as CourseModuleDTO;
     } catch (error) {

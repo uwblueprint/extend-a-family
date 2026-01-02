@@ -7,7 +7,7 @@ export type CourseUnitDTO = {
 
 export type CreateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 export type UpdateCourseUnitDTO = Partial<
-  Pick<CourseUnitDTO, "title" | "displayIndex">
+  Pick<CourseUnitDTO, "title" | "displayIndex" | "modules">
 >;
 
 export enum ModuleStatus {
@@ -18,7 +18,6 @@ export enum ModuleStatus {
 
 export type CourseModuleDTO = {
   id: string;
-  displayIndex: number;
   title: string;
   imageURL?: string;
   pages: CoursePageDTO[];
@@ -27,7 +26,9 @@ export type CourseModuleDTO = {
 };
 
 export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
-export type UpdateCourseModuleDTO = Pick<CourseModuleDTO, "title" | "imageURL">;
+export type UpdateCourseModuleDTO = Partial<
+  Pick<CourseModuleDTO, "title" | "imageURL">
+>;
 
 export type PageType = "Lesson" | "Activity";
 export type CoursePageDTO = {
