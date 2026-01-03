@@ -1,67 +1,32 @@
 import * as React from "react";
 
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import { Box, Drawer, Stack, Typography, useTheme } from "@mui/material";
-import Collapse from "@mui/material/Collapse";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
+import { Box, Stack, Typography, useTheme } from "@mui/material";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import { CourseUnit } from "../../types/CourseTypes";
+import FeedbackAdminUnitSidebar from "./FeedbackAdminViewSidebar";
 
-const FeedbackAdminUnitSidebarItem = ({
-  open,
-  onClick,
-  unit,
-}: {
-  open: boolean;
-  onClick: () => void;
-  unit: CourseUnit;
-}) => {
+const RatingCard = ({ children }: { children?: React.ReactNode }) => {
   const theme = useTheme();
-
   return (
-    <>
-      <ListItemButton
-        onClick={onClick}
-        sx={{
-          borderTop: `1px solid ${theme.palette.Neutral[300]}`,
-          borderBottom: `1px solid ${theme.palette.Neutral[300]}`,
-          paddingLeft: "32px",
-        }}
-      >
-        <ListItemText>
-          <Typography variant={open ? "labelLargeProminent" : "bodyMedium"}>
-            {unit.title}
-          </Typography>
-        </ListItemText>
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          {unit.modules.map((module) => (
-            <ListItemButton key={module.id} sx={{ pl: "48px" }}>
-              <Stack
-                direction="row"
-                gap="8px"
-                alignItems="center"
-                alignSelf="stretch"
-              >
-                <Typography variant="bodyMedium">
-                  {module.displayIndex}.
-                </Typography>
-                <Typography variant="bodyMedium">{module.title}</Typography>
-              </Stack>
-            </ListItemButton>
-          ))}
-        </List>
-      </Collapse>
-    </>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        padding: "24px",
+        justifyContent: "center",
+        alignItems: "flex-start",
+        gap: "16px",
+        borderRadius: "8px",
+        border: `1px solid ${theme.palette.Neutral[400]}`,
+        backgroundColor: theme.palette.Neutral[100],
+      }}
+    >
+      {children}
+    </Box>
   );
 };
 
-const FeedbackAdminUnitSidebar = () => {
+const FeedbackAdminView = () => {
   const theme = useTheme();
 
   const [courseUnits, setCourseUnits] = React.useState<Array<CourseUnit>>([]);
@@ -79,60 +44,48 @@ const FeedbackAdminUnitSidebar = () => {
     getCourseUnits();
   }, []);
 
-  const [open, setOpen] = React.useState<string | undefined>(undefined); // unitId of open unit
-
-  return (
-    <Drawer
-      sx={{
-        width: 388,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          boxSizing: "border-box",
-          position: "relative",
-          background: theme.palette.Administrator.Light.Default,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "8px 0",
-        },
-      }}
-      variant="persistent"
-      anchor="left"
-      open
-    >
-      <List
-        sx={{ width: "100%" }}
-        component="nav"
-        aria-labelledby="nested-list-subheader"
-        subheader={
-          <Box
-            sx={{ display: "flex", padding: "20px 12px 20px 20px" }}
-            alignItems="center"
-            alignSelf="stretch"
-          >
-            <Typography variant="titleMedium">Unit Feedback</Typography>
-          </Box>
-        }
-      >
-        {courseUnits.map((unit) => (
-          <FeedbackAdminUnitSidebarItem
-            key={unit.id}
-            unit={unit}
-            open={open === unit.id}
-            onClick={() =>
-              setOpen((prevOpen) =>
-                prevOpen === unit.id ? undefined : unit.id,
-              )
-            }
-          />
-        ))}
-      </List>
-    </Drawer>
+  const [selectedUnitId, setSelectedUnitId] = React.useState<string | null>(
+    null,
   );
-};
+  const [selectedModuleId, setSelectedModuleId] = React.useState<string | null>(
+    null,
+  );
 
-const FeedbackAdminView = () => {
+  const selectedUnit = courseUnits.find((unit) => unit.id === selectedUnitId);
+  const selectedModule = selectedUnit?.modules.find(
+    (module) => module.id === selectedModuleId,
+  );
+
+  const currentTitle = () => {
+    if (selectedModule) {
+      return selectedModule.title;
+    }
+    if (selectedUnit) {
+      return selectedUnit.title;
+    }
+    return "Course Feedback";
+  };
+
+  const currentLabel = () => {
+    if (selectedModule) {
+      return `Module ${selectedModule.displayIndex}`;
+    }
+    if (selectedUnit) {
+      return `Unit ${selectedUnit.displayIndex}`;
+    }
+    return "Course";
+  };
+
+  const ratingsOutOf = () => {
+    if (selectedModule) {
+      return `20 Ratings`;
+    }
+    if (selectedUnit) {
+      return `6 Modules`;
+    }
+    return `All Modules`;
+  };
+
   return (
     <Box
       display="flex"
@@ -141,7 +94,79 @@ const FeedbackAdminView = () => {
       height="100vh"
       overflow="hidden"
     >
-      <FeedbackAdminUnitSidebar />
+      <FeedbackAdminUnitSidebar
+        courseUnits={courseUnits}
+        selectedUnitId={selectedUnitId}
+        setSelectedUnitId={setSelectedUnitId}
+        selectedModuleId={selectedModuleId}
+        setSelectedModuleId={setSelectedModuleId}
+      />
+      <Stack
+        direction="column"
+        padding="48px"
+        alignItems="flex-start"
+        gap="32px"
+        flex="1 0 0"
+        alignSelf="stretch"
+        overflow="auto"
+      >
+        <Stack direction="column" alignItems="flex-start" gap="16px">
+          <Stack
+            direction="column"
+            alignItems="flex-start"
+            justifyContent="center"
+            gap="4px"
+          >
+            <Stack
+              direction="row"
+              alignItems="flex-start"
+              gap="4px"
+              color={theme.palette.Neutral[500]}
+            >
+              <Typography variant="bodyMedium">Course Feedback</Typography>
+              {selectedUnit && (
+                <>
+                  <Typography variant="bodyMedium">/</Typography>
+                  <Typography variant="bodyMedium">
+                    {selectedUnit.title}
+                  </Typography>
+                  {selectedModule && (
+                    <>
+                      <Typography variant="bodyMedium">/</Typography>
+                      <Typography variant="bodyMedium">
+                        {selectedModule.title}
+                      </Typography>
+                    </>
+                  )}
+                </>
+              )}
+            </Stack>
+            <Typography variant="headlineLarge">{currentTitle()}</Typography>
+          </Stack>
+          <Stack direction="row" alignItems="flex-start" gap="32px">
+            <RatingCard>
+              <Typography variant="labelLarge" fontWeight="700">
+                {currentLabel()} easiness rating:
+              </Typography>
+              <Stack direction="row" alignItems="center" gap="16px">
+                <Typography variant="displayMedium">4.2/5</Typography>
+              </Stack>
+              <Typography variant="labelMedium">
+                Out of {ratingsOutOf()}
+              </Typography>
+            </RatingCard>
+            <RatingCard>
+              <Typography variant="labelLarge" fontWeight="700">
+                {currentLabel()} enjoyability rating:
+              </Typography>
+              <Typography variant="displayMedium">87% Liked</Typography>
+              <Typography variant="labelMedium">
+                Out of {ratingsOutOf()}
+              </Typography>
+            </RatingCard>
+          </Stack>
+        </Stack>
+      </Stack>
     </Box>
   );
 };
