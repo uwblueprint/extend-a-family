@@ -22,9 +22,9 @@ class CourseUnitService implements ICourseUnitService {
 
   async getCourseUnits(): Promise<Array<CourseUnitDTO>> {
     try {
-      const courseUnits: Array<CourseUnit> = await MgCourseUnit.find().sort(
-        "displayIndex",
-      );
+      const courseUnits: Array<CourseUnit> = await MgCourseUnit.find()
+        .populate("modules", "title displayIndex")
+        .sort("displayIndex");
       return courseUnits.map((courseUnit) => courseUnit.toObject());
     } catch (error) {
       Logger.error(`Failed to get courses. Reason = ${getErrorMessage(error)}`);

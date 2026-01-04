@@ -2,6 +2,7 @@ export type CourseUnit = {
   id: string;
   displayIndex: number;
   title: string;
+  modules: CourseModule[];
 };
 
 export enum QuestionType {
