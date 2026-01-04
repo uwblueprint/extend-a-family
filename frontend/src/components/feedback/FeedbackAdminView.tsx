@@ -1,6 +1,11 @@
 import * as React from "react";
 
 import { Box, Stack, Typography, useTheme } from "@mui/material";
+
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import { CourseUnit } from "../../types/CourseTypes";
 import FeedbackAdminUnitSidebar from "./FeedbackAdminViewSidebar";
@@ -103,9 +108,9 @@ const FeedbackAdminView = () => {
       />
       <Stack
         direction="column"
+        gap="32px"
         padding="48px"
         alignItems="flex-start"
-        gap="32px"
         flex="1 0 0"
         alignSelf="stretch"
         overflow="auto"
@@ -143,6 +148,25 @@ const FeedbackAdminView = () => {
             </Stack>
             <Typography variant="headlineLarge">{currentTitle()}</Typography>
           </Stack>
+          <Stack
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            gap="16px"
+          >
+            <Typography variant="labelLarge">Filter by Date:</Typography>
+            <Stack direction="row" alignItems="center" gap="8px">
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label={<Typography variant="labelLarge">From</Typography>}
+                />
+                <Typography variant="labelLarge">-</Typography>
+                <DatePicker
+                  label={<Typography variant="labelLarge">To</Typography>}
+                />
+              </LocalizationProvider>
+            </Stack>
+          </Stack>
           <Stack direction="row" alignItems="flex-start" gap="32px">
             <RatingCard>
               <Typography variant="labelLarge" fontWeight="700">
@@ -165,6 +189,17 @@ const FeedbackAdminView = () => {
               </Typography>
             </RatingCard>
           </Stack>
+        </Stack>
+        <Stack
+          direction="column"
+          alignItems="flex-start"
+          gap="24px"
+          alignSelf="stretch"
+        >
+          <Typography variant="headlineSmall">Student Feedback</Typography>
+          <Typography variant="bodyMedium" color={theme.palette.Neutral[500]}>
+            No feedback available for this period.
+          </Typography>
         </Stack>
       </Stack>
     </Box>
