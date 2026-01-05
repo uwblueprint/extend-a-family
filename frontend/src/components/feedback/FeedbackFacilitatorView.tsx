@@ -28,7 +28,7 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
       justifyContent="space-between"
       gap="24px"
       alignSelf="stretch"
-      sx={{ padding: "32px 64px" }}
+      sx={{ padding: "32px 64px", height: "100%", overflow: "hidden" }}
     >
       <Typography variant="headlineLarge" color={theme.palette.Neutral[700]}>
         View Feedback
@@ -109,8 +109,17 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
           margin: 0,
         }}
       />
-      <LearnerFeedbackBlock />
-      <LearnerFeedbackBlock />
+      <Stack
+        direction="column"
+        alignItems="flex-start"
+        gap="24px"
+        alignSelf="stretch"
+        flexGrow="1"
+        sx={{ overflow: "auto", minHeight: 0 }}
+      >
+        <LearnerFeedbackBlock />
+        <LearnerFeedbackBlock />
+      </Stack>
     </Stack>
   );
 };

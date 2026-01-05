@@ -1,4 +1,5 @@
 import mongoose, { Document, ObjectId, Schema } from "mongoose";
+import mongooseLeanId from "mongoose-lean-id";
 
 import { Role, Status } from "../types/userTypes";
 
@@ -99,6 +100,8 @@ export const UserSchema: Schema = new Schema(
   options,
 );
 
+UserSchema.plugin(mongooseLeanId);
+
 const UserModel = mongoose.model<User>("User", UserSchema);
 
 const AdministratorSchema = new Schema({}, options);
@@ -126,12 +129,14 @@ const LearnerSchema = new Schema(
   {
     facilitator: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Facilitator",
       required: true,
     },
   },
   options,
 );
+
+LearnerSchema.plugin(mongooseLeanId);
 
 const AdministratorModel = UserModel.discriminator(
   "Administrator",

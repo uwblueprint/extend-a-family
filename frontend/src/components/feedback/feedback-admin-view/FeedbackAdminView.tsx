@@ -6,9 +6,16 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import CourseAPIClient from "../../APIClients/CourseAPIClient";
-import { CourseUnit } from "../../types/CourseTypes";
+import CourseAPIClient from "../../../APIClients/CourseAPIClient";
+import { CourseUnit } from "../../../types/CourseTypes";
 import FeedbackAdminUnitSidebar from "./FeedbackAdminViewSidebar";
+import { FeedbackPopulated } from "../../../types/FeedbackTypes";
+import FeedbackAPIClient from "../../../APIClients/FeedbackAPIClient";
+import {
+  FeedbackAdminCourseView,
+  FeedbackAdminModuleView,
+  FeedbackAdminUnitView,
+} from "./FeedbackAdminViewCards";
 
 const RatingCard = ({ children }: { children?: React.ReactNode }) => {
   const theme = useTheme();
@@ -35,18 +42,17 @@ const FeedbackAdminView = () => {
   const theme = useTheme();
 
   const [courseUnits, setCourseUnits] = React.useState<Array<CourseUnit>>([]);
+  const [feedbacks, setFeedbacks] = React.useState<Array<FeedbackPopulated>>(
+    [],
+  );
 
-  const didFetchUnitsRef = React.useRef(false);
+  const didFetchRef = React.useRef(false);
   React.useEffect(() => {
-    if (didFetchUnitsRef.current) return;
-    didFetchUnitsRef.current = true;
+    if (didFetchRef.current) return;
+    didFetchRef.current = true;
 
-    const getCourseUnits = async () => {
-      const data = await CourseAPIClient.getUnits();
-      setCourseUnits(data);
-    };
-
-    getCourseUnits();
+    CourseAPIClient.getUnits().then(setCourseUnits);
+    FeedbackAPIClient.fetchAllFeedback().then(setFeedbacks);
   }, []);
 
   const [selectedUnitId, setSelectedUnitId] = React.useState<string | null>(
@@ -60,6 +66,10 @@ const FeedbackAdminView = () => {
   const selectedModule = selectedUnit?.modules.find(
     (module) => module.id === selectedModuleId,
   );
+
+  const courseView = !selectedUnit && !selectedModule;
+  const unitView = selectedUnit && !selectedModule;
+  const moduleView = selectedUnit && selectedModule;
 
   const currentTitle = () => {
     if (selectedModule) {
@@ -83,7 +93,9 @@ const FeedbackAdminView = () => {
 
   const ratingsOutOf = () => {
     if (selectedModule) {
-      return `20 Ratings`;
+      return `${
+        feedbacks.filter((f) => f.moduleId.id === selectedModule.id).length
+      } Ratings`;
     }
     if (selectedUnit) {
       return `6 Modules`;
@@ -92,13 +104,7 @@ const FeedbackAdminView = () => {
   };
 
   return (
-    <Box
-      display="flex"
-      width="100%"
-      minHeight="100vh"
-      height="100vh"
-      overflow="hidden"
-    >
+    <Box display="flex" width="100%" height="100%" overflow="hidden">
       <FeedbackAdminUnitSidebar
         courseUnits={courseUnits}
         selectedUnitId={selectedUnitId}
@@ -113,7 +119,7 @@ const FeedbackAdminView = () => {
         alignItems="flex-start"
         flex="1 0 0"
         alignSelf="stretch"
-        overflow="auto"
+        sx={{ overflow: "auto", minHeight: 0 }}
       >
         <Stack direction="column" alignItems="flex-start" gap="16px">
           <Stack
@@ -190,17 +196,25 @@ const FeedbackAdminView = () => {
             </RatingCard>
           </Stack>
         </Stack>
-        <Stack
-          direction="column"
-          alignItems="flex-start"
-          gap="24px"
-          alignSelf="stretch"
-        >
-          <Typography variant="headlineSmall">Student Feedback</Typography>
-          <Typography variant="bodyMedium" color={theme.palette.Neutral[500]}>
-            No feedback available for this period.
-          </Typography>
-        </Stack>
+        {courseView && (
+          <FeedbackAdminCourseView
+            units={courseUnits}
+            setSelectedUnitId={setSelectedUnitId}
+          />
+        )}
+        {unitView && selectedUnit && (
+          <FeedbackAdminUnitView
+            unit={selectedUnit}
+            modules={selectedUnit.modules}
+            setSelectedModuleId={setSelectedModuleId}
+          />
+        )}
+        {moduleView && selectedUnit && selectedModule && (
+          <FeedbackAdminModuleView
+            module={selectedModule}
+            feedbacks={feedbacks}
+          />
+        )}
       </Stack>
     </Box>
   );

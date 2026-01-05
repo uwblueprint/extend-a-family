@@ -7,7 +7,7 @@ import Collapse from "@mui/material/Collapse";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import { CourseUnit } from "../../types/CourseTypes";
+import { CourseUnit } from "../../../types/CourseTypes";
 
 const FeedbackAdminUnitSidebarItem = ({
   open,

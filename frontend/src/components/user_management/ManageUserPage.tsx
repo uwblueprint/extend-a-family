@@ -344,6 +344,7 @@ const ManageUserPage = (): React.ReactElement => {
         display: "flex",
         flexDirection: "column",
         padding: "25px",
+        height: "100vh",
       }}
     >
       <AddUserSnackbar />
@@ -372,7 +373,12 @@ const ManageUserPage = (): React.ReactElement => {
         setEmail={setLearnerEmail}
         handleAddLearner={handleAddLearner}
       />
-      <Stack direction="column" spacing={4} margin="2rem">
+      <Stack
+        direction="column"
+        spacing={4}
+        margin="2rem"
+        sx={{ flex: 1, overflow: "hidden" }}
+      >
         <TopToolBar
           searchQuery={searchQuery}
           handleSearch={handleSearch}
@@ -402,7 +408,11 @@ const ManageUserPage = (): React.ReactElement => {
             />
           </Box>
         )}
-        <Stack direction="column" gap="16px">
+        <Stack
+          direction="column"
+          gap="16px"
+          sx={{ flex: 1, minHeight: 0, paddingBottom: 4 }}
+        >
           <Typography variant="headlineMedium">All Users</Typography>
           <UserTable
             filteredUsers={regularUsers}

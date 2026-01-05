@@ -74,9 +74,9 @@ const UserTable: React.FC<UserTableProps> = ({
       sx={{
         border: "none",
         boxShadow: 0,
-        maxHeight: "600px",
         display: "flex",
         flexDirection: "column",
+        height: "100%",
       }}
     >
       <Box
