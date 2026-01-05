@@ -1,9 +1,10 @@
 import * as React from "react";
 
-import { Box, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { Dayjs } from "dayjs";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
@@ -62,9 +63,30 @@ const FeedbackAdminView = () => {
     null,
   );
 
+  const [fromDate, setFromDate] = React.useState<Dayjs | null>(null);
+  const [toDate, setToDate] = React.useState<Dayjs | null>(null);
+
   const selectedUnit = courseUnits.find((unit) => unit.id === selectedUnitId);
+
+  const filterByDateRange = (feedback: FeedbackPopulated) => {
+    const feedbackDate = new Date(feedback.createdAt);
+    if (fromDate && feedbackDate < fromDate.toDate()) return false;
+    if (toDate && feedbackDate > toDate.endOf("day").toDate()) return false;
+    return true;
+  };
+
+  const selectedUnitFeedbacks = feedbacks.filter(
+    (feedback) =>
+      selectedUnit?.modules.some(
+        (module) => module.id === feedback.moduleId.id,
+      ) && filterByDateRange(feedback),
+  );
+
   const selectedModule = selectedUnit?.modules.find(
     (module) => module.id === selectedModuleId,
+  );
+  const selectedModuleFeedbacks = selectedUnitFeedbacks.filter(
+    (feedback) => feedback.moduleId.id === selectedModuleId,
   );
 
   const courseView = !selectedUnit && !selectedModule;
@@ -93,14 +115,58 @@ const FeedbackAdminView = () => {
 
   const ratingsOutOf = () => {
     if (selectedModule) {
-      return `${
-        feedbacks.filter((f) => f.moduleId.id === selectedModule.id).length
-      } Ratings`;
+      return `${selectedModuleFeedbacks.length} Ratings`;
     }
     if (selectedUnit) {
-      return `6 Modules`;
+      return `${selectedUnit.modules.length} Modules`;
     }
     return `All Modules`;
+  };
+
+  const averageEasiness = () => {
+    if (selectedModule) {
+      return (
+        selectedModuleFeedbacks.reduce((acc, feedback) => {
+          return acc + feedback.difficulty;
+        }, 0) / selectedModuleFeedbacks.length
+      );
+    }
+    if (selectedUnit) {
+      return (
+        selectedUnitFeedbacks.reduce((acc, feedback) => {
+          return acc + feedback.difficulty;
+        }, 0) / selectedUnitFeedbacks.length
+      );
+    }
+    const filteredFeedbacks = feedbacks.filter(filterByDateRange);
+    return (
+      filteredFeedbacks.reduce((acc, feedback) => {
+        return acc + feedback.difficulty;
+      }, 0) / filteredFeedbacks.length
+    );
+  };
+
+  const averageLiked = () => {
+    if (selectedModule) {
+      return (
+        (selectedModuleFeedbacks.filter((feedback) => feedback.isLiked).length /
+          selectedModuleFeedbacks.length) *
+        100
+      );
+    }
+    if (selectedUnit) {
+      return (
+        (selectedUnitFeedbacks.filter((feedback) => feedback.isLiked).length /
+          selectedUnitFeedbacks.length) *
+        100
+      );
+    }
+    const filteredFeedbacks = feedbacks.filter(filterByDateRange);
+    return (
+      (filteredFeedbacks.filter((feedback) => feedback.isLiked).length /
+        filteredFeedbacks.length) *
+      100
+    );
   };
 
   return (
@@ -165,12 +231,26 @@ const FeedbackAdminView = () => {
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label={<Typography variant="labelLarge">From</Typography>}
+                  value={fromDate}
+                  onChange={(newValue) => setFromDate(newValue)}
                 />
                 <Typography variant="labelLarge">-</Typography>
                 <DatePicker
                   label={<Typography variant="labelLarge">To</Typography>}
+                  value={toDate}
+                  onChange={(newValue) => setToDate(newValue)}
                 />
               </LocalizationProvider>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setFromDate(null);
+                  setToDate(null);
+                }}
+                disabled={!fromDate && !toDate}
+              >
+                Clear
+              </Button>
             </Stack>
           </Stack>
           <Stack direction="row" alignItems="flex-start" gap="32px">
@@ -179,7 +259,9 @@ const FeedbackAdminView = () => {
                 {currentLabel()} easiness rating:
               </Typography>
               <Stack direction="row" alignItems="center" gap="16px">
-                <Typography variant="displayMedium">4.2/5</Typography>
+                <Typography variant="displayMedium">
+                  {averageEasiness().toFixed(1)}/5
+                </Typography>
               </Stack>
               <Typography variant="labelMedium">
                 Out of {ratingsOutOf()}
@@ -189,7 +271,9 @@ const FeedbackAdminView = () => {
               <Typography variant="labelLarge" fontWeight="700">
                 {currentLabel()} enjoyability rating:
               </Typography>
-              <Typography variant="displayMedium">87% Liked</Typography>
+              <Typography variant="displayMedium">
+                {Math.round(averageLiked())}% Liked
+              </Typography>
               <Typography variant="labelMedium">
                 Out of {ratingsOutOf()}
               </Typography>
@@ -212,7 +296,7 @@ const FeedbackAdminView = () => {
         {moduleView && selectedUnit && selectedModule && (
           <FeedbackAdminModuleView
             module={selectedModule}
-            feedbacks={feedbacks}
+            feedbacks={selectedModuleFeedbacks}
           />
         )}
       </Stack>
