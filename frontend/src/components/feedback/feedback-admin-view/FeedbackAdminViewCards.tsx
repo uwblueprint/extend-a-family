@@ -2,6 +2,12 @@ import { Button, Divider, Stack, Typography, useTheme } from "@mui/material";
 import { CourseModule, CourseUnit } from "../../../types/CourseTypes";
 import { FeedbackPopulated } from "../../../types/FeedbackTypes";
 import FeedbackCard from "../FeedbackCard";
+import {
+  getFeedbacksByUnitId,
+  getFeedbacksByModuleId,
+  calculateAverageEasiness,
+  calculateLikedPercentage,
+} from "./feedbackUtils";
 
 const SummaryCard = ({
   label,
@@ -14,9 +20,9 @@ const SummaryCard = ({
 }: {
   label: string;
   title: string;
-  easiness: number;
-  liked: number;
-  outOf: number;
+  easiness: number | null;
+  liked: number | null;
+  outOf: string;
   onClick: () => void;
   buttonText: string;
 }) => {
@@ -41,8 +47,12 @@ const SummaryCard = ({
         justifyContent="flex-end"
         gap="24px"
       >
-        <Typography variant="titleMedium">{easiness}/5 Easy</Typography>
-        <Typography variant="titleMedium">{liked}% Liked</Typography>
+        <Typography variant="titleMedium">
+          {easiness !== null ? `${easiness.toFixed(1)}/5` : "-/5"} Easy
+        </Typography>
+        <Typography variant="titleMedium">
+          {liked !== null ? `${Math.round(liked)}%` : "-%"} Liked
+        </Typography>
       </Stack>
       <Typography variant="labelMedium">Out of {outOf}</Typography>
       <Button
@@ -64,9 +74,11 @@ const SummaryCard = ({
 
 export const FeedbackAdminCourseView = ({
   units,
+  feedbacks,
   setSelectedUnitId,
 }: {
   units: CourseUnit[];
+  feedbacks: FeedbackPopulated[];
   setSelectedUnitId: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
   return (
@@ -84,18 +96,24 @@ export const FeedbackAdminCourseView = ({
         flexWrap="wrap"
         alignSelf="stretch"
       >
-        {units.map((unit) => (
-          <SummaryCard
-            key={unit.id}
-            label={`Unit ${unit.displayIndex}`}
-            title={unit.title}
-            easiness={4.2}
-            liked={85}
-            outOf={120}
-            onClick={() => setSelectedUnitId(unit.id)}
-            buttonText="View Unit Feedback"
-          />
-        ))}
+        {units.map((unit) => {
+          const unitFeedbacks = getFeedbacksByUnitId(feedbacks, unit);
+          const easiness = calculateAverageEasiness(unitFeedbacks);
+          const liked = calculateLikedPercentage(unitFeedbacks);
+
+          return (
+            <SummaryCard
+              key={unit.id}
+              label={`Unit ${unit.displayIndex}`}
+              title={unit.title}
+              easiness={easiness}
+              liked={liked}
+              outOf={`${unit.modules.length} Modules`}
+              onClick={() => setSelectedUnitId(unit.id)}
+              buttonText="View Unit Feedback"
+            />
+          );
+        })}
       </Stack>
     </Stack>
   );
@@ -104,10 +122,12 @@ export const FeedbackAdminCourseView = ({
 export const FeedbackAdminUnitView = ({
   unit,
   modules,
+  feedbacks,
   setSelectedModuleId,
 }: {
   unit: CourseUnit;
   modules: CourseModule[];
+  feedbacks: FeedbackPopulated[];
   setSelectedModuleId: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
   return (
@@ -127,18 +147,24 @@ export const FeedbackAdminUnitView = ({
         flexWrap="wrap"
         alignSelf="stretch"
       >
-        {modules.map((module) => (
-          <SummaryCard
-            key={module.id}
-            label={`Module ${module.displayIndex}`}
-            title={module.title}
-            easiness={4.2}
-            liked={85}
-            outOf={120}
-            onClick={() => setSelectedModuleId(module.id)}
-            buttonText="View Module Feedback"
-          />
-        ))}
+        {modules.map((module) => {
+          const moduleFeedbacks = getFeedbacksByModuleId(feedbacks, module.id);
+          const easiness = calculateAverageEasiness(moduleFeedbacks);
+          const liked = calculateLikedPercentage(moduleFeedbacks);
+
+          return (
+            <SummaryCard
+              key={module.id}
+              label={`Module ${module.displayIndex}`}
+              title={module.title}
+              easiness={easiness}
+              liked={liked}
+              outOf={`${moduleFeedbacks.length} Reviews`}
+              onClick={() => setSelectedModuleId(module.id)}
+              buttonText="View Module Feedback"
+            />
+          );
+        })}
       </Stack>
     </Stack>
   );

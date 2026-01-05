@@ -17,6 +17,7 @@ import {
   FeedbackAdminModuleView,
   FeedbackAdminUnitView,
 } from "./FeedbackAdminViewCards";
+import { getFeedbacksByUnitId, getFeedbacksByModuleId } from "./feedbackUtils";
 
 const RatingCard = ({ children }: { children?: React.ReactNode }) => {
   const theme = useTheme();
@@ -43,9 +44,9 @@ const FeedbackAdminView = () => {
   const theme = useTheme();
 
   const [courseUnits, setCourseUnits] = React.useState<Array<CourseUnit>>([]);
-  const [feedbacks, setFeedbacks] = React.useState<Array<FeedbackPopulated>>(
-    [],
-  );
+  const [allFeedbacks, setAllFeedbacks] = React.useState<
+    Array<FeedbackPopulated>
+  >([]);
 
   const didFetchRef = React.useRef(false);
   React.useEffect(() => {
@@ -53,7 +54,7 @@ const FeedbackAdminView = () => {
     didFetchRef.current = true;
 
     CourseAPIClient.getUnits().then(setCourseUnits);
-    FeedbackAPIClient.fetchAllFeedback().then(setFeedbacks);
+    FeedbackAPIClient.fetchAllFeedback().then(setAllFeedbacks);
   }, []);
 
   const [selectedUnitId, setSelectedUnitId] = React.useState<string | null>(
@@ -75,19 +76,18 @@ const FeedbackAdminView = () => {
     return true;
   };
 
-  const selectedUnitFeedbacks = feedbacks.filter(
-    (feedback) =>
-      selectedUnit?.modules.some(
-        (module) => module.id === feedback.moduleId.id,
-      ) && filterByDateRange(feedback),
-  );
+  const feedbacks = allFeedbacks.filter(filterByDateRange);
+
+  const selectedUnitFeedbacks = selectedUnit
+    ? getFeedbacksByUnitId(feedbacks, selectedUnit)
+    : [];
 
   const selectedModule = selectedUnit?.modules.find(
     (module) => module.id === selectedModuleId,
   );
-  const selectedModuleFeedbacks = selectedUnitFeedbacks.filter(
-    (feedback) => feedback.moduleId.id === selectedModuleId,
-  );
+  const selectedModuleFeedbacks = selectedModuleId
+    ? getFeedbacksByModuleId(feedbacks, selectedModuleId)
+    : [];
 
   const courseView = !selectedUnit && !selectedModule;
   const unitView = selectedUnit && !selectedModule;
@@ -123,8 +123,9 @@ const FeedbackAdminView = () => {
     return `All Modules`;
   };
 
-  const averageEasiness = () => {
+  const averageEasiness = (): number | null => {
     if (selectedModule) {
+      if (selectedModuleFeedbacks.length === 0) return null;
       return (
         selectedModuleFeedbacks.reduce((acc, feedback) => {
           return acc + feedback.difficulty;
@@ -132,22 +133,24 @@ const FeedbackAdminView = () => {
       );
     }
     if (selectedUnit) {
+      if (selectedUnitFeedbacks.length === 0) return null;
       return (
         selectedUnitFeedbacks.reduce((acc, feedback) => {
           return acc + feedback.difficulty;
         }, 0) / selectedUnitFeedbacks.length
       );
     }
-    const filteredFeedbacks = feedbacks.filter(filterByDateRange);
+    if (feedbacks.length === 0) return null;
     return (
-      filteredFeedbacks.reduce((acc, feedback) => {
+      feedbacks.reduce((acc, feedback) => {
         return acc + feedback.difficulty;
-      }, 0) / filteredFeedbacks.length
+      }, 0) / feedbacks.length
     );
   };
 
-  const averageLiked = () => {
+  const averageLiked = (): number | null => {
     if (selectedModule) {
+      if (selectedModuleFeedbacks.length === 0) return null;
       return (
         (selectedModuleFeedbacks.filter((feedback) => feedback.isLiked).length /
           selectedModuleFeedbacks.length) *
@@ -155,16 +158,17 @@ const FeedbackAdminView = () => {
       );
     }
     if (selectedUnit) {
+      if (selectedUnitFeedbacks.length === 0) return null;
       return (
         (selectedUnitFeedbacks.filter((feedback) => feedback.isLiked).length /
           selectedUnitFeedbacks.length) *
         100
       );
     }
-    const filteredFeedbacks = feedbacks.filter(filterByDateRange);
+    if (feedbacks.length === 0) return null;
     return (
-      (filteredFeedbacks.filter((feedback) => feedback.isLiked).length /
-        filteredFeedbacks.length) *
+      (feedbacks.filter((feedback) => feedback.isLiked).length /
+        feedbacks.length) *
       100
     );
   };
@@ -260,11 +264,13 @@ const FeedbackAdminView = () => {
               </Typography>
               <Stack direction="row" alignItems="center" gap="16px">
                 <Typography variant="displayMedium">
-                  {averageEasiness().toFixed(1)}/5
+                  {averageEasiness() !== null
+                    ? `${averageEasiness()!.toFixed(1)}/5`
+                    : "-/5"}
                 </Typography>
               </Stack>
               <Typography variant="labelMedium">
-                Out of {ratingsOutOf()}
+                Out of {ratingsOutOf()} reviews
               </Typography>
             </RatingCard>
             <RatingCard>
@@ -272,10 +278,12 @@ const FeedbackAdminView = () => {
                 {currentLabel()} enjoyability rating:
               </Typography>
               <Typography variant="displayMedium">
-                {Math.round(averageLiked())}% Liked
+                {averageLiked() !== null
+                  ? `${Math.round(averageLiked()!)}% Liked`
+                  : "-% Liked"}
               </Typography>
               <Typography variant="labelMedium">
-                Out of {ratingsOutOf()}
+                Out of {ratingsOutOf()} reviews
               </Typography>
             </RatingCard>
           </Stack>
@@ -283,6 +291,7 @@ const FeedbackAdminView = () => {
         {courseView && (
           <FeedbackAdminCourseView
             units={courseUnits}
+            feedbacks={feedbacks}
             setSelectedUnitId={setSelectedUnitId}
           />
         )}
@@ -290,6 +299,7 @@ const FeedbackAdminView = () => {
           <FeedbackAdminUnitView
             unit={selectedUnit}
             modules={selectedUnit.modules}
+            feedbacks={feedbacks}
             setSelectedModuleId={setSelectedModuleId}
           />
         )}
