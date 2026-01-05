@@ -35,7 +35,8 @@ import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
 // import UploadThumbnailPage from "./components/courses/UploadThumbnailPage";
-import FeedbackFacilitator from "./components/pages/FeedbackFacilitator";
+import FeedbackAdminView from "./components/feedback/feedback-admin-view/FeedbackAdminView";
+import FeedbackFacilitatorView from "./components/feedback/FeedbackFacilitatorView";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
 import LessonUpload from "./components/pages/LessonUpload";
 import MakeHelpRequestPage from "./components/pages/MakeHelpRequestPage";
@@ -193,7 +194,11 @@ const App = (): React.ReactElement => {
                 <PrivateRoute
                   exact
                   path={Routes.FEEDBACK_PAGE}
-                  component={FeedbackFacilitator}
+                  component={
+                    currentUser?.role === "Administrator"
+                      ? FeedbackAdminView
+                      : FeedbackFacilitatorView
+                  }
                   allowedRoles={["Administrator", "Facilitator"]}
                 />
                 <Route exact path="*" component={NotFound} />

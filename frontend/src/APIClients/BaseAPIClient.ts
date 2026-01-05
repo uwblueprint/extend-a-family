@@ -33,7 +33,7 @@ baseAPIClient.interceptors.request.use(async (config: AxiosRequestConfig) => {
         decodedToken.exp <= Math.round(new Date().getTime() / 1000))
     ) {
       const { data } = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/auth/refresh`,
+        `${process.env.REACT_APP_BACKEND_URL}auth/refresh`,
         {},
         { withCredentials: true },
       );

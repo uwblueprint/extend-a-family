@@ -13,7 +13,7 @@ export const FeedbackSchema: Schema = new Schema(
   {
     learnerId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Learner",
       required: true,
     },
     moduleId: {
