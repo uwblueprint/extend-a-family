@@ -8,6 +8,7 @@ import { useUser } from "../../hooks/useUser";
 import { CourseModule } from "../../types/CourseTypes";
 import ModuleCardAdmin from "./library-viewing/ModuleCardAdmin";
 import ModuleCardLearner from "./library-viewing/ModuleCardLearner";
+import ModuleCardFacilitator from "./library-viewing/ModuleCardFacilitator";
 
 interface ModuleGridProps {
   unitId: string;
@@ -80,26 +81,34 @@ export default function CourseModulesGrid({
   if (error) return <Typography color="error">{error}</Typography>;
 
   const content = (
-    <Grid container gap={role === "Administrator" ? "30px" : 0}>
-      {courseModules.map((module: CourseModule, index: number) =>
-        role === "Administrator" ? (
-          <ModuleCardAdmin
-            key={module.id}
-            module={module}
-            unitId={unitId}
-            index={index}
-            onModuleUpdate={handleModuleUpdate}
-            moveModule={moveModule}
-          />
-        ) : (
-          <ModuleCardLearner
-            key={module.id}
-            module={module}
-            unitId={unitId}
-            isSidebarOpen={isSidebarOpen}
-          />
-        ),
-      )}
+    <Grid container gap={role === "Learner" ? 0 : "30px"}>
+      {courseModules.map((module: CourseModule, index: number) => {
+        switch (role) {
+          case "Administrator":
+            return (
+              <ModuleCardAdmin
+                key={module.id}
+                module={module}
+                unitId={unitId}
+                index={index}
+                onModuleUpdate={handleModuleUpdate}
+                moveModule={moveModule}
+              />
+            );
+          case "Facilitator":
+            return <ModuleCardFacilitator key={module.id} module={module} />;
+          case "Learner":
+          default:
+            return (
+              <ModuleCardLearner
+                key={module.id}
+                module={module}
+                unitId={unitId}
+                isSidebarOpen={isSidebarOpen}
+              />
+            );
+        }
+      })}
     </Grid>
   );
 
