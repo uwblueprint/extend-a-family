@@ -274,7 +274,14 @@ const ModuleCardAdmin = ({
             <ListItemText>Rename module</ListItemText>
           </MenuItem>
           <Divider sx={{ my: "0 !important", py: "4px !important" }} />
-          <MenuItem onClick={handleMenuClose}>
+          <MenuItem
+            onClick={() => {
+              history.push(
+                `${Routes.FEEDBACK_PAGE}?unitId=${unitId}&moduleId=${module.id}`,
+              );
+              handleMenuClose();
+            }}
+          >
             <ListItemIcon>
               <OpenInNew />
             </ListItemIcon>

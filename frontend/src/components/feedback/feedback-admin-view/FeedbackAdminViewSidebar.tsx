@@ -66,7 +66,15 @@ const FeedbackAdminUnitSidebarItem = ({
                 <Typography variant="bodyMedium">
                   {module.displayIndex}.
                 </Typography>
-                <Typography variant="bodyMedium">{module.title}</Typography>
+                <Typography
+                  variant={
+                    module.id === selectedModuleId
+                      ? "labelLargeProminent"
+                      : "bodyMedium"
+                  }
+                >
+                  {module.title}
+                </Typography>
               </Stack>
             </ListItemButton>
           ))}

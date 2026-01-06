@@ -7,6 +7,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Dayjs } from "dayjs";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
+import { useHistory, useLocation } from "react-router-dom";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import { CourseUnit } from "../../../types/CourseTypes";
 import FeedbackAdminUnitSidebar from "./FeedbackAdminViewSidebar";
@@ -40,29 +41,89 @@ const RatingCard = ({ children }: { children?: React.ReactNode }) => {
   );
 };
 
+// Cache data at module level to persist across component remounts
+let cachedCourseUnits: Array<CourseUnit> | null = null;
+let cachedAllFeedbacks: Array<FeedbackPopulated> | null = null;
+let isFetching = false;
+
 const FeedbackAdminView = () => {
   const theme = useTheme();
+  const location = useLocation();
+  const history = useHistory();
 
-  const [courseUnits, setCourseUnits] = React.useState<Array<CourseUnit>>([]);
+  const [courseUnits, setCourseUnits] = React.useState<Array<CourseUnit>>(
+    cachedCourseUnits || [],
+  );
   const [allFeedbacks, setAllFeedbacks] = React.useState<
     Array<FeedbackPopulated>
-  >([]);
+  >(cachedAllFeedbacks || []);
 
-  const didFetchRef = React.useRef(false);
   React.useEffect(() => {
-    if (didFetchRef.current) return;
-    didFetchRef.current = true;
+    if (isFetching) return;
 
-    CourseAPIClient.getUnits().then(setCourseUnits);
-    FeedbackAPIClient.fetchAllFeedback().then(setAllFeedbacks);
+    if (cachedCourseUnits && cachedAllFeedbacks) {
+      setCourseUnits(cachedCourseUnits);
+      setAllFeedbacks(cachedAllFeedbacks);
+      return;
+    }
+
+    isFetching = true;
+
+    Promise.all([
+      CourseAPIClient.getUnits(),
+      FeedbackAPIClient.fetchAllFeedback(),
+    ]).then(([units, feedbacks]) => {
+      cachedCourseUnits = units;
+      cachedAllFeedbacks = feedbacks;
+      setCourseUnits(units);
+      setAllFeedbacks(feedbacks);
+      isFetching = false;
+    });
   }, []);
 
+  // Initialize state from URL params only once
+  const initialUnitIdRef = React.useRef<string | null>(null);
+  const initialModuleIdRef = React.useRef<string | null>(null);
+  const hasInitializedFromUrlRef = React.useRef(false);
+
+  if (!hasInitializedFromUrlRef.current) {
+    const queryParams = new URLSearchParams(location.search);
+    initialUnitIdRef.current = queryParams.get("unitId");
+    initialModuleIdRef.current = queryParams.get("moduleId");
+    hasInitializedFromUrlRef.current = true;
+  }
+
   const [selectedUnitId, setSelectedUnitId] = React.useState<string | null>(
-    null,
+    initialUnitIdRef.current,
   );
   const [selectedModuleId, setSelectedModuleId] = React.useState<string | null>(
-    null,
+    initialModuleIdRef.current,
   );
+
+  // Update URL when selection changes
+  React.useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedUnitId) {
+      params.set("unitId", selectedUnitId);
+    }
+    if (selectedModuleId) {
+      params.set("moduleId", selectedModuleId);
+    }
+    const newSearch = params.toString();
+    const currentSearch = location.search.replace(/^\?/, "");
+    if (newSearch !== currentSearch) {
+      history.replace({
+        pathname: location.pathname,
+        search: newSearch ? `?${newSearch}` : "",
+      });
+    }
+  }, [
+    selectedUnitId,
+    selectedModuleId,
+    history,
+    location.pathname,
+    location.search,
+  ]);
 
   const [fromDate, setFromDate] = React.useState<Dayjs | null>(null);
   const [toDate, setToDate] = React.useState<Dayjs | null>(null);
