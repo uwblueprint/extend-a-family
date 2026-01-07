@@ -100,7 +100,6 @@ const FeedbackAdminView = () => {
     initialModuleIdRef.current,
   );
 
-  // Update URL when selection changes
   React.useEffect(() => {
     const params = new URLSearchParams();
     if (selectedUnitId) {

@@ -4,10 +4,12 @@ import {
   CardContent,
   CardMedia,
   Grid,
+  Stack,
   Typography,
   useTheme,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { CheckCircle } from "@mui/icons-material";
 import * as Routes from "../../../constants/Routes";
 import { CourseModule } from "../../../types/CourseTypes";
 import BlankImg from "../../assets/blankSlide.png";
@@ -66,13 +68,13 @@ const ModuleCardLearner = ({
               "&:last-child": {
                 paddingBottom: 0,
               },
+              gap: "8px",
             }}
           >
             <Typography
               variant="labelLarge"
               sx={{
                 color: theme.palette.Neutral[500],
-                paddingBottom: "8px",
               }}
             >
               Module {module.displayIndex}
@@ -90,6 +92,19 @@ const ModuleCardLearner = ({
             >
               {module.title}
             </Typography>
+            <Stack
+              direction="row"
+              padding="4px 8px"
+              justifyContent="center"
+              alignItems="center"
+              gap="8px"
+              borderRadius="4px"
+              bgcolor={theme.palette.Success.Light.Hover}
+              color={theme.palette.Success.Dark.Default}
+            >
+              <CheckCircle sx={{ fontSize: 15 }} />
+              <Typography variant="labelMedium">FINISHED ON [DATE]</Typography>
+            </Stack>
           </CardContent>
         </CardActionArea>
       </Card>

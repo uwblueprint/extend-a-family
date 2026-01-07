@@ -29,7 +29,7 @@ export default function NavButton({
         borderRadius: "8px",
         padding: "20px",
         gap: "12px",
-        width: 515,
+        width: 350,
         ...theme.typography.bodyLarge,
       }}
     >

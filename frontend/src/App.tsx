@@ -15,6 +15,7 @@ import SignupPending from "./components/auth/SignupPendingPage";
 import Welcome from "./components/auth/WelcomePage";
 import Bookmarks from "./components/pages/Bookmarks";
 import CreateModulePage from "./components/pages/CreateModulePage";
+import FinishedModules from "./components/pages/FinishedModules";
 import Home from "./components/pages/Home";
 import NotAuthorized from "./components/pages/NotAuthorized";
 import NotFound from "./components/pages/NotFound";
@@ -124,6 +125,12 @@ const App = (): React.ReactElement => {
                   exact
                   path={Routes.BOOKMARKS_PAGE}
                   component={Bookmarks}
+                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                />
+                <PrivateRoute
+                  exact
+                  path={Routes.FINISHED_MODULES_PAGE}
+                  component={FinishedModules}
                   allowedRoles={["Administrator", "Facilitator", "Learner"]}
                 />
                 <PrivateRoute
