@@ -8,7 +8,7 @@ import UserAPIClient from "../../APIClients/UserAPIClient";
 import { Learner } from "../../types/UserTypes";
 import FacilitatorCard from "../learners/FacilitatorCard";
 import NavButton from "../learners/NavButton";
-import { BOOKMARKS_PAGE } from "../../constants/Routes";
+import { BOOKMARKS_PAGE, FINISHED_MODULES_PAGE } from "../../constants/Routes";
 
 const Home = (): React.ReactElement => {
   const [learner, setLearner] = useState<Learner>();
@@ -34,13 +34,15 @@ const Home = (): React.ReactElement => {
     <Box display="flex" width="100%">
       <LearnerUnitSidebar />
 
-      <Box display="flex" flexGrow={1} justifyContent="center">
-        <Box display="flex" flexDirection="column">
+      <Box display="flex" flexGrow={1} justifyContent="center" padding="48px">
+        <Box display="flex" flexDirection="column" width="100%">
           <Stack
             direction="row"
             width="100%"
-            justifyContent="space-between"
+            alignItems="flex-start"
             marginY="70px"
+            flexWrap="wrap"
+            gap="20px"
           >
             <NavButton
               label="Bookmarks"
@@ -50,6 +52,7 @@ const Home = (): React.ReactElement => {
             <NavButton
               label="Finished Modules"
               icon={<CheckCircleOutlineIcon />}
+              href={FINISHED_MODULES_PAGE}
             />
           </Stack>
           <Box width="100%" mb="30px">

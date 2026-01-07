@@ -4,6 +4,8 @@ export const HOME_PAGE = "/home";
 
 export const BOOKMARKS_PAGE = "/bookmarks";
 
+export const FINISHED_MODULES_PAGE = "/finished-modules";
+
 export const WELCOME_PAGE = "/welcome";
 
 export const SIGNUP_PAGE = "/signup";
