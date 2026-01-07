@@ -7,6 +7,7 @@ import {
   ArrowCircleUp,
   CheckCircleOutline,
   DeleteOutline,
+  HourglassBottom,
   Refresh,
   VisibilityOutlined,
 } from "@mui/icons-material";
@@ -24,6 +25,8 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Snackbar,
+  SnackbarContent,
   Stack,
   Typography,
   useTheme,
@@ -132,6 +135,11 @@ const ViewModulePage = () => {
     useState<null | HTMLElement>(null);
   const [selectedPageIndexForActivity, setSelectedPageIndexForActivity] =
     useState<number | null>(null);
+  const [uploadSnackbarOpen, setUploadSnackbarOpen] = useState(false);
+  const [uploadSnackbarMessage, setUploadSnackbarMessage] = useState("");
+  const [isSnackbarSuccess, setIsSnackbarSuccess] = useState(true);
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+  const [isDeletingFromContext, setIsDeletingFromContext] = useState(false);
 
   const [hasImage, setHasImage] = useState(
     (currentPageObject &&
@@ -205,16 +213,29 @@ const ViewModulePage = () => {
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file && module) {
+        setIsUploadingPdf(true);
+        setIsSnackbarSuccess(false);
+        setUploadSnackbarMessage("Uploading PDF...");
+        setUploadSnackbarOpen(true);
         try {
+          const previousPageCount = module.pages.length;
           const updatedModule = await CourseAPIClient.lessonUpload(
             file,
             module.id,
             contextMenu.pageIndex,
           );
           setModule(updatedModule);
+          const pagesAdded = updatedModule.pages.length - previousPageCount;
+          setIsSnackbarSuccess(true);
+          setUploadSnackbarMessage(
+            `${pagesAdded} page${pagesAdded !== 1 ? "s" : ""} uploaded`,
+          );
         } catch (error) {
           /* eslint-disable-next-line no-console */
           console.error("Failed to upload PDF:", error);
+          setUploadSnackbarOpen(false);
+        } finally {
+          setIsUploadingPdf(false);
         }
       }
     };
@@ -230,16 +251,29 @@ const ViewModulePage = () => {
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file && module) {
+        setIsUploadingPdf(true);
+        setIsSnackbarSuccess(false);
+        setUploadSnackbarMessage("Uploading PDF...");
+        setUploadSnackbarOpen(true);
         try {
+          const previousPageCount = module.pages.length;
           const updatedModule = await CourseAPIClient.lessonUpload(
             file,
             module.id,
             contextMenu.pageIndex + 1,
           );
           setModule(updatedModule);
+          const pagesAdded = updatedModule.pages.length - previousPageCount;
+          setIsSnackbarSuccess(true);
+          setUploadSnackbarMessage(
+            `${pagesAdded} page${pagesAdded !== 1 ? "s" : ""} uploaded`,
+          );
         } catch (error) {
           /* eslint-disable-next-line no-console */
           console.error("Failed to upload PDF:", error);
+          setUploadSnackbarOpen(false);
+        } finally {
+          setIsUploadingPdf(false);
         }
       }
     };
@@ -278,6 +312,10 @@ const ViewModulePage = () => {
     const pageToDelete = module.pages[contextMenu.pageIndex];
     if (!pageToDelete) return;
 
+    setIsDeletingFromContext(true);
+    setIsSnackbarSuccess(false);
+    setUploadSnackbarMessage("Deleting page...");
+    setUploadSnackbarOpen(true);
     try {
       const deletedPageId = await CourseAPIClient.deletePage(
         module.id,
@@ -293,10 +331,15 @@ const ViewModulePage = () => {
           if (updatedPagesLength === 0) return 0;
           return Math.min(prevPage, updatedPagesLength - 1);
         });
+        setIsSnackbarSuccess(true);
+        setUploadSnackbarMessage("Page deleted");
       }
     } catch (error) {
       /* eslint-disable-next-line no-console */
       console.error("Failed to delete page:", error);
+      setUploadSnackbarOpen(false);
+    } finally {
+      setIsDeletingFromContext(false);
     }
     handleCloseContextMenu();
   };
@@ -504,6 +547,10 @@ const ViewModulePage = () => {
           return;
         }
 
+        setIsSnackbarSuccess(false);
+        setUploadSnackbarMessage("Rearranging pages...");
+        setUploadSnackbarOpen(true);
+
         const updatedModule = await CourseAPIClient.reorderPages(
           module.id,
           draggedIndex,
@@ -526,10 +573,14 @@ const ViewModulePage = () => {
           ) {
             setCurrentPage(currentPage + 1);
           }
+
+          setIsSnackbarSuccess(true);
+          setUploadSnackbarMessage("Pages rearranged");
         }
       } catch (error) {
         /* eslint-disable-next-line no-console */
         console.error("Failed to reorder pages:", error);
+        setUploadSnackbarOpen(false);
       } finally {
         setDraggedIndex(null);
         setHoverIndex(null);
@@ -1186,22 +1237,34 @@ const ViewModulePage = () => {
             : undefined
         }
       >
-        <MenuItem onClick={handleUploadPdfAbove}>
+        <MenuItem
+          onClick={handleUploadPdfAbove}
+          disabled={isUploadingPdf || isDeletingFromContext}
+        >
           <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
             <ArrowCircleUp /> Insert pages above
           </Stack>
         </MenuItem>
-        <MenuItem onClick={handleUploadPdfBelow}>
+        <MenuItem
+          onClick={handleUploadPdfBelow}
+          disabled={isUploadingPdf || isDeletingFromContext}
+        >
           <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
             <ArrowCircleDown /> Insert pages below
           </Stack>
         </MenuItem>
-        <MenuItem onClick={handleCreateActivity}>
+        <MenuItem
+          onClick={handleCreateActivity}
+          disabled={isUploadingPdf || isDeletingFromContext}
+        >
           <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
             <Add /> Create activity
           </Stack>
         </MenuItem>
-        <MenuItem onClick={handleDeletePageFromContext}>
+        <MenuItem
+          onClick={handleDeletePageFromContext}
+          disabled={isUploadingPdf || isDeletingFromContext}
+        >
           <Stack
             direction="row"
             alignItems="center"
@@ -1233,6 +1296,78 @@ const ViewModulePage = () => {
           </MenuItem>
         ))}
       </Menu>
+      <Snackbar
+        anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
+        open={uploadSnackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setUploadSnackbarOpen(false)}
+        sx={{
+          maxWidth: "482px",
+          maxHeight: "64px",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <SnackbarContent
+          sx={{
+            backgroundColor: isSnackbarSuccess
+              ? theme.palette.Success.Light.Hover
+              : theme.palette.Neutral[200],
+            color: theme.palette.Neutral[700],
+            paddingTop: "12px",
+            paddingLeft: "32px",
+            paddingRight: "12px",
+            paddingBottom: "12px",
+            gap: "16px",
+            "& .MuiSnackbarContent-action": {
+              padding: "0px",
+              margin: "0px",
+            },
+          }}
+          message={
+            <span
+              style={{ display: "flex", alignItems: "center", gap: "16px" }}
+            >
+              {isSnackbarSuccess ? (
+                <CheckCircleOutline
+                  sx={{
+                    color: theme.palette.Success.Dark.Default,
+                  }}
+                />
+              ) : (
+                <HourglassBottom
+                  sx={{
+                    color: theme.palette.Neutral[700],
+                  }}
+                />
+              )}
+              <Typography
+                variant="bodyMedium"
+                sx={{
+                  color: isSnackbarSuccess
+                    ? theme.palette.Success.Dark.Default
+                    : theme.palette.Neutral[700],
+                }}
+              >
+                {uploadSnackbarMessage}
+              </Typography>
+            </span>
+          }
+          action={
+            <Button
+              size="small"
+              onClick={() => setUploadSnackbarOpen(false)}
+              sx={{
+                color: isSnackbarSuccess
+                  ? theme.palette.Success.Dark.Default
+                  : theme.palette.Neutral[700],
+              }}
+            >
+              CLOSE
+            </Button>
+          }
+        />
+      </Snackbar>
     </>
   );
 };
