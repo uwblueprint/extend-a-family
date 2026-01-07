@@ -17,7 +17,6 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
-import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import {
   Box,
   Button,
@@ -645,23 +644,43 @@ const ViewModulePage = () => {
                 </Document>
               )}
               {isActivityPage(page) && (
-                <>
-                  <PlayCircleOutlineIcon
-                    sx={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      fontSize: "60px",
-                      zIndex: "1",
-                    }}
-                  />
-                  <Box
-                    height={215}
-                    width={280}
-                    sx={{ backgroundColor: "white" }}
-                  />
-                </>
+                <Box
+                  height={168}
+                  width={224}
+                  flexShrink={0}
+                  sx={{
+                    display: "inline-flex",
+                    // padding: "0 45.5px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "white",
+                    borderRadius: "4px",
+                    border: `1px solid ${theme.palette.Learner.Dark.Default}`,
+                    background: theme.palette.Learner.Light.Default,
+                    color: theme.palette.Learner.Dark.Default,
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap="8px"
+                  >
+                    {questionTypeIcons[page.questionType]}
+                    <Stack
+                      direction="column"
+                      justifyContent="center"
+                      alignItems="flex-start"
+                    >
+                      <Typography variant="bodyMedium">
+                        Activity 4.5.1
+                      </Typography>
+                      <Typography variant="labelSmall" textAlign="center">
+                        {questionTypeLabels[page.questionType]}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </Box>
               )}
             </ModuleSidebarThumbnail>
           ))
@@ -717,6 +736,7 @@ const ViewModulePage = () => {
     [
       theme.palette.Neutral,
       theme.palette.Learner.Dark.Default,
+      theme.palette.Learner.Light.Default,
       isFullScreen,
       isEmptyModuleEditing,
       module?.pages,
