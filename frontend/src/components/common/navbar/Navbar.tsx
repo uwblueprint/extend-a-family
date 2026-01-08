@@ -10,7 +10,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { LANDING_PAGE } from "../../../constants/Routes";
 import { useSocket } from "../../../contexts/SocketContext";
-import useNotifications from "../../../hooks/useNotifications";
+import { useNotifications } from "../../../contexts/NotificationsContext";
 import { useUser } from "../../../hooks/useUser";
 import eafLogo from "../../assets/logoColoured.png";
 import NotificationList from "../../notification/NotificationsList";
@@ -42,7 +42,7 @@ export default function Navbar() {
   };
 
   const handleNotificationClose = () => {
-    socket?.emit("notification:read", user.id);
+    socket?.emit("notification:seen", user.id);
     fetchNotifications();
     handleClose();
   };
@@ -104,7 +104,7 @@ export default function Navbar() {
         }}
       >
         <NotificationList
-          notifications={notifications}
+          notifications={notifications.filter((notif) => !notif.read)}
           refreshNotifs={fetchNotifications}
           errorFetchNotifs={errorFetchNotifs}
         />

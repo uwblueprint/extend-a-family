@@ -1,4 +1,5 @@
 import {
+  ChatOutlined,
   Check,
   Close,
   Delete,
@@ -25,6 +26,8 @@ import React from "react";
 import { useUser } from "../../hooks/useUser";
 import { User } from "../../types/UserTypes";
 import ChatWithLearner from "./chat-with-learner/ChatWithLearner";
+import { useNotifications } from "../../contexts/NotificationsContext";
+import { useSocket } from "../../contexts/SocketContext";
 
 interface UserTableProps {
   filteredUsers: User[];
@@ -61,12 +64,16 @@ const UserTable: React.FC<UserTableProps> = ({
   const theme = useTheme();
   const { role } = useUser();
 
+  const socket = useSocket();
   const [chatPopoverAnchorEl, setChatPopoverAnchorEl] =
     React.useState<HTMLButtonElement | null>(null);
   const chatPopoverOpen = Boolean(chatPopoverAnchorEl);
   const chatPopoverId = chatPopoverOpen ? "chat-popover" : undefined;
 
   const [chatWithUser, setChatWithUser] = React.useState<User | null>(null);
+
+  const { notifications, isLoading, errorFetchNotifs, fetchNotifications } =
+    useNotifications();
 
   return (
     <TableContainer
@@ -135,13 +142,28 @@ const UserTable: React.FC<UserTableProps> = ({
                             setChatWithUser(user);
                           }}
                         >
-                          <MarkUnreadChatAltOutlined
-                            sx={{
-                              width: "24px",
-                              height: "24px",
-                              color: theme.palette.Facilitator.Dark.Selected,
-                            }}
-                          />
+                          {notifications.filter(
+                            (message) =>
+                              // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-explicit-any
+                              (message.helpRequest.learner as any)._id ===
+                                user.id && !message.read,
+                          ).length > 0 ? (
+                            <MarkUnreadChatAltOutlined
+                              sx={{
+                                width: "24px",
+                                height: "24px",
+                                color: theme.palette.Facilitator.Dark.Selected,
+                              }}
+                            />
+                          ) : (
+                            <ChatOutlined
+                              sx={{
+                                width: "24px",
+                                height: "24px",
+                                color: theme.palette.Facilitator.Dark.Selected,
+                              }}
+                            />
+                          )}
                         </IconButton>
                         <Typography
                           variant="labelMedium"
@@ -281,14 +303,25 @@ const UserTable: React.FC<UserTableProps> = ({
         id={chatPopoverId}
         open={chatPopoverOpen}
         anchorEl={chatPopoverAnchorEl}
-        onClose={() => setChatPopoverAnchorEl(null)}
+        onClose={() => {
+          setChatPopoverAnchorEl(null);
+          socket?.emit("notification:seen", chatWithUser?.id);
+        }}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "left",
         }}
         sx={{ borderRadius: "8px" }}
       >
-        {chatWithUser && <ChatWithLearner learner={chatWithUser} />}
+        {chatWithUser && (
+          <ChatWithLearner
+            learner={chatWithUser}
+            allMessages={notifications}
+            isLoading={isLoading}
+            errorFetchNotifs={errorFetchNotifs}
+            fetchNotifications={fetchNotifications}
+          />
+        )}
       </Popover>
     </TableContainer>
   );

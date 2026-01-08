@@ -28,6 +28,7 @@ import SampleContext, {
 } from "./contexts/SampleContext";
 import SampleContextDispatcherContext from "./contexts/SampleContextDispatcherContext";
 import { SocketProvider } from "./contexts/SocketContext";
+import { NotificationsProvider } from "./contexts/NotificationsContext";
 import sampleContextReducer from "./reducers/SampleContextReducer";
 import { AuthenticatedUser } from "./types/AuthTypes";
 import { getLocalStorageObj } from "./utils/LocalStorageUtils";
@@ -35,7 +36,6 @@ import { getLocalStorageObj } from "./utils/LocalStorageUtils";
 import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
-// import UploadThumbnailPage from "./components/courses/UploadThumbnailPage";
 import FeedbackAdminView from "./components/feedback/feedback-admin-view/FeedbackAdminView";
 import FeedbackFacilitatorView from "./components/feedback/FeedbackFacilitatorView";
 import HelpRequestPage from "./components/pages/HelpRequestPage";
@@ -81,136 +81,138 @@ const App = (): React.ReactElement => {
           value={{ authenticatedUser, setAuthenticatedUser }}
         >
           <SocketProvider id={authenticatedUser?.id}>
-            <Router>
-              <Switch>
-                <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
-                <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
-                <Route
-                  exact
-                  path={Routes.SIGNUP_APPROVED_PAGE}
-                  component={SignupApproved}
-                />
-                <Route
-                  exact
-                  path={Routes.SIGNUP_PENDING_PAGE}
-                  component={SignupPending}
-                />
-                <Route
-                  exact
-                  path={Routes.FORGOT_PASSWORD_PAGE}
-                  component={ForgotPasswordPage}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.LANDING_PAGE}
-                  component={() => (
-                    <Redirect
-                      to={
-                        currentUser?.role === "Facilitator" ||
-                        currentUser?.role === "Administrator"
-                          ? Routes.COURSE_PAGE
-                          : Routes.HOME_PAGE
-                      }
-                    />
-                  )}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.HOME_PAGE}
-                  component={Home}
-                  allowedRoles={["Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.BOOKMARKS_PAGE}
-                  component={Bookmarks}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.FINISHED_MODULES_PAGE}
-                  component={FinishedModules}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.MY_ACCOUNT_PAGE}
-                  component={MyAccount}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.CREATE_MODULE_PAGE}
-                  component={CreateModulePage}
-                  allowedRoles={["Administrator"]}
-                />
-                <Route
-                  exact
-                  path={Routes.NOT_AUTHORIZED_PAGE}
-                  component={NotAuthorized}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.CREATE_PASSWORD_PAGE}
-                  component={CreatePasswordPage}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.MANAGE_USERS_PAGE}
-                  component={ManageUserPage}
-                  allowedRoles={["Administrator", "Facilitator"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.MAKE_HELP_REQUEST_PAGE}
-                  component={MakeHelpRequestPage}
-                  allowedRoles={["Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.VIEW_HELP_REQUESTS_PAGE}
-                  component={ViewHelpRequestsPage}
-                  allowedRoles={["Facilitator"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={`${Routes.VIEW_HELP_REQUESTS_PAGE}/:id`}
-                  component={HelpRequestPage}
-                  allowedRoles={["Facilitator"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.COURSE_PAGE}
-                  component={CourseViewingPage}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.LESSON_UPLOAD}
-                  component={LessonUpload}
-                  allowedRoles={["Administrator"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.VIEW_PAGE}
-                  component={ViewModulePage}
-                  allowedRoles={["Administrator", "Facilitator", "Learner"]}
-                />
-                <PrivateRoute
-                  exact
-                  path={Routes.FEEDBACK_PAGE}
-                  component={
-                    currentUser?.role === "Administrator"
-                      ? FeedbackAdminView
-                      : FeedbackFacilitatorView
-                  }
-                  allowedRoles={["Administrator", "Facilitator"]}
-                />
-                <Route exact path="*" component={NotFound} />
-              </Switch>
-            </Router>
+            <NotificationsProvider>
+              <Router>
+                <Switch>
+                  <Route exact path={Routes.WELCOME_PAGE} component={Welcome} />
+                  <Route exact path={Routes.SIGNUP_PAGE} component={Signup} />
+                  <Route
+                    exact
+                    path={Routes.SIGNUP_APPROVED_PAGE}
+                    component={SignupApproved}
+                  />
+                  <Route
+                    exact
+                    path={Routes.SIGNUP_PENDING_PAGE}
+                    component={SignupPending}
+                  />
+                  <Route
+                    exact
+                    path={Routes.FORGOT_PASSWORD_PAGE}
+                    component={ForgotPasswordPage}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.LANDING_PAGE}
+                    component={() => (
+                      <Redirect
+                        to={
+                          currentUser?.role === "Facilitator" ||
+                          currentUser?.role === "Administrator"
+                            ? Routes.COURSE_PAGE
+                            : Routes.HOME_PAGE
+                        }
+                      />
+                    )}
+                    allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.HOME_PAGE}
+                    component={Home}
+                    allowedRoles={["Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.BOOKMARKS_PAGE}
+                    component={Bookmarks}
+                    allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.FINISHED_MODULES_PAGE}
+                    component={FinishedModules}
+                    allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.MY_ACCOUNT_PAGE}
+                    component={MyAccount}
+                    allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.CREATE_MODULE_PAGE}
+                    component={CreateModulePage}
+                    allowedRoles={["Administrator"]}
+                  />
+                  <Route
+                    exact
+                    path={Routes.NOT_AUTHORIZED_PAGE}
+                    component={NotAuthorized}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.CREATE_PASSWORD_PAGE}
+                    component={CreatePasswordPage}
+                    allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.MANAGE_USERS_PAGE}
+                    component={ManageUserPage}
+                    allowedRoles={["Administrator", "Facilitator"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.MAKE_HELP_REQUEST_PAGE}
+                    component={MakeHelpRequestPage}
+                    allowedRoles={["Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.VIEW_HELP_REQUESTS_PAGE}
+                    component={ViewHelpRequestsPage}
+                    allowedRoles={["Facilitator"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={`${Routes.VIEW_HELP_REQUESTS_PAGE}/:id`}
+                    component={HelpRequestPage}
+                    allowedRoles={["Facilitator"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.COURSE_PAGE}
+                    component={CourseViewingPage}
+                    allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.LESSON_UPLOAD}
+                    component={LessonUpload}
+                    allowedRoles={["Administrator"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.VIEW_PAGE}
+                    component={ViewModulePage}
+                    allowedRoles={["Administrator", "Facilitator", "Learner"]}
+                  />
+                  <PrivateRoute
+                    exact
+                    path={Routes.FEEDBACK_PAGE}
+                    component={
+                      currentUser?.role === "Administrator"
+                        ? FeedbackAdminView
+                        : FeedbackFacilitatorView
+                    }
+                    allowedRoles={["Administrator", "Facilitator"]}
+                  />
+                  <Route exact path="*" component={NotFound} />
+                </Switch>
+              </Router>
+            </NotificationsProvider>
           </SocketProvider>
         </AuthContext.Provider>
       </SampleContextDispatcherContext.Provider>
