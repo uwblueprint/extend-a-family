@@ -1,17 +1,24 @@
 import { Box, Divider, Typography, useTheme } from "@mui/material";
-import useNotifications from "../../../hooks/useNotifications";
 import { User } from "../../../types/UserTypes";
 import NotifiactionsFetchError from "../../notification/NotificationsFetchError";
 import ChatMessageItem from "./ChatMessageItem";
+import { Notification } from "../../../types/NotificationTypes";
 
-export default function ChatWithLearner({ learner }: { learner: User }) {
+export default function ChatWithLearner({
+  learner,
+  allMessages,
+  isLoading,
+  errorFetchNotifs,
+  fetchNotifications,
+}: {
+  learner: User;
+  allMessages: Notification[];
+  isLoading: boolean;
+  errorFetchNotifs: boolean;
+  fetchNotifications: () => void;
+}) {
   const theme = useTheme();
 
-  const {
-    notifications: allMessages,
-    isLoading,
-    errorFetchNotifs,
-  } = useNotifications();
   const messages = allMessages.filter(
     // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/no-explicit-any
     (message) => (message.helpRequest.learner as any)._id === learner.id,
@@ -75,7 +82,11 @@ export default function ChatWithLearner({ learner }: { learner: User }) {
       );
     }
     return messages.map((message) => (
-      <ChatMessageItem key={message.id} message={message} />
+      <ChatMessageItem
+        key={message.id}
+        message={message}
+        refreshNotifs={fetchNotifications}
+      />
     ));
   };
 
@@ -127,9 +138,6 @@ export default function ChatWithLearner({ learner }: { learner: User }) {
           color: theme.palette.Neutral[500],
         }}
       />
-      {/* {messages.map((message) => (
-        <ChatMessageItem key={message.id} message={message} />
-      ))} */}
       {content()}
     </Box>
   );

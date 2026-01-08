@@ -18,7 +18,7 @@ const registerNotificationHandlers = (io: Server, socket: Socket) => {
       );
     }
   };
-  socket.on("notification:read", markNotificationAsSeen);
+  socket.on("notification:seen", markNotificationAsSeen);
 };
 
 const registerNotificationSchemaListener = (io: Server) => {
