@@ -1,4 +1,4 @@
-import { CookieOptions, Router } from "express";
+import { Router } from "express";
 
 import { generate } from "generate-password";
 import {
@@ -31,12 +31,6 @@ const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
 
-const cookieOptions: CookieOptions = {
-  httpOnly: true,
-  sameSite: process.env.PREVIEW_DEPLOY ? "none" : "strict",
-  secure: process.env.NODE_ENV === "production",
-};
-
 /* Returns access token and user info in response body and sets refreshToken as an httpOnly cookie */
 authRouter.post("/login", loginRequestValidator, async (req, res) => {
   const requestedRole = req.body.attemptedRole;
@@ -63,10 +57,7 @@ authRouter.post("/login", loginRequestValidator, async (req, res) => {
       throw new Error(AuthErrorCodes.UNVERIFIED_EMAIL);
     }
 
-    res
-      .cookie("refreshToken", refreshToken, cookieOptions)
-      .status(200)
-      .json(rest);
+    res.status(200).json({ ...rest, refreshToken });
   } catch (error: unknown) {
     const message = getErrorMessage(error);
     if (
@@ -110,24 +101,21 @@ authRouter.post("/signup", signupRequestValidator, async (req, res) => {
 
     await authService.sendEmailVerificationLink(req.body.email);
 
-    res
-      .cookie("refreshToken", refreshToken, cookieOptions)
-      .status(200)
-      .json(rest);
+    res.status(200).json({ ...rest, refreshToken });
   } catch (error: unknown) {
     res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
-/* Returns access token in response body and sets refreshToken as an httpOnly cookie */
+/* Returns access token and refresh token in response body */
 authRouter.post("/refresh", async (req, res) => {
   try {
-    const token = await authService.renewToken(req.cookies.refreshToken);
+    const token = await authService.renewToken(req.body.refreshToken);
 
-    res
-      .cookie("refreshToken", token.refreshToken, cookieOptions)
-      .status(200)
-      .json({ accessToken: token.accessToken });
+    res.status(200).json({
+      accessToken: token.accessToken,
+      refreshToken: token.refreshToken,
+    });
   } catch (error: unknown) {
     res.status(500).json({ error: getErrorMessage(error) });
   }
