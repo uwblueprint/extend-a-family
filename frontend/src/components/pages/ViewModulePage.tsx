@@ -1162,7 +1162,11 @@ const ViewModulePage = () => {
                 {padNumber(currentPage + 1)}
               </Typography>
               <IconButton
-                disabled={currentPage >= numPages}
+                disabled={
+                  role === "Learner"
+                    ? currentPage >= numPages
+                    : currentPage >= numPages - 1
+                }
                 onClick={() => setCurrentPage(currentPage + 1)}
                 sx={{
                   border: "1px solid black",
