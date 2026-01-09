@@ -124,6 +124,7 @@ const ViewModulePage = () => {
 
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isWrongAnswerModalOpen, setIsWrongAnswerModalOpen] = useState(false);
+  const [isRetryButtonDisplayed, setIsRetryButtonDisplayed] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
@@ -160,6 +161,7 @@ const ViewModulePage = () => {
   }, [requestedModuleId]);
 
   useEffect(() => {
+    setIsRetryButtonDisplayed(false);
     if (currentPageObject && isActivityPage(currentPageObject)) {
       setActivity(currentPageObject);
       if (currentPageObject.imageUrl) {
@@ -588,6 +590,12 @@ const ViewModulePage = () => {
     [draggedIndex, module, currentPage],
   );
 
+  const onCorrectAnswer = () => {
+    setIsSnackbarSuccess(true);
+    setUploadSnackbarMessage("Correct! Please move on to the next page.");
+    setUploadSnackbarOpen(true);
+  };
+
   const SideBar = useMemo(
     () => (
       <Box
@@ -934,6 +942,7 @@ const ViewModulePage = () => {
                     <MultipleChoiceViewer
                       activity={activity}
                       onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                      onCorrectAnswer={onCorrectAnswer}
                       key={activity.id}
                       ref={activityViewerRef}
                     />
@@ -950,6 +959,7 @@ const ViewModulePage = () => {
                     <TableViewer
                       activity={activity}
                       onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                      onCorrectAnswer={onCorrectAnswer}
                       key={activity.id}
                       ref={activityViewerRef}
                     />
@@ -965,7 +975,8 @@ const ViewModulePage = () => {
                   ) : (
                     <MatchingViewer
                       activity={activity}
-                      onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                      onWrongAnswer={() => setIsRetryButtonDisplayed(true)}
+                      onCorrectAnswer={onCorrectAnswer}
                       key={activity.id}
                       ref={activityViewerRef}
                     />
@@ -1005,9 +1016,9 @@ const ViewModulePage = () => {
                     color: "white",
                   }}
                   onClick={() => {
-                    if (isWrongAnswerModalOpen) {
-                      setIsWrongAnswerModalOpen(false);
+                    if (isRetryButtonDisplayed) {
                       activityViewerRef.current?.onRetry?.();
+                      setIsRetryButtonDisplayed(false);
                     } else {
                       activityViewerRef.current?.checkAnswer();
                     }
@@ -1015,9 +1026,12 @@ const ViewModulePage = () => {
                 >
                   {!isWrongAnswerModalOpen && <CheckCircleOutline />}
                   <Typography variant="labelLarge">
-                    {isWrongAnswerModalOpen ? "Retry" : "Check Answer"}
+                    {isRetryButtonDisplayed || isWrongAnswerModalOpen
+                      ? "Retry"
+                      : "Check Answer"}
                   </Typography>
-                  {isWrongAnswerModalOpen && <Refresh />}
+                  {isRetryButtonDisplayed ||
+                    (isWrongAnswerModalOpen && <Refresh />)}
                 </Button>
               )}
               {role !== "Administrator" && (
@@ -1108,7 +1122,7 @@ const ViewModulePage = () => {
                 {padNumber(currentPage + 1)}
               </Typography>
               <IconButton
-                disabled={currentPage >= numPages - 1}
+                disabled={currentPage >= numPages}
                 onClick={() => setCurrentPage(currentPage + 1)}
                 sx={{
                   border: "1px solid black",
@@ -1338,12 +1352,12 @@ const ViewModulePage = () => {
         ))}
       </Menu>
       <Snackbar
-        anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
+        anchorOrigin={{ horizontal: "center", vertical: "top" }}
         open={uploadSnackbarOpen}
         autoHideDuration={6000}
         onClose={() => setUploadSnackbarOpen(false)}
         sx={{
-          maxWidth: "482px",
+          maxWidth: "fit-content",
           maxHeight: "64px",
           width: "100%",
           height: "100%",

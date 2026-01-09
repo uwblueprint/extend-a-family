@@ -15,6 +15,7 @@ import { TableActivity } from "../../../types/CourseTypes";
 type TableViewerProps = {
   activity: TableActivity;
   onWrongAnswer: () => void;
+  onCorrectAnswer: () => void;
 };
 
 export type ActivityViewerHandle = {
@@ -136,7 +137,7 @@ const TableHeadCell = ({
 };
 
 const TableViewer = React.forwardRef<ActivityViewerHandle, TableViewerProps>(
-  ({ activity, onWrongAnswer }, ref) => {
+  ({ activity, onWrongAnswer, onCorrectAnswer }, ref) => {
     const theme = useTheme();
 
     const [selectedAnswers, setSelectedAnswers] = React.useState<number[][]>(
@@ -166,6 +167,7 @@ const TableViewer = React.forwardRef<ActivityViewerHandle, TableViewerProps>(
       if (!isAnswerCorrect()) {
         onWrongAnswer();
       } else {
+        onCorrectAnswer();
         setIsCompleted(true);
       }
     };

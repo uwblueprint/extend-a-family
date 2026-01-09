@@ -63,13 +63,25 @@ const PreviewLearnerModal = ({
       <Box sx={{ padding: "20px" }}>
         {(isMultipleChoiceActivity(activity) ||
           isMultiSelectActivity(activity)) && (
-          <MultipleChoiceViewer activity={activity} onWrongAnswer={() => {}} />
+          <MultipleChoiceViewer
+            activity={activity}
+            onWrongAnswer={() => {}}
+            onCorrectAnswer={() => {}}
+          />
         )}
         {isTableActivity(activity) && (
-          <TableViewer activity={activity} onWrongAnswer={() => {}} />
+          <TableViewer
+            activity={activity}
+            onWrongAnswer={() => {}}
+            onCorrectAnswer={() => {}}
+          />
         )}
         {isMatchingActivity(activity) && (
-          <MatchingViewer activity={activity} onWrongAnswer={() => {}} />
+          <MatchingViewer
+            activity={activity}
+            onWrongAnswer={() => {}}
+            onCorrectAnswer={() => {}}
+          />
         )}
       </Box>
     </Dialog>

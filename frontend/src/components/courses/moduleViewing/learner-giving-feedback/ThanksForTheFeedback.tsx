@@ -7,7 +7,7 @@ const ThanksForTheFeedbackSlide = () => {
     <Box
       sx={{
         display: "flex",
-        maxWidth: "1024px",
+        width: "100%",
         height: "768px",
         padding: "0 205px",
         justifyContent: "center",

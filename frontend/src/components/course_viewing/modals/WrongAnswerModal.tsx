@@ -7,6 +7,7 @@ import {
   useTheme,
 } from "@mui/material";
 import React from "react";
+import activityWrongAnswerTitles from "../../../constants/ActivityWrongAnswerTitles";
 
 export type WrongAnswerModalProps = {
   open: boolean;
@@ -24,6 +25,12 @@ const WrongAnswerModal: React.FC<WrongAnswerModalProps> = ({
   const handleClose = () => {
     onClose();
   };
+
+  const title = hint
+    ? "Hint"
+    : activityWrongAnswerTitles[
+        Math.floor(Math.random() * activityWrongAnswerTitles.length)
+      ];
 
   return (
     <Dialog
@@ -50,7 +57,7 @@ const WrongAnswerModal: React.FC<WrongAnswerModalProps> = ({
         color={theme.palette.Neutral[700]}
         sx={{ textAlign: "left" }}
       >
-        Oops! Try again.
+        {title}
       </Typography>
 
       <DialogContent
@@ -64,9 +71,8 @@ const WrongAnswerModal: React.FC<WrongAnswerModalProps> = ({
         }}
       >
         <Typography variant="bodyMedium">
-          Choose 1 from the list below + “Click the button below to try again”
+          {hint || "Click the button below to try again"}
         </Typography>
-        {hint && <Typography variant="bodyMedium">Hint: {hint}</Typography>}
         <Button
           sx={{
             height: "40px",

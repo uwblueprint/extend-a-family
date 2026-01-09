@@ -10,6 +10,7 @@ import MultipleChoiceViewOption from "./MultipleChoiceViewOption";
 type MultipleChoiceViewerProps = {
   activity: MultipleChoiceActivity | MultiSelectActivity;
   onWrongAnswer: () => void;
+  onCorrectAnswer: () => void;
 };
 
 export type ActivityViewerHandle = {
@@ -20,7 +21,7 @@ export type ActivityViewerHandle = {
 const MultipleChoiceViewer = React.forwardRef<
   ActivityViewerHandle,
   MultipleChoiceViewerProps
->(({ activity, onWrongAnswer }, ref) => {
+>(({ activity, onWrongAnswer, onCorrectAnswer }, ref) => {
   const theme = useTheme();
   const [selectedOptions, setSelectedOptions] = React.useState<number[]>([]);
   const [isCompleted, setIsCompleted] = React.useState(false);
@@ -35,6 +36,7 @@ const MultipleChoiceViewer = React.forwardRef<
     if (!isCorrect) {
       onWrongAnswer();
     } else {
+      onCorrectAnswer();
       setIsCompleted(true);
     }
   };

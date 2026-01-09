@@ -74,6 +74,7 @@ const HowEasyWasTheModuleSlide = ({
     <Box
       sx={{
         display: "flex",
+        width: "100%",
         padding: "183px 75px",
         justifyContent: "center",
         alignItems: "center",

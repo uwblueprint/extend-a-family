@@ -7,6 +7,7 @@ import MatchingBox from "./MatchingBox";
 type MatchingViewerProps = {
   activity: MatchingActivity;
   onWrongAnswer: () => void;
+  onCorrectAnswer: () => void;
 };
 
 export type ActivityViewerHandle = {
@@ -17,7 +18,7 @@ export type ActivityViewerHandle = {
 const MatchingViewer = React.forwardRef<
   ActivityViewerHandle,
   MatchingViewerProps
->(({ activity, onWrongAnswer }, ref) => {
+>(({ activity, onWrongAnswer, onCorrectAnswer }, ref) => {
   const theme = useTheme();
   const { role: actualRole } = useUser();
   const role = actualRole === "Administrator" ? "Learner" : actualRole;
@@ -150,6 +151,7 @@ const MatchingViewer = React.forwardRef<
     setMatchesMidToRight(correctMidToRight);
     setIsCompleted(true);
     setIsDisplayFeedback(true);
+    onCorrectAnswer();
   };
 
   const onRetry = () => {
