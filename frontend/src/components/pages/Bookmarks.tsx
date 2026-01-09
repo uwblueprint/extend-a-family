@@ -4,17 +4,18 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import useBookmarksFilter from "../../hooks/useBookmarksFilter";
-import { CourseModule, CourseUnit } from "../../types/CourseTypes";
+import { CourseModule } from "../../types/CourseTypes";
 import { Bookmark } from "../../types/UserTypes";
 import {
   BookmarksContent,
   BookmarksSidebar,
   ExpandCollapseButton,
 } from "../bookmarks";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 
 const Bookmarks = (): React.ReactElement => {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
-  const [units, setUnits] = useState<CourseUnit[]>([]);
+  const { courseUnits: units } = useCourseUnits();
   const [modules, setModules] = useState<{ [unitId: string]: CourseModule[] }>(
     {},
   );
@@ -52,18 +53,6 @@ const Bookmarks = (): React.ReactElement => {
     }
   };
 
-  // Fetch all units
-  const fetchUnits = async () => {
-    try {
-      const unitsData = await CourseAPIClient.getUnits();
-      setUnits(unitsData);
-    } catch (err) {
-      /* eslint-disable-next-line no-console */
-      console.error("Failed to fetch units:", err);
-      setError("Failed to load course units");
-    }
-  };
-
   // Fetch modules for a specific unit
   const fetchModulesForUnit = async (unitId: string) => {
     // Prevent duplicate concurrent/repeated fetches for same unit
@@ -90,7 +79,6 @@ const Bookmarks = (): React.ReactElement => {
       setError(null);
 
       await fetchBookmarks();
-      await fetchUnits();
 
       setLoading(false);
     };

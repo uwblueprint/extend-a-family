@@ -84,6 +84,7 @@ import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import NeedHelpModal from "../help/NeedHelpModal";
 import DeletePageModal from "./DeletePageModal";
 import "./ViewModulePage.css";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -163,13 +164,13 @@ const ViewModulePage = () => {
     return fetchedModule;
   }, [requestedModuleId]);
 
+  const { courseUnits: allUnits } = useCourseUnits();
   const fetchUnit = useCallback(async () => {
-    const allUnits = await CourseAPIClient.getUnits();
     const foundUnit = allUnits.find((u) =>
       u.modules.some((m) => m.id === requestedModuleId),
     );
     return foundUnit || null;
-  }, [requestedModuleId]);
+  }, [allUnits, requestedModuleId]);
 
   useEffect(() => {
     setIsRetryButtonDisplayed(false);

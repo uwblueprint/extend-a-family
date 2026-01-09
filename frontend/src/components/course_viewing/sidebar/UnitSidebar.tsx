@@ -13,8 +13,8 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
-import CourseAPIClient from "../../../APIClients/CourseAPIClient";
+import React, { useEffect, useState } from "react";
+import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 import { useUser } from "../../../hooks/useUser";
 import { CourseUnit, UnitSidebarModalType } from "../../../types/CourseTypes";
 import { isAdministrator } from "../../../types/UserTypes";
@@ -38,8 +38,8 @@ export default function UnitSidebar({
 }: UnitSideBarProps) {
   const theme = useTheme();
   const user = useUser();
+  const { courseUnits, createUnit, editUnit, deleteUnit } = useCourseUnits();
 
-  const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -47,20 +47,6 @@ export default function UnitSidebar({
   const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
-
-  const didFetchUnitsRef = useRef(false);
-
-  useEffect(() => {
-    if (didFetchUnitsRef.current) return;
-    didFetchUnitsRef.current = true;
-
-    const getCourseUnits = async () => {
-      const data = await CourseAPIClient.getUnits();
-      setCourseUnits(data);
-    };
-
-    getCourseUnits();
-  }, [setSelectedUnit]);
 
   useEffect(() => {
     if (!courseUnits || !courseUnits.length) return;
@@ -96,38 +82,28 @@ export default function UnitSidebar({
     setAnchorEl(null);
   };
 
-  const createUnit = async (title: string) => {
-    const unit = await CourseAPIClient.createUnit(title);
-    if (unit) {
-      setCourseUnits((prev) => [...prev, unit]);
-    }
+  const handleCreateUnit = async (title: string) => {
+    await createUnit(title);
   };
-  const editUnit = async (title: string) => {
+
+  const handleEditUnit = async (title: string) => {
     if (contextMenuUnit) {
-      const editedUnit = await CourseAPIClient.editUnit(
-        contextMenuUnit.id,
-        title,
-      );
-      if (editedUnit) {
-        setCourseUnits((prev) =>
-          prev.map((unit) => (unit.id === editedUnit.id ? editedUnit : unit)),
+      await editUnit(contextMenuUnit.id, title);
+      if (contextMenuUnit.id === selectedUnit?.id) {
+        // Update selectedUnit with the new title
+        const updatedUnit = courseUnits.find(
+          (unit) => unit.id === contextMenuUnit.id,
         );
-        if (contextMenuUnit.id === selectedUnit?.id) {
-          setSelectedUnit(editedUnit);
+        if (updatedUnit) {
+          setSelectedUnit(updatedUnit);
         }
       }
     }
   };
-  const deleteUnit = async () => {
+
+  const handleDeleteUnit = async () => {
     if (contextMenuUnit) {
-      const deletedUnitId = await CourseAPIClient.deleteUnit(
-        contextMenuUnit.id,
-      );
-      if (deletedUnitId) {
-        setCourseUnits((prev) =>
-          prev.filter((unit) => unit.id !== deletedUnitId),
-        );
-      }
+      await deleteUnit(contextMenuUnit.id);
     }
   };
 
@@ -317,18 +293,18 @@ export default function UnitSidebar({
       <CreateUnitModal
         openCreateUnitModal={openCreateUnitModal}
         handleCloseCreateUnitModal={handleCloseCreateUnitModal}
-        createUnit={createUnit}
+        createUnit={handleCreateUnit}
       />
       <EditUnitModal
         openEditUnitModal={openEditUnitModal}
         handleCloseEditUnitModal={handleCloseEditUnitModal}
-        editUnit={editUnit}
+        editUnit={handleEditUnit}
         currentTitle={contextMenuUnit?.title ?? ""}
       />
       <DeleteUnitModal
         openDeleteUnitModal={openDeleteUnitModal}
         handleCloseDeleteUnitModal={handleCloseDeleteUnitModal}
-        deleteUnit={deleteUnit}
+        deleteUnit={handleDeleteUnit}
       />
     </Drawer>
   );

@@ -4,15 +4,16 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import { HOME_PAGE } from "../../constants/Routes";
-import { CourseModule, CourseUnit } from "../../types/CourseTypes";
+import { CourseModule } from "../../types/CourseTypes";
 import { ExpandCollapseButton } from "../bookmarks";
 import { FinishedModulesContent } from "../finished_modules";
 import LearnerUnitSidebar from "../learners/HomePageSidebar";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 
 const FinishedModules = (): React.ReactElement => {
   const theme = useTheme();
   const history = useHistory();
-  const [units, setUnits] = useState<CourseUnit[]>([]);
+  const { courseUnits: units } = useCourseUnits();
   const [modules, setModules] = useState<{ [unitId: string]: CourseModule[] }>(
     {},
   );
@@ -24,20 +25,6 @@ const FinishedModules = (): React.ReactElement => {
   const [unitOpenMap, setUnitOpenMap] = useState<Record<string, boolean>>({});
   const [expandAllValue, setExpandAllValue] = useState(false);
   const [expandAllStamp, setExpandAllStamp] = useState(0);
-
-  // Fetch all units
-  const fetchUnits = async () => {
-    try {
-      const unitsData = await CourseAPIClient.getUnits();
-      setUnits(unitsData);
-      return unitsData;
-    } catch (err) {
-      /* eslint-disable-next-line no-console */
-      console.error("Failed to fetch units:", err);
-      setError("Failed to load course units");
-      return [];
-    }
-  };
 
   // Fetch modules for a specific unit
   const fetchModulesForUnit = async (unitId: string) => {
@@ -59,18 +46,14 @@ const FinishedModules = (): React.ReactElement => {
       setLoading(true);
       setError(null);
 
-      const fetchedUnits = await fetchUnits();
-
       // Fetch modules for all units
-      await Promise.all(
-        fetchedUnits.map((unit) => fetchModulesForUnit(unit.id)),
-      );
+      await Promise.all(units.map((unit) => fetchModulesForUnit(unit.id)));
 
       setLoading(false);
     };
 
     loadData();
-  }, []);
+  }, [units]);
 
   // Handler to receive unit open state
   const handleUnitOpenStateChange = (unitId: string, isOpen: boolean) => {

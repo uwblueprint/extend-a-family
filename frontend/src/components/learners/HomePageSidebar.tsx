@@ -7,23 +7,13 @@ import {
   ListItemText,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CircularProgressWithLabel from "./CircularProgressBar";
-import CourseAPIClient from "../../APIClients/CourseAPIClient";
-import { CourseUnit } from "../../types/CourseTypes";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 
 export default function LearnerUnitSidebar() {
   const theme = useTheme();
-  const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
-
-  useEffect(() => {
-    const getCouseUnits = async () => {
-      const data = await CourseAPIClient.getUnits();
-      setCourseUnits(data);
-    };
-    getCouseUnits();
-  }, []);
+  const { courseUnits } = useCourseUnits();
 
   return (
     <Drawer

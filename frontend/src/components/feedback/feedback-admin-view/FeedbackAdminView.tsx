@@ -8,8 +8,6 @@ import { Dayjs } from "dayjs";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useHistory, useLocation } from "react-router-dom";
-import CourseAPIClient from "../../../APIClients/CourseAPIClient";
-import { CourseUnit } from "../../../types/CourseTypes";
 import FeedbackAdminUnitSidebar from "./FeedbackAdminViewSidebar";
 import { FeedbackPopulated } from "../../../types/FeedbackTypes";
 import { useFeedbacks } from "../../../contexts/FeedbacksContext";
@@ -19,6 +17,7 @@ import {
   FeedbackAdminUnitView,
 } from "./FeedbackAdminViewCards";
 import { getFeedbacksByUnitId, getFeedbacksByModuleId } from "./feedbackUtils";
+import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 
 const RatingCard = ({ children }: { children?: React.ReactNode }) => {
   const theme = useTheme();
@@ -41,36 +40,13 @@ const RatingCard = ({ children }: { children?: React.ReactNode }) => {
   );
 };
 
-// Cache data at module level to persist across component remounts
-let cachedCourseUnits: Array<CourseUnit> | null = null;
-let isFetching = false;
-
 const FeedbackAdminView = () => {
   const theme = useTheme();
   const location = useLocation();
   const history = useHistory();
 
-  const [courseUnits, setCourseUnits] = React.useState<Array<CourseUnit>>(
-    cachedCourseUnits || [],
-  );
+  const { courseUnits } = useCourseUnits();
   const { feedbacks: allFeedbacks } = useFeedbacks();
-
-  React.useEffect(() => {
-    if (isFetching) return;
-
-    if (cachedCourseUnits) {
-      setCourseUnits(cachedCourseUnits);
-      return;
-    }
-
-    isFetching = true;
-
-    CourseAPIClient.getUnits().then((units) => {
-      cachedCourseUnits = units;
-      setCourseUnits(units);
-      isFetching = false;
-    });
-  }, []);
 
   // Initialize state from URL params only once
   const initialUnitIdRef = React.useRef<string | null>(null);
