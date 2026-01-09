@@ -69,12 +69,19 @@ export interface MatchingActivity extends ActivityBase {
   rows: number;
 }
 
+export enum HeaderColumnIncludesTypes {
+  IMAGE = "image",
+  TEXT = "text",
+  IMAGE_AND_TEXT = "image_and_text",
+}
+
 export interface TableActivity extends ActivityBase {
   type: QuestionType.Table;
   questionType: QuestionType.Table;
   columnLabels: string[];
   rowLabels: string[][]; // Each inner array: [labelText, optionalImageUrl]
   correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
+  headerColumnIncludes: HeaderColumnIncludesTypes;
 }
 
 export type Activity =

@@ -10,7 +10,10 @@ import {
   useTheme,
 } from "@mui/material";
 import React from "react";
-import { TableActivity } from "../../../types/CourseTypes";
+import {
+  HeaderColumnIncludesTypes,
+  TableActivity,
+} from "../../../types/CourseTypes";
 import { useUser } from "../../../hooks/useUser";
 
 type TableViewerProps = {
@@ -32,6 +35,7 @@ const TableActivityRow = ({
   selectedAnswers,
   setSelectedAnswers,
   isCompleted,
+  headerColumnIncludes,
 }: {
   index: number;
   imageURL?: string;
@@ -41,6 +45,7 @@ const TableActivityRow = ({
   selectedAnswers: number[][];
   setSelectedAnswers: React.Dispatch<React.SetStateAction<number[][]>>;
   isCompleted: boolean;
+  headerColumnIncludes: HeaderColumnIncludesTypes;
 }) => {
   const theme = useTheme();
 
@@ -60,26 +65,30 @@ const TableActivityRow = ({
 
   return (
     <TableRow>
-      <TableCell
-        align="center"
-        sx={{
-          backgroundImage: `url(${imageURL})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
-      <TableCell
-        align="center"
-        sx={{
-          borderLeft: `1px solid ${theme.palette.Neutral[400]}`,
-          borderRight: `1px solid ${theme.palette.Neutral[400]}`,
-        }}
-      >
-        <Typography variant="bodySmall">
-          <Typography variant="bodySmall">{rowLabel}</Typography>
-        </Typography>
-      </TableCell>
+      {headerColumnIncludes !== HeaderColumnIncludesTypes.TEXT && (
+        <TableCell
+          align="center"
+          sx={{
+            backgroundImage: `url(${imageURL})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
+      )}
+      {headerColumnIncludes !== HeaderColumnIncludesTypes.IMAGE && (
+        <TableCell
+          align="center"
+          sx={{
+            borderLeft: `1px solid ${theme.palette.Neutral[400]}`,
+            borderRight: `1px solid ${theme.palette.Neutral[400]}`,
+          }}
+        >
+          <Typography variant="bodySmall">
+            <Typography variant="bodySmall">{rowLabel}</Typography>
+          </Typography>
+        </TableCell>
+      )}
       {Array.from({ length: numColumns }).map((_, colIndex) => {
         const displayCorrect =
           isCompleted &&
@@ -237,7 +246,13 @@ const TableViewer = React.forwardRef<ActivityViewerHandle, TableViewerProps>(
               {activity.columnLabels.map((label, index) => (
                 <TableHeadCell
                   key={index}
-                  colSpan={index === 0 ? 2 : 1}
+                  colSpan={
+                    index === 0 &&
+                    activity.headerColumnIncludes ===
+                      HeaderColumnIncludesTypes.IMAGE_AND_TEXT
+                      ? 2
+                      : 1
+                  }
                   value={label}
                 />
               ))}
@@ -260,6 +275,7 @@ const TableViewer = React.forwardRef<ActivityViewerHandle, TableViewerProps>(
                   correctAnswers={activity.correctAnswers}
                   selectedAnswers={selectedAnswers}
                   setSelectedAnswers={setSelectedAnswers}
+                  headerColumnIncludes={activity.headerColumnIncludes}
                 />
               ))}
             </TableBody>

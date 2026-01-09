@@ -55,6 +55,7 @@ import {
   isMultipleChoiceActivity,
   isMultiSelectActivity,
   isTableActivity,
+  HeaderColumnIncludesTypes,
   Media,
   QuestionType,
 } from "../../types/CourseTypes";
@@ -163,14 +164,16 @@ const ViewModulePage = () => {
   }, [requestedModuleId]);
 
   const fetchUnit = useCallback(async () => {
-    if (!requestedUnitId) return null;
     const allUnits = await CourseAPIClient.getUnits();
-    const foundUnit = allUnits.find((u) => u.id === requestedUnitId);
+    const foundUnit = allUnits.find((u) =>
+      u.modules.some((m) => m.id === requestedModuleId),
+    );
     return foundUnit || null;
-  }, [requestedUnitId]);
+  }, [requestedModuleId]);
 
   useEffect(() => {
     setIsRetryButtonDisplayed(false);
+    setIsPreviewModalOpen(false);
     if (currentPageObject && isActivityPage(currentPageObject)) {
       setActivity(currentPageObject);
       if (currentPageObject.imageUrl) {
@@ -819,6 +822,16 @@ const ViewModulePage = () => {
     });
   };
 
+  const setHeaderColumnIncludes = (newIncludes: HeaderColumnIncludesTypes) => {
+    setActivity((prev) => {
+      if (!prev || !isTableActivity(prev)) return prev;
+      return {
+        ...prev,
+        headerColumnIncludes: newIncludes,
+      };
+    });
+  };
+
   const isRightSidebarOpen =
     role === "Administrator" &&
     currentPageObject &&
@@ -872,49 +885,51 @@ const ViewModulePage = () => {
                 </IconButton>
                 <Typography variant="headlineLarge">{module?.title}</Typography>
               </Box>
-              <Box display="inline-flex" alignItems="center" gap="20px">
-                <Button
-                  sx={{
-                    paddingX: "12px",
-                    paddingY: "10px",
-                  }}
-                  onClick={() => setIsHelpModalOpen(true)}
-                >
-                  <Typography
-                    color={theme.palette.Learner.Dark.Default}
-                    variant="labelLarge"
+              {role === "Learner" && (
+                <Box display="inline-flex" alignItems="center" gap="20px">
+                  <Button
+                    sx={{
+                      paddingX: "12px",
+                      paddingY: "10px",
+                    }}
+                    onClick={() => setIsHelpModalOpen(true)}
                   >
-                    Need Help?
-                  </Typography>
-                </Button>
-                <IconButton
-                  sx={{
-                    border: "1px solid",
-                    borderColor: theme.palette.Neutral[500],
-                    height: "48px",
-                    width: "48px",
-                    padding: "8px",
-                  }}
-                  onClick={() => toggleBookmark(currentPage)}
-                  disabled={isBookmarkLoading}
-                >
-                  {isCurrentPageBookmarked ? (
-                    <BookmarkIcon
-                      sx={{
-                        fontSize: "24px",
-                        color: theme.palette.Learner.Dark.Default,
-                      }}
-                    />
-                  ) : (
-                    <BookmarkBorderIcon
-                      sx={{
-                        fontSize: "24px",
-                        color: theme.palette.Learner.Dark.Default,
-                      }}
-                    />
-                  )}
-                </IconButton>
-              </Box>
+                    <Typography
+                      color={theme.palette.Learner.Dark.Default}
+                      variant="labelLarge"
+                    >
+                      Need Help?
+                    </Typography>
+                  </Button>
+                  <IconButton
+                    sx={{
+                      border: "1px solid",
+                      borderColor: theme.palette.Neutral[500],
+                      height: "48px",
+                      width: "48px",
+                      padding: "8px",
+                    }}
+                    onClick={() => toggleBookmark(currentPage)}
+                    disabled={isBookmarkLoading}
+                  >
+                    {isCurrentPageBookmarked ? (
+                      <BookmarkIcon
+                        sx={{
+                          fontSize: "24px",
+                          color: theme.palette.Learner.Dark.Default,
+                        }}
+                      />
+                    ) : (
+                      <BookmarkBorderIcon
+                        sx={{
+                          fontSize: "24px",
+                          color: theme.palette.Learner.Dark.Default,
+                        }}
+                      />
+                    )}
+                  </IconButton>
+                </Box>
+              )}
             </Box>
           )}
           <Box
@@ -1223,8 +1238,8 @@ const ViewModulePage = () => {
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
                 }}
-                // headerColumnIncludes={HeaderColumnIncludesTypes.TEXT}
-                // setHeaderColumnIncludes={() => {}}
+                headerColumnIncludes={currentPageObject.headerColumnIncludes}
+                setHeaderColumnIncludes={setHeaderColumnIncludes}
               />
             )}
             {isMatchingActivity(currentPageObject) && (

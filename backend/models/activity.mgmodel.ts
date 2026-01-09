@@ -44,6 +44,7 @@ export interface TableActivity extends Activity {
   columnLabels: string[];
   rowLabels: string[][]; // Each inner array: [labelText, optionalImageUrl]
   correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
+  headerColumnIncludes: "image" | "text" | "image_and_text";
 }
 
 export type TextInputValidation =
@@ -262,6 +263,12 @@ const TableActivitySchema = new Schema({
         value.every((pair) => pair.length === 2),
       message: "Each coordinate must be a pair of numbers [row, col]",
     },
+  },
+  headerColumnIncludes: {
+    type: String,
+    enum: ["image", "text", "image_and_text"],
+    default: "image_and_text",
+    required: true,
   },
 });
 

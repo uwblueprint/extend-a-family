@@ -8,18 +8,19 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { HeaderColumnIncludesTypes } from "../../../types/CourseTypes";
 
-export enum HeaderColumnIncludesTypes {
-  IMAGE = "image",
-  TEXT = "text",
-  IMAGE_AND_TEXT = "image_and_text",
-}
+const headerColumnIncludesOptions: Record<HeaderColumnIncludesTypes, string> = {
+  [HeaderColumnIncludesTypes.IMAGE]: "Image",
+  [HeaderColumnIncludesTypes.TEXT]: "Text",
+  [HeaderColumnIncludesTypes.IMAGE_AND_TEXT]: "Image + Text",
+};
 
 interface TableSidebarProps {
   numColumns: number;
   setNumColumns: (value: number) => void;
-  // headerColumnIncludes: HeaderColumnIncludesTypes;
-  // setHeaderColumnIncludes: (value: HeaderColumnIncludesTypes) => void;
+  headerColumnIncludes: HeaderColumnIncludesTypes;
+  setHeaderColumnIncludes: (value: HeaderColumnIncludesTypes) => void;
   onAddRow: () => void;
   isAddRowDisabled: boolean;
   hint: string;
@@ -29,8 +30,8 @@ interface TableSidebarProps {
 export default function TableSidebar({
   numColumns,
   setNumColumns,
-  // headerColumnIncludes,
-  // setHeaderColumnIncludes,
+  headerColumnIncludes,
+  setHeaderColumnIncludes,
   onAddRow,
   isAddRowDisabled,
   hint,
@@ -149,6 +150,44 @@ export default function TableSidebar({
                     {numCols - 1} Column{numCols - 1 !== 1 ? "s" : ""}
                   </MenuItem>
                 ))}
+              </Select>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "8px",
+                alignSelf: "stretch",
+              }}
+            >
+              <Typography variant="bodySmall">
+                Header column includes
+              </Typography>
+              <Select
+                value={headerColumnIncludes}
+                onChange={(e) =>
+                  setHeaderColumnIncludes(
+                    e.target.value as HeaderColumnIncludesTypes,
+                  )
+                }
+                sx={{
+                  display: "flex",
+                  height: "40px",
+                  width: "100%",
+                  color: theme.palette.Administrator.Dark.Default,
+
+                  borderRadius: "4px",
+                  border: `1px solid ${theme.palette.Neutral[500]}`,
+                }}
+              >
+                {Object.values(HeaderColumnIncludesTypes).map(
+                  (headerInclude) => (
+                    <MenuItem key={headerInclude} value={headerInclude}>
+                      {headerColumnIncludesOptions[headerInclude]}
+                    </MenuItem>
+                  ),
+                )}
               </Select>
             </Box>
           </Box>

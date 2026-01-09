@@ -18,6 +18,7 @@ import React from "react";
 import ActivityAPIClient from "../../../APIClients/ActivityAPIClient";
 import {
   Activity,
+  HeaderColumnIncludesTypes,
   isTableActivity,
   TableActivity,
 } from "../../../types/CourseTypes";
@@ -35,6 +36,7 @@ const TableActivityRow = ({
   rowLabel,
   numColumns,
   correctAnswers,
+  headerColumnIncludes,
   setActivity,
 }: {
   index: number;
@@ -42,6 +44,7 @@ const TableActivityRow = ({
   rowLabel: string;
   numColumns: number;
   correctAnswers: number[][];
+  headerColumnIncludes: HeaderColumnIncludesTypes;
   setActivity: React.Dispatch<React.SetStateAction<Activity | undefined>>;
 }) => {
   const theme = useTheme();
@@ -64,76 +67,80 @@ const TableActivityRow = ({
 
   return (
     <TableRow>
-      <TableCell
-        align="center"
-        sx={{
-          backgroundImage: `url(${imageURL})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <Button
-          component="label"
+      {headerColumnIncludes !== HeaderColumnIncludesTypes.TEXT && (
+        <TableCell
+          align="center"
           sx={{
-            width: 40,
-            height: 40,
-            minWidth: 40,
-            p: 0,
-            border: `1px solid ${theme.palette.Neutral[400]}`,
-            color: theme.palette.Neutral[800],
+            backgroundImage: `url(${imageURL})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           }}
         >
-          <VisuallyHiddenInput
-            type="file"
-            accept="image/*"
-            onChange={async (event) => {
-              const file: File | undefined = event.target.files?.[0];
-              const path = `activity/imageData/matching-${crypto.randomUUID()}`;
-              if (file) {
-                const uploadedImagePath = await ActivityAPIClient.uploadImage(
-                  path,
-                  file,
-                );
-                if (uploadedImagePath) {
-                  setActivity((prev) => {
-                    if (!prev || !isTableActivity(prev)) return prev;
-                    const newRowLabels = [...prev.rowLabels];
-                    newRowLabels[index][1] = uploadedImagePath;
-                    return { ...prev, rowLabels: newRowLabels };
-                  });
-                }
-              }
+          <Button
+            component="label"
+            sx={{
+              width: 40,
+              height: 40,
+              minWidth: 40,
+              p: 0,
+              border: `1px solid ${theme.palette.Neutral[400]}`,
+              color: theme.palette.Neutral[800],
             }}
-          />
-          <AddPhotoAlternateOutlined
-            sx={{ color: theme.palette.Neutral[800] }}
-          />
-        </Button>
-      </TableCell>
-      <TableCell
-        align="center"
-        sx={{
-          borderLeft: `1px solid ${theme.palette.Neutral[400]}`,
-          borderRight: `1px solid ${theme.palette.Neutral[400]}`,
-        }}
-      >
-        <Typography variant="bodySmall">
-          <BodySmallTextField
-            defaultValue={rowLabel}
-            placeholder="[Row Name]"
-            onChange={(newValue) =>
-              setActivity((prev) => {
-                if (!prev || !isTableActivity(prev)) return prev;
-                const newRowLabels = [...prev.rowLabels];
-                newRowLabels[index][0] = newValue;
+          >
+            <VisuallyHiddenInput
+              type="file"
+              accept="image/*"
+              onChange={async (event) => {
+                const file: File | undefined = event.target.files?.[0];
+                const path = `activity/imageData/matching-${crypto.randomUUID()}`;
+                if (file) {
+                  const uploadedImagePath = await ActivityAPIClient.uploadImage(
+                    path,
+                    file,
+                  );
+                  if (uploadedImagePath) {
+                    setActivity((prev) => {
+                      if (!prev || !isTableActivity(prev)) return prev;
+                      const newRowLabels = [...prev.rowLabels];
+                      newRowLabels[index][1] = uploadedImagePath;
+                      return { ...prev, rowLabels: newRowLabels };
+                    });
+                  }
+                }
+              }}
+            />
+            <AddPhotoAlternateOutlined
+              sx={{ color: theme.palette.Neutral[800] }}
+            />
+          </Button>
+        </TableCell>
+      )}
+      {headerColumnIncludes !== HeaderColumnIncludesTypes.IMAGE && (
+        <TableCell
+          align="center"
+          sx={{
+            borderLeft: `1px solid ${theme.palette.Neutral[400]}`,
+            borderRight: `1px solid ${theme.palette.Neutral[400]}`,
+          }}
+        >
+          <Typography variant="bodySmall">
+            <BodySmallTextField
+              defaultValue={rowLabel}
+              placeholder="[Row Name]"
+              onChange={(newValue) =>
+                setActivity((prev) => {
+                  if (!prev || !isTableActivity(prev)) return prev;
+                  const newRowLabels = [...prev.rowLabels];
+                  newRowLabels[index][0] = newValue;
 
-                return { ...prev, rowLabels: newRowLabels };
-              })
-            }
-          />
-        </Typography>
-      </TableCell>
+                  return { ...prev, rowLabels: newRowLabels };
+                })
+              }
+            />
+          </Typography>
+        </TableCell>
+      )}
       {Array.from({ length: numColumns }).map((_, colIndex) => {
         const isCorrect = correctAnswers.some(
           (coord) => coord[0] === index && coord[1] === colIndex,
@@ -283,7 +290,13 @@ const TableMainEditor = ({
               {activity.columnLabels.map((label, index) => (
                 <TableHeadCell
                   key={index}
-                  colSpan={index === 0 ? 2 : 1}
+                  colSpan={
+                    index === 0 &&
+                    activity.headerColumnIncludes ===
+                      HeaderColumnIncludesTypes.IMAGE_AND_TEXT
+                      ? 2
+                      : 1
+                  }
                   value={label}
                   onChange={(newValue) => {
                     setActivity((prev) => {
@@ -323,6 +336,7 @@ const TableMainEditor = ({
                 correctAnswers={activity.correctAnswers.filter(
                   (coord) => coord[0] === index,
                 )}
+                headerColumnIncludes={activity.headerColumnIncludes}
                 setActivity={setActivity}
               />
             ))}
