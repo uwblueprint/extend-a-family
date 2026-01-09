@@ -393,7 +393,7 @@ const ViewModulePage = () => {
     if (thumbnailRefs.current[currentPage]) {
       thumbnailRefs.current[currentPage]?.scrollIntoView({
         behavior: "smooth",
-        block: "center",
+        block: "nearest",
       });
     }
   }, [currentPage]);
