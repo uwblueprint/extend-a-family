@@ -7,9 +7,9 @@ const ThanksForTheFeedbackSlide = () => {
     <Box
       sx={{
         display: "flex",
-        width: "1024px",
+        maxWidth: "1024px",
         height: "768px",
-        padding: "0 274px",
+        padding: "0 205px",
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -18,7 +18,6 @@ const ThanksForTheFeedbackSlide = () => {
       <Box
         sx={{
           display: "flex",
-          width: "476px",
           flexDirection: "column",
           alignItems: "center",
           gap: "32px",

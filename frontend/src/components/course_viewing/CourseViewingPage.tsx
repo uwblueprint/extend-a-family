@@ -1,7 +1,8 @@
 import AddIcon from "@mui/icons-material/Add";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseModulesGrid from "./CourseModulesGrid";
 import CreateModuleModal from "./modals/CreateModuleModal";
@@ -11,6 +12,8 @@ import { useUser } from "../../hooks/useUser";
 export default function CourseUnitsPage() {
   const theme = useTheme();
   const { role } = useUser();
+  const location = useLocation();
+  const history = useHistory();
   const [selectedUnit, setSelectedUnit] = useState<CourseUnit | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -22,6 +25,22 @@ export default function CourseUnitsPage() {
   const handleDrawerClose = () => {
     setSidebarOpen(false);
   };
+
+  // Update URL when selectedUnit changes
+  useEffect(() => {
+    if (selectedUnit) {
+      const searchParams = new URLSearchParams(location.search);
+      const currentUnitId = searchParams.get("selectedUnit");
+
+      if (currentUnitId !== selectedUnit.id) {
+        searchParams.set("selectedUnit", selectedUnit.id);
+        history.replace({
+          pathname: location.pathname,
+          search: searchParams.toString(),
+        });
+      }
+    }
+  }, [selectedUnit, location.pathname, location.search, history]);
 
   return (
     <Box display="flex" width="100%" height="100vh" overflow="hidden">

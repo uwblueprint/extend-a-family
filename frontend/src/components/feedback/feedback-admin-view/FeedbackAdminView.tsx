@@ -12,7 +12,7 @@ import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import { CourseUnit } from "../../../types/CourseTypes";
 import FeedbackAdminUnitSidebar from "./FeedbackAdminViewSidebar";
 import { FeedbackPopulated } from "../../../types/FeedbackTypes";
-import FeedbackAPIClient from "../../../APIClients/FeedbackAPIClient";
+import { useFeedbacks } from "../../../contexts/FeedbacksContext";
 import {
   FeedbackAdminCourseView,
   FeedbackAdminModuleView,
@@ -43,7 +43,6 @@ const RatingCard = ({ children }: { children?: React.ReactNode }) => {
 
 // Cache data at module level to persist across component remounts
 let cachedCourseUnits: Array<CourseUnit> | null = null;
-let cachedAllFeedbacks: Array<FeedbackPopulated> | null = null;
 let isFetching = false;
 
 const FeedbackAdminView = () => {
@@ -54,29 +53,21 @@ const FeedbackAdminView = () => {
   const [courseUnits, setCourseUnits] = React.useState<Array<CourseUnit>>(
     cachedCourseUnits || [],
   );
-  const [allFeedbacks, setAllFeedbacks] = React.useState<
-    Array<FeedbackPopulated>
-  >(cachedAllFeedbacks || []);
+  const { feedbacks: allFeedbacks } = useFeedbacks();
 
   React.useEffect(() => {
     if (isFetching) return;
 
-    if (cachedCourseUnits && cachedAllFeedbacks) {
+    if (cachedCourseUnits) {
       setCourseUnits(cachedCourseUnits);
-      setAllFeedbacks(cachedAllFeedbacks);
       return;
     }
 
     isFetching = true;
 
-    Promise.all([
-      CourseAPIClient.getUnits(),
-      FeedbackAPIClient.fetchAllFeedback(),
-    ]).then(([units, feedbacks]) => {
+    CourseAPIClient.getUnits().then((units) => {
       cachedCourseUnits = units;
-      cachedAllFeedbacks = feedbacks;
       setCourseUnits(units);
-      setAllFeedbacks(feedbacks);
       isFetching = false;
     });
   }, []);

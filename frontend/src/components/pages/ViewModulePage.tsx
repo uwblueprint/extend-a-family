@@ -650,7 +650,6 @@ const ViewModulePage = () => {
                   flexShrink={0}
                   sx={{
                     display: "inline-flex",
-                    // padding: "0 45.5px",
                     justifyContent: "center",
                     alignItems: "center",
                     backgroundColor: "white",
@@ -784,9 +783,32 @@ const ViewModulePage = () => {
     });
   };
 
+  const isRightSidebarOpen =
+    role === "Administrator" &&
+    currentPageObject &&
+    isActivityPage(currentPageObject);
+
+  const getGridTemplateColumns = () => {
+    if (isRightSidebarOpen) {
+      return "auto minmax(min-content, 1fr) 3px minmax(300px, max-content)";
+    }
+    if (isFullScreen) {
+      return "1fr";
+    }
+    return "auto minmax(min-content, 1fr)";
+  };
+
   return (
     <>
-      <Box display="flex" flexDirection="row">
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: getGridTemplateColumns(),
+          width: "100%",
+          minHeight: "100vh",
+          overflowX: "auto",
+        }}
+      >
         {SideBar}
         <Box
           alignItems="center"
@@ -795,7 +817,6 @@ const ViewModulePage = () => {
           display="flex"
           flexDirection="column"
           gap="24px"
-          flexGrow="1"
           height={boxHeight}
         >
           {!isFullScreen && (

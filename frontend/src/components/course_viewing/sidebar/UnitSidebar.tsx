@@ -66,9 +66,11 @@ export default function UnitSidebar({
     if (!courseUnits || !courseUnits.length) return;
 
     const queryParams = new URLSearchParams(window.location.search);
-    if (queryParams.get("unitId")) {
+    const selectedUnitParam = queryParams.get("selectedUnit");
+
+    if (selectedUnitParam) {
       const unitFromParams = courseUnits.find(
-        (unit) => unit.id === queryParams.get("unitId"),
+        (unit) => unit.id === selectedUnitParam,
       );
       if (unitFromParams) {
         const index = courseUnits.findIndex(
@@ -76,18 +78,13 @@ export default function UnitSidebar({
         );
         setSelectedIndex(index);
         setSelectedUnit(unitFromParams);
+        return;
       }
-
-      const newParams = new URLSearchParams(queryParams.toString());
-      newParams.delete("unitId");
-      const newSearch = newParams.toString();
-      const newUrl =
-        window.location.pathname + (newSearch ? `?${newSearch}` : "");
-      window.history.replaceState(null, "", newUrl);
-    } else {
-      setSelectedUnit(courseUnits[0]);
-      setSelectedIndex(0);
     }
+
+    // Default to first unit if no valid query parameter
+    setSelectedUnit(courseUnits[0]);
+    setSelectedIndex(0);
   }, [courseUnits, setSelectedUnit]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

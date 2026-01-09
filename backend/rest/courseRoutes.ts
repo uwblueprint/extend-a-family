@@ -313,11 +313,13 @@ courseRouter.delete(
   isAuthorizedByRole(new Set(["Administrator"])),
   moduleBelongsToUnitValidator,
   async (req, res) => {
-    const { unitId, moduleId } = req.params;
+    const { unitId, moduleId, deleteFeedbacks } = req.params;
     try {
       const deletedCourseUnitId = await courseModuleService.deleteCourseModule(
         unitId,
         moduleId,
+        undefined,
+        deleteFeedbacks === "true",
       );
       res.status(200).json({ id: deletedCourseUnitId });
     } catch (e: unknown) {

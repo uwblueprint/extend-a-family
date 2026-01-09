@@ -18,6 +18,7 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ICourseModuleService from "../interfaces/courseModuleService";
 import FileStorageService from "./fileStorageService";
+import feedbackMgmodel from "../../models/feedback.mgmodel";
 
 const Logger = logger(__filename);
 
@@ -204,6 +205,7 @@ class CourseModuleService implements ICourseModuleService {
     courseUnitId: string,
     courseModuleId: string,
     currSession?: ClientSession,
+    deleteFeedbacks = false,
   ): Promise<string> {
     let deletedCourseModuleId: string;
     const session: ClientSession = currSession ?? (await startSession());
@@ -244,6 +246,15 @@ class CourseModuleService implements ICourseModuleService {
       }
 
       deletedCourseModuleId = deletedCourseModule.id;
+
+      // Optionally delete associated feedbacks
+      if (deleteFeedbacks) {
+        await feedbackMgmodel
+          .deleteMany({
+            moduleId: courseModuleId,
+          })
+          .session(session);
+      }
 
       if (!currSession) {
         await session.commitTransaction();
