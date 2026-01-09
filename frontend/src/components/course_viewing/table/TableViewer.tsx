@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { TableActivity } from "../../../types/CourseTypes";
+import { useUser } from "../../../hooks/useUser";
 
 type TableViewerProps = {
   activity: TableActivity;
@@ -139,11 +140,14 @@ const TableHeadCell = ({
 const TableViewer = React.forwardRef<ActivityViewerHandle, TableViewerProps>(
   ({ activity, onWrongAnswer, onCorrectAnswer }, ref) => {
     const theme = useTheme();
+    const { role } = useUser();
 
     const [selectedAnswers, setSelectedAnswers] = React.useState<number[][]>(
       [],
     );
-    const [isCompleted, setIsCompleted] = React.useState(false);
+    const [isCompleted, setIsCompleted] = React.useState(
+      role === "Facilitator",
+    );
 
     const isAnswerCorrect = () => {
       const { correctAnswers } = activity;

@@ -11,10 +11,11 @@ interface ModulesGridProps {
 const ModulesGrid: React.FC<ModulesGridProps> = ({ modules, unitId }) => {
   return (
     <Grid container spacing={3}>
-      {modules.map((module) => (
+      {modules.map((module, index) => (
         <ModuleCardLearner
           key={module.id}
           module={module}
+          index={index}
           unitId={unitId}
           isSidebarOpen={false}
         />

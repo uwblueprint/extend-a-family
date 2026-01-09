@@ -6,6 +6,7 @@ import {
   MultiSelectActivity,
 } from "../../../types/CourseTypes";
 import MultipleChoiceViewOption from "./MultipleChoiceViewOption";
+import { useUser } from "../../../hooks/useUser";
 
 type MultipleChoiceViewerProps = {
   activity: MultipleChoiceActivity | MultiSelectActivity;
@@ -23,8 +24,9 @@ const MultipleChoiceViewer = React.forwardRef<
   MultipleChoiceViewerProps
 >(({ activity, onWrongAnswer, onCorrectAnswer }, ref) => {
   const theme = useTheme();
+  const { role } = useUser();
   const [selectedOptions, setSelectedOptions] = React.useState<number[]>([]);
-  const [isCompleted, setIsCompleted] = React.useState(false);
+  const [isCompleted, setIsCompleted] = React.useState(role === "Facilitator");
 
   const checkAnswer = () => {
     const correctOptions = isMultiSelectActivity(activity)

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Add,
+  ArrowBack,
   ArrowCircleDown,
   ArrowCircleUp,
   CheckCircleOutline,
@@ -12,7 +13,6 @@ import {
   VisibilityOutlined,
 } from "@mui/icons-material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
@@ -48,6 +48,7 @@ import { useUser } from "../../hooks/useUser";
 import {
   Activity,
   CourseModule,
+  CourseUnit,
   isActivityPage,
   isLessonPage,
   isMatchingActivity,
@@ -107,6 +108,7 @@ const ViewModulePage = () => {
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [module, setModule] = useState<CourseModule | null>(null);
+  const [unit, setUnit] = useState<CourseUnit | null>(null);
   const lessonPageRef = useRef<HTMLDivElement>(null);
   const lessonPageContainerRef = useRef<HTMLDivElement>(null);
   const [pageHeight, setPageHeight] = useState<number>(0);
@@ -159,6 +161,13 @@ const ViewModulePage = () => {
     );
     return fetchedModule;
   }, [requestedModuleId]);
+
+  const fetchUnit = useCallback(async () => {
+    if (!requestedUnitId) return null;
+    const allUnits = await CourseAPIClient.getUnits();
+    const foundUnit = allUnits.find((u) => u.id === requestedUnitId);
+    return foundUnit || null;
+  }, [requestedUnitId]);
 
   useEffect(() => {
     setIsRetryButtonDisplayed(false);
@@ -362,8 +371,12 @@ const ViewModulePage = () => {
 
   useEffect(() => {
     (async () => {
-      const currentModule = await fetchModule();
+      const [currentModule, currentUnit] = await Promise.all([
+        fetchModule(),
+        fetchUnit(),
+      ]);
       setModule(currentModule);
+      setUnit(currentUnit);
       const defaultCurrentPage = currentModule?.pages.findIndex((page) => {
         return page.id === requestedPageId;
       });
@@ -371,7 +384,7 @@ const ViewModulePage = () => {
         setCurrentPage(defaultCurrentPage);
       }
     })();
-  }, [fetchModule, requestedPageId]);
+  }, [fetchModule, fetchUnit, requestedPageId]);
 
   useEffect(() => {
     if (thumbnailRefs.current[currentPage]) {
@@ -680,7 +693,19 @@ const ViewModulePage = () => {
                       alignItems="flex-start"
                     >
                       <Typography variant="bodyMedium">
-                        Activity 4.5.1
+                        Activity{" "}
+                        {(() => {
+                          const unitNumber = unit?.displayIndex ?? 0;
+                          const moduleNumber =
+                            (unit?.modules.findIndex(
+                              (m) => m.id === module?.id,
+                            ) ?? -1) + 1;
+                          const activityNumber =
+                            module?.pages
+                              .slice(0, index + 1)
+                              .filter(isActivityPage).length ?? 0;
+                          return `${unitNumber}.${moduleNumber}.${activityNumber}`;
+                        })()}
                       </Typography>
                       <Typography variant="labelSmall" textAlign="center">
                         {questionTypeLabels[page.questionType]}
@@ -747,6 +772,7 @@ const ViewModulePage = () => {
       isFullScreen,
       isEmptyModuleEditing,
       module?.pages,
+      module?.id,
       role,
       numPages,
       currentPage,
@@ -758,6 +784,8 @@ const ViewModulePage = () => {
       handleDragOver,
       handleDragLeave,
       handleDrop,
+      unit?.displayIndex,
+      unit?.modules,
     ],
   );
 
@@ -834,16 +862,13 @@ const ViewModulePage = () => {
               alignItems="center"
               width="100%"
             >
-              <Box display="inline-flex" alignItems="center">
+              <Box display="inline-flex" alignItems="center" gap="8px">
                 <IconButton
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                  href={COURSE_PAGE}
+                  href={`${COURSE_PAGE}${
+                    unit ? `?selectedUnit=${unit.id}` : ""
+                  }`}
                 >
-                  <ArrowBackIosIcon sx={{ fontSize: "24px" }} />
+                  <ArrowBack sx={{ fontSize: "24px" }} />
                 </IconButton>
                 <Typography variant="headlineLarge">{module?.title}</Typography>
               </Box>

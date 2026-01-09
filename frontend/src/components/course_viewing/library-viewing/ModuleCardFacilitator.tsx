@@ -6,7 +6,13 @@ import * as Routes from "../../../constants/Routes";
 import { CourseModule } from "../../../types/CourseTypes";
 import BlankImg from "../../assets/blankSlide.png";
 
-const ModuleCardFacilitator = ({ module }: { module: CourseModule }) => {
+const ModuleCardFacilitator = ({
+  module,
+  index,
+}: {
+  module: CourseModule;
+  index: number;
+}) => {
   const theme = useTheme();
   const history = useHistory();
 
@@ -58,9 +64,7 @@ const ModuleCardFacilitator = ({ module }: { module: CourseModule }) => {
         gap="8px"
         alignSelf="stretch"
       >
-        <Typography variant="labelLarge">
-          Module {module.displayIndex}
-        </Typography>
+        <Typography variant="labelLarge">Module {index + 1}</Typography>
         <Typography variant="bodyLarge">{module.title}</Typography>
       </Stack>
       <Button

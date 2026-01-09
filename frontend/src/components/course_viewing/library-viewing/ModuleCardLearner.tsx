@@ -16,10 +16,12 @@ import BlankImg from "../../assets/blankSlide.png";
 
 const ModuleCardLearner = ({
   module,
+  index,
   unitId,
   isSidebarOpen,
 }: {
   module: CourseModule;
+  index: number;
   unitId: string;
   isSidebarOpen: boolean;
 }) => {
@@ -77,7 +79,7 @@ const ModuleCardLearner = ({
                 color: theme.palette.Neutral[500],
               }}
             >
-              Module {module.displayIndex}
+              Module {index + 1}
             </Typography>
             <Typography
               variant="bodyLarge"

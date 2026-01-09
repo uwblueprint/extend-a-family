@@ -96,13 +96,20 @@ export default function CourseModulesGrid({
               />
             );
           case "Facilitator":
-            return <ModuleCardFacilitator key={module.id} module={module} />;
+            return (
+              <ModuleCardFacilitator
+                key={module.id}
+                module={module}
+                index={index}
+              />
+            );
           case "Learner":
           default:
             return (
               <ModuleCardLearner
                 key={module.id}
                 module={module}
+                index={index}
                 unitId={unitId}
                 isSidebarOpen={isSidebarOpen}
               />
