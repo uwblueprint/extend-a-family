@@ -333,9 +333,7 @@ const ModuleCardAdmin = ({
         gap="8px"
         alignSelf="stretch"
       >
-        <Typography variant="labelLarge">
-          Module {module.displayIndex}
-        </Typography>
+        <Typography variant="labelLarge">Module {index + 1}</Typography>
         <Typography variant="bodyLarge">{module.title}</Typography>
       </Stack>
       <Button
