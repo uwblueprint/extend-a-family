@@ -112,10 +112,13 @@ const ViewModulePage = () => {
   const [module, setModule] = useState<CourseModule | null>(null);
   const [unit, setUnit] = useState<CourseUnit | null>(null);
   const lessonPageRef = useRef<HTMLDivElement>(null);
+  const activityPageRef = useRef<HTMLDivElement>(null);
   const lessonPageContainerRef = useRef<HTMLDivElement>(null);
-  const [pageHeight, setPageHeight] = useState<number>(0);
+  const [lessonPageWidth, setLessonPageWidth] = useState<number>(0);
+  const [lessonPageHeight, setLessonPageHeight] = useState<number>(0);
+  const [activityPageWidth, setActivityPageWidth] = useState<number>(0);
+  const [activityPageHeight, setActivityPageHeight] = useState<number>(0);
   const [containerHeight, setContainerHeight] = useState<number>(0);
-  const [pageWidth, setPageWidth] = useState<number>(0);
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const theme = useTheme();
   const currentPageObject = module?.pages[currentPage];
@@ -399,7 +402,7 @@ const ViewModulePage = () => {
     }
   }, [currentPage]);
 
-  const getPageScale = () => {
+  const getPageScale = (pageHeight: number, pageWidth: number) => {
     if (
       pageHeight === 0 ||
       containerHeight === 0 ||
@@ -414,11 +417,17 @@ const ViewModulePage = () => {
   };
 
   const handleResize = useCallback(() => {
-    if (pageHeight === 0) {
-      setPageHeight(lessonPageRef.current?.clientHeight || 0);
+    if (lessonPageHeight === 0) {
+      setLessonPageHeight(lessonPageRef.current?.clientHeight || 0);
     }
-    if (pageWidth === 0) {
-      setPageWidth(lessonPageRef.current?.clientWidth || 0);
+    if (lessonPageWidth === 0) {
+      setLessonPageWidth(lessonPageRef.current?.clientWidth || 0);
+    }
+    if (activityPageHeight === 0) {
+      setActivityPageHeight(activityPageRef.current?.clientHeight || 0);
+    }
+    if (activityPageWidth === 0) {
+      setActivityPageWidth(activityPageRef.current?.clientWidth || 0);
     }
     setContainerHeight(lessonPageContainerRef.current?.clientHeight || 0);
     setContainerWidth(
@@ -427,13 +436,18 @@ const ViewModulePage = () => {
         lessonPageContainerRef.current?.clientWidth || 0,
       ),
     );
-  }, [pageHeight, pageWidth]);
+  }, [
+    activityPageHeight,
+    activityPageWidth,
+    lessonPageHeight,
+    lessonPageWidth,
+  ]);
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, [handleResize, isFullScreen, pageHeight]);
+  }, [handleResize, isFullScreen, lessonPageHeight]);
 
   const isCurrentPageBookmarked = useMemo(() => {
     if (!module?.pages[currentPage]) return false;
@@ -954,8 +968,8 @@ const ViewModulePage = () => {
                 <Page
                   pageNumber={currentPageObject.pageIndex}
                   renderAnnotationLayer={false}
-                  scale={getPageScale()}
-                  onLoadSuccess={() => handleResize()}
+                  scale={getPageScale(lessonPageHeight, lessonPageWidth)}
+                  onLoadSuccess={handleResize}
                   inputRef={lessonPageRef}
                 />
               </Document>
@@ -965,8 +979,13 @@ const ViewModulePage = () => {
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
-                height="100%"
-                width="100%"
+                sx={{
+                  transform: `scale(${getPageScale(
+                    activityPageHeight,
+                    activityPageWidth,
+                  )})`,
+                }}
+                ref={activityPageRef}
               >
                 {activity &&
                   (isMultipleChoiceActivity(activity) ||
@@ -1020,6 +1039,10 @@ const ViewModulePage = () => {
                       onCorrectAnswer={onCorrectAnswer}
                       key={activity.id}
                       ref={activityViewerRef}
+                      scale={getPageScale(
+                        activityPageHeight,
+                        activityPageWidth,
+                      )}
                     />
                   ))}
               </Box>

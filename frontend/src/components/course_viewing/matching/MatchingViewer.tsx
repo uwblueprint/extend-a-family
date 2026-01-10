@@ -8,6 +8,7 @@ type MatchingViewerProps = {
   activity: MatchingActivity;
   onWrongAnswer: () => void;
   onCorrectAnswer: () => void;
+  scale?: number;
 };
 
 export type ActivityViewerHandle = {
@@ -18,7 +19,7 @@ export type ActivityViewerHandle = {
 const MatchingViewer = React.forwardRef<
   ActivityViewerHandle,
   MatchingViewerProps
->(({ activity, onWrongAnswer, onCorrectAnswer }, ref) => {
+>(({ activity, onWrongAnswer, onCorrectAnswer, scale = 1 }, ref) => {
   const theme = useTheme();
   const { role: actualRole } = useUser();
   const role = actualRole === "Administrator" ? "Learner" : actualRole;
@@ -248,10 +249,12 @@ const MatchingViewer = React.forwardRef<
           const leftRect = leftEl.getBoundingClientRect();
           const midRect = midEl.getBoundingClientRect();
 
-          const x1 = leftRect.right - containerRect.left;
-          const y1 = leftRect.top - containerRect.top + leftRect.height / 2;
-          const x2 = midRect.left - containerRect.left;
-          const y2 = midRect.top - containerRect.top + midRect.height / 2;
+          const x1 = (leftRect.right - containerRect.left) / scale;
+          const y1 =
+            (leftRect.top - containerRect.top + leftRect.height / 2) / scale;
+          const x2 = (midRect.left - containerRect.left) / scale;
+          const y2 =
+            (midRect.top - containerRect.top + midRect.height / 2) / scale;
 
           return {
             id: `12-${pair.leftRowIdx}-${pair.midRowIdx}`,
@@ -280,10 +283,12 @@ const MatchingViewer = React.forwardRef<
           const midRect = midEl.getBoundingClientRect();
           const rightRect = rightEl.getBoundingClientRect();
 
-          const x1 = midRect.right - containerRect.left;
-          const y1 = midRect.top - containerRect.top + midRect.height / 2;
-          const x2 = rightRect.left - containerRect.left;
-          const y2 = rightRect.top - containerRect.top + rightRect.height / 2;
+          const x1 = (midRect.right - containerRect.left) / scale;
+          const y1 =
+            (midRect.top - containerRect.top + midRect.height / 2) / scale;
+          const x2 = (rightRect.left - containerRect.left) / scale;
+          const y2 =
+            (rightRect.top - containerRect.top + rightRect.height / 2) / scale;
 
           return {
             id: `23-${pair.midRowIdx}-${pair.rightRowIdx}`,
@@ -311,7 +316,7 @@ const MatchingViewer = React.forwardRef<
     recalcLines();
     window.addEventListener("resize", recalcLines);
     return () => window.removeEventListener("resize", recalcLines);
-  }, [matchesLeftToMid, matchesMidToRight]);
+  }, [matchesLeftToMid, matchesMidToRight, scale]);
 
   const isLeftMatched = (rowIdx: number) =>
     matchesLeftToMid.some((pair) => pair.leftRowIdx === rowIdx);

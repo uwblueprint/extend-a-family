@@ -40,7 +40,7 @@ const MatchingBox = ({
     border: `1px solid ${theme.palette.Neutral[400]}`,
     borderRadius: "4px",
     cursor: item ? "pointer" : "default",
-    // transition: "border-color 120ms ease, box-shadow 120ms ease",
+    transition: "border-color 120ms ease, box-shadow 120ms ease",
     outline: "none",
     borderColor:
       isSelected || isMatched
@@ -54,9 +54,6 @@ const MatchingBox = ({
       backgroundColor: item
         ? theme.palette[role].Light.Hover
         : theme.palette.Neutral[400],
-    },
-    "&:focus": {
-      backgroundColor: theme.palette[role].Light.Pressed,
     },
   } as const;
 
