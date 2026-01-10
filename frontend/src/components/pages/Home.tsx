@@ -66,7 +66,7 @@ const Home = (): React.ReactElement => {
             direction="row"
             width="100%"
             justifyContent="space-between"
-            marginTop="25px"
+            marginTop="70px"
             marginBottom="70px"
           >
             <NavButton
