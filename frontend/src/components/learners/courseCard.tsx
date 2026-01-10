@@ -33,15 +33,16 @@ export default function CourseCard({
   module = defaultModule,
   unitId = "demo-unit",
   size = "small",
-  progress = 0,
+  progress = 100,
 }: CourseCardProps) {
   const theme = useTheme();
+  const isSmall = size === "small";
 
   return (
     <Card
       sx={{
-        maxWidth: size === "small" ? 320 : 1044,
-        height: size === "small" ? 288 : 580,
+        maxWidth: isSmall ? 320 : 1044,
+        height: isSmall ? 288 : 580,
         display: "flex",
         flexDirection: "column",
         border: "none",
@@ -54,7 +55,7 @@ export default function CourseCard({
         component={Link}
         to={`${Routes.VIEW_PAGE}?unitId=${unitId}&moduleId=${module.id}`}
         sx={{
-          borderRadius: size === "small" ? "8px" : "16px",
+          borderRadius: isSmall ? "8px" : "16px",
           backgroundColor: "transparent",
           "&:hover, &:active, &.Mui-focusVisible": {
             backgroundColor: "transparent",
@@ -106,9 +107,9 @@ export default function CourseCard({
               top: -1,
               left: -1,
               right: -1,
-              height: size === "small" ? 7 : 17,
+              height: isSmall ? 7 : 17,
               zIndex: 2, // above image, under overlay
-              borderRadius: size === "small" ? "8px 8px 0 0" : "16px 16px 0 0",
+              borderRadius: isSmall ? "8px 8px 0 0" : "16px 16px 0 0",
               backgroundColor: theme.palette.Learner.Light.Selected,
               "& .MuiLinearProgress-bar": {
                 backgroundColor: theme.palette.Learner.Dark.Default,
@@ -135,10 +136,100 @@ export default function CourseCard({
               }}
             />
           </CardMedia>
+
+          {!isSmall && (
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 2,
+                pointerEvents: "none", // allows clicks through to CardActionArea,
+                background: `linear-gradient(
+                              to top,
+                              ${theme.palette.Learner.Light.Default} 0%,
+                              ${theme.palette.Learner.Light.Default} 30%,
+                              rgba(0,0,0,0) 50%
+                            )`,
+              }}
+            />
+          )}
+
+          {!isSmall && (
+            <CardContent
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                zIndex: 4,
+                padding: 3,
+                color: "#fff",
+              }}
+            >
+              <Typography
+                variant="bodyLarge"
+                sx={{
+                  paddingBottom: "8px",
+                  color: theme.palette.Neutral[500],
+                }}
+              >
+                Module {module.displayIndex}
+              </Typography>
+
+              <Typography
+                variant="headlineLarge"
+                sx={{
+                  color: theme.palette.Neutral[700],
+                  overflowWrap: "break-word",
+                  flexGrow: 1,
+                  display: "block",
+                }}
+              >
+                {module.title}
+              </Typography>
+            </CardContent>
+          )}
+
+          {!isSmall && (
+            <Card
+              elevation={0}
+              sx={{
+                position: "absolute",
+                top: 32,
+                right: 16,
+                zIndex: 2,
+                height: "39px",
+                borderRadius: "5px",
+                backgroundColor: theme.palette.Warning.Light.Hover,
+              }}
+            >
+              <CardContent
+                sx={{
+                  padding: "5px 10px 5px 10px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  variant="labelMedium"
+                  sx={{
+                    color: theme.palette.Warning.Dark.Default,
+                    textAlign: "center",
+                    fontSize: "21px",
+                    fontWeight: 300,
+                    lineHeight: "140%",
+                  }}
+                >
+                  {progress}% complete
+                </Typography>
+              </CardContent>
+            </Card>
+          )}
         </Box>
       </CardActionArea>
 
-      {size === "small" && (
+      {isSmall && (
         <CardContent
           sx={{
             padding: "12px 0px 0px 0px",
@@ -175,7 +266,8 @@ export default function CourseCard({
             elevation={0}
             sx={{
               height: "25px",
-              width: "130px",
+              maxWidth: "140px",
+              borderRadius: "4px",
               backgroundColor: theme.palette.Warning.Light.Hover,
             }}
           >
