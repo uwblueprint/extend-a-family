@@ -32,6 +32,7 @@ export interface Facilitator extends User {
   learners: Array<ObjectId>;
   bio?: string;
   emailPrefrence: number;
+  approved: boolean;
 }
 
 const options = {
@@ -82,7 +83,7 @@ export const UserSchema: Schema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ["Invited", "Active", "PendingApproval"],
+      enum: ["Invited", "Active"],
     },
     email: {
       type: String,
@@ -120,6 +121,11 @@ const FacilitatorSchema = new Schema(
       type: Number,
       required: true,
       default: 1, // Default to daily email notifications
+    },
+    approved: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   options,

@@ -10,12 +10,14 @@ import {
   isAuthenticatedLearner,
 } from "../types/AuthTypes";
 
-export function useUser(): AuthenticatedUser {
-  const { authenticatedUser } = useContext(AuthContext);
+export function useUser(): AuthenticatedUser & {
+  refreshUser: () => Promise<void>;
+} {
+  const { authenticatedUser, refreshUser } = useContext(AuthContext);
   if (!authenticatedUser) {
     throw new Error("Private route component accessed by unauthorized user");
   }
-  return authenticatedUser;
+  return { ...authenticatedUser, refreshUser };
 }
 
 export function useAdministrator(): AuthenticatedAdministrator {

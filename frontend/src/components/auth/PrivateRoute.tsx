@@ -4,11 +4,13 @@ import { Redirect, Route } from "react-router-dom";
 import {
   CREATE_PASSWORD_PAGE,
   NOT_AUTHORIZED_PAGE,
+  SIGNUP_PENDING_PAGE,
   WELCOME_PAGE,
 } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { Role } from "../../types/AuthTypes";
 import Navbar from "../common/navbar/Navbar";
+import { isFacilitator } from "../../types/UserTypes";
 
 type PrivateRouteProps = {
   component: React.FC;
@@ -31,6 +33,10 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
       path !== CREATE_PASSWORD_PAGE
     ) {
       return <Redirect to={CREATE_PASSWORD_PAGE} />;
+    }
+
+    if (isFacilitator(authenticatedUser) && !authenticatedUser.approved) {
+      return <Redirect to={SIGNUP_PENDING_PAGE} />;
     }
 
     const NavbarWrappedComponent: React.FC<PrivateRouteProps> = () => {

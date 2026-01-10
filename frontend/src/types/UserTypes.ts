@@ -26,6 +26,7 @@ export type Facilitator = BaseUser & {
   learners: string[];
   bio?: string;
   emailPrefrence: number;
+  approved: boolean;
 };
 type PublicFacilitator = Pick<
   Facilitator,

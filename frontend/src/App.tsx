@@ -8,6 +8,7 @@ import {
   Switch,
 } from "react-router-dom";
 import authAPIClient from "./APIClients/AuthAPIClient";
+import userAPIClient from "./APIClients/UserAPIClient";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import SignupApproved from "./components/auth/SignupApprovedPage";
 import Signup from "./components/auth/SignupPage";
@@ -59,6 +60,25 @@ const App = (): React.ReactElement => {
     DEFAULT_SAMPLE_CONTEXT,
   );
 
+  const refreshUser = async (): Promise<void> => {
+    try {
+      const user = await userAPIClient.getCurrentUser();
+      if (user && authenticatedUser) {
+        const updatedUser: AuthenticatedUser = {
+          ...authenticatedUser,
+          ...user,
+        };
+        setAuthenticatedUser(updatedUser);
+        localStorage.setItem(
+          AUTHENTICATED_USER_KEY,
+          JSON.stringify(updatedUser),
+        );
+      }
+    } catch (error) {
+      // Failed to refresh user, keep current user data
+    }
+  };
+
   const HOUR_MS = 3300000;
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -80,7 +100,7 @@ const App = (): React.ReactElement => {
         value={dispatchSampleContextUpdate}
       >
         <AuthContext.Provider
-          value={{ authenticatedUser, setAuthenticatedUser }}
+          value={{ authenticatedUser, setAuthenticatedUser, refreshUser }}
         >
           <SocketProvider id={authenticatedUser?.id}>
             <NotificationsProvider>

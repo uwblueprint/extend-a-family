@@ -24,23 +24,13 @@ import {
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import { useUser } from "../../hooks/useUser";
-import { User } from "../../types/UserTypes";
+import { isFacilitator, User } from "../../types/UserTypes";
 import ChatWithLearner from "./chat-with-learner/ChatWithLearner";
 import { useNotifications } from "../../contexts/NotificationsContext";
 import { useSocket } from "../../contexts/SocketContext";
 
 interface UserTableProps {
   filteredUsers: User[];
-  usersPerPage: number;
-  page: number;
-  emptyRows: number;
-  handleChangePage: (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
-  ) => void;
-  handleChangeRowsPerPage: (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => void;
   handleOpenDeleteUserModal: (
     userId: string,
     firstName: string,
@@ -48,21 +38,41 @@ interface UserTableProps {
   ) => void;
   handleApproveFacilitator?: (userId: string) => void;
   handleRejectFacilitator?: (userId: string) => void;
+  defaultUsersPerPage?: number;
 }
 
 const UserTable: React.FC<UserTableProps> = ({
   filteredUsers,
-  usersPerPage,
-  page,
-  emptyRows,
-  handleChangePage,
-  handleChangeRowsPerPage,
   handleOpenDeleteUserModal,
   handleApproveFacilitator,
   handleRejectFacilitator,
+  defaultUsersPerPage = 10,
 }) => {
   const theme = useTheme();
   const { role } = useUser();
+
+  // Pagination state
+  const [page, setPage] = React.useState(0);
+  const [usersPerPage, setUsersPerPage] = React.useState(defaultUsersPerPage);
+
+  const emptyRows =
+    page > 0
+      ? Math.max(0, (1 + page) * usersPerPage - filteredUsers.length)
+      : 0;
+
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setUsersPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const socket = useSocket();
   const [chatPopoverAnchorEl, setChatPopoverAnchorEl] =
@@ -187,8 +197,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     ))}
                   {role === "Administrator" && (
                     <>
-                      {user.status === "PendingApproval" &&
-                      user.role === "Facilitator" ? (
+                      {isFacilitator(user) && user.approved === false ? (
                         <>
                           <Button
                             variant="outlined"
