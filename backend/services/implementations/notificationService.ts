@@ -28,7 +28,6 @@ class NotificationService implements INotificationService {
     try {
       const foundNotifications = await MgNotification.find({
         user,
-        read: false,
       })
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -51,7 +50,6 @@ class NotificationService implements INotificationService {
           );
           populatedNotification = await notification.populate(
             "helpRequest.page",
-            "title",
           );
           return {
             id: populatedNotification.id,

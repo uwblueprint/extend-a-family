@@ -366,9 +366,9 @@ class UserService implements IUserService {
 
   async approveFacilitator(userId: string): Promise<UserDTO> {
     try {
-      const user = await MgUser.findByIdAndUpdate(
+      const user = await FacilitatorModel.findByIdAndUpdate(
         userId,
-        { status: "Active" },
+        { approved: true },
         { new: true, runValidators: true },
       );
 

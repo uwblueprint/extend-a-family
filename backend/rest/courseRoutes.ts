@@ -1,5 +1,4 @@
 import { Router } from "express";
-import fs from "fs";
 import multer from "multer";
 import { isAuthorizedByRole } from "../middlewares/auth";
 import {
@@ -14,8 +13,8 @@ import CourseModuleService from "../services/implementations/courseModuleService
 import CoursePageService from "../services/implementations/coursePageService";
 import CourseUnitService from "../services/implementations/courseUnitService";
 import FileStorageService from "../services/implementations/fileStorageService";
-import { getErrorMessage } from "../utilities/errorUtils";
 import { CourseUnitDTO } from "../types/courseTypes";
+import { getErrorMessage } from "../utilities/errorUtils";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -122,29 +121,21 @@ courseRouter.get(
 
 courseRouter.post(
   "/uploadLessons",
-  multer({ storage: multer.memoryStorage() }).single("lessonPdf"),
+  upload.single("lessonPdf"),
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
     try {
       const {
         file: lessonPdf,
-        body: { moduleId },
+        body: { moduleId, insertIdx },
       } = req;
       if (!lessonPdf) {
         throw new Error("No lessonPdf file uploaded.");
       }
-      const uploadedLessonPath = `uploads/course/pdfs/module-${moduleId}.pdf`;
-      if (!fs.existsSync(uploadedLessonPath)) {
-        fs.mkdirSync("uploads/course/pdfs", { recursive: true });
-      }
-      fs.writeFile(uploadedLessonPath, lessonPdf.buffer, (err) => {
-        if (err) {
-          throw err;
-        }
-      });
       const result = await courseModuleService.uploadLessons(
         moduleId,
-        uploadedLessonPath,
+        lessonPdf.buffer,
+        insertIdx ? parseInt(insertIdx, 10) : undefined,
       );
       res.status(200).json(result);
     } catch (e: unknown) {
@@ -235,6 +226,52 @@ courseRouter.put(
 );
 
 courseRouter.put(
+  "/:unitId/reorderModules",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    const { unitId } = req.params;
+    try {
+      const orderedModuleIds: string[] = req.body.moduleIds;
+
+      if (!Array.isArray(orderedModuleIds)) {
+        throw Error("Invalid request: moduleIds must be an array");
+      }
+
+      const courseModules = await courseModuleService.getCourseModules(unitId);
+
+      // Validate that all modules belong to the unit and no duplicates
+      if (orderedModuleIds.length !== courseModules.length) {
+        throw Error("Invalid arrangement: module count mismatch");
+      }
+
+      const moduleIdSet = new Set(orderedModuleIds);
+      if (moduleIdSet.size !== orderedModuleIds.length) {
+        throw Error("Invalid arrangement: duplicate module IDs");
+      }
+
+      // Validate all modules belong to the unit
+      const invalidModule = orderedModuleIds.find(
+        (moduleId) => !courseModules.some((mod) => mod.id === moduleId),
+      );
+      if (invalidModule) {
+        throw Error(
+          `Invalid arrangement: module ${invalidModule} not found in unit`,
+        );
+      }
+
+      // Update the modules array in the unit to reflect new order
+      await courseUnitService.updateCourseUnit(unitId, {
+        modules: orderedModuleIds,
+      });
+
+      res.status(200).send("success");
+    } catch (error: unknown) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
+courseRouter.put(
   "/:unitId/:moduleId",
   isAuthorizedByRole(new Set(["Administrator"])),
   updateCourseUnitDtoValidator,
@@ -276,11 +313,13 @@ courseRouter.delete(
   isAuthorizedByRole(new Set(["Administrator"])),
   moduleBelongsToUnitValidator,
   async (req, res) => {
-    const { unitId, moduleId } = req.params;
+    const { unitId, moduleId, deleteFeedbacks } = req.params;
     try {
       const deletedCourseUnitId = await courseModuleService.deleteCourseModule(
         unitId,
         moduleId,
+        undefined,
+        deleteFeedbacks === "true",
       );
       res.status(200).json({ id: deletedCourseUnitId });
     } catch (e: unknown) {
@@ -343,11 +382,61 @@ courseRouter.put(
 );
 
 courseRouter.delete(
-  "/:unitId/:moduleId/:pageId",
+  "/module/:moduleId/:pageId",
   isAuthorizedByRole(new Set(["Administrator"])),
+  pageBelongsToModuleValidator,
   async (req, res) => {
     try {
       const deletedCoursePageId = await coursePageService.deleteCoursePage(
+        req.params.moduleId,
+        req.params.pageId,
+      );
+      res.status(200).json({ id: deletedCoursePageId });
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.patch(
+  "/module/:moduleId/reorder",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  async (req, res) => {
+    const { moduleId } = req.params;
+    const { fromIndex, toIndex } = req.body;
+
+    try {
+      if (
+        typeof fromIndex !== "number" ||
+        typeof toIndex !== "number" ||
+        fromIndex < 0 ||
+        toIndex < 0
+      ) {
+        res.status(400).send("Invalid fromIndex or toIndex");
+        return;
+      }
+
+      const updatedModule = await courseModuleService.reorderPages(
+        moduleId,
+        fromIndex,
+        toIndex,
+      );
+      res.status(200).json(updatedModule);
+    } catch (e: unknown) {
+      res.status(500).send(getErrorMessage(e));
+    }
+  },
+);
+
+courseRouter.delete(
+  "/:unitId/:moduleId/:pageId",
+  isAuthorizedByRole(new Set(["Administrator"])),
+  moduleBelongsToUnitValidator,
+  pageBelongsToModuleValidator,
+  async (req, res) => {
+    try {
+      const deletedCoursePageId = await coursePageService.deleteCoursePage(
+        req.params.moduleId,
         req.params.pageId,
       );
       res.status(200).json({ id: deletedCoursePageId });

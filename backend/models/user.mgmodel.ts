@@ -1,4 +1,5 @@
 import mongoose, { Document, ObjectId, Schema } from "mongoose";
+import mongooseLeanId from "mongoose-lean-id";
 
 import { Role, Status } from "../types/userTypes";
 
@@ -31,6 +32,7 @@ export interface Facilitator extends User {
   learners: Array<ObjectId>;
   bio?: string;
   emailPrefrence: number;
+  approved: boolean;
 }
 
 const options = {
@@ -81,7 +83,7 @@ export const UserSchema: Schema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: ["Invited", "Active", "PendingApproval"],
+      enum: ["Invited", "Active"],
     },
     email: {
       type: String,
@@ -98,6 +100,8 @@ export const UserSchema: Schema = new Schema(
   },
   options,
 );
+
+UserSchema.plugin(mongooseLeanId);
 
 const UserModel = mongoose.model<User>("User", UserSchema);
 
@@ -118,6 +122,11 @@ const FacilitatorSchema = new Schema(
       required: true,
       default: 1, // Default to daily email notifications
     },
+    approved: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   options,
 );
@@ -126,12 +135,14 @@ const LearnerSchema = new Schema(
   {
     facilitator: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Facilitator",
       required: true,
     },
   },
   options,
 );
+
+LearnerSchema.plugin(mongooseLeanId);
 
 const AdministratorModel = UserModel.discriminator(
   "Administrator",

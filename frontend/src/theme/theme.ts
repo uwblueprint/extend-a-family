@@ -25,7 +25,7 @@ const palette: PaletteOptions = {
       Default: "#FFE6DD",
       Hover: "#FCC4B1",
       Selected: "#FFD9CC",
-      Pressed: "#000000",
+      Pressed: "#FCC4B1",
     },
     Dark: {
       Default: "#8F4C34",

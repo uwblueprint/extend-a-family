@@ -1,14 +1,22 @@
-import React, { useState } from "react";
-import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import UnitSidebar from "./sidebar/UnitSidebar";
+import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import { CourseUnit } from "../../types/CourseTypes";
 import CourseModulesGrid from "./CourseModulesGrid";
+import CreateModuleModal from "./modals/CreateModuleModal";
+import UnitSidebar from "./sidebar/UnitSidebar";
+import { useUser } from "../../hooks/useUser";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
+  const { role } = useUser();
+  const location = useLocation();
+  const history = useHistory();
   const [selectedUnit, setSelectedUnit] = useState<CourseUnit | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     setSidebarOpen(true);
@@ -18,8 +26,24 @@ export default function CourseUnitsPage() {
     setSidebarOpen(false);
   };
 
+  // Update URL when selectedUnit changes
+  useEffect(() => {
+    if (selectedUnit) {
+      const searchParams = new URLSearchParams(location.search);
+      const currentUnitId = searchParams.get("selectedUnit");
+
+      if (currentUnitId !== selectedUnit.id) {
+        searchParams.set("selectedUnit", selectedUnit.id);
+        history.replace({
+          pathname: location.pathname,
+          search: searchParams.toString(),
+        });
+      }
+    }
+  }, [selectedUnit, location.pathname, location.search, history]);
+
   return (
-    <Box display="flex" width="100%">
+    <Box display="flex" width="100%" height="100vh" overflow="hidden">
       <UnitSidebar
         setSelectedUnit={setSelectedUnit}
         handleClose={handleDrawerClose}
@@ -27,7 +51,7 @@ export default function CourseUnitsPage() {
         selectedUnit={selectedUnit}
       />
 
-      <Box sx={{ flexGrow: 1, p: "48px" }}>
+      <Box sx={{ flexGrow: 1, p: "48px", mb: "48px", overflowY: "scroll" }}>
         {selectedUnit ? (
           <Stack spacing="14px">
             <Box display="flex" alignItems="center" paddingLeft="10px">
@@ -62,9 +86,49 @@ export default function CourseUnitsPage() {
               unitId={selectedUnit.id}
               isSidebarOpen={sidebarOpen}
             />
+            <CreateModuleModal
+              open={uploadModalOpen}
+              setUploadModalOpen={setUploadModalOpen}
+              unitId={selectedUnit.id}
+            />
           </Stack>
         ) : (
           <Typography>Loading units...</Typography>
+        )}
+
+        {role === "Administrator" && (
+          <Button
+            type="button"
+            sx={{
+              position: "fixed",
+              bottom: "40px",
+              right: "40px",
+              display: "flex",
+              padding: "16px 20px 16px 16px",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "12px",
+              borderRadius: "16px",
+              background: theme.palette.Administrator.Light.Selected,
+              boxShadow:
+                "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.30)",
+            }}
+            onClick={() => setUploadModalOpen(true)}
+          >
+            <AddIcon
+              sx={{
+                fontSize: "24px",
+                color: theme.palette.Administrator.Dark.Default,
+              }}
+            />
+            <Typography
+              variant="labelLarge"
+              color={theme.palette.Administrator.Dark.Default}
+              display="inline"
+            >
+              Create Module
+            </Typography>
+          </Button>
         )}
       </Box>
     </Box>

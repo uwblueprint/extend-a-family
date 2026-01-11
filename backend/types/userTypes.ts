@@ -53,6 +53,7 @@ export type FacilitatorDTO = UserDTO & {
   learners: string[];
   bio?: string;
   emailPrefrence: number;
+  approved: boolean;
 };
 
 export function isFacilitator(user: UserDTO): user is FacilitatorDTO {

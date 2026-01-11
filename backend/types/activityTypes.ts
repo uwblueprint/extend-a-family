@@ -49,6 +49,7 @@ export interface TableActivityDTO extends ActivityDTO {
   columnLabels: string[];
   rowLabels: string[][]; // Each row label is an array: [labelText, imageURL?]
   correctAnswers: number[][];
+  headerColumnIncludes: "image" | "text" | "image_and_text";
 }
 
 export type TextInputValidationDTO =

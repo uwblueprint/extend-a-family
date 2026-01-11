@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose";
 import { AuthDTO, Token } from "../../types/authTypes";
-import { Role, Status } from "../../types/userTypes";
+import { Role } from "../../types/userTypes";
 
 interface IAuthService {
   /**
@@ -111,10 +111,11 @@ interface IAuthService {
   getUserIdFromAccessToken(accessToken: string): Promise<ObjectId>;
 
   /**
-   * Returns the user signup status based on the specified email address
-   * @param requestedEmail email address for requested user
+   * Returns whether the facilitator should be automatically approved based on the specified email address
+   * @param requestedEmail email address for requested facilitator
+   * @returns true if the facilitator should be automatically approved, false otherwise
    */
-  getStatusByEmail(requestedEmail: string): Promise<Status>;
+  autoApproveFacilitatorEmail(requestedEmail: string): Promise<boolean>;
 }
 
 export default IAuthService;

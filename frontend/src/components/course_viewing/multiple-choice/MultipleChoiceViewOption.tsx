@@ -1,4 +1,5 @@
 import {
+  Check,
   CheckBox,
   CheckBoxOutlineBlank,
   RadioButtonCheckedOutlined,
@@ -10,17 +11,21 @@ export default function MultipleChoiceViewOption({
   isMultiSelect,
   optionText,
   selected,
+  displayCorrect,
   onClick,
 }: {
   isMultiSelect: boolean;
   optionText: string;
   selected?: boolean;
+  displayCorrect?: boolean;
   onClick: () => void;
 }) {
   const theme = useTheme();
 
   let iconElement: JSX.Element;
-  if (isMultiSelect) {
+  if (displayCorrect) {
+    iconElement = <Check />;
+  } else if (isMultiSelect) {
     if (selected) {
       iconElement = <CheckBox />;
     } else {
@@ -30,6 +35,14 @@ export default function MultipleChoiceViewOption({
     iconElement = <RadioButtonCheckedOutlined />;
   } else {
     iconElement = <RadioButtonUncheckedOutlined />;
+  }
+
+  let backgroundColor: string | null = null;
+  if (displayCorrect) {
+    backgroundColor = "#F5FFDF"; // light green
+  } else if (selected) {
+    // eslint-disable-next-line prefer-destructuring
+    backgroundColor = theme.palette.Neutral[100];
   }
 
   return (
@@ -57,6 +70,7 @@ export default function MultipleChoiceViewOption({
 
           border: `1px solid ${theme.palette.Neutral[400]}`,
           borderRadius: "4px",
+          backgroundColor,
         }}
       >
         <Box

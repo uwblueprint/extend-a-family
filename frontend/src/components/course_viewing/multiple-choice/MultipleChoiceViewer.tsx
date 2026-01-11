@@ -6,14 +6,46 @@ import {
   MultiSelectActivity,
 } from "../../../types/CourseTypes";
 import MultipleChoiceViewOption from "./MultipleChoiceViewOption";
+import { useUser } from "../../../hooks/useUser";
 
-const MultipleChoiceViewer = ({
-  activity,
-}: {
+type MultipleChoiceViewerProps = {
   activity: MultipleChoiceActivity | MultiSelectActivity;
-}) => {
+  onWrongAnswer: () => void;
+  onCorrectAnswer: () => void;
+};
+
+export type ActivityViewerHandle = {
+  checkAnswer: () => void;
+  onRetry?: () => void;
+};
+
+const MultipleChoiceViewer = React.forwardRef<
+  ActivityViewerHandle,
+  MultipleChoiceViewerProps
+>(({ activity, onWrongAnswer, onCorrectAnswer }, ref) => {
   const theme = useTheme();
+  const { role } = useUser();
   const [selectedOptions, setSelectedOptions] = React.useState<number[]>([]);
+  const [isCompleted, setIsCompleted] = React.useState(role === "Facilitator");
+
+  const checkAnswer = () => {
+    const correctOptions = isMultiSelectActivity(activity)
+      ? activity.correctAnswers
+      : [activity.correctAnswer];
+    const isCorrect =
+      selectedOptions.length === correctOptions.length &&
+      selectedOptions.every((value) => correctOptions.includes(value));
+    if (!isCorrect) {
+      onWrongAnswer();
+    } else {
+      onCorrectAnswer();
+      setIsCompleted(true);
+    }
+  };
+
+  React.useImperativeHandle(ref, () => ({
+    checkAnswer,
+  }));
 
   return (
     <Box
@@ -144,8 +176,16 @@ const MultipleChoiceViewer = ({
               key={index}
               optionText={option}
               selected={selectedOptions.includes(index)}
+              displayCorrect={
+                isCompleted &&
+                (isMultiSelectActivity(activity)
+                  ? activity.correctAnswers
+                  : [activity.correctAnswer]
+                ).includes(index)
+              }
               isMultiSelect={isMultiSelectActivity(activity)}
               onClick={() => {
+                if (isCompleted) return;
                 if (isMultiSelectActivity(activity)) {
                   if (selectedOptions.includes(index)) {
                     setSelectedOptions(
@@ -164,6 +204,8 @@ const MultipleChoiceViewer = ({
       </Box>
     </Box>
   );
-};
+});
+
+MultipleChoiceViewer.displayName = "MultipleChoiceViewer";
 
 export default MultipleChoiceViewer;

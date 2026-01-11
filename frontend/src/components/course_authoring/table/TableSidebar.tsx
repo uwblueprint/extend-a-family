@@ -8,18 +8,19 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { HeaderColumnIncludesTypes } from "../../../types/CourseTypes";
 
-export enum HeaderColumnIncludesTypes {
-  IMAGE = "image",
-  TEXT = "text",
-  IMAGE_AND_TEXT = "image_and_text",
-}
+const headerColumnIncludesOptions: Record<HeaderColumnIncludesTypes, string> = {
+  [HeaderColumnIncludesTypes.IMAGE]: "Image",
+  [HeaderColumnIncludesTypes.TEXT]: "Text",
+  [HeaderColumnIncludesTypes.IMAGE_AND_TEXT]: "Image + Text",
+};
 
-interface MultipleChoiceEditorSidebarProps {
+interface TableSidebarProps {
   numColumns: number;
   setNumColumns: (value: number) => void;
-  // headerColumnIncludes: HeaderColumnIncludesTypes;
-  // setHeaderColumnIncludes: (value: HeaderColumnIncludesTypes) => void;
+  headerColumnIncludes: HeaderColumnIncludesTypes;
+  setHeaderColumnIncludes: (value: HeaderColumnIncludesTypes) => void;
   onAddRow: () => void;
   isAddRowDisabled: boolean;
   hint: string;
@@ -29,27 +30,26 @@ interface MultipleChoiceEditorSidebarProps {
 export default function TableSidebar({
   numColumns,
   setNumColumns,
-  // headerColumnIncludes,
-  // setHeaderColumnIncludes,
+  headerColumnIncludes,
+  setHeaderColumnIncludes,
   onAddRow,
   isAddRowDisabled,
   hint,
   setHint,
-}: MultipleChoiceEditorSidebarProps) {
+}: TableSidebarProps) {
   const boxHeight = "calc(100vh - 68px)";
   const theme = useTheme();
   return (
     <Box
       width="auto"
-      minWidth="fit-content"
       maxHeight={boxHeight}
       padding="24px"
       sx={{
         backgroundColor: theme.palette.Neutral[100],
+        minWidth: "300px",
+        maxWidth: "fit-content",
         overflowY: "auto",
         gapY: "24px",
-        maxWidth: "400px",
-        width: "fit-content",
         paddingBottom: "24px",
         flexDirection: "column",
         alignItems: "flex-start",
@@ -152,6 +152,44 @@ export default function TableSidebar({
                 ))}
               </Select>
             </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: "8px",
+                alignSelf: "stretch",
+              }}
+            >
+              <Typography variant="bodySmall">
+                Header column includes
+              </Typography>
+              <Select
+                value={headerColumnIncludes}
+                onChange={(e) =>
+                  setHeaderColumnIncludes(
+                    e.target.value as HeaderColumnIncludesTypes,
+                  )
+                }
+                sx={{
+                  display: "flex",
+                  height: "40px",
+                  width: "100%",
+                  color: theme.palette.Administrator.Dark.Default,
+
+                  borderRadius: "4px",
+                  border: `1px solid ${theme.palette.Neutral[500]}`,
+                }}
+              >
+                {Object.values(HeaderColumnIncludesTypes).map(
+                  (headerInclude) => (
+                    <MenuItem key={headerInclude} value={headerInclude}>
+                      {headerColumnIncludesOptions[headerInclude]}
+                    </MenuItem>
+                  ),
+                )}
+              </Select>
+            </Box>
           </Box>
           <Divider
             sx={{
@@ -241,7 +279,7 @@ export default function TableSidebar({
               placeholder="Include question hint"
               multiline
               rows={5}
-              value={hint}
+              defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
               sx={{ width: "100%" }}
             />

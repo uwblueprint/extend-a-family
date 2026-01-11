@@ -5,6 +5,7 @@ import {
   TextField,
   InputAdornment,
   IconButton,
+  Stack,
 } from "@mui/material";
 import PasswordIcon from "@mui/icons-material/Password";
 import CloseIcon from "@mui/icons-material/Close";
@@ -92,7 +93,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
   ];
 
   return (
-    <>
+    <Stack direction="column" gap="40px">
       <TextField
         label={passwordLabel}
         variant="outlined"
@@ -160,7 +161,7 @@ const PasswordCheck: React.FC<PasswordCheckProps> = ({
           </Box>
         ))}
       </Box>
-    </>
+    </Stack>
   );
 };
 

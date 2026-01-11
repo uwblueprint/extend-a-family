@@ -74,8 +74,8 @@ const HowEasyWasTheModuleSlide = ({
     <Box
       sx={{
         display: "flex",
-        width: "1024px",
-        padding: "244px 100px",
+        width: "100%",
+        padding: "183px 75px",
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -86,8 +86,7 @@ const HowEasyWasTheModuleSlide = ({
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: "40px",
-          flexShrink: 0,
+          gap: "30px",
         }}
       >
         <Typography
@@ -99,7 +98,6 @@ const HowEasyWasTheModuleSlide = ({
         <Box
           sx={{
             display: "flex",
-            width: "804px",
             justifyContent: "space-between",
             alignItems: "center",
           }}

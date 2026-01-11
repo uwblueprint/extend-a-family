@@ -139,7 +139,18 @@ export const pageBelongsToModuleValidator = async (
 
   const courseModule = await courseModuleService.getCourseModule(moduleId);
 
-  if (courseModule?.pages.filter((page) => page.id === pageId).length === 0) {
+  const pageIds = courseModule?.pages.map((page) => {
+    // Support both hydrated and lean results where id may be `_id` or primitive
+    if (typeof page === "string") return page;
+    if (typeof page === "object" && page !== null) {
+      // @ts-expect-error allow fallback to _id
+      // eslint-disable-next-line no-underscore-dangle
+      return (page.id || page._id || "").toString();
+    }
+    return "";
+  });
+
+  if (!pageIds || !pageIds.includes(pageId)) {
     return res
       .status(404)
       .send(

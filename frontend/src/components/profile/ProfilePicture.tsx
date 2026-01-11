@@ -6,14 +6,14 @@ import { useUser } from "../../hooks/useUser";
 
 interface ProfilePictureProps {
   size: number;
-  setUploadModalOpen: Dispatch<SetStateAction<boolean>> | null;
   sourceUrl?: string;
+  setUploadModalOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
 const ProfilePicture = ({
   size,
-  setUploadModalOpen,
   sourceUrl,
+  setUploadModalOpen,
 }: ProfilePictureProps): React.ReactElement => {
   const theme = useTheme();
   const user = useUser();
@@ -39,17 +39,19 @@ const ProfilePicture = ({
           width: "100%",
           height: "100%",
           bgcolor: theme.palette[user.role].Light.Hover,
-          "&:hover": {
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
+          ...(!!setUploadModalOpen && {
+            "&:hover": {
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
 
-            "& .avatar-text": {
-              display: "none",
-            },
+              "& .avatar-text": {
+                display: "none",
+              },
 
-            "& .camera-icon": {
-              display: "block",
+              "& .camera-icon": {
+                display: "block",
+              },
             },
-          },
+          }),
         }}
         src={sourceUrl}
       >

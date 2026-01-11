@@ -11,7 +11,6 @@ enum SurveyFormStage {
   HowEasyWasTheModule = "HowEasyWasTheModule",
   WhatDidYouThinkOfTheModule = "WhatDidYouThinkOfTheModule",
   ThanksForTheFeedback = "ThanksForTheFeedback",
-  Congratulations = "Congratulations",
 }
 
 const SurveySlides = ({ moduleId }: { moduleId: string }) => {
@@ -75,8 +74,6 @@ const SurveySlides = ({ moduleId }: { moduleId: string }) => {
       );
     case SurveyFormStage.ThanksForTheFeedback:
       return <ThanksForTheFeedbackSlide />;
-    case SurveyFormStage.Congratulations:
-      return <div>Congratulations</div>;
     default:
       return <div>Default</div>;
   }

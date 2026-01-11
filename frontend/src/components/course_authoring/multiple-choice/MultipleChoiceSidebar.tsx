@@ -35,16 +35,14 @@ export default function MultipleChoiceEditorSidebar({
   const theme = useTheme();
   return (
     <Box
-      width="auto"
-      minWidth="fit-content"
       maxHeight={boxHeight}
       padding="24px"
       sx={{
         backgroundColor: theme.palette.Neutral[100],
+        minWidth: "300px",
+        maxWidth: "fit-content",
         overflowY: "auto",
         gapY: "24px",
-        maxWidth: "400px",
-        width: "fit-content",
         paddingBottom: "24px",
         flexDirection: "column",
         alignItems: "flex-start",
@@ -238,7 +236,7 @@ export default function MultipleChoiceEditorSidebar({
               placeholder="Include question hint"
               multiline
               rows={5}
-              value={hint}
+              defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
               sx={{ width: "100%" }}
             />

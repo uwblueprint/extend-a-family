@@ -1,11 +1,15 @@
 import React from "react";
 import { Box, Button, Container, Typography, useTheme } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import { useHistory } from "react-router-dom";
 import logo from "../assets/logoColoured.png";
-import { WELCOME_PAGE } from "../../constants/Routes";
+import { useUser } from "../../hooks/useUser";
+import { LANDING_PAGE } from "../../constants/Routes";
 
 const SignupPending = (): React.ReactElement => {
   const theme = useTheme();
+  const { refreshUser } = useUser();
+  const history = useHistory();
   return (
     <Container
       sx={{
@@ -63,7 +67,6 @@ const SignupPending = (): React.ReactElement => {
 
           <Button
             variant="contained"
-            href={WELCOME_PAGE}
             fullWidth
             sx={{
               bgcolor: theme.palette.Facilitator.Dark.Default,
@@ -75,8 +78,12 @@ const SignupPending = (): React.ReactElement => {
               justifyContent: "center",
               alignItems: "center",
             }}
+            onClick={async () => {
+              await refreshUser();
+              history.push(LANDING_PAGE);
+            }}
           >
-            <Typography variant="labelLarge"> Close Page </Typography>
+            <Typography variant="labelLarge">Refresh</Typography>
           </Button>
         </Box>
       </Box>

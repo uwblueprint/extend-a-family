@@ -18,7 +18,7 @@ const DidYouLikeTheContentSlide = ({
     <Box
       sx={{
         display: "flex",
-        width: "1024px",
+        width: "100%",
         padding: "244px 100px",
         justifyContent: "center",
         alignItems: "center",

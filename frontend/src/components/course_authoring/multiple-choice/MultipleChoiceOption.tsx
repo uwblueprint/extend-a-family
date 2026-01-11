@@ -91,7 +91,7 @@ export default function MultipleChoiceOption({
           </Box>
         </Box>
         <BodySmallTextField
-          value={optionText}
+          defaultValue={optionText}
           onChange={onTextChange}
           placeholder="Edit option..."
         />
