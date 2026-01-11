@@ -33,7 +33,7 @@ export default function CourseCard({
   module = defaultModule,
   unitId = "demo-unit",
   size = "small",
-  progress = 100,
+  progress = 0,
 }: CourseCardProps) {
   const theme = useTheme();
   const isSmall = size === "small";
