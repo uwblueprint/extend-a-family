@@ -89,6 +89,19 @@ const ManageUserPage = (): React.ReactElement => {
     (user) => isFacilitator(user) && user.approved === false,
   );
 
+  // Separate invited (not yet active) admins
+  const invitedAdmins = filteredUsers.filter(
+    (user) => user.role === "Administrator" && user.status === "Invited",
+  );
+
+  const currentUsers = filteredUsers.filter(
+    (user) =>
+      !(
+        (isFacilitator(user) && user.approved === false) ||
+        (user.role === "Administrator" && user.status === "Invited")
+      ),
+  );
+
   const handleRoleSelect = (role_curr: string) => {
     if (role_curr === "All") {
       setUsers(userData);
@@ -362,7 +375,7 @@ const ManageUserPage = (): React.ReactElement => {
         />
         <Box sx={{ flex: 1, overflowY: "auto" }}>
           {pendingApprovalFacilitators.length > 0 && (
-            <Box>
+            <Box marginBottom="32px">
               <Typography
                 variant="headlineMedium"
                 sx={{ marginBottom: "16px", fontWeight: 700 }}
@@ -378,16 +391,31 @@ const ManageUserPage = (): React.ReactElement => {
               />
             </Box>
           )}
+          {invitedAdmins.length > 0 && (
+            <Box marginBottom="32px">
+              <Typography
+                variant="headlineMedium"
+                sx={{ marginBottom: "16px", fontWeight: 700 }}
+              >
+                New Admin Account(s)
+              </Typography>
+              <UserTable
+                filteredUsers={invitedAdmins}
+                handleOpenDeleteUserModal={handleOpenDeleteUserModal}
+                defaultUsersPerPage={5}
+              />
+            </Box>
+          )}
           <Stack
             direction="column"
             gap="16px"
             sx={{ flex: 1, minHeight: 0, paddingBottom: 4 }}
           >
             {role === "Administrator" && (
-              <Typography variant="headlineMedium">All Users</Typography>
+              <Typography variant="headlineMedium">Current Users</Typography>
             )}
             <UserTable
-              filteredUsers={filteredUsers}
+              filteredUsers={currentUsers}
               handleOpenDeleteUserModal={handleOpenDeleteUserModal}
               handleApproveFacilitator={handleApproveFacilitator}
               handleRejectFacilitator={handleRejectFacilitator}

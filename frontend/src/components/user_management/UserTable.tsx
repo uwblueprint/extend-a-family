@@ -244,28 +244,52 @@ const UserTable: React.FC<UserTableProps> = ({
                           </Button>
                         </>
                       ) : (
-                        <Button
-                          variant="outlined"
-                          startIcon={<Delete />}
-                          sx={{
-                            height: "40px",
-                            padding: "4px 16px",
-                            borderRadius: "4px",
-                            borderColor: theme.palette.Neutral[500],
-                            color: theme.palette.Error.Dark.Default,
-                          }}
-                          onClick={() =>
-                            handleOpenDeleteUserModal(
-                              user.id,
-                              user.firstName,
-                              user.lastName,
-                            )
-                          }
-                        >
-                          <Typography variant="labelLarge">
-                            DELETE USER
+                        <>
+                          {user.status === "Invited" && (
+                            <Typography
+                              variant="labelMedium"
+                              padding="4px 8px"
+                              marginRight="16px"
+                              borderRadius="4px"
+                              bgcolor="#F6F6F6"
+                              color={theme.palette.Neutral[700]}
+                            >
+                              Pending Account Setup
+                            </Typography>
+                          )}
+                          <Typography
+                            variant="labelMedium"
+                            padding="4px 8px"
+                            marginRight="16px"
+                            borderRadius="4px"
+                            bgcolor={theme.palette[user.role].Light.Default}
+                            color={theme.palette[user.role].Dark.Default}
+                          >
+                            {user.role}
                           </Typography>
-                        </Button>
+                          <Button
+                            variant="outlined"
+                            startIcon={<Delete />}
+                            sx={{
+                              height: "40px",
+                              padding: "4px 16px",
+                              borderRadius: "4px",
+                              borderColor: theme.palette.Neutral[500],
+                              color: theme.palette.Error.Dark.Default,
+                            }}
+                            onClick={() =>
+                              handleOpenDeleteUserModal(
+                                user.id,
+                                user.firstName,
+                                user.lastName,
+                              )
+                            }
+                          >
+                            <Typography variant="labelLarge">
+                              DELETE USER
+                            </Typography>
+                          </Button>
+                        </>
                       )}
                     </>
                   )}
