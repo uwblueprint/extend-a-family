@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+
 export type CourseUnitDTO = {
   id: string;
   displayIndex: number;
@@ -21,6 +23,15 @@ export type CourseModuleDTO = {
   title: string;
   imageURL?: string;
   pages: CoursePageDTO[];
+  unitId?: string;
+  status: ModuleStatus;
+};
+
+export type CourseModuleLeanDTO = {
+  id: string;
+  title: string;
+  imageURL?: string;
+  pages: ObjectId[];
   unitId?: string;
   status: ModuleStatus;
 };

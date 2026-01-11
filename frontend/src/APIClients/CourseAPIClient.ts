@@ -102,7 +102,10 @@ const createModule = async (unitId: string, title: string) => {
   }
 };
 
-const uploadThumbnail = async (moduleID: string, uploadedImage: FormData) => {
+const uploadThumbnail = async (
+  moduleID: string,
+  uploadedImage: FormData,
+): Promise<string | null> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
@@ -183,6 +186,27 @@ const editModule = async (
   }
 };
 
+const deleteModule = async (
+  unitId: string,
+  moduleId: string,
+): Promise<string | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.delete(
+      `/course/${unitId}/${moduleId}`,
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data.id;
+  } catch (error) {
+    return null;
+  }
+};
+
 const deletePage = async (
   moduleId: string,
   pageId: string,
@@ -247,6 +271,48 @@ const reorderPages = async (
   }
 };
 
+const publishModule = async (
+  moduleId: string,
+): Promise<CourseModule | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.patch(
+      `/course/${moduleId}/publish`,
+      {},
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
+const unpublishModule = async (
+  moduleId: string,
+): Promise<CourseModule | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.patch(
+      `/course/${moduleId}/unpublish`,
+      {},
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default {
   getUnits,
   createUnit,
@@ -258,7 +324,10 @@ export default {
   lessonUpload,
   getModuleById,
   editModule,
+  deleteModule,
   deletePage,
   reorderPages,
   reorderModules,
+  publishModule,
+  unpublishModule,
 };

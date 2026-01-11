@@ -29,7 +29,10 @@ import * as Routes from "../../../constants/Routes";
 import { CourseModule, ModuleStatus } from "../../../types/CourseTypes";
 import BlankImg from "../../assets/blankSlide.png";
 import ChangeThumbnailModal from "../modals/ChangeThumbnailModal";
+import DeleteModuleModal from "../modals/DeleteModuleModal";
 import EditModuleModal from "../modals/EditModuleModal";
+import UnpublishModuleModal from "../modals/UnpublishModuleModal";
+import EditPublishedModuleModal from "../modals/EditPublishedModuleModal";
 
 const ItemType = "MODULE_CARD";
 
@@ -44,12 +47,14 @@ const ModuleCardAdmin = ({
   unitId,
   index,
   onModuleUpdate,
+  onModuleDelete,
   moveModule,
 }: {
   module: CourseModule;
   unitId: string;
   index: number;
-  onModuleUpdate?: (updatedModule: CourseModule) => void;
+  onModuleUpdate: (updatedModule: CourseModule) => void;
+  onModuleDelete: (deletedModuleId: string) => void;
   moveModule: (dragIndex: number, hoverIndex: number) => void;
 }) => {
   const theme = useTheme();
@@ -57,6 +62,11 @@ const ModuleCardAdmin = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openEditModuleModal, setOpenEditModuleModal] = useState(false);
   const [openChangeThumbnailModal, setOpenChangeThumbnailModal] =
+    useState(false);
+  const [openDeleteModuleModal, setOpenDeleteModuleModal] = useState(false);
+  const [openUnpublishModuleModal, setOpenUnpublishModuleModal] =
+    useState(false);
+  const [editPublishedModuleModalOpen, setEditPublishedModuleModalOpen] =
     useState(false);
   const open = Boolean(anchorEl);
   const ref = useRef<HTMLDivElement>(null);
@@ -162,8 +172,52 @@ const ModuleCardAdmin = ({
   };
 
   const handleThumbnailUpdate = (newImageUrl: string) => {
-    if (onModuleUpdate) {
-      onModuleUpdate({ ...module, imageURL: newImageUrl });
+    onModuleUpdate({ ...module, imageURL: newImageUrl });
+  };
+
+  const handleOpenDeleteModuleModal = () => {
+    setOpenDeleteModuleModal(true);
+    handleMenuClose();
+  };
+
+  const handleCloseDeleteModuleModal = () => {
+    setOpenDeleteModuleModal(false);
+  };
+
+  const deleteModule = async () => {
+    try {
+      const deletedModuleId = await CourseAPIClient.deleteModule(
+        unitId,
+        module.id,
+      );
+      if (deletedModuleId) {
+        onModuleDelete(deletedModuleId);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to delete module:", error);
+    }
+  };
+
+  const toggleModuleStatus = async () => {
+    let updatedModule: CourseModule | null;
+    if (module.status === ModuleStatus.published) {
+      updatedModule = await CourseAPIClient.unpublishModule(module.id);
+    } else {
+      updatedModule = await CourseAPIClient.publishModule(module.id);
+    }
+    if (updatedModule) {
+      onModuleUpdate(updatedModule);
+    }
+    handleMenuClose();
+  };
+
+  const handleToggleModuleStatus = () => {
+    if (module.status === ModuleStatus.published) {
+      setOpenUnpublishModuleModal(true);
+    } else {
+      toggleModuleStatus();
+      handleMenuClose();
     }
   };
 
@@ -173,7 +227,7 @@ const ModuleCardAdmin = ({
       module.id,
       title,
     );
-    if (updatedModule && onModuleUpdate) {
+    if (updatedModule) {
       onModuleUpdate(updatedModule);
     }
   };
@@ -307,15 +361,23 @@ const ModuleCardAdmin = ({
             <ListItemText>Change Thumbnail</ListItemText>
           </MenuItem>
           <Divider sx={{ my: "0 !important", py: "4px !important" }} />
-          <MenuItem onClick={handleMenuClose}>
+          <MenuItem onClick={handleToggleModuleStatus}>
             <ListItemIcon>
-              <VisibilityOutlined />
+              {module.status === ModuleStatus.published ? (
+                <VisibilityOffOutlined />
+              ) : (
+                <VisibilityOutlined />
+              )}
             </ListItemIcon>
-            <ListItemText>Go Live</ListItemText>
+            <ListItemText>
+              {module.status === ModuleStatus.published
+                ? "Unpublish"
+                : "Go Live"}
+            </ListItemText>
           </MenuItem>
           <Divider sx={{ my: "0 !important", py: "4px !important" }} />
           <MenuItem
-            onClick={handleMenuClose}
+            onClick={handleOpenDeleteModuleModal}
             color={theme.palette.Error.Dark.Default}
             sx={{ color: theme.palette.Error.Dark.Default }}
           >
@@ -346,10 +408,13 @@ const ModuleCardAdmin = ({
           borderRadius: "4px",
           border: `1px solid ${theme.palette.Neutral[500]}`,
         }}
-        href={`${Routes.VIEW_PAGE}?moduleId=${module.id}`}
-        onClick={() =>
-          history.push(`${Routes.VIEW_PAGE}?moduleId=${module.id}`)
-        }
+        onClick={() => {
+          if (module.status !== ModuleStatus.published) {
+            history.push(`${Routes.VIEW_PAGE}?moduleId=${module.id}`);
+          } else {
+            setEditPublishedModuleModalOpen(true);
+          }
+        }}
       >
         <Typography variant="labelLarge">Edit</Typography>
       </Button>
@@ -364,6 +429,29 @@ const ModuleCardAdmin = ({
         onClose={handleCloseChangeThumbnailModal}
         moduleId={module.id}
         onThumbnailUpdate={handleThumbnailUpdate}
+      />
+      <DeleteModuleModal
+        openDeleteModuleModal={openDeleteModuleModal}
+        handleCloseDeleteModuleModal={handleCloseDeleteModuleModal}
+        deleteModule={deleteModule}
+      />
+      <UnpublishModuleModal
+        openUnpublishModuleModal={openUnpublishModuleModal}
+        handleCloseUnpublishModuleModal={() =>
+          setOpenUnpublishModuleModal(false)
+        }
+        unpublishModule={toggleModuleStatus}
+      />
+      <EditPublishedModuleModal
+        openEditPublishedModuleModal={editPublishedModuleModalOpen}
+        handleCloseEditPublishedModuleModal={() =>
+          setEditPublishedModuleModalOpen(false)
+        }
+        unpublishModuleAndEdit={async () => {
+          await toggleModuleStatus();
+          setEditPublishedModuleModalOpen(false);
+          history.push(`${Routes.VIEW_PAGE}?moduleId=${module.id}`);
+        }}
       />
     </Stack>
   );

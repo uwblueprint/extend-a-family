@@ -1,6 +1,7 @@
 import { ClientSession } from "mongoose";
 import {
   CourseModuleDTO,
+  CourseModuleLeanDTO,
   CreateCourseModuleDTO,
   UpdateCourseModuleDTO,
 } from "../../types/courseTypes";
@@ -67,25 +68,17 @@ interface ICourseModuleService {
 
   /**
    * Publish a module (Draft → Published, or Unpublished → Published)
-   * @param courseUnitId the id of the unit that contains the module
    * @param moduleId the id of the module to publish
    * @throws Error if the status transition is invalid or module/unit not found
    */
-  publishCourseModule(
-    courseUnitId: string,
-    moduleId: string,
-  ): Promise<CourseModuleDTO>;
+  publishCourseModule(moduleId: string): Promise<CourseModuleLeanDTO>;
 
   /**
    * Unpublish a module (Published → Unpublished)
-   * @param courseUnitId the id of the unit that contains the module
    * @param moduleId the id of the module to unpublish
    * @throws Error if the status transition is invalid or module/unit not found
    */
-  unpublishCourseModule(
-    courseUnitId: string,
-    moduleId: string,
-  ): Promise<CourseModuleDTO>;
+  unpublishCourseModule(moduleId: string): Promise<CourseModuleLeanDTO>;
 
   /**
    * Reorder pages within a module

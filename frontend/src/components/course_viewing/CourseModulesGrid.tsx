@@ -1,7 +1,8 @@
-import { Grid, Typography } from "@mui/material";
+import { Button, Grid, Typography, useTheme } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { Add } from "@mui/icons-material";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import useCourseModules from "../../hooks/useCourseModules";
 import { useUser } from "../../hooks/useUser";
@@ -9,6 +10,7 @@ import { CourseModule } from "../../types/CourseTypes";
 import ModuleCardAdmin from "./library-viewing/ModuleCardAdmin";
 import ModuleCardLearner from "./library-viewing/ModuleCardLearner";
 import ModuleCardFacilitator from "./library-viewing/ModuleCardFacilitator";
+import CreateModuleModal from "./modals/CreateModuleModal";
 
 interface ModuleGridProps {
   unitId: string;
@@ -25,8 +27,10 @@ export default function CourseModulesGrid({
     error,
   } = useCourseModules(unitId);
   const [courseModules, setCourseModules] = useState<CourseModule[]>([]);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const { role } = useUser();
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     setCourseModules(initialModules);
@@ -37,6 +41,12 @@ export default function CourseModulesGrid({
       prev.map((module) =>
         module.id === updatedModule.id ? updatedModule : module,
       ),
+    );
+  };
+
+  const handleModuleDelete = (deletedModuleId: string) => {
+    setCourseModules((prev) =>
+      prev.filter((module) => module.id !== deletedModuleId),
     );
   };
 
@@ -81,42 +91,87 @@ export default function CourseModulesGrid({
   if (error) return <Typography color="error">{error}</Typography>;
 
   const content = (
-    <Grid container gap={role === "Learner" ? 0 : "30px"}>
-      {courseModules.map((module: CourseModule, index: number) => {
-        switch (role) {
-          case "Administrator":
-            return (
-              <ModuleCardAdmin
-                key={module.id}
-                module={module}
-                unitId={unitId}
-                index={index}
-                onModuleUpdate={handleModuleUpdate}
-                moveModule={moveModule}
-              />
-            );
-          case "Facilitator":
-            return (
-              <ModuleCardFacilitator
-                key={module.id}
-                module={module}
-                index={index}
-              />
-            );
-          case "Learner":
-          default:
-            return (
-              <ModuleCardLearner
-                key={module.id}
-                module={module}
-                index={index}
-                unitId={unitId}
-                isSidebarOpen={isSidebarOpen}
-              />
-            );
-        }
-      })}
-    </Grid>
+    <>
+      <Grid container gap={role === "Learner" ? 0 : "30px"}>
+        {courseModules.map((module: CourseModule, index: number) => {
+          switch (role) {
+            case "Administrator":
+              return (
+                <ModuleCardAdmin
+                  key={module.id}
+                  module={module}
+                  unitId={unitId}
+                  index={index}
+                  onModuleUpdate={handleModuleUpdate}
+                  onModuleDelete={handleModuleDelete}
+                  moveModule={moveModule}
+                />
+              );
+            case "Facilitator":
+              return (
+                <ModuleCardFacilitator
+                  key={module.id}
+                  module={module}
+                  index={index}
+                />
+              );
+            case "Learner":
+            default:
+              return (
+                <ModuleCardLearner
+                  key={module.id}
+                  module={module}
+                  index={index}
+                  unitId={unitId}
+                  isSidebarOpen={isSidebarOpen}
+                />
+              );
+          }
+        })}
+      </Grid>
+      {role === "Administrator" && (
+        <Button
+          type="button"
+          sx={{
+            position: "fixed",
+            bottom: "40px",
+            right: "40px",
+            display: "flex",
+            padding: "16px 20px 16px 16px",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "12px",
+            borderRadius: "16px",
+            background: theme.palette.Administrator.Light.Selected,
+            boxShadow:
+              "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.30)",
+          }}
+          onClick={() => setUploadModalOpen(true)}
+        >
+          <Add
+            sx={{
+              fontSize: "24px",
+              color: theme.palette.Administrator.Dark.Default,
+            }}
+          />
+          <Typography
+            variant="labelLarge"
+            color={theme.palette.Administrator.Dark.Default}
+            display="inline"
+          >
+            Create Module
+          </Typography>
+        </Button>
+      )}
+      <CreateModuleModal
+        open={uploadModalOpen}
+        setUploadModalOpen={setUploadModalOpen}
+        unitId={unitId}
+        onCreate={(newModule) => {
+          setCourseModules((prev) => [...prev, newModule]);
+        }}
+      />
+    </>
   );
 
   return role === "Administrator" ? (

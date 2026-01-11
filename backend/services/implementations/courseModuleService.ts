@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import mongoose, { ClientSession, Schema, startSession } from "mongoose";
+import { ClientSession, Schema, startSession } from "mongoose";
 import { PDFDocument } from "pdf-lib";
 import MgCourseModule, {
   CourseModule,
@@ -10,6 +10,7 @@ import CoursePageModel, {
 import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import {
   CourseModuleDTO,
+  CourseModuleLeanDTO,
   CreateCourseModuleDTO,
   ModuleStatus,
   UpdateCourseModuleDTO,
@@ -276,54 +277,33 @@ class CourseModuleService implements ICourseModuleService {
   /**
    * Publish a module (Draft → Published or Unpublished → Published).
    */
-  async publishCourseModule(
-    courseUnitId: string,
-    moduleId: string,
-  ): Promise<CourseModuleDTO> {
-    return this.changeStatus(courseUnitId, moduleId, ModuleStatus.Published);
+  async publishCourseModule(moduleId: string): Promise<CourseModuleLeanDTO> {
+    return this.changeStatus(moduleId, ModuleStatus.Published);
   }
 
   /**
    * Unpublish a module (Published → Unpublished).
    */
-  async unpublishCourseModule(
-    courseUnitId: string,
-    moduleId: string,
-  ): Promise<CourseModuleDTO> {
-    return this.changeStatus(courseUnitId, moduleId, ModuleStatus.Unpublished);
+  async unpublishCourseModule(moduleId: string): Promise<CourseModuleLeanDTO> {
+    return this.changeStatus(moduleId, ModuleStatus.Unpublished);
   }
 
   /**
    * Internal helper that validates state transitions.
    */
   private async changeStatus(
-    courseUnitId: string,
     moduleId: string,
     newStatus: ModuleStatus,
-  ): Promise<CourseModuleDTO> {
+  ): Promise<CourseModuleLeanDTO> {
     const session = await startSession();
     session.startTransaction();
     try {
-      const courseUnit = await MgCourseUnit.findById(courseUnitId).session(
-        session,
-      );
-      const newModuleId = new mongoose.Types.ObjectId(moduleId);
-
-      const belongsToUnit = courseUnit?.modules.some((m) =>
-        (m as unknown as mongoose.Types.ObjectId).equals(newModuleId),
-      );
-      if (!courseUnit || !belongsToUnit) {
-        throw new Error("Module not found in specified unit");
-      }
-
       const module = await MgCourseModule.findById(moduleId).session(session);
       if (!module) {
         throw new Error("Module not found");
       }
 
-      if (
-        !validTransitions[module.status as ModuleStatus].includes(newStatus)
-      ) {
+      if (!validTransitions[module.status].includes(newStatus)) {
         const msg = `Cannot transition from "${module.status}" to "${newStatus}"`;
         throw new Error(msg);
       }
@@ -332,11 +312,7 @@ class CourseModuleService implements ICourseModuleService {
       await module.save({ session });
       await session.commitTransaction();
 
-      return {
-        id: module.id,
-        title: module.title,
-        status: module.status as ModuleStatus,
-      } as CourseModuleDTO;
+      return module.toObject();
     } catch (error) {
       await session.abortTransaction();
       Logger.error(

@@ -22,26 +22,26 @@ import React, {
 } from "react";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import AuthContext from "../../../contexts/AuthContext";
-import useQueryParams from "../../../hooks/useQueryParams";
+import { CourseModule } from "../../../types/CourseTypes";
 
 interface CreateModuleModalProps {
   open: boolean;
   setUploadModalOpen: Dispatch<SetStateAction<boolean>>;
   unitId: string;
+  onCreate: (newModule: CourseModule) => void;
 }
 
 const CreateModuleModal = ({
   open,
   setUploadModalOpen,
   unitId,
+  onCreate,
 }: CreateModuleModalProps) => {
   const { authenticatedUser } = useContext(AuthContext);
   const theme = useTheme();
   const [image, setImage] = useState<FormData | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [moduleTitle, setModuleTitle] = useState("");
-
-  const { setQueryParams } = useQueryParams();
 
   let role: "Learner" | "Facilitator" | "Administrator";
   if (authenticatedUser?.role === "Learner") {
@@ -79,13 +79,15 @@ const CreateModuleModal = ({
 
   const handleCreate = async () => {
     const res = await CourseAPIClient.createModule(unitId, moduleTitle);
-    await CourseAPIClient.uploadThumbnail(res.id, image as unknown as FormData);
+    const imageURL = await CourseAPIClient.uploadThumbnail(
+      res.id,
+      image as unknown as FormData,
+    );
     setUploadModalOpen(false);
-    try {
-      setQueryParams({ unitId });
-    } catch (e) {
-      window.location.reload();
-    }
+    onCreate({
+      ...res,
+      ...{ imageURL },
+    });
   };
 
   useEffect(() => {
