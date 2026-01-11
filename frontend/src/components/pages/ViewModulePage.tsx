@@ -85,9 +85,11 @@ import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/Surve
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import NeedHelpModal from "../help/NeedHelpModal";
 import DeletePageModal from "./DeletePageModal";
+import ModuleLockedModal from "./ModuleLockedModal";
 import "./ViewModulePage.css";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
+import { useSocket } from "../../contexts/SocketContext";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -104,8 +106,9 @@ const ViewModulePage = () => {
   const requestedModuleId = queryParams.get("moduleId") || "";
   const requestedPageId = queryParams.get("pageId") || "";
   const requestedUnitId = queryParams.get("unitId") || "";
-  const { role } = useUser();
   const history = useHistory();
+  const { role, id: userId, firstName, lastName } = useUser();
+  const socket = useSocket();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -153,6 +156,12 @@ const ViewModulePage = () => {
   const [isSnackbarSuccess, setIsSnackbarSuccess] = useState(true);
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [isDeletingFromContext, setIsDeletingFromContext] = useState(false);
+  const [isModuleLockedModalOpen, setIsModuleLockedModalOpen] = useState(false);
+  const [currentEditorName, setCurrentEditorName] = useState("");
+  const [hasEditingLock, setHasEditingLock] = useState(false);
+
+  // Only allow editing if administrator has acquired the editing lock
+  const canEdit = role === "Administrator" && hasEditingLock;
 
   const [hasImage, setHasImage] = useState(
     (currentPageObject &&
@@ -530,6 +539,75 @@ const ViewModulePage = () => {
     fetchBookmarks();
   }, [fetchBookmarks]);
 
+  // Module editing lock management (Administrators only)
+  useEffect(() => {
+    if (role !== "Administrator" || !socket || !requestedModuleId) {
+      return;
+    }
+
+    const userName = `${firstName} ${lastName}`;
+
+    // Request lock when component mounts
+    socket.emit("moduleEditing:acquireLock", {
+      moduleId: requestedModuleId,
+      userId,
+      userName,
+    });
+
+    // Listen for lock acquisition success
+    const handleLockAcquired = (data: { moduleId: string }) => {
+      if (data.moduleId === requestedModuleId) {
+        setHasEditingLock(true);
+      }
+    };
+
+    // Listen for lock denial (someone else is editing)
+    const handleLockDenied = (data: {
+      moduleId: string;
+      currentEditor: { userId: string; userName: string };
+    }) => {
+      if (data.moduleId === requestedModuleId) {
+        setCurrentEditorName(data.currentEditor.userName);
+        setIsModuleLockedModalOpen(true);
+        setHasEditingLock(false);
+      }
+    };
+
+    // Listen for errors
+    const handleLockError = (data: { moduleId: string; message: string }) => {
+      if (data.moduleId === requestedModuleId) {
+        /* eslint-disable-next-line no-console */
+        console.error("Module editing lock error:", data.message);
+      }
+    };
+
+    socket.on("moduleEditing:lockAcquired", handleLockAcquired);
+    socket.on("moduleEditing:lockDenied", handleLockDenied);
+    socket.on("moduleEditing:error", handleLockError);
+
+    // Release lock when component unmounts or module changes
+    // eslint-disable-next-line consistent-return
+    return () => {
+      if (hasEditingLock) {
+        socket.emit("moduleEditing:releaseLock", {
+          moduleId: requestedModuleId,
+          userId,
+        });
+      }
+      socket.off("moduleEditing:lockAcquired", handleLockAcquired);
+      socket.off("moduleEditing:lockDenied", handleLockDenied);
+      socket.off("moduleEditing:error", handleLockError);
+    };
+  }, [
+    role,
+    socket,
+    requestedModuleId,
+    userId,
+    firstName,
+    lastName,
+    hasEditingLock,
+  ]);
+
   const handleDeletePage = async () => {
     if (!module || !currentPageObject) return;
 
@@ -676,18 +754,12 @@ const ViewModulePage = () => {
               setCurrentPage={setCurrentPage}
               thumbnailRefs={thumbnailRefs}
               isBookmarked={isPageBookmarked(page.id)}
-              onContextMenu={
-                role === "Administrator" ? handleContextMenu : undefined
-              }
-              isDraggable={role === "Administrator"}
-              onDragStart={
-                role === "Administrator" ? handleDragStart : undefined
-              }
-              onDragOver={role === "Administrator" ? handleDragOver : undefined}
-              onDragLeave={
-                role === "Administrator" ? handleDragLeave : undefined
-              }
-              onDrop={role === "Administrator" ? handleDrop : undefined}
+              onContextMenu={canEdit ? handleContextMenu : undefined}
+              isDraggable={canEdit}
+              onDragStart={canEdit ? handleDragStart : undefined}
+              onDragOver={canEdit ? handleDragOver : undefined}
+              onDragLeave={canEdit ? handleDragLeave : undefined}
+              onDrop={canEdit ? handleDrop : undefined}
               isDragging={draggedIndex === index}
               isDropTarget={hoverIndex === index && draggedIndex !== null}
             >
@@ -773,7 +845,7 @@ const ViewModulePage = () => {
               []
             ),
           )}
-        {role === "Administrator" && draggedIndex !== null && module?.pages && (
+        {canEdit && draggedIndex !== null && module?.pages && (
           <Box
             onDragOver={(e) => {
               e.preventDefault();
@@ -828,6 +900,7 @@ const ViewModulePage = () => {
       handleDrop,
       unit?.displayIndex,
       unit?.modules,
+      canEdit,
     ],
   );
 
@@ -872,9 +945,7 @@ const ViewModulePage = () => {
   };
 
   const isRightSidebarOpen =
-    role === "Administrator" &&
-    currentPageObject &&
-    isActivityPage(currentPageObject);
+    canEdit && currentPageObject && isActivityPage(currentPageObject);
 
   const getGridTemplateColumns = () => {
     if (isRightSidebarOpen) {
@@ -1011,7 +1082,7 @@ const ViewModulePage = () => {
                 {activity &&
                   (isMultipleChoiceActivity(activity) ||
                     isMultiSelectActivity(activity)) &&
-                  (role === "Administrator" ? (
+                  (canEdit ? (
                     <MultipleChoiceMainEditor
                       activity={activity}
                       key={activity.id}
@@ -1030,7 +1101,7 @@ const ViewModulePage = () => {
                   ))}
                 {activity &&
                   isTableActivity(activity) &&
-                  (role === "Administrator" ? (
+                  (canEdit ? (
                     <TableMainEditor
                       activity={activity}
                       key={activity.id}
@@ -1047,7 +1118,7 @@ const ViewModulePage = () => {
                   ))}
                 {activity &&
                   isMatchingActivity(activity) &&
-                  (role === "Administrator" ? (
+                  (canEdit ? (
                     <MatchingEditor
                       activity={activity}
                       key={activity.id}
@@ -1135,7 +1206,7 @@ const ViewModulePage = () => {
                   <Typography variant="labelLarge">Fullscreen</Typography>
                 </Button>
               )}
-              {role === "Administrator" && (
+              {canEdit && (
                 <>
                   <Button
                     sx={{
@@ -1222,7 +1293,7 @@ const ViewModulePage = () => {
             </Box>
           </Box>
         </Box>
-        {currentPageObject && role === "Administrator" && (
+        {currentPageObject && canEdit && (
           <>
             <Divider orientation="vertical" flexItem />
             {(isMultipleChoiceActivity(currentPageObject) ||
@@ -1531,6 +1602,12 @@ const ViewModulePage = () => {
             }
           }
         }}
+      />
+      <ModuleLockedModal
+        open={isModuleLockedModalOpen}
+        onClose={() => setIsModuleLockedModalOpen(false)}
+        editorName={currentEditorName}
+        unitId={requestedUnitId}
       />
     </>
   );
