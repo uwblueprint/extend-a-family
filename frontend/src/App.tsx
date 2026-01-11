@@ -52,8 +52,22 @@ const App = (): React.ReactElement => {
   const currentUser: AuthenticatedUser | null =
     getLocalStorageObj<AuthenticatedUser | null>(AUTHENTICATED_USER_KEY);
 
-  const [authenticatedUser, setAuthenticatedUser] =
+  const [authenticatedUser, setAuthenticatedUserState] =
     useState<AuthenticatedUser | null>(currentUser);
+
+  const setAuthenticatedUser = (
+    _authenticatedUser: AuthenticatedUser | null,
+  ) => {
+    setAuthenticatedUserState(_authenticatedUser);
+    if (_authenticatedUser) {
+      localStorage.setItem(
+        AUTHENTICATED_USER_KEY,
+        JSON.stringify(_authenticatedUser),
+      );
+    } else {
+      localStorage.removeItem(AUTHENTICATED_USER_KEY);
+    }
+  };
 
   const [sampleContext, dispatchSampleContextUpdate] = useReducer(
     sampleContextReducer,
@@ -69,10 +83,6 @@ const App = (): React.ReactElement => {
           ...user,
         };
         setAuthenticatedUser(updatedUser);
-        localStorage.setItem(
-          AUTHENTICATED_USER_KEY,
-          JSON.stringify(updatedUser),
-        );
       }
     } catch (error) {
       // Failed to refresh user, keep current user data
