@@ -146,8 +146,8 @@ export default function CourseCard({
                 pointerEvents: "none", // allows clicks through to CardActionArea,
                 background: `linear-gradient(
                               to top,
-                              ${theme.palette.Learner.Light.Default} 0%,
-                              ${theme.palette.Learner.Light.Default} 30%,
+                              #F5FDFF 0%,
+                              #F5FDFF 30%,
                               rgba(0,0,0,0) 50%
                             )`,
               }}
