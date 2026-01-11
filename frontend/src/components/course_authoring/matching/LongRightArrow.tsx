@@ -8,7 +8,7 @@ const LongRightArrow = ({ labelText }: { labelText?: string }) => {
         sx={{
           position: "relative",
           flex: 1,
-          minWidth: "80px",
+          minWidth: "35px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

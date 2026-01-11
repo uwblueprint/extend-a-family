@@ -86,28 +86,12 @@ class ActivityService {
             mediaType: "text",
             context: "",
           },
-          {
-            id: "7",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "8",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "9",
-            mediaType: "text",
-            context: "",
-          },
         ];
         activityData = {
           ...baseActivity,
           media: {
             "1": [media[0], media[1], media[2]],
             "2": [media[3], media[4], media[5]],
-            "3": [media[6], media[7], media[8]],
           },
           correctAnswers: [
             ["1", "4", "7"],

@@ -46,7 +46,7 @@ const FeedbackAdminUnitSidebarItem = ({
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          {unit.modules.map((module) => (
+          {unit.modules.map((module, index) => (
             <ListItemButton
               key={module.id}
               sx={{
@@ -63,9 +63,7 @@ const FeedbackAdminUnitSidebarItem = ({
                 alignItems="center"
                 alignSelf="stretch"
               >
-                <Typography variant="bodyMedium">
-                  {module.displayIndex}.
-                </Typography>
+                <Typography variant="bodyMedium">{index + 1}.</Typography>
                 <Typography
                   variant={
                     module.id === selectedModuleId
