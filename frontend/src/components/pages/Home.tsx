@@ -9,7 +9,7 @@ import { Learner } from "../../types/UserTypes";
 import CourseCard from "../learners/courseCard";
 import FacilitatorCard from "../learners/FacilitatorCard";
 import NavButton from "../learners/NavButton";
-import { BOOKMARKS_PAGE } from "../../constants/Routes";
+import { BOOKMARKS_PAGE, FINISHED_MODULES_PAGE } from "../../constants/Routes";
 
 const Home = (): React.ReactElement => {
   const [learner, setLearner] = useState<Learner>();
@@ -32,10 +32,16 @@ const Home = (): React.ReactElement => {
     );
 
   return (
-    <Box display="flex" width="100%">
+    <Box
+      display="flex"
+      width="100%"
+      minHeight="100vh"
+      height="100vh"
+      overflow="hidden"
+    >
       <LearnerUnitSidebar />
 
-      <Box display="flex" flexGrow={1} justifyContent="center" margin={4}>
+      <Box sx={{ flexGrow: 1, p: "48px", mb: "48px", overflowY: "scroll" }}>
         <Box display="flex" flexDirection="column">
           <Typography variant="bodyLarge">
             Hello, {learner.firstName}!
@@ -62,6 +68,7 @@ const Home = (): React.ReactElement => {
             <CourseCard />
             <CourseCard />
           </Box>
+
           <Stack
             direction="row"
             width="100%"
@@ -77,6 +84,7 @@ const Home = (): React.ReactElement => {
             <NavButton
               label="Finished Modules"
               icon={<CheckCircleOutlineIcon />}
+              href={FINISHED_MODULES_PAGE}
             />
           </Stack>
           <Box width="100%" mb="30px">

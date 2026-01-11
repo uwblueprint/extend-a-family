@@ -12,7 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import BlankImg from "../assets/blankSlide.png";
 import * as Routes from "../../constants/Routes";
-import { CourseModule } from "../../types/CourseTypes";
+import { CourseModule, ModuleStatus } from "../../types/CourseTypes";
 
 interface CourseCardProps {
   module?: CourseModule;
@@ -22,11 +22,12 @@ interface CourseCardProps {
 }
 
 const defaultModule: CourseModule = {
-  id: "demo-module",
+  id: "4823042394hfd0253",
   title: "Sample Module Title",
   displayIndex: 1,
   imageURL: BlankImg,
   pages: [],
+  status: ModuleStatus.published,
 };
 
 export default function CourseCard({

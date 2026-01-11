@@ -31,7 +31,7 @@ export default function LearnerUnitSidebar() {
       anchor="left"
     >
       <Box
-        height="100vh"
+        height="100%"
         display="flex"
         flexDirection="column"
         sx={{
