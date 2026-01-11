@@ -16,6 +16,7 @@ import {
   registerNotificationHandlers,
   registerNotificationSchemaListener,
 } from "./sockets/notification";
+import { registerModuleEditingHandlers } from "./sockets/moduleEditing";
 import helpRequestRouter from "./rest/helpRequestRoutes";
 import notificationRouter from "./rest/notificationRoutes";
 import courseRouter from "./rest/courseRoutes";
@@ -65,6 +66,7 @@ io.on("connection", (socket) => {
   if (!userId && typeof userId !== "string") return;
   socket.join(userId);
   registerNotificationHandlers(io, socket);
+  registerModuleEditingHandlers(io, socket);
 });
 
 registerNotificationSchemaListener(io);
