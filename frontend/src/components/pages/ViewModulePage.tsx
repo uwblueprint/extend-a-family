@@ -980,10 +980,11 @@ const ViewModulePage = () => {
                 justifyContent="center"
                 alignItems="center"
                 sx={{
-                  transform: `scale(${getPageScale(
-                    activityPageHeight,
-                    activityPageWidth,
-                  )})`,
+                  transform: `scale(${
+                    isFullScreen
+                      ? getPageScale(activityPageHeight, activityPageWidth)
+                      : 1
+                  })`,
                 }}
                 ref={activityPageRef}
               >

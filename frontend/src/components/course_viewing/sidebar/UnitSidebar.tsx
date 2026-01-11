@@ -14,7 +14,7 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
+import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import { useUser } from "../../../hooks/useUser";
 import { CourseUnit, UnitSidebarModalType } from "../../../types/CourseTypes";
 import { isAdministrator } from "../../../types/UserTypes";
@@ -22,6 +22,7 @@ import CreateUnitModal from "../modals/CreateUnitModal";
 import DeleteUnitModal from "../modals/DeleteUnitModal";
 import EditUnitModal from "../modals/EditUnitModal";
 import ContextMenu from "./ContextMenu";
+import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 
 interface UnitSideBarProps {
   handleClose: () => void;
@@ -38,15 +39,15 @@ export default function UnitSidebar({
 }: UnitSideBarProps) {
   const theme = useTheme();
   const user = useUser();
-  const { courseUnits, createUnit, editUnit, deleteUnit } = useCourseUnits();
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const [contextMenuUnit, setContextMenuUnit] = useState<CourseUnit | null>();
   const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
+
+  const { courseUnits, refetchCourseUnits } = useCourseUnits();
 
   useEffect(() => {
     if (!courseUnits || !courseUnits.length) return;
@@ -59,10 +60,6 @@ export default function UnitSidebar({
         (unit) => unit.id === selectedUnitParam,
       );
       if (unitFromParams) {
-        const index = courseUnits.findIndex(
-          (unit) => unit.id === unitFromParams.id,
-        );
-        setSelectedIndex(index);
         setSelectedUnit(unitFromParams);
         return;
       }
@@ -70,7 +67,6 @@ export default function UnitSidebar({
 
     // Default to first unit if no valid query parameter
     setSelectedUnit(courseUnits[0]);
-    setSelectedIndex(0);
   }, [courseUnits, setSelectedUnit]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,28 +78,34 @@ export default function UnitSidebar({
     setAnchorEl(null);
   };
 
-  const handleCreateUnit = async (title: string) => {
-    await createUnit(title);
+  const createUnit = async (title: string) => {
+    const unit = await CourseAPIClient.createUnit(title);
+    if (unit) {
+      refetchCourseUnits();
+    }
   };
-
-  const handleEditUnit = async (title: string) => {
+  const editUnit = async (title: string) => {
     if (contextMenuUnit) {
-      await editUnit(contextMenuUnit.id, title);
-      if (contextMenuUnit.id === selectedUnit?.id) {
-        // Update selectedUnit with the new title
-        const updatedUnit = courseUnits.find(
-          (unit) => unit.id === contextMenuUnit.id,
-        );
-        if (updatedUnit) {
-          setSelectedUnit(updatedUnit);
+      const editedUnit = await CourseAPIClient.editUnit(
+        contextMenuUnit.id,
+        title,
+      );
+      if (editedUnit) {
+        refetchCourseUnits();
+        if (contextMenuUnit.id === selectedUnit?.id) {
+          setSelectedUnit(editedUnit);
         }
       }
     }
   };
-
-  const handleDeleteUnit = async () => {
+  const deleteUnit = async () => {
     if (contextMenuUnit) {
-      await deleteUnit(contextMenuUnit.id);
+      const deletedUnitId = await CourseAPIClient.deleteUnit(
+        contextMenuUnit.id,
+      );
+      if (deletedUnitId) {
+        refetchCourseUnits();
+      }
     }
   };
 
@@ -148,7 +150,6 @@ export default function UnitSidebar({
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number,
   ) => {
-    setSelectedIndex(index);
     setSelectedUnit(courseUnits[index]);
   };
 
@@ -225,7 +226,7 @@ export default function UnitSidebar({
                     py: "15px",
                     px: "32px",
                     backgroundColor:
-                      selectedIndex === index
+                      selectedUnit?.id === unit.id
                         ? theme.palette[user.role].Light.Selected
                         : "transparent",
                     "&:hover": {
@@ -238,7 +239,7 @@ export default function UnitSidebar({
                     disableTypography
                     primary={`${unit.displayIndex}. ${unit.title}`}
                     sx={
-                      selectedIndex === index
+                      selectedUnit?.id === unit.id
                         ? theme.typography.labelLargeProminent
                         : theme.typography.bodyMedium
                     }
@@ -293,18 +294,18 @@ export default function UnitSidebar({
       <CreateUnitModal
         openCreateUnitModal={openCreateUnitModal}
         handleCloseCreateUnitModal={handleCloseCreateUnitModal}
-        createUnit={handleCreateUnit}
+        createUnit={createUnit}
       />
       <EditUnitModal
         openEditUnitModal={openEditUnitModal}
         handleCloseEditUnitModal={handleCloseEditUnitModal}
-        editUnit={handleEditUnit}
+        editUnit={editUnit}
         currentTitle={contextMenuUnit?.title ?? ""}
       />
       <DeleteUnitModal
         openDeleteUnitModal={openDeleteUnitModal}
         handleCloseDeleteUnitModal={handleCloseDeleteUnitModal}
-        deleteUnit={handleDeleteUnit}
+        deleteUnit={deleteUnit}
       />
     </Drawer>
   );
