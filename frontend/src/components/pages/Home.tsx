@@ -9,6 +9,7 @@ import { Learner } from "../../types/UserTypes";
 import FacilitatorCard from "../learners/FacilitatorCard";
 import NavButton from "../learners/NavButton";
 import { BOOKMARKS_PAGE, FINISHED_MODULES_PAGE } from "../../constants/Routes";
+import CourseCard from "../learners/CourseCard";
 
 const Home = (): React.ReactElement => {
   const [learner, setLearner] = useState<Learner>();
@@ -34,8 +35,42 @@ const Home = (): React.ReactElement => {
     <Box display="flex" width="100%">
       <LearnerUnitSidebar />
 
-      <Box display="flex" flexGrow={1} justifyContent="center" padding="48px">
+      <Box
+        display="flex"
+        height="100vh"
+        justifyContent="center"
+        padding="48px"
+        overflow="auto"
+      >
         <Box display="flex" flexDirection="column" width="100%">
+          <Box display="flex" flexDirection="column">
+            <Typography variant="bodyLarge">
+              Hello, {learner.firstName}!
+            </Typography>
+            <Typography variant="displayLarge" marginBottom="25px">
+              Continue with Unit 1 Module 5
+            </Typography>
+            <CourseCard size="large" />
+            <Typography
+              variant="displaySmall"
+              marginTop="35px"
+              marginBottom="25px"
+            >
+              Or get started with these modules
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "24px",
+                alignSelf: "stretch",
+              }}
+            >
+              <CourseCard />
+              <CourseCard />
+              <CourseCard />
+            </Box>
+          </Box>
           <Stack
             direction="row"
             width="100%"
