@@ -33,6 +33,7 @@ import {
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+import { useHistory } from "react-router-dom";
 import ActivityAPIClient from "../../APIClients/ActivityAPIClient";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import UserAPIClient from "../../APIClients/UserAPIClient";
@@ -58,6 +59,7 @@ import {
   HeaderColumnIncludesTypes,
   Media,
   QuestionType,
+  ModuleStatus,
 } from "../../types/CourseTypes";
 import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
@@ -85,6 +87,7 @@ import NeedHelpModal from "../help/NeedHelpModal";
 import DeletePageModal from "./DeletePageModal";
 import "./ViewModulePage.css";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
+import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -102,6 +105,7 @@ const ViewModulePage = () => {
   const requestedPageId = queryParams.get("pageId") || "";
   const requestedUnitId = queryParams.get("unitId") || "";
   const { role } = useUser();
+  const history = useHistory();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -124,6 +128,8 @@ const ViewModulePage = () => {
   const currentPageObject = module?.pages[currentPage];
   const thumbnailRefs = useRef<(HTMLDivElement | null)[]>([]);
   const numPages = module?.pages.length || 0;
+  const [editPublishedModuleModalOpen, setEditPublishedModuleModalOpen] =
+    useState(false);
 
   const isFeedbackSurveyPage = role === "Learner" && currentPage === numPages;
   const isEmptyModuleEditing =
@@ -164,8 +170,22 @@ const ViewModulePage = () => {
     const fetchedModule = await CourseAPIClient.getModuleById(
       requestedModuleId,
     );
+    if (
+      fetchedModule?.status === ModuleStatus.unpublished &&
+      role === "Learner"
+    ) {
+      // eslint-disable-next-line no-alert
+      alert("This module is not published yet. Please check back later!");
+      history.replace(`${COURSE_PAGE}?unitId=${requestedUnitId}`);
+    }
+    if (
+      fetchedModule?.status === ModuleStatus.published &&
+      role === "Administrator"
+    ) {
+      setEditPublishedModuleModalOpen(true);
+    }
     return fetchedModule;
-  }, [requestedModuleId]);
+  }, [history, requestedModuleId, requestedUnitId, role]);
 
   const { courseUnits: allUnits } = useCourseUnits();
   const fetchUnit = useCallback(async () => {
@@ -448,6 +468,10 @@ const ViewModulePage = () => {
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize, isFullScreen, lessonPageHeight]);
+
+  const activityPageScale = isFullScreen
+    ? getPageScale(activityPageHeight, activityPageWidth)
+    : 1;
 
   const isCurrentPageBookmarked = useMemo(() => {
     if (!module?.pages[currentPage]) return false;
@@ -980,11 +1004,7 @@ const ViewModulePage = () => {
                 justifyContent="center"
                 alignItems="center"
                 sx={{
-                  transform: `scale(${
-                    isFullScreen
-                      ? getPageScale(activityPageHeight, activityPageWidth)
-                      : 1
-                  })`,
+                  transform: `scale(${activityPageScale})`,
                 }}
                 ref={activityPageRef}
               >
@@ -1040,10 +1060,7 @@ const ViewModulePage = () => {
                       onCorrectAnswer={onCorrectAnswer}
                       key={activity.id}
                       ref={activityViewerRef}
-                      scale={getPageScale(
-                        activityPageHeight,
-                        activityPageWidth,
-                      )}
+                      scale={activityPageScale}
                     />
                   ))}
               </Box>
@@ -1492,6 +1509,29 @@ const ViewModulePage = () => {
           }
         />
       </Snackbar>
+      <EditPublishedModuleModal
+        openEditPublishedModuleModal={editPublishedModuleModalOpen}
+        handleCloseEditPublishedModuleModal={() =>
+          setEditPublishedModuleModalOpen(false)
+        }
+        unpublishModuleAndEdit={async () => {
+          if (module) {
+            const updatedModule = await CourseAPIClient.unpublishModule(
+              module?.id,
+            );
+            if (
+              updatedModule &&
+              updatedModule.status === ModuleStatus.unpublished
+            ) {
+              setModule({
+                ...module,
+                status: updatedModule.status,
+              });
+              setEditPublishedModuleModalOpen(false);
+            }
+          }
+        }}
+      />
     </>
   );
 };
