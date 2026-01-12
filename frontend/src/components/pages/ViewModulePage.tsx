@@ -88,6 +88,7 @@ import DeletePageModal from "./DeletePageModal";
 import "./ViewModulePage.css";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
+import { HeaderLargeTextField } from "../course_authoring/editorComponents/TypographyTextField";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -176,7 +177,7 @@ const ViewModulePage = () => {
     ) {
       // eslint-disable-next-line no-alert
       alert("This module is not published yet. Please check back later!");
-      history.replace(`${COURSE_PAGE}?unitId=${requestedUnitId}`);
+      history.replace(`${COURSE_PAGE}?selectedUnit=${requestedUnitId}`);
     }
     if (
       fetchedModule?.status === ModuleStatus.published &&
@@ -653,168 +654,216 @@ const ViewModulePage = () => {
 
   const SideBar = useMemo(
     () => (
-      <Box
+      <Stack
+        direction="column"
         width="auto"
         minWidth="fit-content"
         maxHeight={boxHeight}
-        padding="24px"
-        sx={{
-          backgroundColor: theme.palette.Neutral[200],
-          overflowY: "auto",
-          gapY: "24px",
-          ...(isFullScreen && { display: "none" }),
-        }}
-        className="no-scrollbar"
+        border="1px solid"
+        borderColor={theme.palette.Neutral[300]}
       >
-        {isEmptyModuleEditing && <EmptyModuleLeftSidebar />}
-        {module?.pages
-          .map((page, index) => (
-            <ModuleSidebarThumbnail
-              key={`thumbnail_${index}`}
-              index={index}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              thumbnailRefs={thumbnailRefs}
-              isBookmarked={isPageBookmarked(page.id)}
-              onContextMenu={
-                role === "Administrator" ? handleContextMenu : undefined
-              }
-              isDraggable={role === "Administrator"}
-              onDragStart={
-                role === "Administrator" ? handleDragStart : undefined
-              }
-              onDragOver={role === "Administrator" ? handleDragOver : undefined}
-              onDragLeave={
-                role === "Administrator" ? handleDragLeave : undefined
-              }
-              onDrop={role === "Administrator" ? handleDrop : undefined}
-              isDragging={draggedIndex === index}
-              isDropTarget={hoverIndex === index && draggedIndex !== null}
-            >
-              {isLessonPage(page) && (
-                <Document
-                  file={page.pdfUrl}
-                  options={options}
-                  loading={
-                    <Typography variant="bodyMedium">Loading...</Typography>
-                  }
-                >
-                  <Thumbnail
-                    pageNumber={page.pageIndex}
-                    height={130}
-                    scale={1.66}
-                  />
-                </Document>
-              )}
-              {isActivityPage(page) && (
-                <Box
-                  height={168}
-                  width={224}
-                  flexShrink={0}
-                  sx={{
-                    display: "inline-flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "white",
-                    borderRadius: "4px",
-                    border: `1px solid ${theme.palette.Learner.Dark.Default}`,
-                    background: theme.palette.Learner.Light.Default,
-                    color: theme.palette.Learner.Dark.Default,
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    justifyContent="center"
-                    alignItems="center"
-                    gap="8px"
-                  >
-                    {questionTypeIcons[page.questionType]}
-                    <Stack
-                      direction="column"
-                      justifyContent="center"
-                      alignItems="flex-start"
-                    >
-                      <Typography variant="bodyMedium">
-                        Activity{" "}
-                        {(() => {
-                          const unitNumber = unit?.displayIndex ?? 0;
-                          const moduleNumber =
-                            (unit?.modules.findIndex(
-                              (m) => m.id === module?.id,
-                            ) ?? -1) + 1;
-                          const activityNumber =
-                            module?.pages
-                              .slice(0, index + 1)
-                              .filter(isActivityPage).length ?? 0;
-                          return `${unitNumber}.${moduleNumber}.${activityNumber}`;
-                        })()}
-                      </Typography>
-                      <Typography variant="labelSmall" textAlign="center">
-                        {questionTypeLabels[page.questionType]}
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </Box>
-              )}
-            </ModuleSidebarThumbnail>
-          ))
-          .concat(
-            role === "Learner" ? (
+        <Box
+          width="auto"
+          minWidth="fit-content"
+          padding="24px"
+          sx={{
+            backgroundColor: theme.palette.Neutral[200],
+            overflowY: "auto",
+            gapY: "24px",
+            ...(isFullScreen && { display: "none" }),
+            flexGrow: 1,
+          }}
+          className="no-scrollbar"
+        >
+          {isEmptyModuleEditing && <EmptyModuleLeftSidebar />}
+          {module?.pages
+            .map((page, index) => (
               <ModuleSidebarThumbnail
-                key="feedback_thumbnail"
-                index={numPages}
+                key={`thumbnail_${index}`}
+                index={index}
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
                 thumbnailRefs={thumbnailRefs}
+                isBookmarked={isPageBookmarked(page.id)}
+                onContextMenu={
+                  role === "Administrator" ? handleContextMenu : undefined
+                }
+                isDraggable={role === "Administrator"}
+                onDragStart={
+                  role === "Administrator" ? handleDragStart : undefined
+                }
+                onDragOver={
+                  role === "Administrator" ? handleDragOver : undefined
+                }
+                onDragLeave={
+                  role === "Administrator" ? handleDragLeave : undefined
+                }
+                onDrop={role === "Administrator" ? handleDrop : undefined}
+                isDragging={draggedIndex === index}
+                isDropTarget={hoverIndex === index && draggedIndex !== null}
               >
-                <FeedbackThumbnail />
+                {isLessonPage(page) && (
+                  <Document
+                    file={page.pdfUrl}
+                    options={options}
+                    loading={
+                      <Typography variant="bodyMedium">Loading...</Typography>
+                    }
+                  >
+                    <Thumbnail
+                      pageNumber={page.pageIndex}
+                      height={130}
+                      scale={1.66}
+                    />
+                  </Document>
+                )}
+                {isActivityPage(page) && (
+                  <Box
+                    height={168}
+                    width={224}
+                    flexShrink={0}
+                    sx={{
+                      display: "inline-flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "white",
+                      borderRadius: "4px",
+                      border: `1px solid ${theme.palette.Learner.Dark.Default}`,
+                      background: theme.palette.Learner.Light.Default,
+                      color: theme.palette.Learner.Dark.Default,
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      justifyContent="center"
+                      alignItems="center"
+                      gap="8px"
+                    >
+                      {questionTypeIcons[page.questionType]}
+                      <Stack
+                        direction="column"
+                        justifyContent="center"
+                        alignItems="flex-start"
+                      >
+                        <Typography variant="bodyMedium">
+                          Activity{" "}
+                          {(() => {
+                            const unitNumber = unit?.displayIndex ?? 0;
+                            const moduleNumber =
+                              (unit?.modules.findIndex(
+                                (m) => m.id === module?.id,
+                              ) ?? -1) + 1;
+                            const activityNumber =
+                              module?.pages
+                                .slice(0, index + 1)
+                                .filter(isActivityPage).length ?? 0;
+                            return `${unitNumber}.${moduleNumber}.${activityNumber}`;
+                          })()}
+                        </Typography>
+                        <Typography variant="labelSmall" textAlign="center">
+                          {questionTypeLabels[page.questionType]}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Box>
+                )}
               </ModuleSidebarThumbnail>
-            ) : (
-              []
-            ),
-          )}
-        {role === "Administrator" && draggedIndex !== null && module?.pages && (
+            ))
+            .concat(
+              role === "Learner" ? (
+                <ModuleSidebarThumbnail
+                  key="feedback_thumbnail"
+                  index={numPages}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  thumbnailRefs={thumbnailRefs}
+                >
+                  <FeedbackThumbnail />
+                </ModuleSidebarThumbnail>
+              ) : (
+                []
+              ),
+            )}
+          {role === "Administrator" &&
+            draggedIndex !== null &&
+            module?.pages && (
+              <Box
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setHoverIndex(module.pages.length);
+                }}
+                onDragLeave={() => setHoverIndex(null)}
+                onDrop={() => handleDrop(module.pages.length)}
+                sx={{
+                  minHeight: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  marginTop: "-10px",
+                  "&::before":
+                    hoverIndex === module.pages.length
+                      ? {
+                          content: '""',
+                          position: "absolute",
+                          top: "0",
+                          left: 0,
+                          right: 0,
+                          height: "3px",
+                          backgroundColor: theme.palette.Learner.Dark.Default,
+                          borderRadius: "2px",
+                          zIndex: 10,
+                        }
+                      : {},
+                }}
+              />
+            )}
+        </Box>
+        {role === "Administrator" && module && (
           <Box
-            onDragOver={(e) => {
-              e.preventDefault();
-              setHoverIndex(module.pages.length);
-            }}
-            onDragLeave={() => setHoverIndex(null)}
-            onDrop={() => handleDrop(module.pages.length)}
+            padding="16px 24px"
             sx={{
-              minHeight: "40px",
               display: "flex",
+              width: "100%",
+              padding: "16px 24px",
               alignItems: "center",
               justifyContent: "center",
-              position: "relative",
-              marginTop: "-10px",
-              "&::before":
-                hoverIndex === module.pages.length
-                  ? {
-                      content: '""',
-                      position: "absolute",
-                      top: "0",
-                      left: 0,
-                      right: 0,
-                      height: "3px",
-                      backgroundColor: theme.palette.Learner.Dark.Default,
-                      borderRadius: "2px",
-                      zIndex: 10,
-                    }
-                  : {},
+              alignSelf: "stretch",
+              borderTop: `1px solid ${theme.palette.Neutral[300]}`,
             }}
-          />
+          >
+            <Button
+              sx={{
+                borderRadius: "4px",
+                backgroundColor: theme.palette[role].Dark.Default,
+                color: "white",
+                width: "100%",
+                height: "40px",
+              }}
+              onClick={async () => {
+                CourseAPIClient.publishModule(module.id)
+                  .then(() => {
+                    history.push(
+                      `${COURSE_PAGE}${unit ? `?selectedUnit=${unit.id}` : ""}`,
+                    );
+                  })
+                  .catch(() => {
+                    /* eslint-disable-next-line no-alert */
+                    alert("Failed to publish module. Please try again later.");
+                  });
+              }}
+            >
+              <Typography variant="labelLarge">Publish Module</Typography>
+            </Button>
+          </Box>
         )}
-      </Box>
+      </Stack>
     ),
     [
-      theme.palette.Neutral,
-      theme.palette.Learner.Dark.Default,
-      theme.palette.Learner.Light.Default,
+      theme.palette,
       isFullScreen,
       isEmptyModuleEditing,
-      module?.pages,
-      module?.id,
+      module,
       role,
       numPages,
       currentPage,
@@ -826,8 +875,8 @@ const ViewModulePage = () => {
       handleDragOver,
       handleDragLeave,
       handleDrop,
-      unit?.displayIndex,
-      unit?.modules,
+      unit,
+      history,
     ],
   );
 
@@ -922,7 +971,26 @@ const ViewModulePage = () => {
                 >
                   <ArrowBack sx={{ fontSize: "24px" }} />
                 </IconButton>
-                <Typography variant="headlineLarge">{module?.title}</Typography>
+                <HeaderLargeTextField
+                  defaultValue={module?.title || ""}
+                  onChange={(newValue) => {
+                    setModule((prev) =>
+                      prev ? { ...prev, title: newValue } : prev,
+                    );
+                  }}
+                  onBlur={() => {
+                    if (unit && module) {
+                      CourseAPIClient.editModule(
+                        unit.id,
+                        module.id,
+                        module.title,
+                      ).catch(() => {
+                        /* eslint-disable-next-line no-alert */
+                        alert("Failed to update module title");
+                      });
+                    }
+                  }}
+                />
               </Box>
               {role === "Learner" && (
                 <Box display="inline-flex" alignItems="center" gap="20px">
@@ -1135,49 +1203,51 @@ const ViewModulePage = () => {
                   <Typography variant="labelLarge">Fullscreen</Typography>
                 </Button>
               )}
-              {role === "Administrator" && (
-                <>
-                  <Button
-                    sx={{
-                      height: "48px",
-                      paddingLeft: "16px",
-                      paddingRight: "24px",
-                      paddingY: "10px",
-                      gap: "8px",
-                      border: "1px solid",
-                      borderColor: theme.palette.Neutral[500],
-                      borderRadius: "4px",
-                      backgroundColor: theme.palette[role].Dark.Default,
-                      color: "white",
-                    }}
-                    onClick={() => setIsPreviewModalOpen(true)}
-                  >
-                    <VisibilityOutlined />
-                    <Typography variant="labelLarge">Preview</Typography>
-                  </Button>
-                  <Button
-                    sx={{
-                      height: "48px",
-                      paddingLeft: "16px",
-                      paddingRight: "24px",
-                      paddingY: "10px",
-                      gap: "8px",
-                      border: "1px solid",
-                      borderColor: theme.palette.Error.Light.Default,
-                      borderRadius: "4px",
-                      backgroundColor: theme.palette.Error.Light.Default,
-                      color: theme.palette.Error.Dark.Default,
-                    }}
-                    onClick={() => setIsDeleteModalOpen(true)}
-                    disabled={isDeleteLoading}
-                  >
-                    <DeleteOutline />
-                    <Typography variant="labelLarge">
-                      {isDeleteLoading ? "Deleting..." : "Delete Page"}
-                    </Typography>
-                  </Button>
-                </>
-              )}
+              {role === "Administrator" &&
+                module &&
+                module?.pages.length > 0 && (
+                  <>
+                    <Button
+                      sx={{
+                        height: "48px",
+                        paddingLeft: "16px",
+                        paddingRight: "24px",
+                        paddingY: "10px",
+                        gap: "8px",
+                        border: "1px solid",
+                        borderColor: theme.palette.Neutral[500],
+                        borderRadius: "4px",
+                        backgroundColor: theme.palette[role].Dark.Default,
+                        color: "white",
+                      }}
+                      onClick={() => setIsPreviewModalOpen(true)}
+                    >
+                      <VisibilityOutlined />
+                      <Typography variant="labelLarge">Preview</Typography>
+                    </Button>
+                    <Button
+                      sx={{
+                        height: "48px",
+                        paddingLeft: "16px",
+                        paddingRight: "24px",
+                        paddingY: "10px",
+                        gap: "8px",
+                        border: "1px solid",
+                        borderColor: theme.palette.Error.Light.Default,
+                        borderRadius: "4px",
+                        backgroundColor: theme.palette.Error.Light.Default,
+                        color: theme.palette.Error.Dark.Default,
+                      }}
+                      onClick={() => setIsDeleteModalOpen(true)}
+                      disabled={isDeleteLoading}
+                    >
+                      <DeleteOutline />
+                      <Typography variant="labelLarge">
+                        {isDeleteLoading ? "Deleting..." : "Delete Page"}
+                      </Typography>
+                    </Button>
+                  </>
+                )}
             </Box>
 
             <Box display="flex" gap="16px">
