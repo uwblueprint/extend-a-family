@@ -7,6 +7,7 @@ interface FeedbacksContextType {
   isLoading: boolean;
   error: boolean;
   refetchFeedbacks: () => Promise<void>;
+  exportFeedbackToTSV: () => void;
 }
 
 const FeedbacksContext = createContext<FeedbacksContextType | undefined>(
@@ -45,6 +46,60 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     }
   };
 
+  const exportFeedbackToTSV = () => {
+    if (feedbacks.length === 0) {
+      // eslint-disable-next-line no-alert
+      alert("No feedback data to export yet");
+      return;
+    }
+
+    // Define TSV headers
+    const headers = [
+      "Learner First Name",
+      "Learner Last Name",
+      "Module Title",
+      "Is Liked",
+      "Difficulty",
+      "Message",
+      "Created At",
+      "Feedback ID",
+      "Learner ID",
+      "Module ID",
+    ];
+
+    // Convert feedbacks to TSV rows
+    const rows = feedbacks.map((feedback) => [
+      feedback.learnerId.firstName,
+      feedback.learnerId.lastName,
+      feedback.moduleId.title,
+      feedback.isLiked ? "Yes" : "No",
+      feedback.difficulty.toString(),
+      feedback.message.replace(/\t/g, " ").replace(/\n/g, " "), // Replace tabs and newlines
+      feedback.createdAt,
+      feedback.id,
+      feedback.learnerId.id,
+      feedback.moduleId.id,
+    ]);
+
+    // Combine headers and rows
+    const tsvContent = [headers, ...rows]
+      .map((row) => row.join("\t"))
+      .join("\n");
+
+    // Create blob and download
+    const blob = new Blob([tsvContent], { type: "text/tab-separated-values" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `feedback_export_${
+      new Date().toISOString().split("T")[0]
+    }.tsv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   useEffect(() => {
     refetchFeedbacks();
   }, []);
@@ -54,6 +109,7 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     isLoading,
     error,
     refetchFeedbacks,
+    exportFeedbackToTSV,
   };
 
   return (

@@ -10,7 +10,9 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { FileDownload } from "@mui/icons-material";
 import { useUser } from "../../../hooks/useUser";
+import { useFeedbacks } from "../../../contexts/FeedbacksContext";
 
 interface DeleteModuleModalProps {
   openDeleteModuleModal: boolean;
@@ -24,6 +26,8 @@ export default function DeleteModuleModal(props: DeleteModuleModalProps) {
 
   const theme = useTheme();
   const user = useUser();
+
+  const { exportFeedbackToTSV } = useFeedbacks();
 
   return (
     <Box
@@ -76,8 +80,11 @@ export default function DeleteModuleModal(props: DeleteModuleModalProps) {
           </DialogTitle>
           <DialogContent
             sx={{
+              display: "flex",
+              flexDirection: "column",
               margin: "0px",
               padding: "0px",
+              gap: "32px",
             }}
           >
             <DialogContentText>
@@ -89,6 +96,42 @@ export default function DeleteModuleModal(props: DeleteModuleModalProps) {
                 recovered.
               </Typography>
             </DialogContentText>
+            <Box
+              sx={{
+                display: "flex",
+                padding: "16px",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "flex-start",
+                gap: "16px",
+                alignSelf: "stretch",
+                borderRadius: "8px",
+                backgroundColor: theme.palette.Administrator.Light.Default,
+              }}
+            >
+              <Typography variant="bodyMedium">
+                Save a copy of the learner feedback before deleting:
+              </Typography>
+              <Button
+                variant="outlined"
+                startIcon={<FileDownload />}
+                sx={{
+                  display: "flex",
+                  width: "100%",
+                  height: "36px",
+                  borderRadius: "4px",
+                  backgroundColor: theme.palette.Administrator.Dark.Default,
+                  borderColor: theme.palette.Administrator.Dark.Default,
+                  color: "white",
+                }}
+                disableElevation
+                onClick={exportFeedbackToTSV}
+              >
+                <Typography variant="labelLarge">
+                  Download Feedback (TSV)
+                </Typography>
+              </Button>
+            </Box>
           </DialogContent>
         </Box>
         <Box
@@ -117,7 +160,7 @@ export default function DeleteModuleModal(props: DeleteModuleModalProps) {
               variant="labelLarge"
               color={theme.palette[user.role].Dark.Default}
             >
-              GO BACK
+              Go Back
             </Typography>
           </Button>
           <Button
@@ -137,7 +180,7 @@ export default function DeleteModuleModal(props: DeleteModuleModalProps) {
             }}
             disableElevation
           >
-            <Typography variant="labelLarge">DELETE</Typography>
+            <Typography variant="labelLarge">Delete</Typography>
           </Button>
         </Box>
       </Dialog>
