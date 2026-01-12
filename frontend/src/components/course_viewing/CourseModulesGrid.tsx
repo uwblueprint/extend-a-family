@@ -6,7 +6,7 @@ import { Add } from "@mui/icons-material";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import useCourseModules from "../../hooks/useCourseModules";
 import { useUser } from "../../hooks/useUser";
-import { CourseModule } from "../../types/CourseTypes";
+import { CourseModule, ModuleStatus } from "../../types/CourseTypes";
 import ModuleCardAdmin from "./library-viewing/ModuleCardAdmin";
 import ModuleCardLearner from "./library-viewing/ModuleCardLearner";
 import ModuleCardFacilitator from "./library-viewing/ModuleCardFacilitator";
@@ -118,13 +118,15 @@ export default function CourseModulesGrid({
             case "Learner":
             default:
               return (
-                <ModuleCardLearner
-                  key={module.id}
-                  module={module}
-                  index={index}
-                  unitId={unitId}
-                  isSidebarOpen={isSidebarOpen}
-                />
+                module.status === ModuleStatus.published && (
+                  <ModuleCardLearner
+                    key={module.id}
+                    module={module}
+                    index={index}
+                    unitId={unitId}
+                    isSidebarOpen={isSidebarOpen}
+                  />
+                )
               );
           }
         })}

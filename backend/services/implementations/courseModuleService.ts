@@ -277,8 +277,37 @@ class CourseModuleService implements ICourseModuleService {
   /**
    * Publish a module (Draft → Published or Unpublished → Published).
    */
-  async publishCourseModule(moduleId: string): Promise<CourseModuleLeanDTO> {
-    return this.changeStatus(moduleId, ModuleStatus.Published);
+  async publishCourseModule(
+    moduleId: string,
+    oldFeedbackDecision?: string,
+  ): Promise<CourseModuleLeanDTO> {
+    let session: ClientSession | undefined;
+    if (oldFeedbackDecision === "discard") {
+      session = await startSession();
+      session.startTransaction();
+      // Delete all feedback associated with this module
+      try {
+        await feedbackMgmodel.deleteMany({ moduleId }, { session });
+      } catch (error) {
+        await session.abortTransaction();
+        Logger.error(
+          `Failed to delete feedback for module ${moduleId} during publish. Reason = ${getErrorMessage(
+            error,
+          )}`,
+        );
+        throw error;
+      }
+    }
+    const updatedModule = await this.changeStatus(
+      moduleId,
+      ModuleStatus.Published,
+      session,
+    );
+    if (session) {
+      await session.commitTransaction();
+      session.endSession();
+    }
+    return updatedModule;
   }
 
   /**
@@ -294,9 +323,12 @@ class CourseModuleService implements ICourseModuleService {
   private async changeStatus(
     moduleId: string,
     newStatus: ModuleStatus,
+    currSession?: ClientSession,
   ): Promise<CourseModuleLeanDTO> {
-    const session = await startSession();
-    session.startTransaction();
+    const session: ClientSession = currSession ?? (await startSession());
+    if (!currSession) {
+      session.startTransaction();
+    }
     try {
       const module = await MgCourseModule.findById(moduleId).session(session);
       if (!module) {
@@ -310,11 +342,16 @@ class CourseModuleService implements ICourseModuleService {
 
       module.status = newStatus;
       await module.save({ session });
-      await session.commitTransaction();
+
+      if (!currSession) {
+        await session.commitTransaction();
+      }
 
       return module.toObject();
     } catch (error) {
-      await session.abortTransaction();
+      if (!currSession) {
+        await session.abortTransaction();
+      }
       Logger.error(
         `Failed to change status for module ${moduleId}. Reason = ${getErrorMessage(
           error,
@@ -322,7 +359,9 @@ class CourseModuleService implements ICourseModuleService {
       );
       throw error;
     } finally {
-      session.endSession();
+      if (!currSession) {
+        session.endSession();
+      }
     }
   }
 

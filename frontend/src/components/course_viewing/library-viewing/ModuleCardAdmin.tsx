@@ -33,6 +33,7 @@ import DeleteModuleModal from "../modals/DeleteModuleModal";
 import EditModuleModal from "../modals/EditModuleModal";
 import UnpublishModuleModal from "../modals/UnpublishModuleModal";
 import EditPublishedModuleModal from "../modals/EditPublishedModuleModal";
+import PublishModuleModal from "../modals/PublishModuleModal";
 
 const ItemType = "MODULE_CARD";
 
@@ -64,6 +65,7 @@ const ModuleCardAdmin = ({
   const [openChangeThumbnailModal, setOpenChangeThumbnailModal] =
     useState(false);
   const [openDeleteModuleModal, setOpenDeleteModuleModal] = useState(false);
+  const [openPublishModuleModal, setOpenPublishModuleModal] = useState(false);
   const [openUnpublishModuleModal, setOpenUnpublishModuleModal] =
     useState(false);
   const [editPublishedModuleModalOpen, setEditPublishedModuleModalOpen] =
@@ -216,8 +218,7 @@ const ModuleCardAdmin = ({
     if (module.status === ModuleStatus.published) {
       setOpenUnpublishModuleModal(true);
     } else {
-      toggleModuleStatus();
-      handleMenuClose();
+      setOpenPublishModuleModal(true);
     }
   };
 
@@ -434,6 +435,12 @@ const ModuleCardAdmin = ({
         openDeleteModuleModal={openDeleteModuleModal}
         handleCloseDeleteModuleModal={handleCloseDeleteModuleModal}
         deleteModule={deleteModule}
+      />
+      <PublishModuleModal
+        openPublishModuleModal={openPublishModuleModal}
+        handleClosePublishModuleModal={() => setOpenPublishModuleModal(false)}
+        moduleId={module.id}
+        onUpdateModule={onModuleUpdate}
       />
       <UnpublishModuleModal
         openUnpublishModuleModal={openUnpublishModuleModal}

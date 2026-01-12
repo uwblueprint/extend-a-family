@@ -451,8 +451,12 @@ courseRouter.patch(
   isAuthorizedByRole(new Set(["Administrator"])),
   async (req, res) => {
     const { moduleId } = req.params;
+    const { oldFeedbackDecision } = req.body;
     try {
-      const updated = await courseModuleService.publishCourseModule(moduleId);
+      const updated = await courseModuleService.publishCourseModule(
+        moduleId,
+        oldFeedbackDecision,
+      );
       res.json(updated);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));

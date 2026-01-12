@@ -12,15 +12,13 @@ import {
 } from "@mui/material";
 import { useUser } from "../../../hooks/useUser";
 
-interface UnpublisheModuleModalProps {
+interface UnpublishModuleModalProps {
   openUnpublishModuleModal: boolean;
   handleCloseUnpublishModuleModal: () => void;
   unpublishModule: () => Promise<void>;
 }
 
-export default function UnpublishModuleModal(
-  props: UnpublisheModuleModalProps,
-) {
+export default function UnpublishModuleModal(props: UnpublishModuleModalProps) {
   const {
     openUnpublishModuleModal,
     handleCloseUnpublishModuleModal,

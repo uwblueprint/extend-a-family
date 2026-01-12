@@ -273,6 +273,7 @@ const reorderPages = async (
 
 const publishModule = async (
   moduleId: string,
+  oldFeedbackDecision?: string,
 ): Promise<CourseModule | null> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -281,7 +282,7 @@ const publishModule = async (
   try {
     const { data } = await baseAPIClient.patch(
       `/course/${moduleId}/publish`,
-      {},
+      { oldFeedbackDecision },
       {
         headers: { Authorization: bearerToken },
       },
