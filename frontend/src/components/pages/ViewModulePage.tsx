@@ -90,6 +90,7 @@ import "./ViewModulePage.css";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
 import { useSocket } from "../../contexts/SocketContext";
+import PublishModuleModal from "../course_viewing/modals/PublishModuleModal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -133,6 +134,7 @@ const ViewModulePage = () => {
   const numPages = module?.pages.length || 0;
   const [editPublishedModuleModalOpen, setEditPublishedModuleModalOpen] =
     useState(false);
+  const [publishModuleModalOpen, setPublishModuleModalOpen] = useState(false);
 
   const isFeedbackSurveyPage = role === "Learner" && currentPage === numPages;
   const isEmptyModuleEditing =
@@ -907,18 +909,7 @@ const ViewModulePage = () => {
                 width: "100%",
                 height: "40px",
               }}
-              onClick={async () => {
-                CourseAPIClient.publishModule(module.id)
-                  .then(() => {
-                    history.push(
-                      `${COURSE_PAGE}${unit ? `?selectedUnit=${unit.id}` : ""}`,
-                    );
-                  })
-                  .catch(() => {
-                    /* eslint-disable-next-line no-alert */
-                    alert("Failed to publish module. Please try again later.");
-                  });
-              }}
+              onClick={() => setPublishModuleModalOpen(true)}
             >
               <Typography variant="labelLarge">Publish Module</Typography>
             </Button>
@@ -944,7 +935,6 @@ const ViewModulePage = () => {
       handleDragLeave,
       handleDrop,
       unit,
-      history,
     ],
   );
 
@@ -1653,6 +1643,18 @@ const ViewModulePage = () => {
         editorName={currentEditorName}
         unitId={requestedUnitId}
       />
+      {module && (
+        <PublishModuleModal
+          openPublishModuleModal={publishModuleModalOpen}
+          handleClosePublishModuleModal={() => setPublishModuleModalOpen(false)}
+          moduleId={module.id}
+          onUpdateModule={() =>
+            history.push(
+              `${COURSE_PAGE}${unit ? `?selectedUnit=${unit?.id}` : ""}`,
+            )
+          }
+        />
+      )}
     </>
   );
 };
