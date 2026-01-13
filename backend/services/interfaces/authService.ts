@@ -56,12 +56,14 @@ interface IAuthService {
    * Sends an email invitation to an invited learner with the temporary password specified
    * @param email email of new learner invited
    * @param temporaryPassword the new learner's temporary password
+   * @param firstName the new learner's first name
    * @throws Error if unable to generate link or send email
    */
   sendLearnerInvite(
     firstName: string,
     email: string,
     temporaryPassword: string,
+    facilitatorName?: string,
   ): Promise<void>;
 
   /**

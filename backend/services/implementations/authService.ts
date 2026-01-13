@@ -9,6 +9,9 @@ import { Role } from "../../types/userTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import FirebaseRestClient from "../../utilities/firebaseRestClient";
 import logger from "../../utilities/logger";
+import learnerInviteEmail from "../../emails/learnerInvite";
+import adminInviteEmail from "../../emails/adminInvite";
+import facilitatorVerificationEmail from "../../emails/facilitatorVerification";
 
 const Logger = logger(__filename);
 
@@ -109,15 +112,12 @@ class AuthService implements IAuthService {
       const emailVerificationLink = await firebaseAdmin
         .auth()
         .generateEmailVerificationLink(email);
-      const emailBody = `
-      Hello,
-      <br><br>
-      Please click the following link to verify your email and activate your account.
-      <strong>This link is only valid for 1 hour.</strong>
-      <br><br>
-      <a href=${emailVerificationLink}>Verify email</a>`;
 
-      this.emailService.sendEmail(email, "Verify your email", emailBody);
+      this.emailService.sendEmail(
+        email,
+        "Verify your email",
+        facilitatorVerificationEmail(emailVerificationLink),
+      );
     } catch (error) {
       Logger.error(
         `Failed to generate email verification link for user with email ${email}`,
@@ -142,20 +142,11 @@ class AuthService implements IAuthService {
         .auth()
         .generateEmailVerificationLink(email);
 
-      const emailBody = `Hello,<br> <br>
-        You have been invited as an administrator to Smart Saving, Smart Spending.
-        <br> <br>
-        Please click the following link to verify your email and activate your account.
-        <strong>This link is only valid for 1 hour.</strong>
-        <br> <br>
-        <a href=${emailVerificationLink}>Verify email</a>
-        <br> <br>
-        To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`;
-
       await this.emailService.sendEmail(
         email,
         "Administrator Invitation: Smart Saving, Smart Spending",
-        emailBody,
+        adminInviteEmail(emailVerificationLink, temporaryPassword),
+        "pranol.mathan@eafwr.on.ca",
       );
     } catch (error: unknown) {
       Logger.error(
@@ -185,6 +176,7 @@ class AuthService implements IAuthService {
     firstName: string,
     email: string,
     temporaryPassword: string,
+    facilitatorName: string = "Your Facilitator",
   ): Promise<void> {
     if (!this.emailService) {
       const errorMessage =
@@ -197,26 +189,16 @@ class AuthService implements IAuthService {
       .auth()
       .generateEmailVerificationLink(email);
 
-    const emailBody = `Hello ${firstName},
-      <br><br>
-      Welcome to Smart Saving, Smart Spending!
-      <br><br>
-      Please click the link to confirm your account: <a href=${emailVerificationLink}>Confirm my account</a>
-      <br>
-      If the link has expired, ask your facilitator to invite you again.
-      <br><br>
-      To log in for the first time, use the following email and password:
-      <br><br>
-      Email: <strong>${email}</strong>
-      <br>
-      Password: <strong>${temporaryPassword}</strong>
-      <br><br>
-      Happy learning!`;
-
     await this.emailService.sendEmail(
       email,
       "Welcome to Smart Saving, Smart Spending!",
-      emailBody,
+      learnerInviteEmail(
+        firstName,
+        facilitatorName,
+        emailVerificationLink,
+        temporaryPassword,
+      ),
+      "pranol.mathan@eafwr.on.ca",
     );
   }
 

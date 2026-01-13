@@ -24,16 +24,16 @@ class EmailService implements IEmailService {
     to: string,
     subject: string,
     htmlBody: string,
+    replyTo?: string,
   ): Promise<void> {
-    const mailOptions = {
-      from: this.sender,
-      to,
-      subject,
-      html: htmlBody,
-    };
-
     try {
-      return await this.transporter.sendMail(mailOptions);
+      return await this.transporter.sendMail({
+        from: this.sender,
+        to,
+        subject,
+        html: htmlBody,
+        replyTo,
+      });
     } catch (error: unknown) {
       Logger.error(`Failed to send email. Reason = ${getErrorMessage(error)}`);
       throw error;

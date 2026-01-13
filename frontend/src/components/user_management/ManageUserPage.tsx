@@ -41,12 +41,14 @@ const ManageUserPage = (): React.ReactElement => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
 
   // States for learner modal inputs
   const [openAddLearnerModal, setOpenAddLearnerModal] = useState(false);
   const [learnerFirstName, setLearnerFirstName] = useState("");
   const [learnerLastName, setLearnerLastName] = useState("");
   const [learnerEmail, setLearnerEmail] = useState("");
+  const [isCreatingLearner, setIsCreatingLearner] = useState(false);
 
   const [selectedRole, setSelectedRole] = useState<string>("");
 
@@ -148,32 +150,46 @@ const ManageUserPage = (): React.ReactElement => {
 
   const handleAddAdmin = async () => {
     if (firstName && lastName && email) {
-      const admin = await AuthAPIClient.inviteAdmin(firstName, lastName, email);
-      if (admin) {
-        setAddSnackbarMessage(
-          `"${admin.firstName} ${admin.lastName}" was added as admin`,
+      setIsCreatingAdmin(true);
+      try {
+        const admin = await AuthAPIClient.inviteAdmin(
+          firstName,
+          lastName,
+          email,
         );
-        handleCloseAddAdminModal();
-        setOpenAddUserSnackbar(true);
-        await getUsers();
+        if (admin) {
+          setAddSnackbarMessage(
+            `"${admin.firstName} ${admin.lastName}" was added as admin`,
+          );
+          handleCloseAddAdminModal();
+          setOpenAddUserSnackbar(true);
+          await getUsers();
+        }
+      } finally {
+        setIsCreatingAdmin(false);
       }
     }
   };
 
   const handleAddLearner = async () => {
     if (learnerFirstName && learnerLastName && learnerEmail) {
-      const learner = await AuthAPIClient.inviteLearner(
-        learnerFirstName,
-        learnerLastName,
-        learnerEmail,
-      );
-      if (learner) {
-        setAddSnackbarMessage(
-          `User "${learner.firstName} ${learner.lastName}" was created`,
+      setIsCreatingLearner(true);
+      try {
+        const learner = await AuthAPIClient.inviteLearner(
+          learnerFirstName,
+          learnerLastName,
+          learnerEmail,
         );
-        handleCloseAddLearnerModal();
-        setOpenAddUserSnackbar(true);
-        await getUsers();
+        if (learner) {
+          setAddSnackbarMessage(
+            `User "${learner.firstName} ${learner.lastName}" was created`,
+          );
+          handleCloseAddLearnerModal();
+          setOpenAddUserSnackbar(true);
+          await getUsers();
+        }
+      } finally {
+        setIsCreatingLearner(false);
       }
     }
   };
@@ -350,6 +366,7 @@ const ManageUserPage = (): React.ReactElement => {
         setLastName={setLastName}
         setEmail={setEmail}
         handleAddAdmin={handleAddAdmin}
+        isCreating={isCreatingAdmin}
       />
       <AddLearnerModal
         open={openAddLearnerModal}
@@ -358,6 +375,7 @@ const ManageUserPage = (): React.ReactElement => {
         setLastName={setLearnerLastName}
         setEmail={setLearnerEmail}
         handleAddLearner={handleAddLearner}
+        isCreating={isCreatingLearner}
       />
       <Stack
         direction="column"

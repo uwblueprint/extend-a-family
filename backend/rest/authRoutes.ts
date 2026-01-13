@@ -220,10 +220,14 @@ authRouter.post(
         },
         facilitatorId.toString(),
       );
+      const facilitator = await userService.getUserById(
+        facilitatorId.toString(),
+      );
       await authService.sendLearnerInvite(
         req.body.firstName,
         req.body.email,
         temporaryPassword,
+        `${facilitator.firstName} ${facilitator.lastName}`,
       );
       res.status(200).json(invitedLearnerUser);
     } catch (error: unknown) {

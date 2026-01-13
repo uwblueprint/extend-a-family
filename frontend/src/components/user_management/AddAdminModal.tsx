@@ -20,6 +20,7 @@ interface AddAdminModalProps {
   setLastName: (value: string) => void;
   setEmail: (value: string) => void;
   handleAddAdmin: () => void;
+  isCreating?: boolean;
 }
 
 const AddAdminModal: React.FC<AddAdminModalProps> = ({
@@ -29,6 +30,7 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
   setLastName,
   setEmail,
   handleAddAdmin,
+  isCreating = false,
 }) => {
   const theme = useTheme();
   return (
@@ -144,6 +146,7 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
               borderColor: theme.palette.Neutral[500],
             }}
             onClick={onClose}
+            disabled={isCreating}
           >
             <Typography
               variant="labelLarge"
@@ -162,8 +165,11 @@ const AddAdminModal: React.FC<AddAdminModalProps> = ({
               "&:hover": { bgcolor: theme.palette.Administrator.Dark.Default },
             }}
             onClick={handleAddAdmin}
+            disabled={isCreating}
           >
-            <Typography variant="labelLarge">ADD ADMIN</Typography>
+            <Typography variant="labelLarge">
+              {isCreating ? "ADDING..." : "ADD ADMIN"}
+            </Typography>
           </Button>
         </Box>
       </Dialog>
