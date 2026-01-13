@@ -45,7 +45,7 @@ const FeedbackAdminView = () => {
   const location = useLocation();
   const history = useHistory();
 
-  const { courseUnits } = useCourseUnits();
+  const { courseUnits, moduleDisplayIndex } = useCourseUnits();
   const { feedbacks: allFeedbacks, exportFeedbackToTSV } = useFeedbacks();
 
   // Initialize state from URL params only once
@@ -132,7 +132,7 @@ const FeedbackAdminView = () => {
 
   const currentLabel = () => {
     if (selectedModule) {
-      return `Module ${selectedModule.displayIndex}`;
+      return `Module ${moduleDisplayIndex(selectedModule.id)}`;
     }
     if (selectedUnit) {
       return `Unit ${selectedUnit.displayIndex}`;

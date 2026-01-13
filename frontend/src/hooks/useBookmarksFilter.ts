@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Bookmark } from "../types/UserTypes";
-import { CourseUnit, CourseModule } from "../types/CourseTypes";
+import { CourseUnit, CourseModule, ModuleStatus } from "../types/CourseTypes";
 
 type GroupedBookmarks = {
   [unitId: string]: {
@@ -24,9 +24,14 @@ const useBookmarksFilter = (
   // Get unique unit IDs that have bookmarks
   const unitIdsWithBookmarks = useMemo(() => {
     return bookmarks
+      .filter((b) => {
+        const unitModules = modules[b.unitId] || [];
+        const module = unitModules.find((m) => m.id === b.moduleId);
+        return module && module.status === ModuleStatus.published;
+      })
       .map((b) => b.unitId)
       .filter((unitId, index, array) => array.indexOf(unitId) === index);
-  }, [bookmarks]);
+  }, [bookmarks, modules]);
 
   // Group bookmarks by unit and module
   const groupedBookmarks = useMemo((): GroupedBookmarks => {
@@ -37,7 +42,7 @@ const useBookmarksFilter = (
       const unitModules = modules[bookmark.unitId] || [];
       const module = unitModules.find((m) => m.id === bookmark.moduleId);
 
-      if (unit && module) {
+      if (unit && module && module.status === ModuleStatus.published) {
         if (!grouped[bookmark.unitId]) {
           grouped[bookmark.unitId] = {
             unit,

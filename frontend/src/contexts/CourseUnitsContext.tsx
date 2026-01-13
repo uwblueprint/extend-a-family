@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useCallback,
+  useState,
+} from "react";
 import CourseAPIClient from "../APIClients/CourseAPIClient";
 import { CourseUnit } from "../types/CourseTypes";
 
@@ -10,6 +16,7 @@ interface CourseUnitsContextType {
   createUnit: (title: string) => Promise<void>;
   editUnit: (unitId: string, title: string) => Promise<void>;
   deleteUnit: (unitId: string) => Promise<void>;
+  moduleDisplayIndex: (moduleId: string) => number;
 }
 
 const CourseUnitsContext = createContext<CourseUnitsContextType | undefined>(
@@ -85,6 +92,22 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     }
   };
 
+  const moduleDisplayIndex = useCallback(
+    (moduleId: string): number => {
+      let displayIndex = -1;
+      courseUnits.forEach((unit) => {
+        const index = unit.modules.findIndex(
+          (module) => module.id === moduleId,
+        );
+        if (index !== -1) {
+          displayIndex = index + 1;
+        }
+      });
+      return displayIndex;
+    },
+    [courseUnits],
+  );
+
   useEffect(() => {
     refetchCourseUnits();
   }, []);
@@ -97,6 +120,7 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     createUnit,
     editUnit,
     deleteUnit,
+    moduleDisplayIndex,
   };
 
   return (

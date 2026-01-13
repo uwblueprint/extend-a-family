@@ -14,16 +14,12 @@ import "react-pdf/dist/Page/TextLayer.css";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import { CourseModule } from "../../types/CourseTypes";
 import ModuleBookmarksGrid from "./ModuleBookmarksGrid";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url,
 ).toString();
-
-// const options = {
-//   cMapUrl: "/cmaps/",
-//   standardFontDataUrl: "/standard_fonts/",
-// };
 
 interface ModuleSectionProps {
   module: CourseModule;
@@ -54,6 +50,7 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
   const [detailedModule, setDetailedModule] = useState<CourseModule | null>(
     null,
   );
+  const { moduleDisplayIndex } = useCourseUnits();
 
   // Sync when expandAll changes OR when a command id changes (button press)
   useEffect(() => {
@@ -128,7 +125,7 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
           }}
         >
           <Typography sx={{ ...theme.typography.titleLarge }}>
-            Module {module.displayIndex}: {module.title}
+            Module {moduleDisplayIndex(module.id)}: {module.title}
           </Typography>
           <Typography sx={{ ...theme.typography.labelLarge }}>
             {activityCount} bookmarked {activityLabel}, {slideCount} bookmarked{" "}

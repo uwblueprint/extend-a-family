@@ -8,6 +8,7 @@ import {
   calculateAverageEasiness,
   calculateLikedPercentage,
 } from "./feedbackUtils";
+import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 
 const SummaryCard = ({
   label,
@@ -130,6 +131,7 @@ export const FeedbackAdminUnitView = ({
   feedbacks: FeedbackPopulated[];
   setSelectedModuleId: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
+  const { moduleDisplayIndex } = useCourseUnits();
   return (
     <Stack
       direction="column"
@@ -155,7 +157,7 @@ export const FeedbackAdminUnitView = ({
           return (
             <SummaryCard
               key={module.id}
-              label={`Module ${module.displayIndex}`}
+              label={`Module ${moduleDisplayIndex(module.id)}`}
               title={module.title}
               easiness={easiness}
               liked={liked}

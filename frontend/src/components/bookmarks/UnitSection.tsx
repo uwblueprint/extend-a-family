@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { CourseUnit, CourseModule } from "../../types/CourseTypes";
 import ModuleSection from "./ModuleSection";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 
 interface UnitSectionProps {
   unit: CourseUnit;
@@ -38,13 +39,15 @@ const UnitSection: React.FC<UnitSectionProps> = ({
   onModuleOpenStateChange,
 }) => {
   const theme = useTheme();
+  const { moduleDisplayIndex } = useCourseUnits();
 
   // Sort modules by displayIndex before rendering
   const sortedModuleGroups = useMemo(() => {
     return Object.values(modules).sort(
-      (a, b) => a.module.displayIndex - b.module.displayIndex,
+      (a, b) =>
+        moduleDisplayIndex(a.module.id) - moduleDisplayIndex(b.module.id),
     );
-  }, [modules]);
+  }, [modules, moduleDisplayIndex]);
 
   // Track open/closed state per module to determine "all opened/closed"
   const [moduleOpenState, setModuleOpenState] = useState<

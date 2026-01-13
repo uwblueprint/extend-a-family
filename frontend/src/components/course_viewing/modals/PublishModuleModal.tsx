@@ -41,7 +41,7 @@ export default function PublishModuleModal(props: PublishModuleModalProps) {
     moduleId,
     onUpdateModule,
   } = props;
-  const { exportFeedbackToTSV } = useFeedbacks();
+  const { exportFeedbackToTSV, refetchFeedbacks } = useFeedbacks();
 
   const [retainFeedback, setRetainFeedback] = useState<
     RetainFeedbackOption | undefined
@@ -53,6 +53,9 @@ export default function PublishModuleModal(props: PublishModuleModalProps) {
       retainFeedback,
     );
     if (updatedModule) onUpdateModule(updatedModule);
+    if (retainFeedback === RetainFeedbackOption.DISCARD) {
+      await refetchFeedbacks();
+    }
     handleClosePublishModuleModal();
   };
 
