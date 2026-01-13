@@ -252,7 +252,17 @@ const FeedbackAdminView = () => {
               </Stack>
               <Typography variant="headlineLarge">{currentTitle()}</Typography>
             </Stack>
-            <Button variant="outlined" onClick={exportFeedbackToTSV}>
+            <Button
+              variant="outlined"
+              sx={{
+                color: theme.palette.Administrator.Dark.Default,
+                borderColor: theme.palette.Administrator.Dark.Default,
+                "&:hover": {
+                  backgroundColor: theme.palette.Administrator.Light.Hover,
+                },
+              }}
+              onClick={exportFeedbackToTSV}
+            >
               Export Feedback TSV
             </Button>
           </Stack>
