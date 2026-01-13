@@ -15,11 +15,13 @@ import CreateModuleModal from "./modals/CreateModuleModal";
 interface ModuleGridProps {
   unitId: string;
   isSidebarOpen: boolean;
+  searchQuery?: string;
 }
 
 export default function CourseModulesGrid({
   unitId,
   isSidebarOpen,
+  searchQuery = "",
 }: ModuleGridProps) {
   const {
     courseModules: initialModules,
@@ -90,10 +92,15 @@ export default function CourseModulesGrid({
     return <Typography paddingLeft="10px">Loading modules...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
+  // Filter modules based on search query
+  const filteredModules = courseModules.filter((module) =>
+    module.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
   const content = (
     <>
       <Grid container gap={role === "Learner" ? 0 : "30px"}>
-        {courseModules.map((module: CourseModule, index: number) => {
+        {filteredModules.map((module: CourseModule, index: number) => {
           switch (role) {
             case "Administrator":
               return (
