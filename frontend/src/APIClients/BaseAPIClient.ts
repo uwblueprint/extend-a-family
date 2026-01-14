@@ -35,34 +35,41 @@ baseAPIClient.interceptors.request.use(async (config: AxiosRequestConfig) => {
       (typeof decodedToken === "string" ||
         decodedToken.exp <= Math.round(new Date().getTime() / 1000))
     ) {
-      const refreshToken = getLocalStorageObjProperty(
-        AUTHENTICATED_USER_KEY,
-        "refreshToken",
-      );
-
-      const { data } = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/auth/refresh`,
-        { refreshToken },
-      );
-
-      const accessToken = data.accessToken || data.access_token;
-      setLocalStorageObjProperty(
-        AUTHENTICATED_USER_KEY,
-        "accessToken",
-        accessToken,
-      );
-
-      // Update refreshToken in localStorage
-      if (data.refreshToken) {
-        setLocalStorageObjProperty(
+      try {
+        const refreshToken = getLocalStorageObjProperty(
           AUTHENTICATED_USER_KEY,
           "refreshToken",
-          data.refreshToken,
         );
-      }
 
-      if (newConfig.headers) {
-        newConfig.headers.Authorization = `Bearer ${accessToken}`;
+        const { data } = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/auth/refresh`,
+          { refreshToken },
+        );
+
+        const accessToken = data.accessToken || data.access_token;
+        setLocalStorageObjProperty(
+          AUTHENTICATED_USER_KEY,
+          "accessToken",
+          accessToken,
+        );
+
+        // Update refreshToken in localStorage
+        if (data.refreshToken) {
+          setLocalStorageObjProperty(
+            AUTHENTICATED_USER_KEY,
+            "refreshToken",
+            data.refreshToken,
+          );
+        }
+
+        if (newConfig.headers) {
+          newConfig.headers.Authorization = `Bearer ${accessToken}`;
+        }
+      } catch (error) {
+        // If refresh fails, clear authentication data and redirect to login
+        localStorage.removeItem(AUTHENTICATED_USER_KEY);
+        window.location.href = "/";
+        throw error;
       }
     }
   }

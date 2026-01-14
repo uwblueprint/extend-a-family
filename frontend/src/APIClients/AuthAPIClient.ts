@@ -199,6 +199,9 @@ const refresh = async (): Promise<boolean> => {
     }
     return true;
   } catch (error) {
+    // If refresh fails, clear authentication data and redirect to login
+    localStorage.removeItem(AUTHENTICATED_USER_KEY);
+    window.location.href = "/";
     return false;
   }
 };

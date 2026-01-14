@@ -4,7 +4,7 @@ const facilitatorVerificationEmail = (verifyEmailLink: string): string => `
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width" />
-  <title>Learner Invitation Email</title>
+  <title>Facilitator Email Verification Email</title>
 </head>
 
 <body style="margin: 0">

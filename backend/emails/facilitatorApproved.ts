@@ -8,7 +8,7 @@ const facilitatorApprovedEmail = (
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width" />
-  <title>Learner Invitation Email</title>
+  <title>Facilitator Approved Email</title>
 </head>
 
 <body style="margin: 0">
