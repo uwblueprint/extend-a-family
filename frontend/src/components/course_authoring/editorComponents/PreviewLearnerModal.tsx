@@ -67,6 +67,7 @@ const PreviewLearnerModal = ({
             activity={activity}
             onWrongAnswer={() => {}}
             onCorrectAnswer={() => {}}
+            isCompleted={false}
           />
         )}
         {isTableActivity(activity) && (
@@ -74,6 +75,7 @@ const PreviewLearnerModal = ({
             activity={activity}
             onWrongAnswer={() => {}}
             onCorrectAnswer={() => {}}
+            isCompleted={false}
           />
         )}
         {isMatchingActivity(activity) && (
@@ -81,6 +83,7 @@ const PreviewLearnerModal = ({
             activity={activity}
             onWrongAnswer={() => {}}
             onCorrectAnswer={() => {}}
+            isCompleted={false}
           />
         )}
       </Box>

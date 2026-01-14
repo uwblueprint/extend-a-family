@@ -14,12 +14,12 @@ import {
   HeaderColumnIncludesTypes,
   TableActivity,
 } from "../../../types/CourseTypes";
-import { useUser } from "../../../hooks/useUser";
 
 type TableViewerProps = {
   activity: TableActivity;
   onWrongAnswer: () => void;
   onCorrectAnswer: () => void;
+  isCompleted: boolean;
 };
 
 export type ActivityViewerHandle = {
@@ -147,15 +147,11 @@ const TableHeadCell = ({
 };
 
 const TableViewer = React.forwardRef<ActivityViewerHandle, TableViewerProps>(
-  ({ activity, onWrongAnswer, onCorrectAnswer }, ref) => {
+  ({ activity, onWrongAnswer, onCorrectAnswer, isCompleted }, ref) => {
     const theme = useTheme();
-    const { role } = useUser();
 
     const [selectedAnswers, setSelectedAnswers] = React.useState<number[][]>(
       [],
-    );
-    const [isCompleted, setIsCompleted] = React.useState(
-      role === "Facilitator",
     );
 
     const isAnswerCorrect = () => {
@@ -181,7 +177,6 @@ const TableViewer = React.forwardRef<ActivityViewerHandle, TableViewerProps>(
         onWrongAnswer();
       } else {
         onCorrectAnswer();
-        setIsCompleted(true);
       }
     };
 

@@ -6,12 +6,12 @@ import {
   MultiSelectActivity,
 } from "../../../types/CourseTypes";
 import MultipleChoiceViewOption from "./MultipleChoiceViewOption";
-import { useUser } from "../../../hooks/useUser";
 
 type MultipleChoiceViewerProps = {
   activity: MultipleChoiceActivity | MultiSelectActivity;
   onWrongAnswer: () => void;
   onCorrectAnswer: () => void;
+  isCompleted: boolean;
 };
 
 export type ActivityViewerHandle = {
@@ -22,11 +22,9 @@ export type ActivityViewerHandle = {
 const MultipleChoiceViewer = React.forwardRef<
   ActivityViewerHandle,
   MultipleChoiceViewerProps
->(({ activity, onWrongAnswer, onCorrectAnswer }, ref) => {
+>(({ activity, onWrongAnswer, onCorrectAnswer, isCompleted }, ref) => {
   const theme = useTheme();
-  const { role } = useUser();
   const [selectedOptions, setSelectedOptions] = React.useState<number[]>([]);
-  const [isCompleted, setIsCompleted] = React.useState(role === "Facilitator");
 
   const checkAnswer = () => {
     const correctOptions = isMultiSelectActivity(activity)
@@ -39,7 +37,6 @@ const MultipleChoiceViewer = React.forwardRef<
       onWrongAnswer();
     } else {
       onCorrectAnswer();
-      setIsCompleted(true);
     }
   };
 

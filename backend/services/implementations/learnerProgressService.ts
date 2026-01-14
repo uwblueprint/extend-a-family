@@ -349,13 +349,14 @@ class LearnerProgressService implements ILearnerProgressService {
       // If there are no activities in any published modules, consider it 100% complete
       // (modules with no activities are considered completed)
       const progressPercentage =
+        // eslint-disable-next-line no-nested-ternary
         allActivityIds.length > 0
           ? Math.round(
               (completedInPublished.length / allActivityIds.length) * 100,
             )
           : publishedModules.length > 0
-            ? 100
-            : 0;
+          ? 100
+          : 0;
 
       return {
         totalActivities: allActivityIds.length,
@@ -474,13 +475,14 @@ class LearnerProgressService implements ILearnerProgressService {
         // If there are no activities in any published modules, consider it 100% complete
         // (modules with no activities are considered completed)
         const progressPercentage =
+          // eslint-disable-next-line no-nested-ternary
           allActivityIds.length > 0
             ? Math.round(
                 (completedInPublished.length / allActivityIds.length) * 100,
               )
             : publishedModules.length > 0
-              ? 100
-              : 0;
+            ? 100
+            : 0;
 
         progressMap.set(learnerId, {
           totalActivities: allActivityIds.length,
