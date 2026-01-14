@@ -184,18 +184,15 @@ const MatchingViewer = React.forwardRef<
     [],
   );
 
-  const column1 = React.useMemo(
-    () => shuffleColumn(activity.media["1"] || []),
-    [activity.media, shuffleColumn],
-  );
-  const column2 = React.useMemo(
-    () => shuffleColumn(activity.media["2"] || []),
-    [activity.media, shuffleColumn],
-  );
-  const column3 = React.useMemo(
-    () => shuffleColumn(activity.media["3"] || []),
-    [activity.media, shuffleColumn],
-  );
+  const column1 = React.useRef(
+    shuffleColumn(activity.media["1"] || []),
+  ).current;
+  const column2 = React.useRef(
+    shuffleColumn(activity.media["2"] || []),
+  ).current;
+  const column3 = React.useRef(
+    shuffleColumn(activity.media["3"] || []),
+  ).current;
 
   const handleLeftClick = (rowIdx?: number) => () => {
     if (rowIdx === undefined || isDisplayFeedback || isCompleted) return;

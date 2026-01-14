@@ -179,7 +179,11 @@ const UserTable: React.FC<UserTableProps> = ({
                           variant="labelMedium"
                           sx={{ marginLeft: "16px" }}
                         >
-                          X% COMPLETE
+                          {user.courseProgress
+                            ? `${Math.round(
+                                user.courseProgress.progressPercentage,
+                              )}% COMPLETE`
+                            : "0% COMPLETE"}
                         </Typography>
                       </>
                     ) : (

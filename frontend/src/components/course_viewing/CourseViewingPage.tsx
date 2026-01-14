@@ -64,6 +64,7 @@ export default function CourseUnitsPage() {
               alignItems="center"
               paddingLeft="10px"
               justifyContent="space-between"
+              gap="16px"
             >
               <Box display="flex" alignItems="center">
                 {!sidebarOpen && (
@@ -111,7 +112,7 @@ export default function CourseUnitsPage() {
                 }
                 focusedBorderColor={theme.palette[role].Dark.Default}
                 sx={{
-                  minWidth: "400px",
+                  minWidth: "225px",
                   borderRadius: "8px",
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
