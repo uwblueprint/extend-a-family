@@ -70,7 +70,14 @@ class FeedbackService implements IFeedbackService {
 
   async getAllFeedback(): Promise<FeedbackDTO[]> {
     try {
-      const allFeedback = await MgFeedback.find()
+      const publishedModules = await MgCourseModule.find({
+        status: "published",
+      }).select("_id");
+      const moduleIds = publishedModules.map((m) => m.id);
+
+      const allFeedback = await MgFeedback.find({
+        moduleId: { $in: moduleIds },
+      })
         .populate("learnerId", "firstName lastName")
         .populate("moduleId", "title")
         .lean()
