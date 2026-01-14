@@ -33,9 +33,10 @@ import {
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import ActivityAPIClient from "../../APIClients/ActivityAPIClient";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import ProgressAPIClient from "../../APIClients/ProgressAPIClient";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import {
   questionTypeIcons,
@@ -136,7 +137,6 @@ const ViewModulePage = () => {
     useState(false);
   const [publishModuleModalOpen, setPublishModuleModalOpen] = useState(false);
 
-  const isFeedbackSurveyPage = role === "Learner" && currentPage === numPages;
   const isEmptyModuleEditing =
     role === "Administrator" && module && numPages === 0;
 
@@ -198,7 +198,14 @@ const ViewModulePage = () => {
     return fetchedModule;
   }, [history, requestedModuleId, requestedUnitId, role]);
 
-  const { courseUnits: allUnits } = useCourseUnits();
+  const { courseUnits: allUnits, isModuleCompleted } = useCourseUnits();
+
+  const isFeedbackSurveyPage =
+    role === "Learner" &&
+    currentPage === numPages &&
+    module !== null &&
+    isModuleCompleted(module.id);
+
   const fetchUnit = useCallback(async () => {
     const foundUnit = allUnits.find((u) =>
       u.modules.some((m) => m.id === requestedModuleId),
@@ -725,10 +732,24 @@ const ViewModulePage = () => {
     [draggedIndex, module, currentPage],
   );
 
-  const onCorrectAnswer = () => {
+  const onCorrectAnswer = async () => {
     setIsSnackbarSuccess(true);
     setUploadSnackbarMessage("Correct! Please move on to the next page.");
     setUploadSnackbarOpen(true);
+
+    // Track activity completion for learners
+    if (role === "Learner" && currentPageObject && module) {
+      const activityId = currentPageObject.id;
+      const result = await ProgressAPIClient.completeActivity(
+        activityId,
+        module.id,
+      );
+      if (result?.moduleCompleted) {
+        // Module was just completed, could show a celebration message
+        // eslint-disable-next-line no-console
+        console.log("Module completed!");
+      }
+    }
   };
 
   const SideBar = useMemo(
@@ -842,7 +863,7 @@ const ViewModulePage = () => {
               </ModuleSidebarThumbnail>
             ))
             .concat(
-              role === "Learner" ? (
+              role === "Learner" && module && isModuleCompleted(module.id) ? (
                 <ModuleSidebarThumbnail
                   key="feedback_thumbnail"
                   index={numPages}
@@ -923,6 +944,7 @@ const ViewModulePage = () => {
       isEmptyModuleEditing,
       module,
       role,
+      isModuleCompleted,
       numPages,
       currentPage,
       canEdit,
@@ -934,7 +956,8 @@ const ViewModulePage = () => {
       handleDragOver,
       handleDragLeave,
       handleDrop,
-      unit,
+      unit?.displayIndex,
+      unit?.modules,
     ],
   );
 
@@ -1020,13 +1043,13 @@ const ViewModulePage = () => {
               width="100%"
             >
               <Box display="inline-flex" alignItems="center" gap="8px">
-                <IconButton
-                  href={`${COURSE_PAGE}${
-                    unit ? `?selectedUnit=${unit.id}` : ""
-                  }`}
+                <Link
+                  to={`${COURSE_PAGE}${unit ? `?selectedUnit=${unit.id}` : ""}`}
                 >
-                  <ArrowBack sx={{ fontSize: "24px" }} />
-                </IconButton>
+                  <IconButton>
+                    <ArrowBack sx={{ fontSize: "24px" }} />
+                  </IconButton>
+                </Link>
                 <Typography variant="headlineLarge">{module?.title}</Typography>
               </Box>
               {role === "Learner" && (
