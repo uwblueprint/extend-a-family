@@ -1,16 +1,17 @@
-import { defaultLoginLink } from "./constants";
-
-const adminInviteEmail = (
-  verifyEmailLink: string,
-  temporaryPassword: string,
-  loginLink: string = defaultLoginLink,
+const forgotPasswordEmail = (
+  name: string,
+  changePasswordLink: string,
+  isLearner: boolean,
+  bannerBackground: string = "#E3F9FC",
+  bannerBorder: string = "#C8F3FA",
+  buttonBackground: string = "#00AEEF",
 ): string => `
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width" />
-  <title>Admin Invitation Email</title>
+  <title>Forgot Password Email</title>
 </head>
 
 <body style="margin: 0">
@@ -27,8 +28,8 @@ const adminInviteEmail = (
       <td style="
         padding: 16px 32px;
         text-align: center;
-        border-bottom: 2px solid #FFE6DD;
-        background: #FCC4B1;
+        border-bottom: 2px solid ${bannerBorder};
+        background: ${bannerBackground};
       ">
         <img src="https://firebasestorage.googleapis.com/v0/b/extendafamily-7613e.appspot.com/o/eaf-logo.png?alt=media&token=9f3f5da0-264e-42a5-85a7-0c1fb120b27c" alt="Extend-A-Family logo" style="height: 40px" />
       </td>
@@ -42,50 +43,19 @@ const adminInviteEmail = (
     <!-- MAIN CONTENT -->
     <tr>
       <td style="padding: 0 32px">
-        <p style="margin: 0 0 20px">Hello,</p>
+        <p style="margin: 0 0 20px">Hi ${name},</p>
 
         <p style="margin: 0 0 20px">
-          You have been invited as an administrator on the Extend-A-Family Waterloo Region Financial Literacy Tool.
+          We heard you forgot your password for the Extend-A-Family Waterloo Region Financial Literacy Tool. No worries! Here’s the link to create a new one.
         </p>
-
-        <p style="margin: 0 0 20px">
-          Please click <a href="${verifyEmailLink}">here</a> to verify your email. Then, please use the temporary
-          password below to <a href="${loginLink}">login</a>.
-        </p>
-
-        <div style="
-          display: flex;
-          padding: 20px;
-          margin: 0 0 20px;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          gap: 8px;
-          align-self: stretch;
-          border-radius: 8px;
-          background: var(--Neutral-Light-Hover, #F8FAFA);
-        ">
-          <p style="
-            width: 100%;
-            margin: 0;
-            text-align: center;
-            color: var(--Neutral-900, #111);
-            font-family: Courier New, monospace;
-            font-size: 18px;
-            font-style: normal;
-            font-weight: 400;
-            line-height: 140%;
-            letter-spacing: 0.4px;
-          ">${temporaryPassword}</p>
-        </div>
 
         <!-- RESPOND BUTTON -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="text-align: center">
-              <a href="${loginLink}" style="
+              <a href="${changePasswordLink}" style="
                 display: inline-block;
-                background: #8F4C34;
+                background: ${buttonBackground};
                 padding: 10px 24px;
                 border-radius: 4px;
                 text-decoration: none;
@@ -93,7 +63,7 @@ const adminInviteEmail = (
                 font-weight: 300;
                 letter-spacing: 0.7px;
               ">
-                LOG IN
+                CHANGE PASSWORD
               </a>
             </td>
           </tr>
@@ -110,6 +80,7 @@ const adminInviteEmail = (
     <tr>
       <td style="padding: 0 32px">
         <p style="margin: 0">
+          ${isLearner ? "Happy learning,<br />" : ""}
           Extend-A-Family Waterloo Region 💙
         </p>
       </td>
@@ -153,4 +124,4 @@ const adminInviteEmail = (
 </html>
 `;
 
-export default adminInviteEmail;
+export default forgotPasswordEmail;

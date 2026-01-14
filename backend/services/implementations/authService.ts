@@ -12,6 +12,8 @@ import logger from "../../utilities/logger";
 import learnerInviteEmail from "../../emails/learnerInvite";
 import adminInviteEmail from "../../emails/adminInvite";
 import facilitatorVerificationEmail from "../../emails/facilitatorVerification";
+import forgotPasswordEmail from "../../emails/forgotPassword";
+import { ROLE_COLORS } from "../../emails/constants";
 
 const Logger = logger(__filename);
 
@@ -70,7 +72,7 @@ class AuthService implements IAuthService {
     }
   }
 
-  async resetPassword(email: string): Promise<void> {
+  async resetPassword(name: string, role: Role, email: string): Promise<void> {
     if (!this.emailService) {
       const errorMessage =
         "Attempted to call resetPassword but this instance of AuthService does not have an EmailService instance";
@@ -82,16 +84,19 @@ class AuthService implements IAuthService {
       const resetLink = await firebaseAdmin
         .auth()
         .generatePasswordResetLink(email);
-      const emailBody = `
-      Hello,
-      <br><br>
-      We have received a password reset request for your account.
-      Please click the following link to reset it.
-      <strong>This link is only valid for 1 hour.</strong>
-      <br><br>
-      <a href=${resetLink}>Reset Password</a>`;
 
-      this.emailService.sendEmail(email, "Your Password Reset Link", emailBody);
+      this.emailService.sendEmail(
+        email,
+        "Extend-a-family - Create a new password",
+        forgotPasswordEmail(
+          name,
+          resetLink,
+          role === "Learner",
+          ROLE_COLORS[role].Light.Default,
+          ROLE_COLORS[role].Light.Hover,
+          ROLE_COLORS[role].Dark.Default,
+        ),
+      );
     } catch (error) {
       Logger.error(
         `Failed to generate password reset link for user with email ${email}`,
@@ -146,7 +151,6 @@ class AuthService implements IAuthService {
         email,
         "Administrator Invitation: Smart Saving, Smart Spending",
         adminInviteEmail(emailVerificationLink, temporaryPassword),
-        "pranol.mathan@eafwr.on.ca",
       );
     } catch (error: unknown) {
       Logger.error(
@@ -198,7 +202,6 @@ class AuthService implements IAuthService {
         emailVerificationLink,
         temporaryPassword,
       ),
-      "pranol.mathan@eafwr.on.ca",
     );
   }
 

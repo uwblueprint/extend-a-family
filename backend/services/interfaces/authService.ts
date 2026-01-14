@@ -31,10 +31,12 @@ interface IAuthService {
   /**
    * Generate a password reset link for the user with the given email and send
    * the link to that email address
+   * @param name name of user requesting password reset
+   * @param role role of user requesting password reset
    * @param email email of user requesting password reset
    * @throws Error if unable to generate link or send email
    */
-  resetPassword(email: string): Promise<void>;
+  resetPassword(name: string, role: Role, email: string): Promise<void>;
 
   /**
    * Generate an email verification link for the user with the given email and send

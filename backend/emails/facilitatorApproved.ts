@@ -1,4 +1,4 @@
-import defaultLoginLink from "./constants";
+import { defaultLoginLink } from "./constants";
 
 const facilitatorApprovedEmail = (
   loginLink: string = defaultLoginLink,

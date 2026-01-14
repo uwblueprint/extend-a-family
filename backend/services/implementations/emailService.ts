@@ -3,6 +3,7 @@ import IEmailService from "../interfaces/emailService";
 import { NodemailerConfig } from "../../types/authTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
+import { defaultReplyToEmail } from "../../emails/constants";
 
 const Logger = logger(__filename);
 
@@ -24,7 +25,7 @@ class EmailService implements IEmailService {
     to: string,
     subject: string,
     htmlBody: string,
-    replyTo?: string,
+    replyTo: string = defaultReplyToEmail,
   ): Promise<void> {
     try {
       return await this.transporter.sendMail({

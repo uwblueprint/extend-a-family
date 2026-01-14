@@ -143,7 +143,10 @@ authRouter.post(
 /* Emails a password reset link to the user with the specified email */
 authRouter.post("/resetPassword/:email", async (req, res) => {
   try {
-    await authService.resetPassword(req.params.email);
+    const { firstName, role } = await userService.getUserByEmail(
+      req.params.email,
+    );
+    await authService.resetPassword(firstName, role, req.params.email);
     res.status(204).send();
   } catch (error: unknown) {
     res.status(500).json({ error: getErrorMessage(error) });
@@ -242,8 +245,10 @@ authRouter.post(
   forgotPasswordRequestValidator,
   async (req, res) => {
     try {
-      await userService.getUserByEmail(req.body.email);
-      await authService.resetPassword(req.body.email);
+      const { firstName, role } = await userService.getUserByEmail(
+        req.body.email,
+      );
+      await authService.resetPassword(firstName, role, req.body.email);
       res.status(204).send();
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });

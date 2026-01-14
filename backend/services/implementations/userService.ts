@@ -390,7 +390,6 @@ class UserService implements IUserService {
         user.email,
         "Facilitator Account Approved",
         facilitatorApprovedEmail(),
-        "pranol.mathan@eafwr.on.ca",
       );
 
       await session.commitTransaction();
@@ -435,7 +434,6 @@ class UserService implements IUserService {
         user.email,
         "Facilitator Application Status",
         facilitatorRejectedEmail(),
-        "pranol.mathan@eafwr.on.ca",
       );
       await session.commitTransaction();
     } catch (error: unknown) {
