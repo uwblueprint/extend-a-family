@@ -36,7 +36,9 @@ import "react-pdf/dist/Page/TextLayer.css";
 import { Link, useHistory } from "react-router-dom";
 import ActivityAPIClient from "../../APIClients/ActivityAPIClient";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
-import ProgressAPIClient from "../../APIClients/ProgressAPIClient";
+import ProgressAPIClient, {
+  LearnerProgress,
+} from "../../APIClients/ProgressAPIClient";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import {
   questionTypeIcons,
@@ -120,6 +122,8 @@ const ViewModulePage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [module, setModule] = useState<CourseModule | null>(null);
   const [unit, setUnit] = useState<CourseUnit | null>(null);
+  const [learnerProgress, setLearnerProgress] =
+    useState<LearnerProgress | null>(null);
   const lessonPageRef = useRef<HTMLDivElement>(null);
   const activityPageRef = useRef<HTMLDivElement>(null);
   const lessonPageContainerRef = useRef<HTMLDivElement>(null);
@@ -199,6 +203,21 @@ const ViewModulePage = () => {
   }, [history, requestedModuleId, requestedUnitId, role]);
 
   const { courseUnits: allUnits, isModuleCompleted } = useCourseUnits();
+
+  const isActivityCompleted = useCallback(
+    (moduleId: string, activityId: string): boolean => {
+      if (!learnerProgress) return false;
+      return learnerProgress.completedActivities.includes(activityId);
+    },
+    [learnerProgress],
+  );
+
+  const displayActivityCompleted =
+    role === "Facilitator" ||
+    (module &&
+      currentPageObject &&
+      isActivityCompleted(module.id, currentPageObject.id)) ||
+    false;
 
   const isFeedbackSurveyPage =
     role === "Learner" &&
@@ -548,6 +567,21 @@ const ViewModulePage = () => {
     fetchBookmarks();
   }, [fetchBookmarks]);
 
+  useEffect(() => {
+    const fetchLearnerProgress = async () => {
+      if (role === "Learner") {
+        try {
+          const progress = await ProgressAPIClient.getLearnerProgress();
+          setLearnerProgress(progress);
+        } catch (error) {
+          /* eslint-disable-next-line no-console */
+          console.error("Failed to fetch learner progress:", error);
+        }
+      }
+    };
+    fetchLearnerProgress();
+  }, [role]);
+
   // Module editing lock management (Administrators only)
   useEffect(() => {
     if (role !== "Administrator" || !socket || !requestedModuleId) {
@@ -749,6 +783,14 @@ const ViewModulePage = () => {
         // eslint-disable-next-line no-console
         console.log("Module completed!");
       }
+      // Refetch learner progress to update completion status
+      try {
+        const updatedProgress = await ProgressAPIClient.getLearnerProgress();
+        setLearnerProgress(updatedProgress);
+      } catch (error) {
+        /* eslint-disable-next-line no-console */
+        console.error("Failed to fetch updated learner progress:", error);
+      }
     }
   };
 
@@ -822,10 +864,38 @@ const ViewModulePage = () => {
                       backgroundColor: "white",
                       borderRadius: "4px",
                       border: `1px solid ${theme.palette.Learner.Dark.Default}`,
-                      background: theme.palette.Learner.Light.Default,
-                      color: theme.palette.Learner.Dark.Default,
+                      background: isActivityCompleted(module.id, page.id)
+                        ? theme.palette.Success.Light.Default
+                        : theme.palette.Learner.Light.Default,
+                      color: isActivityCompleted(module.id, page.id)
+                        ? theme.palette.Success.Dark.Default
+                        : theme.palette.Learner.Dark.Default,
                     }}
                   >
+                    {isActivityCompleted(module.id, page.id) && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          position: "absolute",
+                          top: 0,
+                          width: "224px",
+                          padding: "4px 16px 4px 8px",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: "10px",
+                          backgroundColor: theme.palette.Success.Dark.Default,
+                        }}
+                      >
+                        <Typography
+                          variant="labelSmall"
+                          textAlign="center"
+                          color="white"
+                        >
+                          Completed
+                        </Typography>
+                      </Box>
+                    )}
                     <Stack
                       direction="row"
                       justifyContent="center"
@@ -956,6 +1026,7 @@ const ViewModulePage = () => {
       handleDragOver,
       handleDragLeave,
       handleDrop,
+      isActivityCompleted,
       unit?.displayIndex,
       unit?.modules,
     ],
@@ -1152,6 +1223,7 @@ const ViewModulePage = () => {
                       activity={activity}
                       onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
                       onCorrectAnswer={onCorrectAnswer}
+                      isCompleted={displayActivityCompleted}
                       key={activity.id}
                       ref={activityViewerRef}
                     />
@@ -1169,6 +1241,7 @@ const ViewModulePage = () => {
                       activity={activity}
                       onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
                       onCorrectAnswer={onCorrectAnswer}
+                      isCompleted={displayActivityCompleted}
                       key={activity.id}
                       ref={activityViewerRef}
                     />
@@ -1186,6 +1259,7 @@ const ViewModulePage = () => {
                       activity={activity}
                       onWrongAnswer={() => setIsRetryButtonDisplayed(true)}
                       onCorrectAnswer={onCorrectAnswer}
+                      isCompleted={displayActivityCompleted}
                       key={activity.id}
                       ref={activityViewerRef}
                       scale={activityPageScale}
@@ -1211,39 +1285,41 @@ const ViewModulePage = () => {
             }}
           >
             <Box display="flex" gap="12px">
-              {role === "Learner" && isActivityPage(currentPageObject) && (
-                <Button
-                  sx={{
-                    height: "48px",
-                    paddingLeft: "16px",
-                    paddingRight: "24px",
-                    paddingY: "10px",
-                    gap: "8px",
-                    border: "1px solid",
-                    borderColor: theme.palette.Neutral[500],
-                    borderRadius: "4px",
-                    backgroundColor: theme.palette.Learner.Dark.Default,
-                    color: "white",
-                  }}
-                  onClick={() => {
-                    if (isRetryButtonDisplayed) {
-                      activityViewerRef.current?.onRetry?.();
-                      setIsRetryButtonDisplayed(false);
-                    } else {
-                      activityViewerRef.current?.checkAnswer();
-                    }
-                  }}
-                >
-                  {!isWrongAnswerModalOpen && <CheckCircleOutline />}
-                  <Typography variant="labelLarge">
-                    {isRetryButtonDisplayed || isWrongAnswerModalOpen
-                      ? "Retry"
-                      : "Check Answer"}
-                  </Typography>
-                  {isRetryButtonDisplayed ||
-                    (isWrongAnswerModalOpen && <Refresh />)}
-                </Button>
-              )}
+              {role === "Learner" &&
+                isActivityPage(currentPageObject) &&
+                !displayActivityCompleted && (
+                  <Button
+                    sx={{
+                      height: "48px",
+                      paddingLeft: "16px",
+                      paddingRight: "24px",
+                      paddingY: "10px",
+                      gap: "8px",
+                      border: "1px solid",
+                      borderColor: theme.palette.Neutral[500],
+                      borderRadius: "4px",
+                      backgroundColor: theme.palette.Learner.Dark.Default,
+                      color: "white",
+                    }}
+                    onClick={() => {
+                      if (isRetryButtonDisplayed) {
+                        activityViewerRef.current?.onRetry?.();
+                        setIsRetryButtonDisplayed(false);
+                      } else {
+                        activityViewerRef.current?.checkAnswer();
+                      }
+                    }}
+                  >
+                    {!isWrongAnswerModalOpen && <CheckCircleOutline />}
+                    <Typography variant="labelLarge">
+                      {isRetryButtonDisplayed || isWrongAnswerModalOpen
+                        ? "Retry"
+                        : "Check Answer"}
+                    </Typography>
+                    {isRetryButtonDisplayed ||
+                      (isWrongAnswerModalOpen && <Refresh />)}
+                  </Button>
+                )}
               {role !== "Administrator" && (
                 <Button
                   sx={{
