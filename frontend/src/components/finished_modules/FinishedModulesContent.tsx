@@ -11,6 +11,7 @@ interface FinishedModulesContentProps {
   allExpanded?: boolean;
   expandAllStamp?: number;
   onUnitOpenStateChange?: (unitId: string, isOpen: boolean) => void;
+  getModuleCompletionDate?: (moduleId: string) => string | null;
 }
 
 const FinishedModulesContent: React.FC<FinishedModulesContentProps> = ({
@@ -21,6 +22,7 @@ const FinishedModulesContent: React.FC<FinishedModulesContentProps> = ({
   allExpanded = false,
   expandAllStamp = 0,
   onUnitOpenStateChange,
+  getModuleCompletionDate,
 }) => {
   const theme = useTheme();
 
@@ -94,6 +96,7 @@ const FinishedModulesContent: React.FC<FinishedModulesContentProps> = ({
                 onUnitOpenStateChange(unit.id, isOpen);
               }
             }}
+            getModuleCompletionDate={getModuleCompletionDate}
           />
         ))}
       </Box>
