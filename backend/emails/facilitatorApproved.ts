@@ -1,5 +1,7 @@
+import defaultLoginLink from "./constants";
+
 const facilitatorApprovedEmail = (
-  loginLink: string = "https://example.com/login",
+  loginLink: string = defaultLoginLink,
 ): string => `
 <html lang="en">
 

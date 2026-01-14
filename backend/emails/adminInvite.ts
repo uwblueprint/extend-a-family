@@ -1,7 +1,9 @@
+import defaultLoginLink from "./constants";
+
 const adminInviteEmail = (
   verifyEmailLink: string,
   temporaryPassword: string,
-  loginLink: string = "https://smart-saving-smart-spending.eafwr.on.ca/login",
+  loginLink: string = defaultLoginLink,
 ): string => `
 <html lang="en">
 

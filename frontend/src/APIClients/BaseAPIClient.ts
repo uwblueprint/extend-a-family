@@ -41,7 +41,7 @@ baseAPIClient.interceptors.request.use(async (config: AxiosRequestConfig) => {
       );
 
       const { data } = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}auth/refresh`,
+        `${process.env.REACT_APP_BACKEND_URL}/auth/refresh`,
         { refreshToken },
       );
 
