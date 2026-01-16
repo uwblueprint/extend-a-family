@@ -16,11 +16,13 @@ import {
   registerNotificationHandlers,
   registerNotificationSchemaListener,
 } from "./sockets/notification";
+import { registerModuleEditingHandlers } from "./sockets/moduleEditing";
 import helpRequestRouter from "./rest/helpRequestRoutes";
 import notificationRouter from "./rest/notificationRoutes";
 import courseRouter from "./rest/courseRoutes";
 import feedbackRouter from "./rest/feedbackRoutes";
 import activityRouter from "./rest/activityRoutes";
+import progressRouter from "./rest/progressRoutes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -65,6 +67,7 @@ io.on("connection", (socket) => {
   if (!userId && typeof userId !== "string") return;
   socket.join(userId);
   registerNotificationHandlers(io, socket);
+  registerModuleEditingHandlers(io, socket);
 });
 
 registerNotificationSchemaListener(io);
@@ -83,6 +86,7 @@ app.use("/help-request", helpRequestRouter);
 app.use("/notifications", notificationRouter);
 app.use("/course", courseRouter);
 app.use("/feedbacks", feedbackRouter);
+app.use("/progress", progressRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.set("io", io);
 
