@@ -4,9 +4,11 @@ import { Document, Thumbnail } from "react-pdf";
 import { Link } from "react-router-dom";
 import { Notification } from "../../../types/NotificationTypes";
 import { formatTimeElasped } from "../../../utils/DateUtils";
-import { isLessonPage } from "../../../types/CourseTypes";
+import { isActivityPage, isLessonPage } from "../../../types/CourseTypes";
 import * as Routes from "../../../constants/Routes";
 import NotificationAPIClient from "../../../APIClients/NotificationAPIClient";
+import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
+import { questionTypeIcons } from "../../../constants/ActivityLabels";
 
 export default function ChatMessageItem({
   message,
@@ -16,6 +18,7 @@ export default function ChatMessageItem({
   refreshNotifs: () => void;
 }) {
   const theme = useTheme();
+  const { courseUnits } = useCourseUnits();
 
   const handleMarkAsRead = async (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -25,6 +28,21 @@ export default function ChatMessageItem({
     await NotificationAPIClient.markNotificationRead(message.id);
     refreshNotifs();
   };
+
+  // @ts-expect-error populate gives _id instead of id
+  // eslint-disable-next-line no-underscore-dangle
+  const unit = courseUnits.find((u) => u.id === message.helpRequest.unit._id);
+  const moduleIndex =
+    // @ts-expect-error populate gives _id instead of id
+    // eslint-disable-next-line no-underscore-dangle
+    (unit?.modules.findIndex((m) => m.id === message.helpRequest.module._id) ??
+      -1) + 1;
+  const pageIndex =
+    (message.helpRequest.module.pages.findIndex(
+      // @ts-expect-error populate gives _id instead of id
+      // eslint-disable-next-line no-underscore-dangle
+      (p) => p === message.helpRequest.page._id,
+    ) ?? -1) + 1;
 
   return (
     <Link
@@ -110,17 +128,57 @@ export default function ChatMessageItem({
             )}
           </Box>
           <Typography variant="bodySmall">{message.message}</Typography>
-          {isLessonPage(message.helpRequest.page) && (
-            <Document
-              file={message.helpRequest.page.pdfUrl}
-              loading="Loading..."
-            >
-              <Thumbnail
-                pageNumber={message.helpRequest.page.pageIndex}
-                width={330}
-              />
-            </Document>
-          )}
+          <Box
+            sx={{
+              width: "300px",
+              height: "183px",
+              border: "1px solid",
+              borderColor: theme.palette.Neutral[400],
+              borderRadius: "7.252px",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "156px",
+                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {isLessonPage(message.helpRequest.page) && (
+                  <Document
+                    file={message.helpRequest.page.pdfUrl}
+                    loading="Loading..."
+                  >
+                    <Thumbnail
+                      pageNumber={message.helpRequest.page.pageIndex}
+                      width={300}
+                    />
+                  </Document>
+                )}
+                {isActivityPage(message.helpRequest.page) &&
+                  questionTypeIcons[message.helpRequest.page.questionType]}
+              </Box>
+              <Box width="100%" height="27px">
+                <Typography
+                  variant="labelLarge"
+                  color={theme.palette.Facilitator.Dark.Default}
+                  sx={{ ml: 1 }}
+                >
+                  MODULE {message.helpRequest.unit.displayIndex}.{moduleIndex}:{" "}
+                  {message.helpRequest.module.title} &gt; PAGE {pageIndex}
+                </Typography>
+              </Box>
+            </>
+          </Box>
         </Box>
       </Box>
     </Link>

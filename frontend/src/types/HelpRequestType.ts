@@ -15,6 +15,7 @@ export interface HelpRequest {
     id: string;
     displayIndex: number;
     title: string;
+    pages: string[]; // array of CoursePage IDs
   };
   page: CoursePage;
   completed: boolean;

@@ -42,11 +42,11 @@ class NotificationService implements INotificationService {
           );
           populatedNotification = await notification.populate(
             "helpRequest.unit",
-            "title",
+            "title displayIndex",
           );
           populatedNotification = await notification.populate(
             "helpRequest.module",
-            "title",
+            "title pages",
           );
           populatedNotification = await notification.populate(
             "helpRequest.page",
