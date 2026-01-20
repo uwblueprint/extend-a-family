@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import UnitSidebar from "./sidebar/UnitSidebar";
@@ -14,15 +14,10 @@ export default function CourseUnitsPage() {
     setSidebarOpen(true);
   };
 
-  const handleDrawerClose = () => {
-    setSidebarOpen(false);
-  };
-
   return (
     <Box display="flex" width="100%">
       <UnitSidebar
         setSelectedUnit={setSelectedUnit}
-        handleClose={handleDrawerClose}
         open={sidebarOpen}
         selectedUnit={selectedUnit}
       />

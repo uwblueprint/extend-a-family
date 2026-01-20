@@ -51,6 +51,7 @@ const editUnit = async (
     );
     return data;
   } catch (error) {
+    console.log(error);
     return null;
   }
 };
@@ -147,6 +148,26 @@ const getModuleById = async (
   }
 };
 
+const rearangeUnits = async (arangement: Map<string, number>) => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const arang = Object.fromEntries(arangement);
+    const { data } = await baseAPIClient.put(
+      `/course/rearangeUnits`,
+      { arang },
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default {
   getUnits,
   createUnit,
@@ -156,4 +177,5 @@ export default {
   uploadThumbnail,
   lessonUpload,
   getModuleById,
+  rearangeUnits,
 };
