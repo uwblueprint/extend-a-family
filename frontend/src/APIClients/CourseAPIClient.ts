@@ -148,16 +148,16 @@ const getModuleById = async (
   }
 };
 
-const rearangeUnits = async (arangement: Map<string, number>) => {
+const rearangeUnits = async (arange: Map<string, number>) => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
     "accessToken",
   )}`;
   try {
-    const arang = Object.fromEntries(arangement);
+    const arangement = Object.fromEntries(arange);
     const { data } = await baseAPIClient.put(
       `/course/rearangeUnits`,
-      { arang },
+      { arangement },
       {
         headers: { Authorization: bearerToken },
       },
