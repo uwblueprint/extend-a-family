@@ -1,5 +1,8 @@
 export const defaultLoginLink = "https://eaf.jimmyliu.dev/welcome";
 
+export const defaultLogoURL =
+  "https://firebasestorage.googleapis.com/v0/b/extendafamily-7613e.appspot.com/o/eaf-email-banner-logo.png?alt=media&token=73fa0ff8-4122-45fa-9f12-5fd57039c7c6";
+
 export const defaultReplyToEmail = "pranol.mathan@eafwr.on.ca";
 
 export const ROLE_COLORS = {

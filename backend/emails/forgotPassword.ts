@@ -1,3 +1,5 @@
+import { defaultLogoURL } from "./constants";
+
 const forgotPasswordEmail = (
   name: string,
   changePasswordLink: string,
@@ -31,7 +33,7 @@ const forgotPasswordEmail = (
         border-bottom: 2px solid ${bannerBorder};
         background: ${bannerBackground};
       ">
-        <img src="https://firebasestorage.googleapis.com/v0/b/extendafamily-7613e.appspot.com/o/eaf-logo.png?alt=media&token=9f3f5da0-264e-42a5-85a7-0c1fb120b27c" alt="Extend-A-Family logo" style="height: 40px" />
+        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="height: 40px" />
       </td>
     </tr>
 
