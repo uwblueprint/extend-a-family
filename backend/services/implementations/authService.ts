@@ -5,10 +5,15 @@ import IAuthService from "../interfaces/authService";
 import IEmailService from "../interfaces/emailService";
 import IUserService from "../interfaces/userService";
 import { AuthDTO, Token } from "../../types/authTypes";
-import { Role, Status } from "../../types/userTypes";
+import { Role } from "../../types/userTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import FirebaseRestClient from "../../utilities/firebaseRestClient";
 import logger from "../../utilities/logger";
+import learnerInviteEmail from "../../emails/learnerInvite";
+import adminInviteEmail from "../../emails/adminInvite";
+import facilitatorVerificationEmail from "../../emails/facilitatorVerification";
+import forgotPasswordEmail from "../../emails/forgotPassword";
+import { ROLE_COLORS } from "../../emails/constants";
 
 const Logger = logger(__filename);
 
@@ -67,7 +72,7 @@ class AuthService implements IAuthService {
     }
   }
 
-  async resetPassword(email: string): Promise<void> {
+  async resetPassword(name: string, role: Role, email: string): Promise<void> {
     if (!this.emailService) {
       const errorMessage =
         "Attempted to call resetPassword but this instance of AuthService does not have an EmailService instance";
@@ -79,16 +84,19 @@ class AuthService implements IAuthService {
       const resetLink = await firebaseAdmin
         .auth()
         .generatePasswordResetLink(email);
-      const emailBody = `
-      Hello,
-      <br><br>
-      We have received a password reset request for your account.
-      Please click the following link to reset it.
-      <strong>This link is only valid for 1 hour.</strong>
-      <br><br>
-      <a href=${resetLink}>Reset Password</a>`;
 
-      this.emailService.sendEmail(email, "Your Password Reset Link", emailBody);
+      this.emailService.sendEmail(
+        email,
+        "Extend-a-family - Create a new password",
+        forgotPasswordEmail(
+          name,
+          resetLink,
+          role === "Learner",
+          ROLE_COLORS[role].Light.Default,
+          ROLE_COLORS[role].Light.Hover,
+          ROLE_COLORS[role].Dark.Default,
+        ),
+      );
     } catch (error) {
       Logger.error(
         `Failed to generate password reset link for user with email ${email}`,
@@ -109,15 +117,12 @@ class AuthService implements IAuthService {
       const emailVerificationLink = await firebaseAdmin
         .auth()
         .generateEmailVerificationLink(email);
-      const emailBody = `
-      Hello,
-      <br><br>
-      Please click the following link to verify your email and activate your account.
-      <strong>This link is only valid for 1 hour.</strong>
-      <br><br>
-      <a href=${emailVerificationLink}>Verify email</a>`;
 
-      this.emailService.sendEmail(email, "Verify your email", emailBody);
+      this.emailService.sendEmail(
+        email,
+        "Verify your email",
+        facilitatorVerificationEmail(emailVerificationLink),
+      );
     } catch (error) {
       Logger.error(
         `Failed to generate email verification link for user with email ${email}`,
@@ -142,20 +147,10 @@ class AuthService implements IAuthService {
         .auth()
         .generateEmailVerificationLink(email);
 
-      const emailBody = `Hello,<br> <br>
-        You have been invited as an administrator to Smart Saving, Smart Spending.
-        <br> <br>
-        Please click the following link to verify your email and activate your account.
-        <strong>This link is only valid for 1 hour.</strong>
-        <br> <br>
-        <a href=${emailVerificationLink}>Verify email</a>
-        <br> <br>
-        To log in for the first time, use your email address and the following temporary password: <strong>${temporaryPassword}</strong>`;
-
       await this.emailService.sendEmail(
         email,
         "Administrator Invitation: Smart Saving, Smart Spending",
-        emailBody,
+        adminInviteEmail(emailVerificationLink, temporaryPassword),
       );
     } catch (error: unknown) {
       Logger.error(
@@ -185,6 +180,7 @@ class AuthService implements IAuthService {
     firstName: string,
     email: string,
     temporaryPassword: string,
+    facilitatorName: string = "Your Facilitator",
   ): Promise<void> {
     if (!this.emailService) {
       const errorMessage =
@@ -197,26 +193,15 @@ class AuthService implements IAuthService {
       .auth()
       .generateEmailVerificationLink(email);
 
-    const emailBody = `Hello ${firstName},
-      <br><br>
-      Welcome to Smart Saving, Smart Spending!
-      <br><br>
-      Please click the link to confirm your account: <a href=${emailVerificationLink}>Confirm my account</a>
-      <br>
-      If the link has expired, ask your facilitator to invite you again.
-      <br><br>
-      To log in for the first time, use the following email and password:
-      <br><br>
-      Email: <strong>${email}</strong>
-      <br>
-      Password: <strong>${temporaryPassword}</strong>
-      <br><br>
-      Happy learning!`;
-
     await this.emailService.sendEmail(
       email,
       "Welcome to Smart Saving, Smart Spending!",
-      emailBody,
+      learnerInviteEmail(
+        firstName,
+        facilitatorName,
+        emailVerificationLink,
+        temporaryPassword,
+      ),
     );
   }
 
@@ -298,11 +283,8 @@ class AuthService implements IAuthService {
     }
   }
 
-  async getStatusByEmail(requestedEmail: string): Promise<Status> {
-    if (requestedEmail.endsWith("@eafwr.on.ca")) {
-      return "Active";
-    }
-    return "PendingApproval";
+  async autoApproveFacilitatorEmail(requestedEmail: string): Promise<boolean> {
+    return requestedEmail.endsWith("@eafwr.on.ca");
   }
 }
 

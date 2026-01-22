@@ -1,6 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import fs from "fs/promises";
-import mongoose, { ClientSession, Schema, startSession } from "mongoose";
+import { ClientSession, Schema, startSession } from "mongoose";
 import { PDFDocument } from "pdf-lib";
 import MgCourseModule, {
   CourseModule,
@@ -11,20 +10,17 @@ import CoursePageModel, {
 import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
 import {
   CourseModuleDTO,
+  CourseModuleLeanDTO,
   CreateCourseModuleDTO,
-  UpdateCourseModuleDTO,
   ModuleStatus,
+  UpdateCourseModuleDTO,
 } from "../../types/courseTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ICourseModuleService from "../interfaces/courseModuleService";
-import IFileStorageService from "../interfaces/fileStorageService";
 import FileStorageService from "./fileStorageService";
+import feedbackMgmodel from "../../models/feedback.mgmodel";
 
-const defaultBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
-const fileStorageService: IFileStorageService = new FileStorageService(
-  defaultBucket,
-);
 const Logger = logger(__filename);
 
 /**
@@ -49,19 +45,19 @@ class CourseModuleService implements ICourseModuleService {
     courseUnitId: string,
   ): Promise<Array<CourseModuleDTO>> {
     try {
-      const courseUnit: CourseUnit | null = await MgCourseUnit.findById(
-        courseUnitId,
-      );
+      const courseUnit = await MgCourseUnit.findById(courseUnitId)
+        .populate("modules")
+        .lean()
+        .exec();
 
       if (!courseUnit) {
         throw new Error(`Course unit with id ${courseUnitId} not found.`);
       }
 
-      const courseModules: Array<CourseModule> = await MgCourseModule.find({
-        _id: { $in: courseUnit.modules },
-      });
+      const courseModules: Array<CourseModuleDTO> =
+        courseUnit.modules as unknown as Array<CourseModuleDTO>;
 
-      return courseModules.map((courseModule) => courseModule.toObject());
+      return courseModules;
     } catch (error) {
       Logger.error(
         `Failed to get course modules for course unit with id: ${courseUnitId}. Reason = ${getErrorMessage(
@@ -98,9 +94,6 @@ class CourseModuleService implements ICourseModuleService {
         );
       }
 
-      const lessonPdfUrl: string | undefined = await fileStorageService.getFile(
-        `course/pdfs/module-${courseModuleId}.pdf`,
-      );
       const fetchPage = async (page: Schema.Types.ObjectId) => {
         const pageObject = await CoursePageModel.findById(page).lean().exec();
         if (!pageObject) {
@@ -112,9 +105,8 @@ class CourseModuleService implements ICourseModuleService {
       return {
         ...courseModule,
         unitId: courseUnit._id.toString(), // eslint-disable-line no-underscore-dangle
-        lessonPdfUrl,
         pages: await pageObjects,
-      } as CourseModuleDTO;
+      };
     } catch (error) {
       Logger.error(
         `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(
@@ -174,7 +166,6 @@ class CourseModuleService implements ICourseModuleService {
 
     return {
       id: newCourseModule.id,
-      displayIndex: newCourseModule.displayIndex,
       title: newCourseModule.title,
       status: newCourseModule.status as ModuleStatus,
     } as CourseModuleDTO;
@@ -207,7 +198,6 @@ class CourseModuleService implements ICourseModuleService {
     return {
       id: updatedModule.id,
       title: updatedModule.title,
-      displayIndex: updatedModule.displayIndex,
       status: updatedModule.status as ModuleStatus,
     } as CourseModuleDTO;
   }
@@ -216,6 +206,7 @@ class CourseModuleService implements ICourseModuleService {
     courseUnitId: string,
     courseModuleId: string,
     currSession?: ClientSession,
+    deleteFeedbacks = false,
   ): Promise<string> {
     let deletedCourseModuleId: string;
     const session: ClientSession = currSession ?? (await startSession());
@@ -256,11 +247,15 @@ class CourseModuleService implements ICourseModuleService {
       }
 
       deletedCourseModuleId = deletedCourseModule.id;
-      // get the index and update the ones behind it
-      await MgCourseModule.updateMany(
-        { displayIndex: { $gt: deletedCourseModule.displayIndex } },
-        { $inc: { displayIndex: -1 } },
-      ).session(session);
+
+      // Optionally delete associated feedbacks
+      if (deleteFeedbacks) {
+        await feedbackMgmodel
+          .deleteMany({
+            moduleId: courseModuleId,
+          })
+          .session(session);
+      }
 
       if (!currSession) {
         await session.commitTransaction();
@@ -283,69 +278,80 @@ class CourseModuleService implements ICourseModuleService {
    * Publish a module (Draft → Published or Unpublished → Published).
    */
   async publishCourseModule(
-    courseUnitId: string,
     moduleId: string,
-  ): Promise<CourseModuleDTO> {
-    return this.changeStatus(courseUnitId, moduleId, ModuleStatus.Published);
+    oldFeedbackDecision?: string,
+  ): Promise<CourseModuleLeanDTO> {
+    let session: ClientSession | undefined;
+    if (oldFeedbackDecision === "discard") {
+      session = await startSession();
+      session.startTransaction();
+      // Delete all feedback associated with this module
+      try {
+        await feedbackMgmodel.deleteMany({ moduleId }, { session });
+      } catch (error) {
+        await session.abortTransaction();
+        Logger.error(
+          `Failed to delete feedback for module ${moduleId} during publish. Reason = ${getErrorMessage(
+            error,
+          )}`,
+        );
+        throw error;
+      }
+    }
+    const updatedModule = await this.changeStatus(
+      moduleId,
+      ModuleStatus.Published,
+      session,
+    );
+    if (session) {
+      await session.commitTransaction();
+      session.endSession();
+    }
+    return updatedModule;
   }
 
   /**
    * Unpublish a module (Published → Unpublished).
    */
-  async unpublishCourseModule(
-    courseUnitId: string,
-    moduleId: string,
-  ): Promise<CourseModuleDTO> {
-    return this.changeStatus(courseUnitId, moduleId, ModuleStatus.Unpublished);
+  async unpublishCourseModule(moduleId: string): Promise<CourseModuleLeanDTO> {
+    return this.changeStatus(moduleId, ModuleStatus.Unpublished);
   }
 
   /**
    * Internal helper that validates state transitions.
    */
   private async changeStatus(
-    courseUnitId: string,
     moduleId: string,
     newStatus: ModuleStatus,
-  ): Promise<CourseModuleDTO> {
-    const session = await startSession();
-    session.startTransaction();
+    currSession?: ClientSession,
+  ): Promise<CourseModuleLeanDTO> {
+    const session: ClientSession = currSession ?? (await startSession());
+    if (!currSession) {
+      session.startTransaction();
+    }
     try {
-      const courseUnit = await MgCourseUnit.findById(courseUnitId).session(
-        session,
-      );
-      const newModuleId = new mongoose.Types.ObjectId(moduleId);
-
-      const belongsToUnit = courseUnit?.modules.some((m) =>
-        (m as unknown as mongoose.Types.ObjectId).equals(newModuleId),
-      );
-      if (!courseUnit || !belongsToUnit) {
-        throw new Error("Module not found in specified unit");
-      }
-
       const module = await MgCourseModule.findById(moduleId).session(session);
       if (!module) {
         throw new Error("Module not found");
       }
 
-      if (
-        !validTransitions[module.status as ModuleStatus].includes(newStatus)
-      ) {
+      if (!validTransitions[module.status].includes(newStatus)) {
         const msg = `Cannot transition from "${module.status}" to "${newStatus}"`;
         throw new Error(msg);
       }
 
       module.status = newStatus;
       await module.save({ session });
-      await session.commitTransaction();
 
-      return {
-        id: module.id,
-        title: module.title,
-        displayIndex: module.displayIndex,
-        status: module.status as ModuleStatus,
-      } as CourseModuleDTO;
+      if (!currSession) {
+        await session.commitTransaction();
+      }
+
+      return module.toObject();
     } catch (error) {
-      await session.abortTransaction();
+      if (!currSession) {
+        await session.abortTransaction();
+      }
       Logger.error(
         `Failed to change status for module ${moduleId}. Reason = ${getErrorMessage(
           error,
@@ -353,13 +359,16 @@ class CourseModuleService implements ICourseModuleService {
       );
       throw error;
     } finally {
-      session.endSession();
+      if (!currSession) {
+        session.endSession();
+      }
     }
   }
 
   async uploadLessons(
     moduleId: string,
-    pdfPath: string,
+    pdfBuffer: Buffer,
+    insertIdx?: number,
   ): Promise<CourseModuleDTO> {
     const session = await startSession();
     session.startTransaction();
@@ -374,20 +383,22 @@ class CourseModuleService implements ICourseModuleService {
       }
 
       // 2. Read and process the PDF
-      const pdfBytes = await fs.readFile(pdfPath);
-      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const pdfDoc = await PDFDocument.load(pdfBuffer);
       const numPages = pdfDoc.getPageCount();
 
       // 3. Upload PDF to Firebase Storage
-      const pdfFileName = `course/pdfs/module-${moduleId}.pdf`;
-      await this.fileStorageService.createFile(
+      const pdfFileName = `course/pdfs/module-${moduleId}-${Date.now()}.pdf`;
+      const pdfUrl = await this.fileStorageService.uploadFile(
         pdfFileName,
-        pdfPath,
+        pdfBuffer,
         "application/pdf",
         true,
       );
 
-      // 4. Create lesson pages using LessonPageModel
+      // 4. Determine insertion position and starting display index
+      const insertPosition = insertIdx ?? courseModule.pages.length;
+
+      // 5. Create lesson pages using LessonPageModel
       const createdPages: Array<string> = [];
       for (let i = 1; i <= numPages; i += 1) {
         // eslint-disable-next-line no-await-in-loop
@@ -396,10 +407,10 @@ class CourseModuleService implements ICourseModuleService {
             {
               // Note: Wrapped in array as per Mongoose v7+ requirements
               title: `Page ${i}`,
-              displayIndex: courseModule.pages.length + i,
               type: "Lesson",
               source: pdfFileName,
               pageIndex: i,
+              pdfUrl,
             },
           ],
           { session },
@@ -407,12 +418,22 @@ class CourseModuleService implements ICourseModuleService {
         createdPages.push(newPage[0].id); // Access first element and get _id
       }
 
-      // 5. Update module with new pages
+      // 6. Update module with new pages at the specified position
       const updatedModule = await MgCourseModule.findByIdAndUpdate(
         moduleId,
-        { $push: { pages: { $each: createdPages } } }, // createdPages is already array of IDs
+        {
+          $push: {
+            pages: {
+              $each: createdPages,
+              $position: insertPosition,
+            },
+          },
+        },
         { new: true, session },
-      );
+      )
+        .populate("pages")
+        .lean()
+        .exec();
 
       if (!updatedModule) {
         throw new Error(
@@ -422,12 +443,7 @@ class CourseModuleService implements ICourseModuleService {
 
       await session.commitTransaction();
 
-      return {
-        id: updatedModule.id,
-        displayIndex: updatedModule.displayIndex,
-        title: updatedModule.title,
-        status: updatedModule.status as ModuleStatus,
-      } as CourseModuleDTO;
+      return updatedModule as unknown as CourseModuleDTO;
     } catch (error) {
       await session.abortTransaction();
       Logger.error(
@@ -438,6 +454,69 @@ class CourseModuleService implements ICourseModuleService {
       throw error;
     } finally {
       session.endSession();
+    }
+  }
+
+  async reorderPages(
+    moduleId: string,
+    fromIndex: number,
+    toIndex: number,
+  ): Promise<CourseModuleDTO> {
+    try {
+      const courseModule: CourseModule | null = await MgCourseModule.findById(
+        moduleId,
+      );
+
+      if (!courseModule) {
+        throw new Error(`Course module with id ${moduleId} not found.`);
+      }
+
+      // Validate indices
+      if (
+        fromIndex < 0 ||
+        fromIndex >= courseModule.pages.length ||
+        toIndex < 0 ||
+        toIndex >= courseModule.pages.length
+      ) {
+        throw new Error(
+          `Invalid indices: fromIndex=${fromIndex}, toIndex=${toIndex}, pages.length=${courseModule.pages.length}`,
+        );
+      }
+
+      // If indices are the same, no reordering needed
+      if (fromIndex === toIndex) {
+        const result = await this.getCourseModule(moduleId);
+        return result as CourseModuleDTO;
+      }
+
+      // Reorder pages array
+      const pages = [...courseModule.pages];
+      const [movedPage] = pages.splice(fromIndex, 1);
+      pages.splice(toIndex, 0, movedPage);
+
+      // Update module with reordered pages
+      const updatedModule = await MgCourseModule.findByIdAndUpdate(
+        moduleId,
+        { pages },
+        { new: true },
+      );
+
+      if (!updatedModule) {
+        throw new Error(
+          `Failed to update course module with id ${moduleId} after reordering`,
+        );
+      }
+
+      // Return the fully populated module
+      const result = await this.getCourseModule(moduleId);
+      return result as CourseModuleDTO;
+    } catch (error) {
+      Logger.error(
+        `Failed to reorder pages for module ${moduleId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
     }
   }
 }

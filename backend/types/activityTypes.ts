@@ -5,6 +5,7 @@ export enum QuestionType {
   MultiSelect = "MultiSelect",
   Matching = "Matching",
   Table = "Table",
+  TextInput = "TextInput",
   Custom = "Custom",
 }
 
@@ -20,7 +21,7 @@ export interface ActivityDTO extends CoursePageDTO {
 
 export interface Media {
   id: string;
-  mediaType: "text" | "media";
+  mediaType: "text" | "image";
   context: string;
 }
 
@@ -46,8 +47,31 @@ export interface MultiSelectActivityDTO extends ActivityDTO {
 export interface TableActivityDTO extends ActivityDTO {
   questionType: QuestionType.Table;
   columnLabels: string[];
-  rowLabels: Map<string, string | undefined>; // key is label, and value is image URL
+  rowLabels: string[][]; // Each row label is an array: [labelText, imageURL?]
   correctAnswers: number[][];
+  headerColumnIncludes: "image" | "text" | "image_and_text";
+}
+
+export type TextInputValidationDTO =
+  | {
+      mode: "short_answer";
+      answers: string[];
+    }
+  | {
+      mode: "numeric_set";
+      values: number[]; // list of acceptable numeric answers
+    }
+  | {
+      mode: "numeric_range";
+      min?: number; // at least one of min or max should be defined
+      max?: number;
+    };
+
+export interface TextInputActivityDTO extends ActivityDTO {
+  questionType: QuestionType.TextInput;
+  placeholder?: string;
+  maxLength?: number;
+  validation?: TextInputValidationDTO;
 }
 
 // Future question types would have their own specific fields
@@ -108,6 +132,19 @@ export type CreateActivityDTO =
       | "columnLabels"
       | "rowLabels"
       | "correctAnswers"
+    >
+  | Pick<
+      TextInputActivityDTO,
+      | "questionType"
+      | "activityNumber"
+      | "questionText"
+      | "instruction"
+      | "placeholder"
+      | "maxLength"
+      | "validation"
+      | "imageUrl"
+      | "additionalContext"
+      | "userFeedback"
     >;
 
 export type UpdateActivityDTO = CreateActivityDTO;

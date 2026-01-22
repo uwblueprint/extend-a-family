@@ -78,8 +78,5 @@
   },
   "resolutions": {
     "fs-capacitor": "^6.2.0"
-  },
-  "engines": {
-    "node": ">=20.11.1"
   }
 }

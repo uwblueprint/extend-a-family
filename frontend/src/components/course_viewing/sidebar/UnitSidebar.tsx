@@ -16,6 +16,7 @@ import DeleteUnitModal from "../modals/DeleteUnitModal";
 import EditUnitModal from "../modals/EditUnitModal";
 import ContextMenu from "./ContextMenu";
 import Unit from "./Unit";
+import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 
 interface UnitSideBarProps {
   open: boolean;
@@ -31,8 +32,6 @@ export default function UnitSidebar({
   const theme = useTheme();
   const user = useUser();
 
-  const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const [contextMenuUnit, setContextMenuUnit] = useState<CourseUnit | null>();
@@ -40,8 +39,8 @@ export default function UnitSidebar({
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
 
-  const [rearrangeUnitsMode, setRearrangeUnitsMode] = useState<boolean>(false);
-
+  const { courseUnits, refetchCourseUnits } = useCourseUnits();
+  
   useEffect(() => {
     const getCouseUnits = async () => {
       const data = await CourseAPIClient.getUnits();
@@ -59,6 +58,26 @@ export default function UnitSidebar({
     };
     getCouseUnits();
   }, [setSelectedUnit]);
+
+  useEffect(() => {
+    if (!courseUnits || !courseUnits.length) return;
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const selectedUnitParam = queryParams.get("selectedUnit");
+
+    if (selectedUnitParam) {
+      const unitFromParams = courseUnits.find(
+        (unit) => unit.id === selectedUnitParam,
+      );
+      if (unitFromParams) {
+        setSelectedUnit(unitFromParams);
+        return;
+      }
+    }
+
+    // Default to first unit if no valid query parameter
+    setSelectedUnit(courseUnits[0]);
+  }, [courseUnits, setSelectedUnit]);
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const handleContextMenuOpen = (event: any, unit: CourseUnit) => {
@@ -87,7 +106,7 @@ export default function UnitSidebar({
   const createUnit = async (title: string) => {
     const unit = await CourseAPIClient.createUnit(title);
     if (unit) {
-      setCourseUnits((prev) => [...prev, unit]);
+      refetchCourseUnits();
     }
   };
   const editUnit = async (title: string) => {
@@ -97,9 +116,7 @@ export default function UnitSidebar({
         title,
       );
       if (editedUnit) {
-        setCourseUnits((prev) =>
-          prev.map((unit) => (unit.id === editedUnit.id ? editedUnit : unit)),
-        );
+        refetchCourseUnits();
         if (contextMenuUnit.id === selectedUnit?.id) {
           setSelectedUnit(editedUnit);
         }
@@ -112,9 +129,7 @@ export default function UnitSidebar({
         contextMenuUnit.id,
       );
       if (deletedUnitId) {
-        setCourseUnits((prev) =>
-          prev.filter((unit) => unit.id !== deletedUnitId),
-        );
+        refetchCourseUnits();
       }
     }
   };
@@ -199,7 +214,6 @@ export default function UnitSidebar({
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number,
   ) => {
-    setSelectedIndex(index);
     setSelectedUnit(courseUnits[index]);
   };
 
@@ -220,12 +234,13 @@ export default function UnitSidebar({
       open={open}
     >
       <Box
-        height="100vh"
         sx={{
           backgroundColor: theme.palette[user.role].Light.Default,
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          overflowX: "hidden",
+          height: "100%",
         }}
       >
         <Box
@@ -292,44 +307,69 @@ export default function UnitSidebar({
                 collisionDetection={closestCorners}
                 onDragEnd={handleDragEnd}
               >
-                <SortableContext
-                  items={courseUnits.map((u) => u.id)}
-                  strategy={verticalListSortingStrategy}
+                <ListItemButton
+                  key={unit.id}
+                  sx={{
+                    py: "15px",
+                    px: "32px",
+                    backgroundColor:
+                      selectedUnit?.id === unit.id
+                        ? theme.palette[user.role].Light.Selected
+                        : "transparent",
+                    "&:hover": {
+                      backgroundColor: theme.palette[user.role].Light.Hover,
+                    },
+                  }}
+                  onClick={(event) => handleListItemClick(event, index)}
                 >
-                  {courseUnits.map((unit, index) => {
-                    return (
-                      <Unit
-                        key={index}
-                        index={index}
-                        unit={unit}
-                        courseLength={courseUnits.length}
-                        handleListItemClick={handleListItemClick}
-                        selectedIndex={selectedIndex}
-                        userRole={user.role}
-                        rearrangeUnitsMode={rearrangeUnitsMode}
-                        isAdmin={isAdministrator(user)}
-                        handleContextMenuOpen={handleContextMenuOpen}
-                      />
-                    );
-                  })}
-                </SortableContext>
-              </DndContext>
-            </List>
-          </Box>
-        </Box>
-        {isAdministrator(user) && !rearrangeUnitsMode && (
-          <Box sx={{ p: "24px 32px" }}>
-            <Button
-              variant="contained"
-              onClick={handleOpenCreateUnitModal}
-              disableElevation
-              startIcon={<AddIcon />}
-              sx={{
-                width: "100%",
-                height: "40px",
-                maxWidth: "236px",
-                backgroundColor: theme.palette[user.role].Dark.Default,
-                alignItems: "center",
+                  <ListItemText
+                    disableTypography
+                    primary={`${unit.displayIndex}. ${unit.title}`}
+                    sx={
+                      selectedUnit?.id === unit.id
+                        ? theme.typography.labelLargeProminent
+                        : theme.typography.bodyMedium
+                    }
+                  />
+                  {isAdministrator(user) && (
+                    <IconButton
+                      edge="end"
+                      onClick={(event) => {
+                        event.stopPropagation(); // Prevent triggering the list item click
+                        handleContextMenuOpen(event, unit); // Custom function to handle button click
+                      }}
+                      sx={{ marginLeft: "16px" }}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  )}
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+        {isAdministrator(user) && (
+          <Button
+            variant="contained"
+            onClick={handleOpenCreateUnitModal}
+            disableElevation
+            startIcon={<AddIcon />}
+            sx={{
+              width: "100%",
+              height: "40px",
+              maxWidth: "236px",
+              backgroundColor: theme.palette[user.role].Dark.Default,
+              alignItems: "center",
+              marginTop: "24px",
+              marginBottom: "24px",
+              marginLeft: "32px",
+              marginRight: "32px",
+            }}
+          >
+            <Typography
+              variant="labelLarge"
+              style={{
+                color: theme.palette.Neutral[100],
               }}
             >
               <Typography

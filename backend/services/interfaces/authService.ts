@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose";
 import { AuthDTO, Token } from "../../types/authTypes";
-import { Role, Status } from "../../types/userTypes";
+import { Role } from "../../types/userTypes";
 
 interface IAuthService {
   /**
@@ -31,10 +31,12 @@ interface IAuthService {
   /**
    * Generate a password reset link for the user with the given email and send
    * the link to that email address
+   * @param name name of user requesting password reset
+   * @param role role of user requesting password reset
    * @param email email of user requesting password reset
    * @throws Error if unable to generate link or send email
    */
-  resetPassword(email: string): Promise<void>;
+  resetPassword(name: string, role: Role, email: string): Promise<void>;
 
   /**
    * Generate an email verification link for the user with the given email and send
@@ -56,12 +58,14 @@ interface IAuthService {
    * Sends an email invitation to an invited learner with the temporary password specified
    * @param email email of new learner invited
    * @param temporaryPassword the new learner's temporary password
+   * @param firstName the new learner's first name
    * @throws Error if unable to generate link or send email
    */
   sendLearnerInvite(
     firstName: string,
     email: string,
     temporaryPassword: string,
+    facilitatorName?: string,
   ): Promise<void>;
 
   /**
@@ -111,10 +115,11 @@ interface IAuthService {
   getUserIdFromAccessToken(accessToken: string): Promise<ObjectId>;
 
   /**
-   * Returns the user signup status based on the specified email address
-   * @param requestedEmail email address for requested user
+   * Returns whether the facilitator should be automatically approved based on the specified email address
+   * @param requestedEmail email address for requested facilitator
+   * @returns true if the facilitator should be automatically approved, false otherwise
    */
-  getStatusByEmail(requestedEmail: string): Promise<Status>;
+  autoApproveFacilitatorEmail(requestedEmail: string): Promise<boolean>;
 }
 
 export default IAuthService;

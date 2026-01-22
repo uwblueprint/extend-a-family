@@ -1,110 +1,191 @@
-import React from "react";
-import {
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  useTheme,
-  CardActionArea,
-} from "@mui/material";
-import { Link } from "react-router-dom";
-import BlankImg from "../assets/blankSlide.png";
+import { Button, Grid, Typography, useTheme } from "@mui/material";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { Add } from "@mui/icons-material";
+import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import useCourseModules from "../../hooks/useCourseModules";
-import { CourseModule } from "../../types/CourseTypes";
-import * as Routes from "../../constants/Routes";
+import { useUser } from "../../hooks/useUser";
+import { CourseModule, ModuleStatus } from "../../types/CourseTypes";
+import ModuleCardAdmin from "./library-viewing/ModuleCardAdmin";
+import ModuleCardLearner from "./library-viewing/ModuleCardLearner";
+import ModuleCardFacilitator from "./library-viewing/ModuleCardFacilitator";
+import CreateModuleModal from "./modals/CreateModuleModal";
 
 interface ModuleGridProps {
   unitId: string;
   isSidebarOpen: boolean;
+  searchQuery?: string;
 }
 
 export default function CourseModulesGrid({
   unitId,
   isSidebarOpen,
+  searchQuery = "",
 }: ModuleGridProps) {
-  const { courseModules, loading, error } = useCourseModules(unitId);
+  const {
+    courseModules: initialModules,
+    loading,
+    error,
+  } = useCourseModules(unitId);
+  const [courseModules, setCourseModules] = useState<CourseModule[]>([]);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const { role } = useUser();
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const theme = useTheme();
+
+  useEffect(() => {
+    setCourseModules(initialModules);
+  }, [initialModules]);
+
+  const handleModuleUpdate = (updatedModule: CourseModule) => {
+    setCourseModules((prev) =>
+      prev.map((module) =>
+        module.id === updatedModule.id ? updatedModule : module,
+      ),
+    );
+  };
+
+  const handleModuleDelete = (deletedModuleId: string) => {
+    setCourseModules((prev) =>
+      prev.filter((module) => module.id !== deletedModuleId),
+    );
+  };
+
+  const saveModuleOrder = useCallback(
+    async (modules: CourseModule[]) => {
+      const moduleIds = modules.map((module) => module.id);
+
+      try {
+        await CourseAPIClient.reorderModules(unitId, moduleIds);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("Failed to save module order:", err);
+      }
+    },
+    [unitId],
+  );
+
+  const moveModule = useCallback(
+    (dragIndex: number, hoverIndex: number) => {
+      setCourseModules((prevModules) => {
+        const dragModule = prevModules[dragIndex];
+        const newModules = [...prevModules];
+        newModules.splice(dragIndex, 1);
+        newModules.splice(hoverIndex, 0, dragModule);
+
+        // Debounce the save operation
+        if (saveTimeoutRef.current) {
+          clearTimeout(saveTimeoutRef.current);
+        }
+        saveTimeoutRef.current = setTimeout(() => {
+          saveModuleOrder(newModules);
+        }, 1000);
+
+        return newModules;
+      });
+    },
+    [saveModuleOrder],
+  );
 
   if (loading)
     return <Typography paddingLeft="10px">Loading modules...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  return (
-    <Grid container>
-      {courseModules.map((module: CourseModule) => (
-        <Grid
-          item
-          key={module.id}
-          xs={12}
-          sm={6}
-          md={4}
-          lg={isSidebarOpen ? 4 : 3}
-          xl={isSidebarOpen ? 3 : 2}
+  // Filter modules based on search query
+  const filteredModules = courseModules.filter((module) =>
+    module.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const content = (
+    <>
+      <Grid container gap={role === "Learner" ? 0 : "30px"}>
+        {filteredModules.map((module: CourseModule, index: number) => {
+          switch (role) {
+            case "Administrator":
+              return (
+                <ModuleCardAdmin
+                  key={module.id}
+                  module={module}
+                  unitId={unitId}
+                  index={index}
+                  onModuleUpdate={handleModuleUpdate}
+                  onModuleDelete={handleModuleDelete}
+                  moveModule={moveModule}
+                />
+              );
+            case "Facilitator":
+              return (
+                <ModuleCardFacilitator
+                  key={module.id}
+                  module={module}
+                  index={index}
+                />
+              );
+            case "Learner":
+            default:
+              return (
+                module.status === ModuleStatus.published && (
+                  <ModuleCardLearner
+                    key={module.id}
+                    module={module}
+                    index={index}
+                    unitId={unitId}
+                    isSidebarOpen={isSidebarOpen}
+                  />
+                )
+              );
+          }
+        })}
+      </Grid>
+      {role === "Administrator" && (
+        <Button
+          type="button"
+          sx={{
+            position: "fixed",
+            bottom: "40px",
+            right: "40px",
+            display: "flex",
+            padding: "16px 20px 16px 16px",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "12px",
+            borderRadius: "16px",
+            background: theme.palette.Administrator.Light.Selected,
+            boxShadow:
+              "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.30)",
+          }}
+          onClick={() => setUploadModalOpen(true)}
         >
-          <Card
+          <Add
             sx={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              border: "none",
-              boxShadow: "none",
+              fontSize: "24px",
+              color: theme.palette.Administrator.Dark.Default,
             }}
+          />
+          <Typography
+            variant="labelLarge"
+            color={theme.palette.Administrator.Dark.Default}
+            display="inline"
           >
-            <CardActionArea
-              component={Link}
-              to={`${Routes.VIEW_PAGE}?unitId=${unitId}&moduleId=${module.id}`}
-              sx={{ padding: "12px", borderRadius: "8px" }}
-            >
-              <CardMedia
-                component="img"
-                image={module.imageURL ? module.imageURL : BlankImg}
-                alt={module.title}
-                sx={{
-                  border: `1px solid ${theme.palette.Neutral[400]}`,
-                  borderRadius: "8px",
-                  aspectRatio: "16 / 9",
-                }}
-              />
-              <CardContent
-                sx={{
-                  padding: "12px 0px 0px 0px",
-                  flexGrow: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  "&:last-child": {
-                    paddingBottom: 0,
-                  },
-                }}
-              >
-                <Typography
-                  variant="labelLarge"
-                  sx={{
-                    color: theme.palette.Neutral[500],
-                    paddingBottom: "8px",
-                  }}
-                >
-                  Module {module.displayIndex}
-                </Typography>
-                <Typography
-                  variant="bodyLarge"
-                  sx={{
-                    color: theme.palette.Neutral[700],
-                    minHeight: "24px", // Minimum height for one line
-                    lineHeight: "24px", // Ensure consistent line height
-                    overflowWrap: "break-word", // Handle long words that might overflow
-                    flexGrow: 1, // Allow title area to grow with longer titles
-                    display: "block",
-                  }}
-                >
-                  {module.title}
-                </Typography>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
+            Create Module
+          </Typography>
+        </Button>
+      )}
+      <CreateModuleModal
+        open={uploadModalOpen}
+        setUploadModalOpen={setUploadModalOpen}
+        unitId={unitId}
+        onCreate={(newModule) => {
+          setCourseModules((prev) => [...prev, newModule]);
+        }}
+      />
+    </>
+  );
+
+  return role === "Administrator" ? (
+    <DndProvider backend={HTML5Backend}>{content}</DndProvider>
+  ) : (
+    content
   );
 }

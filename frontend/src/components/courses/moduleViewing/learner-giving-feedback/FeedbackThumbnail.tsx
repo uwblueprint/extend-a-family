@@ -19,8 +19,8 @@ const FeedbackThumbnail = () => {
   const theme = useTheme();
   return (
     <Box
-      height={215}
-      width={280}
+      height={168}
+      width={224}
       sx={{
         display: "flex",
         justifyContent: "center",

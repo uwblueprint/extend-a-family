@@ -16,6 +16,12 @@ interface IFeedbackService {
    * @throws Error if feedback creation fails
    */
   createFeedback(feedback: CreateFeedbackDTO): Promise<FeedbackDTO>;
+
+  /**
+   * @returns all feedback that exist
+   * @throws error if feedback retrieval fails
+   */
+  getAllFeedback(): Promise<FeedbackDTO[]>;
 }
 
 export default IFeedbackService;

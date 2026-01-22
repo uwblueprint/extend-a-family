@@ -1,3 +1,4 @@
+import { CoursePage } from "./CourseTypes";
 import { Facilitator, Learner } from "./UserTypes";
 
 export interface HelpRequest {
@@ -14,11 +15,9 @@ export interface HelpRequest {
     id: string;
     displayIndex: number;
     title: string;
+    pages: string[]; // array of CoursePage IDs
   };
-  page: {
-    id: string;
-    title: string;
-  };
+  page: CoursePage;
   completed: boolean;
   createdAt: string;
 }

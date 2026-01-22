@@ -1,7 +1,8 @@
 import mongoose, { ObjectId } from "mongoose";
 import { Activity } from "../../models/activity.mgmodel";
 import CourseModuleModel from "../../models/coursemodule.mgmodel";
-import { QuestionType } from "../../types/activityTypes";
+import { Media, QuestionType } from "../../types/activityTypes";
+import { CourseModuleDTO } from "../../types/courseTypes";
 import { activityModelMapper } from "../../utilities/activityModelMapper";
 
 class ActivityService {
@@ -9,7 +10,7 @@ class ActivityService {
     moduleId: string,
     questionType: QuestionType,
     index?: number,
-  ): Promise<{ pages: string[] }> {
+  ): Promise<CourseModuleDTO> {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -40,6 +41,65 @@ class ActivityService {
           correctAnswers: [0],
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
         };
+      } else if (questionType === QuestionType.Table) {
+        activityData = {
+          ...baseActivity,
+          columnLabels: ["Header", "Header", "Header", "Header", "Header"],
+          rowLabels: [["Row 1"], ["Row 2"], ["Row 3"], ["Row 4"], ["Row 5"]],
+          correctAnswers: [
+            [0, 0],
+            [1, 0],
+            [2, 0],
+            [3, 0],
+            [4, 0],
+          ],
+        };
+      } else if (questionType === QuestionType.Matching) {
+        const media: Media[] = [
+          {
+            id: "1",
+            mediaType: "text",
+            context: "",
+          },
+          {
+            id: "2",
+            mediaType: "text",
+            context: "",
+          },
+          {
+            id: "3",
+            mediaType: "text",
+            context: "",
+          },
+          {
+            id: "4",
+            mediaType: "text",
+            context: "",
+          },
+          {
+            id: "5",
+            mediaType: "text",
+            context: "",
+          },
+          {
+            id: "6",
+            mediaType: "text",
+            context: "",
+          },
+        ];
+        activityData = {
+          ...baseActivity,
+          media: {
+            "1": [media[0], media[1], media[2]],
+            "2": [media[3], media[4], media[5]],
+          },
+          correctAnswers: [
+            ["1", "4", "7"],
+            ["2", "5", "8"],
+            ["3", "6", "9"],
+          ],
+          rows: 3,
+        };
       } else {
         activityData = baseActivity;
       }
@@ -59,16 +119,17 @@ class ActivityService {
         moduleId,
         { $push: { pages: pushOp } },
         { new: true, session },
-      ).lean();
+      )
+        .populate("pages")
+        .lean()
+        .exec();
 
       if (!updatedModule) {
         throw new Error("Module not found");
       }
 
       await session.commitTransaction();
-      return {
-        pages: updatedModule.pages.map((id: ObjectId) => id.toString()),
-      };
+      return updatedModule as unknown as CourseModuleDTO;
     } catch (e) {
       await session.abortTransaction();
       throw e;
@@ -148,7 +209,7 @@ class ActivityService {
     const updated = await (Model as typeof mongoose.Model)
       .findByIdAndUpdate(activityId, update, {
         new: true,
-        runValidators: true,
+        validateModifiedOnly: true,
       })
       .lean();
     if (!updated) {

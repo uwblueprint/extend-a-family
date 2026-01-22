@@ -26,18 +26,19 @@ import { ElementSkeleton, PageType } from "../types/courseTypes";
 //   },
 // });
 
-export interface CoursePage extends Document {
+export interface CoursePageBase extends Document {
   id: string;
   title: string;
   type: PageType;
 }
 
-export interface LessonPage extends CoursePage {
+export interface LessonPage extends CoursePageBase {
   source: string;
   pageIndex: number;
+  pdfUrl: string;
 }
 
-export interface ActivityPage extends CoursePage {
+export interface ActivityPage extends CoursePageBase {
   layout: [ElementSkeleton];
 }
 
@@ -69,6 +70,10 @@ const LessonPageSchema: Schema = new Schema({
     type: Number,
     required: true,
   },
+  pdfUrl: {
+    type: String,
+    required: true,
+  },
 });
 
 // const ActivityPageSchema: Schema = new Schema({
@@ -90,7 +95,7 @@ CoursePageSchema.set("toObject", {
 
 CoursePageSchema.plugin(mongooseLeanId);
 
-const CoursePageModel = mongoose.model<CoursePage>(
+const CoursePageModel = mongoose.model<CoursePageBase>(
   "CoursePage",
   CoursePageSchema,
 );

@@ -1,9 +1,9 @@
 import { Document, Schema } from "mongoose";
 import { QuestionType } from "../types/activityTypes";
-import CoursePageModel, { CoursePage } from "./coursepage.mgmodel";
+import CoursePageModel, { CoursePageBase } from "./coursepage.mgmodel";
 
 // Base Activity Interface
-export interface Activity extends CoursePage {
+export interface Activity extends CoursePageBase {
   questionType: QuestionType;
   activityNumber: string;
   questionText: string;
@@ -28,13 +28,13 @@ export interface MultiSelectActivity extends Activity {
 
 export interface Media {
   id: string;
-  mediaType: "text" | "media";
-  context: string;
+  mediaType: "text" | "image";
+  context: string; // firebase url if mediaType is image
 }
 
 export interface MatchingActivity extends Activity {
   questionType: QuestionType.Matching;
-  media: Map<'1' | '2' | '3', Media[]>; // key: column number
+  media: Map<"1" | "2" | "3", Media[]>; // key: column number
   correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
   rows: number;
 }
@@ -42,8 +42,31 @@ export interface MatchingActivity extends Activity {
 export interface TableActivity extends Activity {
   questionType: QuestionType.Table;
   columnLabels: string[];
-  rowLabels: Map<string, string | undefined>; // key: label, value: image url
+  rowLabels: string[][]; // Each inner array: [labelText, optionalImageUrl]
   correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
+  headerColumnIncludes: "image" | "text" | "image_and_text";
+}
+
+export type TextInputValidation =
+  | {
+      mode: "short_answer";
+      answers: string[];
+    }
+  | {
+      mode: "numeric_set";
+      values: number[];
+    }
+  | {
+      mode: "numeric_range";
+      min?: number;
+      max?: number;
+    };
+
+export interface TextInputActivity extends Activity {
+  questionType: QuestionType.TextInput;
+  placeholder?: string;
+  maxLength?: number;
+  validation?: TextInputValidation;
 }
 
 const options2 = {
@@ -61,7 +84,7 @@ const options2 = {
       delete ret.updatedAt;
     },
   },
-}
+};
 
 export const ActivitySchema: Schema = new Schema(
   {
@@ -103,15 +126,15 @@ export const ActivitySchema: Schema = new Schema(
       required: false,
     },
   },
-  options2
+  options2,
 );
 
 // Create combined schemas for each specific activity type
 
 const MediaSchema = new Schema({
   id: { type: String, required: true },
-  mediaType: { type: String, enum: ["text", "media"], required: true },
-  context: { type: String, required: true },
+  mediaType: { type: String, enum: ["text", "image"], required: true },
+  context: { type: String, required: false },
 });
 
 const MatchingActivitySchema = new Schema({
@@ -222,12 +245,15 @@ const TableActivitySchema = new Schema({
     required: true,
   },
   rowLabels: {
-    type: Map,
-    of: {
-      type: String,
-      required: false,
-    },
+    // Represented as array of arrays: [labelText, imageUrl?]
+    type: [[String]],
     required: true,
+    validate: {
+      validator: (rows: string[][]) =>
+        rows.every((row) => row.length >= 1 && row.length <= 2),
+      message:
+        "Each row label must have 1 (text) or 2 (text + imageUrl) elements",
+    },
   },
   correctAnswers: {
     type: [[Number]],
@@ -237,6 +263,45 @@ const TableActivitySchema = new Schema({
         value.every((pair) => pair.length === 2),
       message: "Each coordinate must be a pair of numbers [row, col]",
     },
+  },
+  headerColumnIncludes: {
+    type: String,
+    enum: ["image", "text", "image_and_text"],
+    default: "image_and_text",
+    required: true,
+  },
+});
+
+const TextInputActivitySchema = new Schema({
+  ...ActivitySchema.obj,
+  placeholder: {
+    type: String,
+    required: false,
+  },
+  maxLength: {
+    type: Number,
+    required: false,
+    validate: {
+      validator: (v: number) => v > 0,
+      message: "maxLength must be a positive number",
+    },
+  },
+  validation: {
+    type: {
+      mode: {
+        type: String,
+        required: true,
+        enum: ["short_answer", "numeric_set", "numeric_range"],
+      },
+      // short_answer
+      answers: { type: [String], required: false },
+      // numeric_set
+      values: { type: [Number], required: false },
+      // numeric_range
+      min: { type: Number, required: false },
+      max: { type: Number, required: false },
+    },
+    required: true,
   },
 });
 
@@ -262,9 +327,15 @@ const TableActivityModel = CoursePageModel.discriminator<TableActivity>(
   TableActivitySchema,
 );
 
+const TextInputActivityModel = CoursePageModel.discriminator<TextInputActivity>(
+  QuestionType.TextInput,
+  TextInputActivitySchema,
+);
+
 export {
   MatchingActivityModel,
   MultipleChoiceActivityModel,
   MultiSelectActivityModel,
   TableActivityModel,
+  TextInputActivityModel,
 };

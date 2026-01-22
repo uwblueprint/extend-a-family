@@ -4,7 +4,7 @@ import { CourseModule, CoursePageBase } from "../../../types/CourseTypes";
 export interface NeedHelpModalProps {
   open: boolean;
   onClose: () => void;
-  module: (CourseModule & { lessonPdfUrl: string }) | null;
+  module: CourseModule | null;
   currentPage: CoursePageBase | null;
 }
 

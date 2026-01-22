@@ -1,4 +1,5 @@
 import mongoose, { Document, ObjectId, Schema } from "mongoose";
+import mongooseLeanId from "mongoose-lean-id";
 
 export interface Feedback extends Document {
   id: ObjectId;
@@ -13,7 +14,7 @@ export const FeedbackSchema: Schema = new Schema(
   {
     learnerId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Learner",
       required: true,
     },
     moduleId: {
@@ -48,5 +49,7 @@ FeedbackSchema.set("toJSON", {
     delete ret._id;
   },
 });
+
+FeedbackSchema.plugin(mongooseLeanId);
 
 export default mongoose.model<Feedback>("Feedback", FeedbackSchema);

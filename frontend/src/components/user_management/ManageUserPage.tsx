@@ -11,7 +11,7 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 
 import UserAPIClient from "../../APIClients/UserAPIClient";
-import { User } from "../../types/UserTypes";
+import { isFacilitator, User } from "../../types/UserTypes";
 
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
 import { useUser } from "../../hooks/useUser";
@@ -26,8 +26,6 @@ const ManageUserPage = (): React.ReactElement => {
   // Main state
   const [users, setUsers] = useState<User[]>([]);
   const [userData, setUserData] = useState<User[]>([]);
-  const [page, setPage] = useState(0);
-  const [usersPerPage, setUsersPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [openAddAdminModal, setOpenAddAdminModal] = useState(false);
   const [openDeleteUserModal, setOpenDeleteUserModal] = useState(false);
@@ -43,12 +41,14 @@ const ManageUserPage = (): React.ReactElement => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
 
   // States for learner modal inputs
   const [openAddLearnerModal, setOpenAddLearnerModal] = useState(false);
   const [learnerFirstName, setLearnerFirstName] = useState("");
   const [learnerLastName, setLearnerLastName] = useState("");
   const [learnerEmail, setLearnerEmail] = useState("");
+  const [isCreatingLearner, setIsCreatingLearner] = useState(false);
 
   const [selectedRole, setSelectedRole] = useState<string>("");
 
@@ -70,9 +70,6 @@ const ManageUserPage = (): React.ReactElement => {
     getUsers();
   }, [getUsers]);
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * usersPerPage - users.length) : 0;
-
   // Search handlers
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -91,29 +88,21 @@ const ManageUserPage = (): React.ReactElement => {
 
   // Separate pending approval facilitators
   const pendingApprovalFacilitators = filteredUsers.filter(
-    (user) => user.status === "PendingApproval" && user.role === "Facilitator",
+    (user) => isFacilitator(user) && user.approved === false,
   );
 
-  // Regular users (excluding pending approval facilitators)
-  const regularUsers = filteredUsers.filter(
+  // Separate invited (not yet active) admins
+  const invitedAdmins = filteredUsers.filter(
+    (user) => user.role === "Administrator" && user.status === "Invited",
+  );
+
+  const currentUsers = filteredUsers.filter(
     (user) =>
-      !(user.status === "PendingApproval" && user.role === "Facilitator"),
+      !(
+        (isFacilitator(user) && user.approved === false) ||
+        (user.role === "Administrator" && user.status === "Invited")
+      ),
   );
-
-  // Pagination handlers
-  const handleChangePage = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
-  ) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setUsersPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
 
   const handleRoleSelect = (role_curr: string) => {
     if (role_curr === "All") {
@@ -121,7 +110,6 @@ const ManageUserPage = (): React.ReactElement => {
     } else {
       setUsers(userData.filter((item) => item.role === role_curr));
     }
-    setPage(0);
     setSelectedRole(role_curr);
   };
 
@@ -162,32 +150,46 @@ const ManageUserPage = (): React.ReactElement => {
 
   const handleAddAdmin = async () => {
     if (firstName && lastName && email) {
-      const admin = await AuthAPIClient.inviteAdmin(firstName, lastName, email);
-      if (admin) {
-        setAddSnackbarMessage(
-          `"${admin.firstName} ${admin.lastName}" was added as admin`,
+      setIsCreatingAdmin(true);
+      try {
+        const admin = await AuthAPIClient.inviteAdmin(
+          firstName,
+          lastName,
+          email,
         );
-        handleCloseAddAdminModal();
-        setOpenAddUserSnackbar(true);
-        await getUsers();
+        if (admin) {
+          setAddSnackbarMessage(
+            `"${admin.firstName} ${admin.lastName}" was added as admin`,
+          );
+          handleCloseAddAdminModal();
+          setOpenAddUserSnackbar(true);
+          await getUsers();
+        }
+      } finally {
+        setIsCreatingAdmin(false);
       }
     }
   };
 
   const handleAddLearner = async () => {
     if (learnerFirstName && learnerLastName && learnerEmail) {
-      const learner = await AuthAPIClient.inviteLearner(
-        learnerFirstName,
-        learnerLastName,
-        learnerEmail,
-      );
-      if (learner) {
-        setAddSnackbarMessage(
-          `User "${learner.firstName} ${learner.lastName}" was created`,
+      setIsCreatingLearner(true);
+      try {
+        const learner = await AuthAPIClient.inviteLearner(
+          learnerFirstName,
+          learnerLastName,
+          learnerEmail,
         );
-        handleCloseAddLearnerModal();
-        setOpenAddUserSnackbar(true);
-        await getUsers();
+        if (learner) {
+          setAddSnackbarMessage(
+            `User "${learner.firstName} ${learner.lastName}" was created`,
+          );
+          handleCloseAddLearnerModal();
+          setOpenAddUserSnackbar(true);
+          await getUsers();
+        }
+      } finally {
+        setIsCreatingLearner(false);
       }
     }
   };
@@ -340,7 +342,12 @@ const ManageUserPage = (): React.ReactElement => {
   return (
     <Box
       role="main"
-      sx={{ display: "flex", flexDirection: "column", padding: "25px" }}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        padding: "25px",
+        height: "100vh",
+      }}
     >
       <AddUserSnackbar />
       <DeleteUserSnackbar />
@@ -359,6 +366,7 @@ const ManageUserPage = (): React.ReactElement => {
         setLastName={setLastName}
         setEmail={setEmail}
         handleAddAdmin={handleAddAdmin}
+        isCreating={isCreatingAdmin}
       />
       <AddLearnerModal
         open={openAddLearnerModal}
@@ -367,8 +375,14 @@ const ManageUserPage = (): React.ReactElement => {
         setLastName={setLearnerLastName}
         setEmail={setLearnerEmail}
         handleAddLearner={handleAddLearner}
+        isCreating={isCreatingLearner}
       />
-      <Stack direction="column" spacing={4} margin="2rem">
+      <Stack
+        direction="column"
+        spacing={4}
+        margin="2rem"
+        sx={{ flex: 1, overflow: "hidden" }}
+      >
         <TopToolBar
           searchQuery={searchQuery}
           handleSearch={handleSearch}
@@ -377,45 +391,54 @@ const ManageUserPage = (): React.ReactElement => {
           handleOpenAddAdminModal={handleOpenAddAdminModal}
           handleOpenAddLearnerModal={handleOpenAddLearnerModal}
         />
-        {pendingApprovalFacilitators.length > 0 && (
-          <Box>
-            <Typography
-              variant="headlineMedium"
-              sx={{ marginBottom: "16px", fontWeight: 700 }}
-            >
-              New Facilitator Account(s) (Pending Approval)
-            </Typography>
+        <Box sx={{ flex: 1, overflowY: "auto" }}>
+          {pendingApprovalFacilitators.length > 0 && (
+            <Box marginBottom="32px">
+              <Typography
+                variant="headlineMedium"
+                sx={{ marginBottom: "16px", fontWeight: 700 }}
+              >
+                New Facilitator Account(s) (Pending Approval)
+              </Typography>
+              <UserTable
+                filteredUsers={pendingApprovalFacilitators}
+                handleOpenDeleteUserModal={handleOpenDeleteUserModal}
+                handleApproveFacilitator={handleApproveFacilitator}
+                handleRejectFacilitator={handleRejectFacilitator}
+                defaultUsersPerPage={5}
+              />
+            </Box>
+          )}
+          {invitedAdmins.length > 0 && (
+            <Box marginBottom="32px">
+              <Typography
+                variant="headlineMedium"
+                sx={{ marginBottom: "16px", fontWeight: 700 }}
+              >
+                New Admin Account(s)
+              </Typography>
+              <UserTable
+                filteredUsers={invitedAdmins}
+                handleOpenDeleteUserModal={handleOpenDeleteUserModal}
+                defaultUsersPerPage={5}
+              />
+            </Box>
+          )}
+          <Stack
+            direction="column"
+            gap="16px"
+            sx={{ flex: 1, minHeight: 0, paddingBottom: 4 }}
+          >
+            {role === "Administrator" && (
+              <Typography variant="headlineMedium">Current Users</Typography>
+            )}
             <UserTable
-              filteredUsers={pendingApprovalFacilitators}
-              usersPerPage={usersPerPage}
-              page={page}
-              emptyRows={emptyRows}
-              handleChangePage={handleChangePage}
-              handleChangeRowsPerPage={handleChangeRowsPerPage}
+              filteredUsers={currentUsers}
               handleOpenDeleteUserModal={handleOpenDeleteUserModal}
               handleApproveFacilitator={handleApproveFacilitator}
               handleRejectFacilitator={handleRejectFacilitator}
             />
-          </Box>
-        )}
-        <Box>
-          <Typography
-            variant="headlineMedium"
-            sx={{ marginBottom: "16px", fontWeight: 700 }}
-          >
-            All Users
-          </Typography>
-          <UserTable
-            filteredUsers={regularUsers}
-            usersPerPage={usersPerPage}
-            page={page}
-            emptyRows={emptyRows}
-            handleChangePage={handleChangePage}
-            handleChangeRowsPerPage={handleChangeRowsPerPage}
-            handleOpenDeleteUserModal={handleOpenDeleteUserModal}
-            handleApproveFacilitator={handleApproveFacilitator}
-            handleRejectFacilitator={handleRejectFacilitator}
-          />
+          </Stack>
         </Box>
       </Stack>
     </Box>

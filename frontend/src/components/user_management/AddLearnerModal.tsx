@@ -20,6 +20,7 @@ interface AddLearnerModalProps {
   setLastName: (value: string) => void;
   setEmail: (value: string) => void;
   handleAddLearner: () => void;
+  isCreating: boolean;
 }
 
 const AddLearnerModal: React.FC<AddLearnerModalProps> = ({
@@ -29,6 +30,7 @@ const AddLearnerModal: React.FC<AddLearnerModalProps> = ({
   setLastName,
   setEmail,
   handleAddLearner,
+  isCreating,
 }) => {
   const theme = useTheme();
   return (
@@ -145,8 +147,8 @@ const AddLearnerModal: React.FC<AddLearnerModalProps> = ({
                 "&:hover": { bgcolor: theme.palette.Facilitator.Dark.Hover },
                 width: "100%",
               }}
-              // onClick={handleAddLearner}
               type="submit"
+              disabled={isCreating}
             >
               <Typography
                 variant="labelLarge"
@@ -156,7 +158,7 @@ const AddLearnerModal: React.FC<AddLearnerModalProps> = ({
                   width: "100%",
                 }}
               >
-                CREATE ACCOUNT
+                {isCreating ? "CREATING..." : "CREATE ACCOUNT"}
               </Typography>
             </Button>
             <Button
@@ -170,6 +172,7 @@ const AddLearnerModal: React.FC<AddLearnerModalProps> = ({
                 width: "100%",
               }}
               onClick={onClose}
+              disabled={isCreating}
             >
               <Typography
                 variant="labelLarge"
