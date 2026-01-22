@@ -11,7 +11,7 @@ export const questionTypeIcons: Record<QuestionType, React.ReactNode> = {
   [QuestionType.MultiSelect]: <AccountTreeOutlined />,
   [QuestionType.Table]: <TableChartOutlined />,
   [QuestionType.Matching]: <AccountTreeOutlined />,
-  [QuestionType.Input]: <Subject />,
+  [QuestionType.TextInput]: <Subject />,
 };
 
 export const questionTypeLabels: Record<QuestionType, string> = {
@@ -19,5 +19,5 @@ export const questionTypeLabels: Record<QuestionType, string> = {
   [QuestionType.MultiSelect]: "Multi Select",
   [QuestionType.Table]: "Table",
   [QuestionType.Matching]: "Matching",
-  [QuestionType.Input]: "Short Answer",
+  [QuestionType.TextInput]: "Short Answer",
 };
