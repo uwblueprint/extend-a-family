@@ -63,6 +63,7 @@ import {
   Media,
   QuestionType,
   ModuleStatus,
+  isTextInputActivity,
 } from "../../types/CourseTypes";
 import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
@@ -94,6 +95,9 @@ import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
 import { useSocket } from "../../contexts/SocketContext";
 import PublishModuleModal from "../course_viewing/modals/PublishModuleModal";
+import TextInputEditorSidebar from "../course_authoring/text-input/TextInputSidebar";
+import TextInputEditor from "../course_authoring/text-input/TextInputEditor";
+import TextInputViewer from "../course_viewing/text-input/TextInputViewer";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1197,76 +1201,94 @@ const ViewModulePage = () => {
                 />
               </Document>
             )}
-            {currentPageObject && isActivityPage(currentPageObject) && (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                sx={{
-                  transform: `scale(${activityPageScale})`,
-                }}
-                ref={activityPageRef}
-              >
-                {activity &&
-                  (isMultipleChoiceActivity(activity) ||
+            {currentPageObject &&
+              isActivityPage(currentPageObject) &&
+              activity && (
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{
+                    transform: `scale(${activityPageScale})`,
+                  }}
+                  ref={activityPageRef}
+                >
+                  {(isMultipleChoiceActivity(activity) ||
                     isMultiSelectActivity(activity)) &&
-                  (canEdit ? (
-                    <MultipleChoiceMainEditor
-                      activity={activity}
-                      key={activity.id}
-                      setActivity={setActivity}
-                      hasImage={hasImage}
-                      hasAdditionalContext={hasAdditionalContext}
-                    />
-                  ) : (
-                    <MultipleChoiceViewer
-                      activity={activity}
-                      onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
-                      onCorrectAnswer={onCorrectAnswer}
-                      isCompleted={displayActivityCompleted}
-                      key={activity.id}
-                      ref={activityViewerRef}
-                    />
-                  ))}
-                {activity &&
-                  isTableActivity(activity) &&
-                  (canEdit ? (
-                    <TableMainEditor
-                      activity={activity}
-                      key={activity.id}
-                      setActivity={setActivity}
-                    />
-                  ) : (
-                    <TableViewer
-                      activity={activity}
-                      onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
-                      onCorrectAnswer={onCorrectAnswer}
-                      isCompleted={displayActivityCompleted}
-                      key={activity.id}
-                      ref={activityViewerRef}
-                    />
-                  ))}
-                {activity &&
-                  isMatchingActivity(activity) &&
-                  (canEdit ? (
-                    <MatchingEditor
-                      activity={activity}
-                      key={activity.id}
-                      setActivity={setActivity}
-                    />
-                  ) : (
-                    <MatchingViewer
-                      activity={activity}
-                      onWrongAnswer={() => setIsRetryButtonDisplayed(true)}
-                      onCorrectAnswer={onCorrectAnswer}
-                      isCompleted={displayActivityCompleted}
-                      key={activity.id}
-                      ref={activityViewerRef}
-                      scale={activityPageScale}
-                    />
-                  ))}
-              </Box>
-            )}
+                    (canEdit ? (
+                      <MultipleChoiceMainEditor
+                        activity={activity}
+                        key={activity.id}
+                        setActivity={setActivity}
+                        hasImage={hasImage}
+                        hasAdditionalContext={hasAdditionalContext}
+                      />
+                    ) : (
+                      <MultipleChoiceViewer
+                        activity={activity}
+                        onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                        onCorrectAnswer={onCorrectAnswer}
+                        isCompleted={displayActivityCompleted}
+                        key={activity.id}
+                        ref={activityViewerRef}
+                      />
+                    ))}
+                  {isTableActivity(activity) &&
+                    (canEdit ? (
+                      <TableMainEditor
+                        activity={activity}
+                        key={activity.id}
+                        setActivity={setActivity}
+                      />
+                    ) : (
+                      <TableViewer
+                        activity={activity}
+                        onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                        onCorrectAnswer={onCorrectAnswer}
+                        isCompleted={displayActivityCompleted}
+                        key={activity.id}
+                        ref={activityViewerRef}
+                      />
+                    ))}
+                  {isMatchingActivity(activity) &&
+                    (canEdit ? (
+                      <MatchingEditor
+                        activity={activity}
+                        key={activity.id}
+                        setActivity={setActivity}
+                      />
+                    ) : (
+                      <MatchingViewer
+                        activity={activity}
+                        onWrongAnswer={() => setIsRetryButtonDisplayed(true)}
+                        onCorrectAnswer={onCorrectAnswer}
+                        isCompleted={displayActivityCompleted}
+                        key={activity.id}
+                        ref={activityViewerRef}
+                        scale={activityPageScale}
+                      />
+                    ))}
+                  {isTextInputActivity(activity) &&
+                    (canEdit ? (
+                      <TextInputEditor
+                        activity={activity}
+                        key={activity.id}
+                        setActivity={setActivity}
+                        hasImage={hasImage}
+                        hasAdditionalContext={hasAdditionalContext}
+                      />
+                    ) : (
+                      <TextInputViewer
+                        activity={activity}
+                        onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                        onCorrectAnswer={onCorrectAnswer}
+                        isCompleted={displayActivityCompleted}
+                        key={activity.id}
+                        ref={activityViewerRef}
+                      />
+                    ))}
+                </Box>
+              )}
             {isFeedbackSurveyPage && module && (
               <SurveySlides moduleId={module.id} />
             )}
@@ -1542,6 +1564,78 @@ const ViewModulePage = () => {
                 hint={currentPageObject.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
+                }}
+              />
+            )}
+            {isTextInputActivity(currentPageObject) && (
+              <TextInputEditorSidebar
+                key={currentPageObject.id}
+                mode={currentPageObject.validation.mode}
+                setMode={(newMode: "short_answer" | "numeric_range") =>
+                  setActivity((prev) => {
+                    if (!prev || !isTextInputActivity(prev)) return prev;
+                    return {
+                      ...prev,
+                      validation: {
+                        answers:
+                          prev.validation.mode === "short_answer"
+                            ? prev.validation.answers
+                            : [],
+                        min:
+                          prev.validation.mode === "numeric_range"
+                            ? prev.validation.min
+                            : 0,
+                        max:
+                          prev.validation.mode === "numeric_range"
+                            ? prev.validation.max
+                            : 0,
+                        ...prev.validation,
+                        mode: newMode,
+                      },
+                    };
+                  })
+                }
+                correctAnswers={
+                  currentPageObject.validation.mode === "short_answer"
+                    ? currentPageObject.validation.answers
+                    : []
+                }
+                setCorrectAnswers={(newCorrectAnswers) =>
+                  setActivity((prev) => {
+                    if (
+                      !prev ||
+                      !isTextInputActivity(prev) ||
+                      prev.validation.mode !== "short_answer"
+                    )
+                      return prev;
+                    return {
+                      ...prev,
+                      validation: {
+                        ...prev.validation,
+                        answers: newCorrectAnswers,
+                      },
+                    };
+                  })
+                }
+                hint={currentPageObject.hint || ""}
+                setHint={(newHint: string) => {
+                  setActivity((prev) => prev && { ...prev, hint: newHint });
+                }}
+                hasImage={hasImage}
+                setHasImage={(newHasImage) => {
+                  setHasImage(newHasImage);
+                  if (!newHasImage) {
+                    setActivity((prev) => prev && { ...prev, imageUrl: "" });
+                  }
+                }}
+                hasAdditionalContext={hasAdditionalContext}
+                setHasAdditionalContext={(newHasAdditionalContext) => {
+                  setHasAdditionalContext(newHasAdditionalContext);
+                  if (!newHasAdditionalContext) {
+                    setActivity(
+                      (prev) => prev && { ...prev, additionalContext: "" },
+                    );
+                  }
                 }}
               />
             )}
