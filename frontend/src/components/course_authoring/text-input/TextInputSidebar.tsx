@@ -42,6 +42,7 @@ export default function TextInputEditorSidebar({
   const boxHeight = "calc(100vh - 68px)";
   const theme = useTheme();
   const [currentAnswer, setCurrentAnswer] = useState("");
+  const [hasUnits, setHasUnits] = useState(false);
 
   const handleAddAnswer = (ev: React.FormEvent) => {
     ev.preventDefault();
@@ -226,6 +227,26 @@ export default function TextInputEditorSidebar({
                 onChange={(ev) => setHasAdditionalContext(ev.target.checked)}
               />
             </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                alignSelf: "stretch",
+              }}
+            >
+              <Typography variant="bodySmall">Units</Typography>
+              <IOSSwitch
+                checked={hasUnits}
+                onChange={(ev) => setHasUnits(ev.target.checked)}
+              />
+            </Box>
+            {hasUnits && (
+              <TextField
+                placeholder="Unit - ex. dollars, coins, etc."
+                sx={{ width: "100%" }}
+              />
+            )}
           </Box>
           <Divider
             sx={{
@@ -252,58 +273,81 @@ export default function TextInputEditorSidebar({
                 alignSelf: "stretch",
               }}
             >
-              <Typography variant="titleSmall">Text input answers</Typography>
+              {mode === "short_answer" && (
+                <Typography variant="titleSmall">Text input answers</Typography>
+              )}
+              {mode === "numeric_range" && (
+                <Typography variant="titleSmall">
+                  Numerical range answers
+                </Typography>
+              )}
             </Box>
-            <form onSubmit={handleAddAnswer} style={{ width: "100%" }}>
-              <Stack direction="row" alignItems="center" gap="8px">
-                <TextField
-                  variant="outlined"
-                  placeholder="Enter an answer..."
-                  value={currentAnswer}
-                  onChange={(e) => setCurrentAnswer(e.target.value)}
-                  sx={{ width: "100%" }}
-                />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    backgroundColor: theme.palette.Administrator.Dark.Default,
-                    color: "white",
-                  }}
-                >
-                  Add
-                </Button>
-              </Stack>
-            </form>
-            <Stack spacing={1} sx={{ width: "100%" }}>
-              {correctAnswers.map((answer, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "8px 12px",
-                    backgroundColor: theme.palette.Neutral[200],
-                    borderRadius: "4px",
-                  }}
-                >
-                  <Typography variant="bodySmall">{answer}</Typography>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleDeleteAnswer(index)}
-                    sx={{
-                      color: theme.palette.Neutral[700],
-                      "&:hover": {
-                        backgroundColor: theme.palette.Neutral[300],
-                      },
-                    }}
-                  >
-                    <Close fontSize="small" />
-                  </IconButton>
-                </Box>
-              ))}
-            </Stack>
+            {mode === "short_answer" && (
+              <>
+                <form onSubmit={handleAddAnswer} style={{ width: "100%" }}>
+                  <Stack direction="row" alignItems="center" gap="8px">
+                    <TextField
+                      variant="outlined"
+                      placeholder="Enter an answer..."
+                      value={currentAnswer}
+                      onChange={(e) => setCurrentAnswer(e.target.value)}
+                      sx={{ width: "100%" }}
+                    />
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{
+                        backgroundColor:
+                          theme.palette.Administrator.Dark.Default,
+                        color: "white",
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </Stack>
+                </form>
+                <Stack spacing={1} sx={{ width: "100%" }}>
+                  {correctAnswers.map((answer, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        padding: "8px 12px",
+                        backgroundColor: theme.palette.Neutral[200],
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <Typography variant="bodySmall">{answer}</Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteAnswer(index)}
+                        sx={{
+                          color: theme.palette.Neutral[700],
+                          "&:hover": {
+                            backgroundColor: theme.palette.Neutral[300],
+                          },
+                        }}
+                      >
+                        <Close fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  ))}
+                </Stack>
+              </>
+            )}
+            {mode === "numeric_range" && (
+              <>
+                <Typography variant="bodySmall" color="#6F797B">
+                  Set a number range for correct answers
+                </Typography>
+                <Stack direction="row" alignItems="center" gap="16px">
+                  <TextField type="number" label="Min" sx={{ width: "100%" }} />
+                  <TextField type="number" label="Max" sx={{ width: "100%" }} />
+                </Stack>
+              </>
+            )}
           </Box>
           <Divider
             sx={{
