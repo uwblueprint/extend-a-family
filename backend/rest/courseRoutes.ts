@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import { isAuthorizedByRole } from "../middlewares/auth";
+import { getAccessToken, isAuthorizedByRole } from "../middlewares/auth";
 import {
   coursePageDtoValidator,
   createCourseUnitDtoValidator,
@@ -13,6 +13,11 @@ import CourseModuleService from "../services/implementations/courseModuleService
 import CoursePageService from "../services/implementations/coursePageService";
 import CourseUnitService from "../services/implementations/courseUnitService";
 import FileStorageService from "../services/implementations/fileStorageService";
+import LearnerProgressService from "../services/implementations/learnerProgressService";
+import AuthService from "../services/implementations/authService";
+import UserService from "../services/implementations/userService";
+import EmailService from "../services/implementations/emailService";
+import nodemailerConfig from "../nodemailer.config";
 import { CourseUnitDTO } from "../types/courseTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
 
@@ -26,6 +31,10 @@ const coursePageService: CoursePageService = new CoursePageService();
 const firebaseStorageService: FileStorageService = new FileStorageService(
   process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
 );
+const userService = new UserService();
+const emailService = new EmailService(nodemailerConfig);
+const authService = new AuthService(userService, emailService);
+const progressService = new LearnerProgressService();
 
 courseRouter.post(
   "/:moduleId/uploadThumbnail",
@@ -144,13 +153,43 @@ courseRouter.post(
   },
 );
 
+/**
+ * GET /course/module/:moduleId
+ * Get a single module. For learners, includes module progress.
+ */
 courseRouter.get(
   "/module/:moduleId",
   isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
   async (req, res) => {
     const { moduleId } = req.params;
+    const accessToken = getAccessToken(req);
+
     try {
       const courseModule = await courseModuleService.getCourseModule(moduleId);
+
+      // For learners, include module progress
+      if (accessToken) {
+        try {
+          const userId = await authService.getUserIdFromAccessToken(
+            accessToken,
+          );
+          const user = await userService.getUserById(userId.toString());
+          if (user.role === "Learner") {
+            const moduleProgress = await progressService.getModuleProgress(
+              userId.toString(),
+              moduleId,
+            );
+            res.status(200).json({
+              ...courseModule,
+              progress: moduleProgress,
+            });
+            return;
+          }
+        } catch {
+          // If we can't get progress, just return module without it
+        }
+      }
+
       res.status(200).json(courseModule);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));
@@ -158,14 +197,49 @@ courseRouter.get(
   },
 );
 
+/**
+ * GET /course/:unitId
+ * Get all modules in a unit. For learners, includes progress for each module.
+ */
 courseRouter.get(
   "/:unitId",
   isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
   async (req, res) => {
+    const accessToken = getAccessToken(req);
+
     try {
       const courseModules = await courseModuleService.getCourseModules(
         req.params.unitId,
       );
+
+      // For learners, include module progress for each module
+      if (accessToken) {
+        try {
+          const userId = await authService.getUserIdFromAccessToken(
+            accessToken,
+          );
+          const user = await userService.getUserById(userId.toString());
+          if (user.role === "Learner") {
+            const modulesWithProgress = await Promise.all(
+              courseModules.map(async (module) => {
+                const moduleProgress = await progressService.getModuleProgress(
+                  userId.toString(),
+                  module.id,
+                );
+                return {
+                  ...module,
+                  progress: moduleProgress,
+                };
+              }),
+            );
+            res.status(200).json(modulesWithProgress);
+            return;
+          }
+        } catch {
+          // If we can't get progress, just return modules without it
+        }
+      }
+
       res.status(200).json(courseModules);
     } catch (e: unknown) {
       res.status(500).send(getErrorMessage(e));

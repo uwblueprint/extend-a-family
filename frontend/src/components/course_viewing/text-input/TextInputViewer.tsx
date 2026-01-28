@@ -1,14 +1,9 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import * as React from "react";
-import {
-  isMultiSelectActivity,
-  MultipleChoiceActivity,
-  MultiSelectActivity,
-} from "../../../types/CourseTypes";
-import MultipleChoiceViewOption from "./MultipleChoiceViewOption";
+import { TextInputActivity } from "../../../types/CourseTypes";
 
-type MultipleChoiceViewerProps = {
-  activity: MultipleChoiceActivity | MultiSelectActivity;
+type TextInputViewerProps = {
+  activity: TextInputActivity;
   onWrongAnswer: () => void;
   onCorrectAnswer: () => void;
   isCompleted: boolean;
@@ -19,30 +14,22 @@ export type ActivityViewerHandle = {
   onRetry?: () => void;
 };
 
-const MultipleChoiceViewer = React.forwardRef<
+const TextInputViewer = React.forwardRef<
   ActivityViewerHandle,
-  MultipleChoiceViewerProps
+  TextInputViewerProps
 >(({ activity, onWrongAnswer, onCorrectAnswer, isCompleted }, ref) => {
   const theme = useTheme();
-  const [selectedOptions, setSelectedOptions] = React.useState<number[]>([]);
 
   const checkAnswer = () => {
-    const correctOptions = isMultiSelectActivity(activity)
-      ? activity.correctAnswers
-      : [activity.correctAnswer];
-    const isCorrect =
-      selectedOptions.length === correctOptions.length &&
-      selectedOptions.every((value) => correctOptions.includes(value));
-    if (!isCorrect) {
-      onWrongAnswer();
-    } else {
-      onCorrectAnswer();
-    }
+    // No-op for now
   };
 
   React.useImperativeHandle(ref, () => ({
     checkAnswer,
   }));
+
+  // eslint-disable-next-line no-console
+  console.log({ isCompleted, onCorrectAnswer, onWrongAnswer });
 
   return (
     <Box
@@ -84,9 +71,7 @@ const MultipleChoiceViewer = React.forwardRef<
             variant="bodyMedium"
             sx={{ color: theme.palette.Neutral[500] }}
           >
-            {isMultiSelectActivity(activity)
-              ? "Pick all the answers that are correct. There can be more than 1 correct answer."
-              : "Pick the correct answer"}
+            Type one word or a short phrase in the box.
           </Typography>
         </Box>
         <Box
@@ -167,42 +152,12 @@ const MultipleChoiceViewer = React.forwardRef<
             columnGap: "34px",
             flexWrap: "wrap",
           }}
-        >
-          {activity.options.map((option, index) => (
-            <MultipleChoiceViewOption
-              key={index}
-              optionText={option}
-              selected={selectedOptions.includes(index)}
-              displayCorrect={
-                isCompleted &&
-                (isMultiSelectActivity(activity)
-                  ? activity.correctAnswers
-                  : [activity.correctAnswer]
-                ).includes(index)
-              }
-              isMultiSelect={isMultiSelectActivity(activity)}
-              onClick={() => {
-                if (isCompleted) return;
-                if (isMultiSelectActivity(activity)) {
-                  if (selectedOptions.includes(index)) {
-                    setSelectedOptions(
-                      selectedOptions.filter((i) => i !== index),
-                    );
-                  } else {
-                    setSelectedOptions([...selectedOptions, index]);
-                  }
-                } else {
-                  setSelectedOptions([index]);
-                }
-              }}
-            />
-          ))}
-        </Box>
+        />
       </Box>
     </Box>
   );
 });
 
-MultipleChoiceViewer.displayName = "MultipleChoiceViewer";
+TextInputViewer.displayName = "MultipleChoiceViewer";
 
-export default MultipleChoiceViewer;
+export default TextInputViewer;
