@@ -56,6 +56,7 @@ class NotificationService implements INotificationService {
             message: populatedNotification.message,
             seen: populatedNotification.seen,
             read: populatedNotification.read,
+            emailSent: populatedNotification.emailSent,
             createdAt: populatedNotification.createdAt,
             link: populatedNotification.link,
             helpRequest: populatedNotification.helpRequest,
@@ -106,6 +107,7 @@ class NotificationService implements INotificationService {
       message: newNotification.message,
       seen: newNotification.seen,
       read: newNotification.read,
+      emailSent: newNotification.emailSent,
       createdAt: newNotification.createdAt,
       link: newNotification.link,
     };
