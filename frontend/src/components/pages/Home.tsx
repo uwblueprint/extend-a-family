@@ -32,52 +32,49 @@ const Home = (): React.ReactElement => {
     );
 
   return (
-    <Box display="flex" width="100%">
+    <Box
+      display="flex"
+      width="100%"
+      minHeight="100vh"
+      height="100vh"
+      overflow="hidden"
+    >
       <LearnerUnitSidebar />
 
-      <Box
-        display="flex"
-        height="100vh"
-        justifyContent="center"
-        padding="48px"
-        overflow="auto"
-      >
-        <Box display="flex" flexDirection="column" width="100%">
-          <Box display="flex" flexDirection="column">
-            <Typography variant="bodyLarge">
-              Hello, {learner.firstName}!
-            </Typography>
-            <Typography variant="displayLarge" marginBottom="25px">
-              Continue with Unit 1 Module 5
-            </Typography>
-            <CourseCard size="large" />
-            <Typography
-              variant="displaySmall"
-              marginTop="35px"
-              marginBottom="25px"
-            >
-              Or get started with these modules
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "24px",
-                alignSelf: "stretch",
-              }}
-            >
-              <CourseCard />
-              <CourseCard />
-              <CourseCard />
-            </Box>
+      <Box sx={{ flexGrow: 1, p: "48px", mb: "48px", overflowY: "scroll" }}>
+        <Box display="flex" flexDirection="column">
+          <Typography variant="bodyLarge">
+            Hello, {learner.firstName}!
+          </Typography>
+          <Typography variant="displayLarge" marginBottom="25px">
+            Continue with Unit 1 Module 5
+          </Typography>
+          <CourseCard size="large" />
+          <Typography
+            variant="displaySmall"
+            marginTop="70px"
+            marginBottom="35px"
+          >
+            Or get started with these modules
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+            }}
+          >
+            <CourseCard />
+            <CourseCard />
+            <CourseCard />
           </Box>
+
           <Stack
             direction="row"
             width="100%"
-            alignItems="flex-start"
-            marginY="70px"
-            flexWrap="wrap"
-            gap="20px"
+            justifyContent="space-between"
+            marginTop="70px"
+            marginBottom="70px"
           >
             <NavButton
               label="Bookmarks"
