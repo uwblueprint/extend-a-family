@@ -9,9 +9,7 @@ export type SingleMessageProps = {
   respondLink: string;
 };
 
-export function buildSingleMessage(
-  props: SingleMessageProps
-): string {
+export function buildSingleMessage(props: SingleMessageProps): string {
   return `
 <table
   width="100%"

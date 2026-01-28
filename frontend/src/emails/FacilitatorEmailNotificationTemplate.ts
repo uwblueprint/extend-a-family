@@ -7,7 +7,7 @@ export type FacilitatorEmailNotificationTemplateProps = {
 };
 
 export function buildFacilitatorEmailNotificationTemplate(
-  props: FacilitatorEmailNotificationTemplateProps
+  props: FacilitatorEmailNotificationTemplateProps,
 ): string {
   return `
 <!DOCTYPE html>

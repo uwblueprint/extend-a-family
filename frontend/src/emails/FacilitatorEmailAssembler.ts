@@ -1,24 +1,19 @@
 import fs from "fs";
 import path from "path";
 
-import {
-  buildFacilitatorEmailNotificationTemplate,
-} from "./FacilitatorEmailNotificationTemplate";
+import { buildFacilitatorEmailNotificationTemplate } from "./FacilitatorEmailNotificationTemplate";
 
-import {
-  buildSingleMessage,
-} from "./SingleMessageTemplate";
+import { buildSingleMessage } from "./SingleMessageTemplate";
 
-import {
-  buildMultiMessage,
-} from "./MultiMessageTemplate";
+import { buildMultiMessage } from "./MultiMessageTemplate";
 
 /* ----------------------------------
    MULTI MESSAGE #1
 ----------------------------------- */
 
 const multiMessageHTML1 = buildMultiMessage({
-  learnerProfilePicture: "https://i.pinimg.com/736x/cd/97/f1/cd97f101e2603a65a826b184aa4ab58a.jpg",
+  learnerProfilePicture:
+    "https://i.pinimg.com/736x/cd/97/f1/cd97f101e2603a65a826b184aa4ab58a.jpg",
   learnerName: "Jotaro Kujo",
   messageBody: `
     <p style="margin: 0">
@@ -39,7 +34,8 @@ const multiMessageHTML1 = buildMultiMessage({
 ----------------------------------- */
 
 const multiMessageHTML2 = buildMultiMessage({
-  learnerProfilePicture: "https://i.redd.it/joseph-old-design-vs-new-v0-ny1f6jx4ut3f1.jpg?width=735&format=pjpg&auto=webp&s=a48a302a789a75adfbbc1caeebee0298f60daaac",
+  learnerProfilePicture:
+    "https://i.redd.it/joseph-old-design-vs-new-v0-ny1f6jx4ut3f1.jpg?width=735&format=pjpg&auto=webp&s=a48a302a789a75adfbbc1caeebee0298f60daaac",
   learnerName: "Joseph Joestar",
   messageBody: `
     <p style="margin: 0">
@@ -100,7 +96,8 @@ const introSentence =
 ----------------------------------- */
 
 const fullEmailHTML = buildFacilitatorEmailNotificationTemplate({
-  EAFLogo: "https://www.eafwr.on.ca/wp-content/uploads/2016/09/EAFWR_NEW_LOGO-OL.png",
+  EAFLogo:
+    "https://www.eafwr.on.ca/wp-content/uploads/2016/09/EAFWR_NEW_LOGO-OL.png",
   facilitatorName: "Dio Brando",
   introSentence,
   emailSettingsLink: "https://example.com/email-settings",
@@ -114,4 +111,5 @@ const fullEmailHTML = buildFacilitatorEmailNotificationTemplate({
 const outputPath = path.join(__dirname, "preview.html");
 fs.writeFileSync(outputPath, fullEmailHTML);
 
+// eslint-disable-next-line no-console
 console.log("✅ Email preview written to:", outputPath);

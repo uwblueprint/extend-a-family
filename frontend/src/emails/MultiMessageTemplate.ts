@@ -11,9 +11,7 @@ export type MultiMessageProps = {
   respondLink: string;
 };
 
-export function buildMultiMessage(
-  props: MultiMessageProps
-): string {
+export function buildMultiMessage(props: MultiMessageProps): string {
   return `
 <table
   width="100%"
