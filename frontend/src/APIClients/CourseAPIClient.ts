@@ -51,6 +51,7 @@ const editUnit = async (
     );
     return data;
   } catch (error) {
+    console.log(error);
     return null;
   }
 };
@@ -314,6 +315,26 @@ const unpublishModule = async (
   }
 };
 
+const rearangeUnits = async (arange: Map<string, number>) => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const arangement = Object.fromEntries(arange);
+    const { data } = await baseAPIClient.put(
+      `/course/rearangeUnits`,
+      { arangement },
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default {
   getUnits,
   createUnit,
@@ -324,6 +345,7 @@ export default {
   uploadThumbnail,
   lessonUpload,
   getModuleById,
+  rearangeUnits,
   editModule,
   deleteModule,
   deletePage,

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { Search } from "@mui/icons-material";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
@@ -51,7 +52,6 @@ export default function CourseUnitsPage() {
     <Box display="flex" width="100%" height="100vh" overflow="hidden">
       <UnitSidebar
         setSelectedUnit={setSelectedUnit}
-        handleClose={handleDrawerClose}
         open={sidebarOpen}
         selectedUnit={selectedUnit}
       />

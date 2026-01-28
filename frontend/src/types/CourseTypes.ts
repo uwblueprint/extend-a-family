@@ -168,4 +168,5 @@ export enum UnitSidebarModalType {
   Create = "Create",
   Delete = "Delete",
   Edit = "Edit",
+  Move = "Move",
 }
