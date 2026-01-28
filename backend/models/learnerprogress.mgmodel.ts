@@ -74,7 +74,6 @@ export const LearnerProgressSchema: Schema = new Schema(
       ref: "User",
       required: true,
       unique: true,
-      index: true,
     },
     completedActivities: {
       type: [mongoose.Schema.Types.ObjectId],
@@ -95,8 +94,6 @@ export const LearnerProgressSchema: Schema = new Schema(
   },
 );
 
-// Create index for efficient lookups
-LearnerProgressSchema.index({ learnerId: 1 });
 LearnerProgressSchema.index({ completedActivities: 1 });
 
 LearnerProgressSchema.plugin(mongooseLeanId);
