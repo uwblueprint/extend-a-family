@@ -24,6 +24,7 @@ import activityRouter from "./rest/activityRoutes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
+  "https://eaf.jimmyliu.dev",
   "https://extendafamily-7613e.firebaseapp.com",
   "https://extendafamily-7613e.web.app",
   /^https:\/\/extendafamily-7613e--pr.*\.web\.app$/,

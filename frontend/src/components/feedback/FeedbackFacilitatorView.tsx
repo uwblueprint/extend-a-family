@@ -9,9 +9,9 @@ import {
 import React, { useState } from "react";
 import { useUser } from "../../hooks/useUser";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
-import LearnerFeedbackBlock from "../feedback/LearnerFeedbackBlock";
+import LearnerFeedbackBlock from "./LearnerFeedbackBlock";
 
-const FeedbackFacilitator = (): React.ReactElement => {
+const FeedbackFacilitatorView = (): React.ReactElement => {
   const theme = useTheme();
   const { role } = useUser();
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -28,7 +28,7 @@ const FeedbackFacilitator = (): React.ReactElement => {
       justifyContent="space-between"
       gap="24px"
       alignSelf="stretch"
-      sx={{ padding: "32px 64px" }}
+      sx={{ padding: "32px 64px", height: "100%", overflow: "hidden" }}
     >
       <Typography variant="headlineLarge" color={theme.palette.Neutral[700]}>
         View Feedback
@@ -109,10 +109,19 @@ const FeedbackFacilitator = (): React.ReactElement => {
           margin: 0,
         }}
       />
-      <LearnerFeedbackBlock />
-      <LearnerFeedbackBlock />
+      <Stack
+        direction="column"
+        alignItems="flex-start"
+        gap="24px"
+        alignSelf="stretch"
+        flexGrow="1"
+        sx={{ overflow: "auto", minHeight: 0 }}
+      >
+        <LearnerFeedbackBlock />
+        <LearnerFeedbackBlock />
+      </Stack>
     </Stack>
   );
 };
 
-export default FeedbackFacilitator;
+export default FeedbackFacilitatorView;

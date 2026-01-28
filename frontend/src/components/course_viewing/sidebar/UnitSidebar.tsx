@@ -22,6 +22,7 @@ import CreateUnitModal from "../modals/CreateUnitModal";
 import DeleteUnitModal from "../modals/DeleteUnitModal";
 import EditUnitModal from "../modals/EditUnitModal";
 import ContextMenu from "./ContextMenu";
+import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 
 interface UnitSideBarProps {
   handleClose: () => void;
@@ -39,8 +40,6 @@ export default function UnitSidebar({
   const theme = useTheme();
   const user = useUser();
 
-  const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const [contextMenuUnit, setContextMenuUnit] = useState<CourseUnit | null>();
@@ -48,18 +47,27 @@ export default function UnitSidebar({
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
 
-  useEffect(() => {
-    const getCouseUnits = async () => {
-      const data = await CourseAPIClient.getUnits();
-      setCourseUnits(data);
+  const { courseUnits, refetchCourseUnits } = useCourseUnits();
 
-      // Set selectedUnit to the first unit if data is not empty
-      if (data.length > 0) {
-        setSelectedUnit(data[0]);
+  useEffect(() => {
+    if (!courseUnits || !courseUnits.length) return;
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const selectedUnitParam = queryParams.get("selectedUnit");
+
+    if (selectedUnitParam) {
+      const unitFromParams = courseUnits.find(
+        (unit) => unit.id === selectedUnitParam,
+      );
+      if (unitFromParams) {
+        setSelectedUnit(unitFromParams);
+        return;
       }
-    };
-    getCouseUnits();
-  }, [setSelectedUnit]);
+    }
+
+    // Default to first unit if no valid query parameter
+    setSelectedUnit(courseUnits[0]);
+  }, [courseUnits, setSelectedUnit]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleContextMenuOpen = (event: any, unit: CourseUnit) => {
@@ -73,7 +81,7 @@ export default function UnitSidebar({
   const createUnit = async (title: string) => {
     const unit = await CourseAPIClient.createUnit(title);
     if (unit) {
-      setCourseUnits((prev) => [...prev, unit]);
+      refetchCourseUnits();
     }
   };
   const editUnit = async (title: string) => {
@@ -83,9 +91,7 @@ export default function UnitSidebar({
         title,
       );
       if (editedUnit) {
-        setCourseUnits((prev) =>
-          prev.map((unit) => (unit.id === editedUnit.id ? editedUnit : unit)),
-        );
+        refetchCourseUnits();
         if (contextMenuUnit.id === selectedUnit?.id) {
           setSelectedUnit(editedUnit);
         }
@@ -98,9 +104,7 @@ export default function UnitSidebar({
         contextMenuUnit.id,
       );
       if (deletedUnitId) {
-        setCourseUnits((prev) =>
-          prev.filter((unit) => unit.id !== deletedUnitId),
-        );
+        refetchCourseUnits();
       }
     }
   };
@@ -146,7 +150,6 @@ export default function UnitSidebar({
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number,
   ) => {
-    setSelectedIndex(index);
     setSelectedUnit(courseUnits[index]);
   };
 
@@ -167,10 +170,10 @@ export default function UnitSidebar({
       open={open}
     >
       <Box
-        height="100vh"
         sx={{
           backgroundColor: theme.palette[user.role].Light.Default,
           overflowX: "hidden",
+          height: "100%",
         }}
       >
         <Box
@@ -223,7 +226,7 @@ export default function UnitSidebar({
                     py: "15px",
                     px: "32px",
                     backgroundColor:
-                      selectedIndex === index
+                      selectedUnit?.id === unit.id
                         ? theme.palette[user.role].Light.Selected
                         : "transparent",
                     "&:hover": {
@@ -236,7 +239,7 @@ export default function UnitSidebar({
                     disableTypography
                     primary={`${unit.displayIndex}. ${unit.title}`}
                     sx={
-                      selectedIndex === index
+                      selectedUnit?.id === unit.id
                         ? theme.typography.labelLargeProminent
                         : theme.typography.bodyMedium
                     }

@@ -1,7 +1,30 @@
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
-import { Activity } from "../types/CourseTypes";
+import { Activity, CourseModule, QuestionType } from "../types/CourseTypes";
 import { getLocalStorageObjProperty } from "../utils/LocalStorageUtils";
 import baseAPIClient from "./BaseAPIClient";
+
+const createActivity = async (
+  moduleId: string,
+  questionType: QuestionType,
+  index?: number,
+): Promise<CourseModule | null> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.post(
+      `/activities/${moduleId}/${questionType}`,
+      { index },
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
 
 const updateActivity = async <ActivityType extends Activity>(
   activity: ActivityType,
@@ -104,6 +127,7 @@ const uploadImage = async (
 };
 
 export default {
+  createActivity,
   updateActivity,
   updateActivityMainPicture,
   sendFeedback,

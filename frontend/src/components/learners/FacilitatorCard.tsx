@@ -44,7 +44,7 @@ export default function FacilitatorCard({ facilitator }: FacilitatorCardProps) {
   return (
     <Card
       variant="outlined"
-      sx={{ width: 1045, height: 230, borderRadius: "10px" }}
+      sx={{ maxWidth: 1045, height: 230, borderRadius: "10px" }}
     >
       <CardContent sx={{ height: "100%" }}>
         <Box

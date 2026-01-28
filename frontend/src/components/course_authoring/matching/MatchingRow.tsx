@@ -70,7 +70,7 @@ const MediaDisplay = ({
   // mediaItem.mediaType === "text"
   return (
     <TextField
-      sx={{ width: "231.8px", maxHeight: "64px" }}
+      sx={{ width: "180px", maxHeight: "64px" }}
       placeholder="[Click here to edit]"
       defaultValue={mediaItem.context}
       onChange={(e) => onChange(e.target.value)}
@@ -106,7 +106,7 @@ const MatchingRow = ({
   return (
     <Stack
       direction="row"
-      gap="16px"
+      gap="10px"
       alignItems="center"
       minHeight="52px"
       maxHeight="80px"
@@ -114,7 +114,7 @@ const MatchingRow = ({
     >
       <Stack
         direction="row"
-        gap="28px"
+        gap="10px"
         alignItems="center"
         minHeight="52px"
         maxHeight="80px"
@@ -133,7 +133,7 @@ const MatchingRow = ({
         />
         {threeColumns && (
           <>
-            <LongRightArrow labelText={`Match ${rowNum + 1}`} />
+            <LongRightArrow />
             <MediaDisplay
               mediaItem={media["3"][rowNum]}
               onChange={handleChange("3")}

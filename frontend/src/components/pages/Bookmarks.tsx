@@ -1,20 +1,21 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
-import { Box, Typography } from "@mui/material";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
-import UserAPIClient from "../../APIClients/UserAPIClient";
+import { Box, Typography } from "@mui/material";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
-import { Bookmark } from "../../types/UserTypes";
-import { CourseUnit, CourseModule } from "../../types/CourseTypes";
+import UserAPIClient from "../../APIClients/UserAPIClient";
 import useBookmarksFilter from "../../hooks/useBookmarksFilter";
+import { CourseModule } from "../../types/CourseTypes";
+import { Bookmark } from "../../types/UserTypes";
 import {
-  BookmarksSidebar,
   BookmarksContent,
+  BookmarksSidebar,
   ExpandCollapseButton,
 } from "../bookmarks";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 
 const Bookmarks = (): React.ReactElement => {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
-  const [units, setUnits] = useState<CourseUnit[]>([]);
+  const { courseUnits: units } = useCourseUnits();
   const [modules, setModules] = useState<{ [unitId: string]: CourseModule[] }>(
     {},
   );
@@ -52,18 +53,6 @@ const Bookmarks = (): React.ReactElement => {
     }
   };
 
-  // Fetch all units
-  const fetchUnits = async () => {
-    try {
-      const unitsData = await CourseAPIClient.getUnits();
-      setUnits(unitsData);
-    } catch (err) {
-      /* eslint-disable-next-line no-console */
-      console.error("Failed to fetch units:", err);
-      setError("Failed to load course units");
-    }
-  };
-
   // Fetch modules for a specific unit
   const fetchModulesForUnit = async (unitId: string) => {
     // Prevent duplicate concurrent/repeated fetches for same unit
@@ -90,7 +79,6 @@ const Bookmarks = (): React.ReactElement => {
       setError(null);
 
       await fetchBookmarks();
-      await fetchUnits();
 
       setLoading(false);
     };
@@ -196,7 +184,13 @@ const Bookmarks = (): React.ReactElement => {
     : null;
 
   return (
-    <Box display="flex" width="100%" minHeight="100vh">
+    <Box
+      display="flex"
+      width="100%"
+      minHeight="100vh"
+      height="100vh"
+      overflow="hidden"
+    >
       {/* Sidebar */}
       <BookmarksSidebar
         units={unitsWithBookmarks}
@@ -205,7 +199,7 @@ const Bookmarks = (): React.ReactElement => {
       />
 
       {/* Main Content */}
-      <Box sx={{ flexGrow: 1, p: "48px" }}>
+      <Box sx={{ flexGrow: 1, p: "48px", mb: "48px", overflowY: "scroll" }}>
         {!loading && !error && hasBookmarks && (
           <Box
             display="flex"

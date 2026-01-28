@@ -34,6 +34,7 @@ import ErrorAlert from "../common/ErrorAlert";
 import Login from "./Login";
 import PasswordCheck from "./PasswordCheck";
 import { getSignUpPath, getSignUpPrompt } from "./WelcomePage";
+import { isFacilitator } from "../../types/UserTypes";
 
 const Signup = (): React.ReactElement => {
   const history = useHistory();
@@ -46,6 +47,7 @@ const Signup = (): React.ReactElement => {
   const [errorData, setErrorData] = useState<PresentableError | null>(null);
   const [emailError, setEmailError] = useState<PresentableError | null>(null);
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
@@ -53,6 +55,7 @@ const Signup = (): React.ReactElement => {
   const onSignupClick = async () => {
     setEmailError(null);
     setErrorData(null);
+    setIsSigningUp(true);
 
     try {
       const signedUpUser = await AuthAPIClient.signup(
@@ -62,13 +65,13 @@ const Signup = (): React.ReactElement => {
         password,
         "Facilitator",
       );
-      // eslint-disable-next-line no-alert
-      alert("Signup successful, verification link was sent to your email.");
 
-      if (signedUpUser?.status === "Active") {
-        history.push(SIGNUP_APPROVED_PAGE);
-      } else if (signedUpUser?.status === "PendingApproval") {
-        history.push(SIGNUP_PENDING_PAGE);
+      if (signedUpUser && isFacilitator(signedUpUser)) {
+        if (signedUpUser.approved) {
+          history.push(SIGNUP_APPROVED_PAGE);
+        } else {
+          history.push(SIGNUP_PENDING_PAGE);
+        }
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -86,6 +89,8 @@ const Signup = (): React.ReactElement => {
             break;
         }
       }
+    } finally {
+      setIsSigningUp(false);
     }
   };
 
@@ -240,7 +245,7 @@ const Signup = (): React.ReactElement => {
             <Button
               variant="contained"
               onClick={onSignupClick}
-              disabled={!isPasswordValid}
+              disabled={!isPasswordValid || isSigningUp}
               fullWidth
               sx={{
                 bgcolor: theme.palette.Facilitator.Dark.Default,
@@ -257,10 +262,13 @@ const Signup = (): React.ReactElement => {
               }}
             >
               <Typography variant="labelLargeProminent">
-                Sign up as a facilitator
+                {isSigningUp ? "Signing up..." : "Sign up as a facilitator"}
               </Typography>
             </Button>
-            <Stack direction="row" sx={{ position: "relative" }}>
+            <Stack
+              direction="row"
+              sx={{ position: "relative", marginBottom: "50px" }}
+            >
               <Link href={WELCOME_PAGE}>
                 <Typography
                   variant="labelSmall"

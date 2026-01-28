@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+
 export type CourseUnitDTO = {
   id: string;
   displayIndex: number;
@@ -7,7 +9,7 @@ export type CourseUnitDTO = {
 
 export type CreateCourseUnitDTO = Pick<CourseUnitDTO, "title">;
 export type UpdateCourseUnitDTO = Partial<
-  Pick<CourseUnitDTO, "title" | "displayIndex">
+  Pick<CourseUnitDTO, "title" | "displayIndex" | "modules">
 >;
 
 export enum ModuleStatus {
@@ -18,17 +20,26 @@ export enum ModuleStatus {
 
 export type CourseModuleDTO = {
   id: string;
-  displayIndex: number;
   title: string;
   imageURL?: string;
   pages: CoursePageDTO[];
-  lessonPdfUrl?: string;
+  unitId?: string;
+  status: ModuleStatus;
+};
+
+export type CourseModuleLeanDTO = {
+  id: string;
+  title: string;
+  imageURL?: string;
+  pages: ObjectId[];
   unitId?: string;
   status: ModuleStatus;
 };
 
 export type CreateCourseModuleDTO = Pick<CourseModuleDTO, "title">;
-export type UpdateCourseModuleDTO = Pick<CourseModuleDTO, "title" | "imageURL">;
+export type UpdateCourseModuleDTO = Partial<
+  Pick<CourseModuleDTO, "title" | "imageURL">
+>;
 
 export type PageType = "Lesson" | "Activity";
 export type CoursePageDTO = {
@@ -39,6 +50,8 @@ export type CoursePageDTO = {
 
 export type LessonPageDTO = CoursePageDTO & {
   source: string;
+  pageIndex: number;
+  pdfUrl: string;
 };
 
 export type ElementSkeleton = {

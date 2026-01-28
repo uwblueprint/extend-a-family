@@ -1,29 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Document, pdfjs } from "react-pdf";
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import {
   Accordion,
-  AccordionSummary,
   AccordionDetails,
+  AccordionSummary,
   Box,
   Typography,
   useTheme,
 } from "@mui/material";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import React, { useEffect, useState } from "react";
+import { pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import { CourseModule } from "../../types/CourseTypes";
 import ModuleBookmarksGrid from "./ModuleBookmarksGrid";
-import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url,
 ).toString();
-
-const options = {
-  cMapUrl: "/cmaps/",
-  standardFontDataUrl: "/standard_fonts/",
-};
 
 interface ModuleSectionProps {
   module: CourseModule;
@@ -51,10 +47,10 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
 }) => {
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
-  const [lessonPdfUrl, setLessonPdfUrl] = useState<string | null>(null);
-  const [detailedModule, setDetailedModule] = useState<
-    (CourseModule & { lessonPdfUrl: string }) | null
-  >(null);
+  const [detailedModule, setDetailedModule] = useState<CourseModule | null>(
+    null,
+  );
+  const { moduleDisplayIndex } = useCourseUnits();
 
   // Sync when expandAll changes OR when a command id changes (button press)
   useEffect(() => {
@@ -69,7 +65,6 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
     (async () => {
       const detailed = await CourseAPIClient.getModuleById(module.id);
       if (isMounted && detailed) {
-        setLessonPdfUrl(detailed.lessonPdfUrl || null);
         setDetailedModule(detailed);
       }
     })();
@@ -130,7 +125,7 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
           }}
         >
           <Typography sx={{ ...theme.typography.titleLarge }}>
-            Module {module.displayIndex}: {module.title}
+            Module {moduleDisplayIndex(module.id)}: {module.title}
           </Typography>
           <Typography sx={{ ...theme.typography.labelLarge }}>
             {activityCount} bookmarked {activityLabel}, {slideCount} bookmarked{" "}
@@ -145,13 +140,11 @@ const ModuleSection: React.FC<ModuleSectionProps> = ({
           padding: "32px 32px 42px 32px",
         }}
       >
-        <Document file={lessonPdfUrl || null} options={options}>
-          <ModuleBookmarksGrid
-            module={detailedModule || module}
-            bookmarks={bookmarks}
-            onBookmarkDeleted={onBookmarkDeleted}
-          />
-        </Document>
+        <ModuleBookmarksGrid
+          module={detailedModule || module}
+          bookmarks={bookmarks}
+          onBookmarkDeleted={onBookmarkDeleted}
+        />
       </AccordionDetails>
     </Accordion>
   );

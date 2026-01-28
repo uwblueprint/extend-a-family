@@ -2,7 +2,10 @@ import axios, { AxiosRequestConfig } from "axios";
 import { jwtDecode } from "jwt-decode";
 
 import AUTHENTICATED_USER_KEY from "../constants/AuthConstants";
-import { setLocalStorageObjProperty } from "../utils/LocalStorageUtils";
+import {
+  getLocalStorageObjProperty,
+  setLocalStorageObjProperty,
+} from "../utils/LocalStorageUtils";
 
 import { DecodedJWT } from "../types/AuthTypes";
 
@@ -32,21 +35,41 @@ baseAPIClient.interceptors.request.use(async (config: AxiosRequestConfig) => {
       (typeof decodedToken === "string" ||
         decodedToken.exp <= Math.round(new Date().getTime() / 1000))
     ) {
-      const { data } = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/auth/refresh`,
-        {},
-        { withCredentials: true },
-      );
+      try {
+        const refreshToken = getLocalStorageObjProperty(
+          AUTHENTICATED_USER_KEY,
+          "refreshToken",
+        );
 
-      const accessToken = data.accessToken || data.access_token;
-      setLocalStorageObjProperty(
-        AUTHENTICATED_USER_KEY,
-        "accessToken",
-        accessToken,
-      );
+        const { data } = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/auth/refresh`,
+          { refreshToken },
+        );
 
-      if (newConfig.headers) {
-        newConfig.headers.Authorization = `Bearer ${accessToken}`;
+        const accessToken = data.accessToken || data.access_token;
+        setLocalStorageObjProperty(
+          AUTHENTICATED_USER_KEY,
+          "accessToken",
+          accessToken,
+        );
+
+        // Update refreshToken in localStorage
+        if (data.refreshToken) {
+          setLocalStorageObjProperty(
+            AUTHENTICATED_USER_KEY,
+            "refreshToken",
+            data.refreshToken,
+          );
+        }
+
+        if (newConfig.headers) {
+          newConfig.headers.Authorization = `Bearer ${accessToken}`;
+        }
+      } catch (error) {
+        // If refresh fails, clear authentication data and redirect to login
+        localStorage.removeItem(AUTHENTICATED_USER_KEY);
+        window.location.href = "/";
+        throw error;
       }
     }
   }
