@@ -10,7 +10,8 @@ class ActivityService {
     moduleId: string,
     questionType: QuestionType,
     index?: number,
-  ): Promise<CourseModuleDTO> {
+    activityData?: Partial<Activity>,
+  ): Promise<{ pages: string[] }> {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -28,84 +29,41 @@ class ActivityService {
         instruction: "Please select the correct answer",
       };
 
-      let activityData;
+      let activityDataToCreate;
       if (questionType === QuestionType.MultipleChoice) {
-        activityData = {
+        activityDataToCreate = {
           ...baseActivity,
           correctAnswer: 0,
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+          ...activityData,
         };
       } else if (questionType === QuestionType.MultiSelect) {
-        activityData = {
+        activityDataToCreate = {
           ...baseActivity,
           correctAnswers: [0],
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+          ...activityData,
         };
-      } else if (questionType === QuestionType.Table) {
-        activityData = {
+      } else if (questionType === QuestionType.TextInput) {
+        activityDataToCreate = {
           ...baseActivity,
-          columnLabels: ["Header", "Header", "Header", "Header", "Header"],
-          rowLabels: [["Row 1"], ["Row 2"], ["Row 3"], ["Row 4"], ["Row 5"]],
-          correctAnswers: [
-            [0, 0],
-            [1, 0],
-            [2, 0],
-            [3, 0],
-            [4, 0],
-          ],
-        };
-      } else if (questionType === QuestionType.Matching) {
-        const media: Media[] = [
-          {
-            id: "1",
-            mediaType: "text",
-            context: "",
+          placeholder: "Enter your answer here",
+          maxLength: 200,
+          validation: {
+            mode: "short_answer",
+            answers: [],
           },
-          {
-            id: "2",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "3",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "4",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "5",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "6",
-            mediaType: "text",
-            context: "",
-          },
-        ];
-        activityData = {
-          ...baseActivity,
-          media: {
-            "1": [media[0], media[1], media[2]],
-            "2": [media[3], media[4], media[5]],
-          },
-          correctAnswers: [
-            ["1", "4", "7"],
-            ["2", "5", "8"],
-            ["3", "6", "9"],
-          ],
-          rows: 3,
+          ...activityData,
         };
       } else {
-        activityData = baseActivity;
+        activityDataToCreate = {
+          ...baseActivity,
+          ...activityData,
+        };
       }
 
       const activityDocs = await (Model as typeof mongoose.Model).create(
-        [activityData],
+        [activityDataToCreate],
         { session },
       );
       const activity = activityDocs[0];
