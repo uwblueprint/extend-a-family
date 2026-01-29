@@ -55,65 +55,6 @@ class ActivityService {
           },
           ...activityData,
         };
-      } else if (questionType === QuestionType.Table) {
-        activityData = {
-          ...baseActivity,
-          columnLabels: ["Header", "Header", "Header", "Header", "Header"],
-          rowLabels: [["Row 1"], ["Row 2"], ["Row 3"], ["Row 4"], ["Row 5"]],
-          correctAnswers: [
-            [0, 0],
-            [1, 0],
-            [2, 0],
-            [3, 0],
-            [4, 0],
-          ],
-        };
-      } else if (questionType === QuestionType.Matching) {
-        const media: Media[] = [
-          {
-            id: "1",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "2",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "3",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "4",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "5",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "6",
-            mediaType: "text",
-            context: "",
-          },
-        ];
-        activityData = {
-          ...baseActivity,
-          media: {
-            "1": [media[0], media[1], media[2]],
-            "2": [media[3], media[4], media[5]],
-          },
-          correctAnswers: [
-            ["1", "4", "7"],
-            ["2", "5", "8"],
-            ["3", "6", "9"],
-          ],
-          rows: 3,
-        };
       } else {
         activityDataToCreate = {
           ...baseActivity,
