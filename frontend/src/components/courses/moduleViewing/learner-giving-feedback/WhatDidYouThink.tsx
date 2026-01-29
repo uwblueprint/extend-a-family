@@ -16,6 +16,7 @@ const WhatDidYouThink = ({
     <Box
       sx={{
         display: "inline-flex",
+        width: "100%",
         padding: "177.5px 212px 178.5px 212px",
         justifyContent: "center",
         alignItems: "center",

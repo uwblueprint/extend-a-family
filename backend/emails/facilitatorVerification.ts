@@ -1,0 +1,121 @@
+import { defaultLogoURL } from "./constants";
+
+const facilitatorVerificationEmail = (verifyEmailLink: string): string => `
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>Facilitator Email Verification Email</title>
+</head>
+
+<body style="margin: 0">
+  <table width="100%" cellpadding="0" cellspacing="0" style="
+      font-family: Lexend Deca, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 140%;
+      letter-spacing: 0.32px;
+      color: #000;
+    ">
+    <!-- TOP BANNER -->
+    <tr>
+      <td style="
+        padding: 16px 32px;
+        text-align: center;
+        border-bottom: 2px solid #E5E7FF;
+        background: #F2F3FF;
+      ">
+        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="height: 40px" />
+      </td>
+    </tr>
+
+    <!-- SPACER -->
+    <tr>
+      <td height="32" style="line-height: 0">&nbsp;</td>
+    </tr>
+
+    <!-- MAIN CONTENT -->
+    <tr>
+      <td style="padding: 0 32px">
+        <p style="margin: 0 0 20px">Hello,</p>
+
+        <p style="margin: 0 0 20px">
+          Thank you for making an account on the Smart Spending, Smart Saving Financial Literacy Tool. Please click the link below to verify your email to proceed.
+        </p>
+
+        <!-- RESPOND BUTTON -->
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="text-align: center">
+              <a href="${verifyEmailLink}" style="
+                display: inline-block;
+                background: #4F549E;
+                padding: 10px 24px;
+                border-radius: 4px;
+                text-decoration: none;
+                color: #fff;
+                font-weight: 300;
+                letter-spacing: 0.7px;
+              ">
+                VERIFY EMAIL
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- SPACER -->
+    <tr>
+      <td height="32" style="line-height: 0">&nbsp;</td>
+    </tr>
+
+    <!-- SIGNATURE -->
+    <tr>
+      <td style="padding: 0 32px">
+        <p style="margin: 0">
+          Extend-A-Family Waterloo Region 💙
+        </p>
+      </td>
+    </tr>
+
+    <!-- SPACER -->
+    <tr>
+      <td height="32" style="line-height: 0">&nbsp;</td>
+    </tr>
+
+    <!-- DIVIDER -->
+    <tr>
+      <td style="padding: 0 32px">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="border-top: 1px solid #d1d2d4; line-height: 1px">
+              &nbsp;
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+      <td style="
+        color: var(--Neutral-700, #555759);
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 140%;
+        letter-spacing: 0.32px;
+        padding: 20px;
+      ">
+        This is an automatic message. If you need help, feel free to reply to this email.
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>
+`;
+
+export default facilitatorVerificationEmail;

@@ -10,7 +10,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { LANDING_PAGE } from "../../../constants/Routes";
 import { useSocket } from "../../../contexts/SocketContext";
-import useNotifications from "../../../hooks/useNotifications";
+import { useNotifications } from "../../../contexts/NotificationsContext";
 import { useUser } from "../../../hooks/useUser";
 import eafLogo from "../../assets/logoColoured.png";
 import NotificationList from "../../notification/NotificationsList";
@@ -42,7 +42,7 @@ export default function Navbar() {
   };
 
   const handleNotificationClose = () => {
-    socket?.emit("notification:read", user.id);
+    socket?.emit("notification:seen", user.id);
     fetchNotifications();
     handleClose();
   };
@@ -70,23 +70,25 @@ export default function Navbar() {
           </Link>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", gap: "24px" }}>
+            {user.role === "Facilitator" && (
+              <IconButton
+                size="large"
+                aria-label="show new notifications"
+                onClick={handleClick}
+                sx={{ color: theme.palette.Facilitator.Light.Hover }}
+              >
+                <Badge badgeContent={numUnseenNotifications} color="error">
+                  <MessageOutlinedIcon
+                    sx={{
+                      width: "24px",
+                      height: "24px",
+                      color: theme.palette.Facilitator.Dark.Default,
+                    }}
+                  />
+                </Badge>
+              </IconButton>
+            )}
             <PageTabs />
-            <IconButton
-              size="large"
-              aria-label="show new notifications"
-              onClick={handleClick}
-              sx={{ color: theme.palette.Facilitator.Light.Hover }}
-            >
-              <Badge badgeContent={numUnseenNotifications} color="error">
-                <MessageOutlinedIcon
-                  sx={{
-                    width: "24px",
-                    height: "24px",
-                    color: theme.palette.Facilitator.Dark.Default,
-                  }}
-                />
-              </Badge>
-            </IconButton>
             <UserButton />
           </Box>
         </Toolbar>
@@ -102,7 +104,7 @@ export default function Navbar() {
         }}
       >
         <NotificationList
-          notifications={notifications}
+          notifications={notifications.filter((notif) => !notif.read)}
           refreshNotifs={fetchNotifications}
           errorFetchNotifs={errorFetchNotifs}
         />

@@ -1,4 +1,6 @@
 import * as React from "react";
+import ActivityAPIClient from "../../../../APIClients/ActivityAPIClient";
+import { useLearner } from "../../../../hooks/useUser";
 import DidYouLikeTheContentSlide from "./DidYouLikeTheContent";
 import HowEasyWasTheModuleSlide from "./HowEasyWasTheModule";
 import ThanksForTheFeedbackSlide from "./ThanksForTheFeedback";
@@ -9,10 +11,9 @@ enum SurveyFormStage {
   HowEasyWasTheModule = "HowEasyWasTheModule",
   WhatDidYouThinkOfTheModule = "WhatDidYouThinkOfTheModule",
   ThanksForTheFeedback = "ThanksForTheFeedback",
-  Congratulations = "Congratulations",
 }
 
-const SurveySlides = () => {
+const SurveySlides = ({ moduleId }: { moduleId: string }) => {
   const [formStage, setFormStage] = React.useState<SurveyFormStage>(
     SurveyFormStage.DidYouLikeTheContent,
   );
@@ -23,9 +24,16 @@ const SurveySlides = () => {
   >();
   const [moduleFeedbackText, setModuleFeedbackText] =
     React.useState<string>("");
+  const { id: learnerId } = useLearner();
 
-  const submitFeedback = () => {
-    // TODO: Handle feedback submission logic here
+  const submitFeedback = async () => {
+    await ActivityAPIClient.sendFeedback({
+      learnerId,
+      moduleId,
+      isLiked: contentLiked,
+      difficulty: moduleEaseRating,
+      message: moduleFeedbackText,
+    });
   };
 
   switch (formStage) {
@@ -66,8 +74,6 @@ const SurveySlides = () => {
       );
     case SurveyFormStage.ThanksForTheFeedback:
       return <ThanksForTheFeedbackSlide />;
-    case SurveyFormStage.Congratulations:
-      return <div>Congratulations</div>;
     default:
       return <div>Default</div>;
   }

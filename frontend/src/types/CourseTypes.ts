@@ -2,6 +2,7 @@ export type CourseUnit = {
   id: string;
   displayIndex: number;
   title: string;
+  modules: CourseModule[];
 };
 
 export enum QuestionType {
@@ -9,7 +10,7 @@ export enum QuestionType {
   MultiSelect = "MultiSelect",
   Table = "Table",
   Matching = "Matching",
-  Custom = "Custom",
+  Input = "Input",
 }
 
 export type PageType = "Lesson" | QuestionType;
@@ -24,6 +25,13 @@ export interface LessonPage extends CoursePageBase {
   type: "Lesson";
   source: string;
   pageIndex: number;
+  pdfUrl: string;
+}
+
+export interface Media {
+  id: string;
+  mediaType: "text" | "image";
+  context: string;
 }
 
 interface ActivityBase extends CoursePageBase {
@@ -51,16 +59,47 @@ export interface MultiSelectActivity extends ActivityBase {
   correctAnswers: number[];
 }
 
-export type Activity = MultipleChoiceActivity | MultiSelectActivity;
+export interface MatchingActivity extends ActivityBase {
+  type: QuestionType.Matching;
+  questionType: QuestionType.Matching;
+  media: {
+    [key: string]: Media[]; // key: column number
+  };
+  correctAnswers: string[][]; // [[id2, id2, id3]....] where all strings in one set form a correct match
+  rows: number;
+}
+
+export enum HeaderColumnIncludesTypes {
+  IMAGE = "image",
+  TEXT = "text",
+  IMAGE_AND_TEXT = "image_and_text",
+}
+
+export interface TableActivity extends ActivityBase {
+  type: QuestionType.Table;
+  questionType: QuestionType.Table;
+  columnLabels: string[];
+  rowLabels: string[][]; // Each inner array: [labelText, optionalImageUrl]
+  correctAnswers: number[][]; // list of table coordinates which represent answers [row, col]
+  headerColumnIncludes: HeaderColumnIncludesTypes;
+}
+
+export type Activity =
+  | MultipleChoiceActivity
+  | MultiSelectActivity
+  | MatchingActivity
+  | TableActivity;
 
 export type CoursePage = LessonPage | Activity;
 
-export function isLessonPage(page: CoursePageBase): page is LessonPage {
+export function isLessonPage(page: CoursePage): page is LessonPage {
   return page.type === "Lesson";
 }
 
-export function isActivityPage(page: CoursePageBase): page is Activity {
-  return Object.values(QuestionType).includes(page.type as QuestionType);
+export function isActivityPage(page?: CoursePage): page is Activity {
+  return !!(
+    page && Object.values(QuestionType).includes(page.type as QuestionType)
+  );
 }
 
 export function isMultipleChoiceActivity(
@@ -75,6 +114,24 @@ export function isMultiSelectActivity(
   return activity.type === QuestionType.MultiSelect;
 }
 
+export function isMatchingActivity(
+  activity?: CoursePage,
+): activity is MatchingActivity {
+  return !!(activity && activity.type === QuestionType.Matching);
+}
+
+export function isTableActivity(
+  activity: CoursePage,
+): activity is TableActivity {
+  return activity.type === QuestionType.Table;
+}
+
+export enum ModuleStatus {
+  draft = "draft",
+  published = "published",
+  unpublished = "unpublished",
+}
+
 export type CourseModule = {
   id: string;
   displayIndex: number;
@@ -82,6 +139,7 @@ export type CourseModule = {
   imageURL?: string;
   pages: CoursePage[];
   unitId?: string;
+  status: ModuleStatus;
 };
 
 export enum InteractiveElementType {

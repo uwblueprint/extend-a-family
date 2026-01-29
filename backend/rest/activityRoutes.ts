@@ -168,4 +168,28 @@ activityRouter.patch(
   },
 );
 
+activityRouter.patch(
+  "/UploadImage",
+  upload.single("uploadedImage"),
+  isAuthorizedByRole(new Set(["Administrator"])),
+  uploadPictureValidator,
+  async (req, res) => {
+    const imageData = req.file!.buffer!;
+    const contentType = req.file!.mimetype!;
+    const { path } = req.body;
+
+    try {
+      const imageUrl: string = await firebaseStorageService.uploadImage(
+        path,
+        imageData,
+        contentType,
+      );
+
+      res.status(200).json(imageUrl);
+    } catch (error: unknown) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
 export default activityRouter;

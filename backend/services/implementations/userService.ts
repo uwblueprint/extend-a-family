@@ -1,5 +1,5 @@
 import * as firebaseAdmin from "firebase-admin";
-import { Model, ObjectId } from "mongoose";
+import mongoose, { Model, ObjectId } from "mongoose";
 import IUserService from "../interfaces/userService";
 import MgUser, {
   Learner,
@@ -18,8 +18,14 @@ import {
 import { AuthErrorCodes } from "../../types/authTypes";
 import { getErrorCode, getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
+import EmailService from "./emailService";
+import IEmailService from "../interfaces/emailService";
+import nodemailerConfig from "../../nodemailer.config";
+import facilitatorRejectedEmail from "../../emails/facilitatorRejected";
+import facilitatorApprovedEmail from "../../emails/facilitatorApproved";
 
 const Logger = logger(__filename);
+const emailService: IEmailService = new EmailService(nodemailerConfig);
 
 const getMongoUserByAuthId = async (authId: string): Promise<User> => {
   const user: User | null = await MgUser.findOne({ authId });
@@ -34,7 +40,10 @@ class UserService implements IUserService {
   async getUserById(userId: string | ObjectId): Promise<UserDTO> {
     let user: User | null;
     try {
-      user = await MgUser.findById(userId);
+      user = await MgUser.findById(userId).populate({
+        path: "facilitator",
+        select: "firstName lastName email bio profilePicture",
+      });
 
       if (!user) {
         throw new Error(`userId ${userId} not found.`);
@@ -362,11 +371,13 @@ class UserService implements IUserService {
   }
 
   async approveFacilitator(userId: string): Promise<UserDTO> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-      const user = await MgUser.findByIdAndUpdate(
+      const user = await FacilitatorModel.findByIdAndUpdate(
         userId,
-        { status: "Active" },
-        { new: true, runValidators: true },
+        { approved: true },
+        { new: true, runValidators: true, session },
       );
 
       if (!user) {
@@ -374,18 +385,32 @@ class UserService implements IUserService {
       }
 
       Logger.info(`Facilitator ${userId} has been approved`);
+
+      await emailService.sendEmail(
+        user.email,
+        "Facilitator Account Approved",
+        facilitatorApprovedEmail(),
+      );
+
+      await session.commitTransaction();
+
       return user.toObject() as unknown as UserDTO;
     } catch (error: unknown) {
+      await session.abortTransaction();
       Logger.error(
         `Failed to approve facilitator. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 
   async rejectFacilitator(userId: string): Promise<void> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-      const user = await MgUser.findById(userId);
+      const user = await MgUser.findById(userId, null, { session });
       if (!user) {
         throw new Error("User not found");
       }
@@ -401,14 +426,24 @@ class UserService implements IUserService {
       }
 
       // Then delete from MongoDB
-      await MgUser.findByIdAndDelete(userId);
+      await MgUser.findByIdAndDelete(userId, { session });
 
       Logger.info(`Facilitator ${userId} has been rejected and deleted`);
+
+      await emailService.sendEmail(
+        user.email,
+        "Facilitator Application Status",
+        facilitatorRejectedEmail(),
+      );
+      await session.commitTransaction();
     } catch (error: unknown) {
+      await session.abortTransaction();
       Logger.error(
         `Failed to reject facilitator. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 }

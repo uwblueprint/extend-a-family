@@ -14,11 +14,19 @@ const login = async (
   attemptedRole: Role,
 ): Promise<AuthenticatedUser | null> => {
   try {
-    const { data } = await baseAPIClient.post(
-      "/auth/login",
-      { email, password, attemptedRole },
-      { withCredentials: true },
-    );
+    const { data } = await baseAPIClient.post("/auth/login", {
+      email,
+      password,
+      attemptedRole,
+    });
+    // Store refreshToken in localStorage
+    if (data.refreshToken) {
+      setLocalStorageObjProperty(
+        AUTHENTICATED_USER_KEY,
+        "refreshToken",
+        data.refreshToken,
+      );
+    }
     return data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -56,11 +64,21 @@ const signup = async (
   role: string,
 ): Promise<AuthenticatedUser | null> => {
   try {
-    const { data } = await baseAPIClient.post(
-      "/auth/signup",
-      { firstName, lastName, email, password, role },
-      { withCredentials: true },
-    );
+    const { data } = await baseAPIClient.post("/auth/signup", {
+      firstName,
+      lastName,
+      email,
+      password,
+      role,
+    });
+    // Store refreshToken in localStorage
+    if (data.refreshToken) {
+      setLocalStorageObjProperty(
+        AUTHENTICATED_USER_KEY,
+        "refreshToken",
+        data.refreshToken,
+      );
+    }
     return data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -159,18 +177,31 @@ const updateUserStatus = async (newStatus: Status): Promise<boolean> => {
 // for testing only, refresh does not need to be exposed in the client
 const refresh = async (): Promise<boolean> => {
   try {
-    const { data } = await baseAPIClient.post(
-      "/auth/refresh",
-      {},
-      { withCredentials: true },
+    const refreshToken = getLocalStorageObjProperty(
+      AUTHENTICATED_USER_KEY,
+      "refreshToken",
     );
+    const { data } = await baseAPIClient.post("/auth/refresh", {
+      refreshToken,
+    });
     setLocalStorageObjProperty(
       AUTHENTICATED_USER_KEY,
       "accessToken",
       data.accessToken,
     );
+    // Update refreshToken in localStorage
+    if (data.refreshToken) {
+      setLocalStorageObjProperty(
+        AUTHENTICATED_USER_KEY,
+        "refreshToken",
+        data.refreshToken,
+      );
+    }
     return true;
   } catch (error) {
+    // If refresh fails, clear authentication data and redirect to login
+    localStorage.removeItem(AUTHENTICATED_USER_KEY);
+    window.location.href = "/";
     return false;
   }
 };

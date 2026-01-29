@@ -1,4 +1,3 @@
-import { QuestionType } from "../types/activityTypes";
 import {
   MatchingActivityModel,
   MultipleChoiceActivityModel,
@@ -6,6 +5,7 @@ import {
   TableActivityModel,
   TextInputActivityModel,
 } from "../models/activity.mgmodel";
+import { QuestionType } from "../types/activityTypes";
 
 export const activityModelMapper = {
   [QuestionType.MultipleChoice]: MultipleChoiceActivityModel,

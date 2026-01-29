@@ -3,6 +3,7 @@ import IEmailService from "../interfaces/emailService";
 import { NodemailerConfig } from "../../types/authTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
+import { defaultReplyToEmail } from "../../emails/constants";
 
 const Logger = logger(__filename);
 
@@ -24,16 +25,16 @@ class EmailService implements IEmailService {
     to: string,
     subject: string,
     htmlBody: string,
+    replyTo: string = defaultReplyToEmail,
   ): Promise<void> {
-    const mailOptions = {
-      from: this.sender,
-      to,
-      subject,
-      html: htmlBody,
-    };
-
     try {
-      return await this.transporter.sendMail(mailOptions);
+      return await this.transporter.sendMail({
+        from: this.sender,
+        to,
+        subject,
+        html: htmlBody,
+        replyTo,
+      });
     } catch (error: unknown) {
       Logger.error(`Failed to send email. Reason = ${getErrorMessage(error)}`);
       throw error;

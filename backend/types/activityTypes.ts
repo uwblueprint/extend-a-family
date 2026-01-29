@@ -21,7 +21,7 @@ export interface ActivityDTO extends CoursePageDTO {
 
 export interface Media {
   id: string;
-  mediaType: "text" | "media";
+  mediaType: "text" | "image";
   context: string;
 }
 
@@ -47,8 +47,9 @@ export interface MultiSelectActivityDTO extends ActivityDTO {
 export interface TableActivityDTO extends ActivityDTO {
   questionType: QuestionType.Table;
   columnLabels: string[];
-  rowLabels: Map<string, string | undefined>; // key is label, and value is image URL
+  rowLabels: string[][]; // Each row label is an array: [labelText, imageURL?]
   correctAnswers: number[][];
+  headerColumnIncludes: "image" | "text" | "image_and_text";
 }
 
 export type TextInputValidationDTO =

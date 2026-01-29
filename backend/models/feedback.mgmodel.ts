@@ -1,10 +1,10 @@
-import mongoose, { Schema, Document, ObjectId } from "mongoose";
+import mongoose, { Document, ObjectId, Schema } from "mongoose";
+import mongooseLeanId from "mongoose-lean-id";
 
 export interface Feedback extends Document {
   id: ObjectId;
   learnerId: ObjectId;
   moduleId: ObjectId;
-  unitId: ObjectId;
   isLiked: boolean;
   difficulty: number;
   message: string;
@@ -14,17 +14,12 @@ export const FeedbackSchema: Schema = new Schema(
   {
     learnerId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Learner",
       required: true,
     },
     moduleId: {
       type: Schema.Types.ObjectId,
       ref: "CourseModule",
-      required: true,
-    },
-    unitId: {
-      type: Schema.Types.ObjectId,
-      ref: "CourseUnit",
       required: true,
     },
     isLiked: {
@@ -54,5 +49,7 @@ FeedbackSchema.set("toJSON", {
     delete ret._id;
   },
 });
+
+FeedbackSchema.plugin(mongooseLeanId);
 
 export default mongoose.model<Feedback>("Feedback", FeedbackSchema);

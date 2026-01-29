@@ -106,6 +106,28 @@ class FileStorageService implements IFileStorageService {
       throw error;
     }
   }
+
+  async uploadFile(
+    fileName: string,
+    fileData: Buffer,
+    contentType: string | null = null,
+    allowOverwrite = false,
+  ): Promise<string> {
+    try {
+      const bucket = storage().bucket(this.bucketName);
+      const currentBlob = bucket.file(fileName);
+      if (!allowOverwrite && (await currentBlob.exists())[0]) {
+        throw new Error(`File name ${fileName} already exists`);
+      }
+      await currentBlob.save(fileData, {
+        metadata: { contentType },
+      });
+      return await this.getFile(fileName);
+    } catch (error: unknown) {
+      Logger.error(`Failed to upload file. Reason = ${getErrorMessage(error)}`);
+      throw error;
+    }
+  }
 }
 
 export default FileStorageService;

@@ -4,6 +4,8 @@ export const HOME_PAGE = "/home";
 
 export const BOOKMARKS_PAGE = "/bookmarks";
 
+export const FINISHED_MODULES_PAGE = "/finished-modules";
+
 export const WELCOME_PAGE = "/welcome";
 
 export const SIGNUP_PAGE = "/signup";
@@ -41,3 +43,5 @@ export const UPLOAD_THUMBNAIL = "/module-thumbnail";
 export const LESSON_UPLOAD = "/lesson-upload";
 
 export const VIEW_PAGE = "/view-page";
+
+export const FEEDBACK_PAGE = "/feedback";
