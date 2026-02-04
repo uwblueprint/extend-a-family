@@ -1,4 +1,5 @@
 import { ObjectId, Schema } from "mongoose";
+import { escape } from "html-escaper";
 import IFacilitatorNotificationEmailService from "../interfaces/facilitatorNotificationEmailService";
 import IEmailService from "../interfaces/emailService";
 import MgNotification, {
@@ -27,7 +28,9 @@ function generateInitialsAvatarUrl(
   firstName: string,
   lastName: string,
 ): string {
-  const name = encodeURIComponent(`${firstName} ${lastName}`);
+  const safeName =
+    `${firstName || ""} ${lastName || ""}`.trim() || "User";
+  const name = encodeURIComponent(safeName);
   return `https://ui-avatars.com/api/?name=${name}&background=E3F9FC&color=006C7D&size=48&font-size=0.4&bold=true&rounded=true`;
 }
 
@@ -79,6 +82,12 @@ class FacilitatorNotificationEmailService
         return;
       }
 
+      if (enrichedData.length < threshold) {
+        Logger.warn(
+          `Only ${enrichedData.length} of ${threshold} notifications could be enriched for facilitator ${facilitatorId}`,
+        );
+      }
+
       const emailHtml =
         await FacilitatorNotificationEmailService.buildEmailHtml(
           facilitator.firstName,
@@ -103,14 +112,16 @@ class FacilitatorNotificationEmailService
 
       Logger.info(`Email sent successfully to ${facilitator.email}`);
 
-      const notificationIds = notificationsToSend.map((n) => n.id);
+      const successfulNotificationIds = enrichedData.map(
+        (data) => data.notificationId,
+      );
       await MgNotification.updateMany(
-        { _id: { $in: notificationIds } },
+        { _id: { $in: successfulNotificationIds } },
         { $set: { emailSent: true } },
       );
 
       Logger.info(
-        `Sent email notification to facilitator ${facilitatorId} with ${enrichedData.length} messages`,
+        `Sent email notification to facilitator ${facilitatorId} with ${enrichedData.length} messages (${successfulNotificationIds.length} notifications marked as sent)`,
       );
     } catch (error: unknown) {
       Logger.error(
@@ -185,13 +196,13 @@ class FacilitatorNotificationEmailService
         return {
           notificationId: notification.id as ObjectId,
           helpRequestId: helpRequest.id as ObjectId,
-          message: helpRequest.message,
+          message: escape(helpRequest.message),
           createdAt: helpRequest.createdAt,
-          learnerName,
+          learnerName: escape(learnerName),
           learnerProfilePicture,
-          moduleTitle: module.title,
+          moduleTitle: escape(module.title),
           moduleNumber,
-          modulePage: page.title,
+          modulePage: escape(page.title),
           unitId: unit.id.toString(),
           moduleId: module.id.toString(),
           moduleLink,
