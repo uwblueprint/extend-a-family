@@ -10,7 +10,8 @@ class ActivityService {
     moduleId: string,
     questionType: QuestionType,
     index?: number,
-  ): Promise<CourseModuleDTO> {
+    activityData?: Partial<Activity>,
+  ): Promise<{ pages: string[] }> {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -28,21 +29,23 @@ class ActivityService {
         instruction: "Please select the correct answer",
       };
 
-      let activityData;
+      let activityDataToCreate;
       if (questionType === QuestionType.MultipleChoice) {
-        activityData = {
+        activityDataToCreate = {
           ...baseActivity,
           correctAnswer: 0,
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+          ...activityData,
         };
       } else if (questionType === QuestionType.MultiSelect) {
-        activityData = {
+        activityDataToCreate = {
           ...baseActivity,
           correctAnswers: [0],
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+          ...activityData,
         };
       } else if (questionType === QuestionType.Table) {
-        activityData = {
+        activityDataToCreate = {
           ...baseActivity,
           columnLabels: ["Header", "Header", "Header", "Header", "Header"],
           rowLabels: [["Row 1"], ["Row 2"], ["Row 3"], ["Row 4"], ["Row 5"]],
@@ -53,45 +56,27 @@ class ActivityService {
             [3, 0],
             [4, 0],
           ],
+          headerColumnIncludes: "image_and_text",
+          ...activityData,
         };
       } else if (questionType === QuestionType.Matching) {
         const media: Media[] = [
-          {
-            id: "1",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "2",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "3",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "4",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "5",
-            mediaType: "text",
-            context: "",
-          },
-          {
-            id: "6",
-            mediaType: "text",
-            context: "",
-          },
+          { id: "1", mediaType: "text", context: "" },
+          { id: "2", mediaType: "text", context: "" },
+          { id: "3", mediaType: "text", context: "" },
+          { id: "4", mediaType: "text", context: "" },
+          { id: "5", mediaType: "text", context: "" },
+          { id: "6", mediaType: "text", context: "" },
+          { id: "7", mediaType: "text", context: "" },
+          { id: "8", mediaType: "text", context: "" },
+          { id: "9", mediaType: "text", context: "" },
         ];
-        activityData = {
+        activityDataToCreate = {
           ...baseActivity,
           media: {
             "1": [media[0], media[1], media[2]],
             "2": [media[3], media[4], media[5]],
+            "3": [media[6], media[7], media[8]],
           },
           correctAnswers: [
             ["1", "4", "7"],
@@ -99,13 +84,28 @@ class ActivityService {
             ["3", "6", "9"],
           ],
           rows: 3,
+          ...activityData,
+        };
+      } else if (questionType === QuestionType.TextInput) {
+        activityDataToCreate = {
+          ...baseActivity,
+          placeholder: "Enter your answer here",
+          maxLength: 200,
+          validation: {
+            mode: "short_answer",
+            answers: [],
+          },
+          ...activityData,
         };
       } else {
-        activityData = baseActivity;
+        activityDataToCreate = {
+          ...baseActivity,
+          ...activityData,
+        };
       }
 
       const activityDocs = await (Model as typeof mongoose.Model).create(
-        [activityData],
+        [activityDataToCreate],
         { session },
       );
       const activity = activityDocs[0];
@@ -129,7 +129,18 @@ class ActivityService {
       }
 
       await session.commitTransaction();
-      return updatedModule as unknown as CourseModuleDTO;
+      return {
+        pages: updatedModule.pages.map(
+          (page: CourseModuleDTO["pages"][number] | ObjectId | string) => {
+            if (typeof page === "string") return page;
+            if (page instanceof mongoose.Types.ObjectId) return page.toString();
+            if ("id" in page && page.id) return page.id;
+            // eslint-disable-next-line no-underscore-dangle
+            if ("_id" in page && page._id) return page._id.toString();
+            return String(page);
+          },
+        ),
+      };
     } catch (e) {
       await session.abortTransaction();
       throw e;
