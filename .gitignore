@@ -11,3 +11,11 @@
 **/*.cache
 **/*.egg-info
 backend/uploads/
+
+# Yarn PnP files (Yarn 2+)
+**/.pnp.*
+**/.yarn/*
+!**/.yarn/patches
+!**/.yarn/plugins
+!**/.yarn/releases
+!**/.yarn/versions
