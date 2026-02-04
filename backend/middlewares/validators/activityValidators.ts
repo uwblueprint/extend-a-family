@@ -43,13 +43,15 @@ export const checkActivityEditable = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const activityId = req.params.activityId;
+    const { activityId } = req.params;
     if (!activityId) {
       res.status(400).send("Missing activityId");
       return;
     }
     // find module that contains this activity id in its pages array
-    const moduleDoc = await CourseModuleModel.findOne({ pages: activityId }).lean();
+    const moduleDoc = await CourseModuleModel.findOne({
+      pages: activityId,
+    }).lean();
     if (!moduleDoc) {
       res.status(404).send("Module not found");
       return;
