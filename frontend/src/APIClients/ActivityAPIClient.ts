@@ -45,6 +45,10 @@ const updateActivity = async <ActivityType extends Activity>(
     );
     return data;
   } catch (error) {
+    // eslint-disable-next-line no-alert
+    alert(
+      "Failed to update activity. Please refresh the page, try again later, or contact us.",
+    );
     return null;
   }
 };

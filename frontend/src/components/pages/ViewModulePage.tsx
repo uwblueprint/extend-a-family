@@ -85,9 +85,12 @@ import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/Surve
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import NeedHelpModal from "../help/NeedHelpModal";
 import DeletePageModal from "./DeletePageModal";
+import ModuleLockedModal from "./ModuleLockedModal";
 import "./ViewModulePage.css";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
+import { useSocket } from "../../contexts/SocketContext";
+import PublishModuleModal from "../course_viewing/modals/PublishModuleModal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -104,8 +107,9 @@ const ViewModulePage = () => {
   const requestedModuleId = queryParams.get("moduleId") || "";
   const requestedPageId = queryParams.get("pageId") || "";
   const requestedUnitId = queryParams.get("unitId") || "";
-  const { role } = useUser();
   const history = useHistory();
+  const { role, id: userId, firstName, lastName } = useUser();
+  const socket = useSocket();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -130,6 +134,7 @@ const ViewModulePage = () => {
   const numPages = module?.pages.length || 0;
   const [editPublishedModuleModalOpen, setEditPublishedModuleModalOpen] =
     useState(false);
+  const [publishModuleModalOpen, setPublishModuleModalOpen] = useState(false);
 
   const isFeedbackSurveyPage = role === "Learner" && currentPage === numPages;
   const isEmptyModuleEditing =
@@ -153,6 +158,12 @@ const ViewModulePage = () => {
   const [isSnackbarSuccess, setIsSnackbarSuccess] = useState(true);
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [isDeletingFromContext, setIsDeletingFromContext] = useState(false);
+  const [isModuleLockedModalOpen, setIsModuleLockedModalOpen] = useState(false);
+  const [currentEditorName, setCurrentEditorName] = useState("");
+  const [hasEditingLock, setHasEditingLock] = useState(false);
+
+  // Only allow editing if administrator has acquired the editing lock
+  const canEdit = role === "Administrator" && hasEditingLock;
 
   const [hasImage, setHasImage] = useState(
     (currentPageObject &&
@@ -530,6 +541,75 @@ const ViewModulePage = () => {
     fetchBookmarks();
   }, [fetchBookmarks]);
 
+  // Module editing lock management (Administrators only)
+  useEffect(() => {
+    if (role !== "Administrator" || !socket || !requestedModuleId) {
+      return;
+    }
+
+    const userName = `${firstName} ${lastName}`;
+
+    // Request lock when component mounts
+    socket.emit("moduleEditing:acquireLock", {
+      moduleId: requestedModuleId,
+      userId,
+      userName,
+    });
+
+    // Listen for lock acquisition success
+    const handleLockAcquired = (data: { moduleId: string }) => {
+      if (data.moduleId === requestedModuleId) {
+        setHasEditingLock(true);
+      }
+    };
+
+    // Listen for lock denial (someone else is editing)
+    const handleLockDenied = (data: {
+      moduleId: string;
+      currentEditor: { userId: string; userName: string };
+    }) => {
+      if (data.moduleId === requestedModuleId) {
+        setCurrentEditorName(data.currentEditor.userName);
+        setIsModuleLockedModalOpen(true);
+        setHasEditingLock(false);
+      }
+    };
+
+    // Listen for errors
+    const handleLockError = (data: { moduleId: string; message: string }) => {
+      if (data.moduleId === requestedModuleId) {
+        /* eslint-disable-next-line no-console */
+        console.error("Module editing lock error:", data.message);
+      }
+    };
+
+    socket.on("moduleEditing:lockAcquired", handleLockAcquired);
+    socket.on("moduleEditing:lockDenied", handleLockDenied);
+    socket.on("moduleEditing:error", handleLockError);
+
+    // Release lock when component unmounts or module changes
+    // eslint-disable-next-line consistent-return
+    return () => {
+      if (hasEditingLock) {
+        socket.emit("moduleEditing:releaseLock", {
+          moduleId: requestedModuleId,
+          userId,
+        });
+      }
+      socket.off("moduleEditing:lockAcquired", handleLockAcquired);
+      socket.off("moduleEditing:lockDenied", handleLockDenied);
+      socket.off("moduleEditing:error", handleLockError);
+    };
+  }, [
+    role,
+    socket,
+    requestedModuleId,
+    userId,
+    firstName,
+    lastName,
+    hasEditingLock,
+  ]);
+
   const handleDeletePage = async () => {
     if (!module || !currentPageObject) return;
 
@@ -653,171 +733,199 @@ const ViewModulePage = () => {
 
   const SideBar = useMemo(
     () => (
-      <Box
+      <Stack
+        direction="column"
         width="auto"
         minWidth="fit-content"
         maxHeight={boxHeight}
-        padding="24px"
-        sx={{
-          backgroundColor: theme.palette.Neutral[200],
-          overflowY: "auto",
-          gapY: "24px",
-          ...(isFullScreen && { display: "none" }),
-        }}
-        className="no-scrollbar"
+        border="1px solid"
+        borderColor={theme.palette.Neutral[300]}
       >
-        {isEmptyModuleEditing && <EmptyModuleLeftSidebar />}
-        {module?.pages
-          .map((page, index) => (
-            <ModuleSidebarThumbnail
-              key={`thumbnail_${index}`}
-              index={index}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              thumbnailRefs={thumbnailRefs}
-              isBookmarked={isPageBookmarked(page.id)}
-              onContextMenu={
-                role === "Administrator" ? handleContextMenu : undefined
-              }
-              isDraggable={role === "Administrator"}
-              onDragStart={
-                role === "Administrator" ? handleDragStart : undefined
-              }
-              onDragOver={role === "Administrator" ? handleDragOver : undefined}
-              onDragLeave={
-                role === "Administrator" ? handleDragLeave : undefined
-              }
-              onDrop={role === "Administrator" ? handleDrop : undefined}
-              isDragging={draggedIndex === index}
-              isDropTarget={hoverIndex === index && draggedIndex !== null}
-            >
-              {isLessonPage(page) && (
-                <Document
-                  file={page.pdfUrl}
-                  options={options}
-                  loading={
-                    <Typography variant="bodyMedium">Loading...</Typography>
-                  }
-                >
-                  <Thumbnail
-                    pageNumber={page.pageIndex}
-                    height={130}
-                    scale={1.66}
-                  />
-                </Document>
-              )}
-              {isActivityPage(page) && (
-                <Box
-                  height={168}
-                  width={224}
-                  flexShrink={0}
-                  sx={{
-                    display: "inline-flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "white",
-                    borderRadius: "4px",
-                    border: `1px solid ${theme.palette.Learner.Dark.Default}`,
-                    background: theme.palette.Learner.Light.Default,
-                    color: theme.palette.Learner.Dark.Default,
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    justifyContent="center"
-                    alignItems="center"
-                    gap="8px"
-                  >
-                    {questionTypeIcons[page.questionType]}
-                    <Stack
-                      direction="column"
-                      justifyContent="center"
-                      alignItems="flex-start"
-                    >
-                      <Typography variant="bodyMedium">
-                        Activity{" "}
-                        {(() => {
-                          const unitNumber = unit?.displayIndex ?? 0;
-                          const moduleNumber =
-                            (unit?.modules.findIndex(
-                              (m) => m.id === module?.id,
-                            ) ?? -1) + 1;
-                          const activityNumber =
-                            module?.pages
-                              .slice(0, index + 1)
-                              .filter(isActivityPage).length ?? 0;
-                          return `${unitNumber}.${moduleNumber}.${activityNumber}`;
-                        })()}
-                      </Typography>
-                      <Typography variant="labelSmall" textAlign="center">
-                        {questionTypeLabels[page.questionType]}
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </Box>
-              )}
-            </ModuleSidebarThumbnail>
-          ))
-          .concat(
-            role === "Learner" ? (
+        <Box
+          width="auto"
+          minWidth="fit-content"
+          maxHeight={boxHeight}
+          flexGrow={1}
+          padding="24px"
+          sx={{
+            backgroundColor: theme.palette.Neutral[200],
+            overflowY: "auto",
+            gapY: "24px",
+            ...(isFullScreen && { display: "none" }),
+          }}
+          className="no-scrollbar"
+        >
+          {isEmptyModuleEditing && <EmptyModuleLeftSidebar />}
+          {module?.pages
+            .map((page, index) => (
               <ModuleSidebarThumbnail
-                key="feedback_thumbnail"
-                index={numPages}
+                key={`thumbnail_${index}`}
+                index={index}
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
                 thumbnailRefs={thumbnailRefs}
+                isBookmarked={isPageBookmarked(page.id)}
+                onContextMenu={canEdit ? handleContextMenu : undefined}
+                isDraggable={canEdit}
+                onDragStart={canEdit ? handleDragStart : undefined}
+                onDragOver={canEdit ? handleDragOver : undefined}
+                onDragLeave={canEdit ? handleDragLeave : undefined}
+                onDrop={canEdit ? handleDrop : undefined}
+                isDragging={draggedIndex === index}
+                isDropTarget={hoverIndex === index && draggedIndex !== null}
               >
-                <FeedbackThumbnail />
+                {isLessonPage(page) && (
+                  <Document
+                    file={page.pdfUrl}
+                    options={options}
+                    loading={
+                      <Typography variant="bodyMedium">Loading...</Typography>
+                    }
+                  >
+                    <Thumbnail
+                      pageNumber={page.pageIndex}
+                      height={130}
+                      scale={1.66}
+                    />
+                  </Document>
+                )}
+                {isActivityPage(page) && (
+                  <Box
+                    height={168}
+                    width={224}
+                    flexShrink={0}
+                    sx={{
+                      display: "inline-flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "white",
+                      borderRadius: "4px",
+                      border: `1px solid ${theme.palette.Learner.Dark.Default}`,
+                      background: theme.palette.Learner.Light.Default,
+                      color: theme.palette.Learner.Dark.Default,
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      justifyContent="center"
+                      alignItems="center"
+                      gap="8px"
+                    >
+                      {questionTypeIcons[page.questionType]}
+                      <Stack
+                        direction="column"
+                        justifyContent="center"
+                        alignItems="flex-start"
+                      >
+                        <Typography variant="bodyMedium">
+                          Activity{" "}
+                          {(() => {
+                            const unitNumber = unit?.displayIndex ?? 0;
+                            const moduleNumber =
+                              (unit?.modules.findIndex(
+                                (m) => m.id === module?.id,
+                              ) ?? -1) + 1;
+                            const activityNumber =
+                              module?.pages
+                                .slice(0, index + 1)
+                                .filter(isActivityPage).length ?? 0;
+                            return `${unitNumber}.${moduleNumber}.${activityNumber}`;
+                          })()}
+                        </Typography>
+                        <Typography variant="labelSmall" textAlign="center">
+                          {questionTypeLabels[page.questionType]}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Box>
+                )}
               </ModuleSidebarThumbnail>
-            ) : (
-              []
-            ),
+            ))
+            .concat(
+              role === "Learner" ? (
+                <ModuleSidebarThumbnail
+                  key="feedback_thumbnail"
+                  index={numPages}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  thumbnailRefs={thumbnailRefs}
+                >
+                  <FeedbackThumbnail />
+                </ModuleSidebarThumbnail>
+              ) : (
+                []
+              ),
+            )}
+          {canEdit && draggedIndex !== null && module?.pages && (
+            <Box
+              onDragOver={(e) => {
+                e.preventDefault();
+                setHoverIndex(module.pages.length);
+              }}
+              onDragLeave={() => setHoverIndex(null)}
+              onDrop={() => handleDrop(module.pages.length)}
+              sx={{
+                minHeight: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                marginTop: "-10px",
+                "&::before":
+                  hoverIndex === module.pages.length
+                    ? {
+                        content: '""',
+                        position: "absolute",
+                        top: "0",
+                        left: 0,
+                        right: 0,
+                        height: "3px",
+                        backgroundColor: theme.palette.Learner.Dark.Default,
+                        borderRadius: "2px",
+                        zIndex: 10,
+                      }
+                    : {},
+              }}
+            />
           )}
-        {role === "Administrator" && draggedIndex !== null && module?.pages && (
+        </Box>
+        {role === "Administrator" && module && (
           <Box
-            onDragOver={(e) => {
-              e.preventDefault();
-              setHoverIndex(module.pages.length);
-            }}
-            onDragLeave={() => setHoverIndex(null)}
-            onDrop={() => handleDrop(module.pages.length)}
+            padding="16px 24px"
             sx={{
-              minHeight: "40px",
               display: "flex",
+              width: "100%",
+              padding: "16px 24px",
               alignItems: "center",
               justifyContent: "center",
-              position: "relative",
-              marginTop: "-10px",
-              "&::before":
-                hoverIndex === module.pages.length
-                  ? {
-                      content: '""',
-                      position: "absolute",
-                      top: "0",
-                      left: 0,
-                      right: 0,
-                      height: "3px",
-                      backgroundColor: theme.palette.Learner.Dark.Default,
-                      borderRadius: "2px",
-                      zIndex: 10,
-                    }
-                  : {},
+              borderTop: `1px solid ${theme.palette.Neutral[300]}`,
             }}
-          />
+          >
+            <Button
+              sx={{
+                borderRadius: "4px",
+                backgroundColor: theme.palette[role].Dark.Default,
+                color: "white",
+                width: "100%",
+                height: "40px",
+              }}
+              onClick={() => setPublishModuleModalOpen(true)}
+            >
+              <Typography variant="labelLarge">Publish Module</Typography>
+            </Button>
+          </Box>
         )}
-      </Box>
+      </Stack>
     ),
     [
-      theme.palette.Neutral,
-      theme.palette.Learner.Dark.Default,
-      theme.palette.Learner.Light.Default,
+      theme.palette,
       isFullScreen,
       isEmptyModuleEditing,
-      module?.pages,
-      module?.id,
+      module,
       role,
       numPages,
       currentPage,
+      canEdit,
       draggedIndex,
       hoverIndex,
       isPageBookmarked,
@@ -826,8 +934,7 @@ const ViewModulePage = () => {
       handleDragOver,
       handleDragLeave,
       handleDrop,
-      unit?.displayIndex,
-      unit?.modules,
+      unit,
     ],
   );
 
@@ -872,9 +979,7 @@ const ViewModulePage = () => {
   };
 
   const isRightSidebarOpen =
-    role === "Administrator" &&
-    currentPageObject &&
-    isActivityPage(currentPageObject);
+    canEdit && currentPageObject && isActivityPage(currentPageObject);
 
   const getGridTemplateColumns = () => {
     if (isRightSidebarOpen) {
@@ -1011,7 +1116,7 @@ const ViewModulePage = () => {
                 {activity &&
                   (isMultipleChoiceActivity(activity) ||
                     isMultiSelectActivity(activity)) &&
-                  (role === "Administrator" ? (
+                  (canEdit ? (
                     <MultipleChoiceMainEditor
                       activity={activity}
                       key={activity.id}
@@ -1030,7 +1135,7 @@ const ViewModulePage = () => {
                   ))}
                 {activity &&
                   isTableActivity(activity) &&
-                  (role === "Administrator" ? (
+                  (canEdit ? (
                     <TableMainEditor
                       activity={activity}
                       key={activity.id}
@@ -1047,7 +1152,7 @@ const ViewModulePage = () => {
                   ))}
                 {activity &&
                   isMatchingActivity(activity) &&
-                  (role === "Administrator" ? (
+                  (canEdit ? (
                     <MatchingEditor
                       activity={activity}
                       key={activity.id}
@@ -1135,7 +1240,7 @@ const ViewModulePage = () => {
                   <Typography variant="labelLarge">Fullscreen</Typography>
                 </Button>
               )}
-              {role === "Administrator" && (
+              {canEdit && (
                 <>
                   <Button
                     sx={{
@@ -1222,7 +1327,7 @@ const ViewModulePage = () => {
             </Box>
           </Box>
         </Box>
-        {currentPageObject && role === "Administrator" && (
+        {currentPageObject && canEdit && (
           <>
             <Divider orientation="vertical" flexItem />
             {(isMultipleChoiceActivity(currentPageObject) ||
@@ -1532,6 +1637,24 @@ const ViewModulePage = () => {
           }
         }}
       />
+      <ModuleLockedModal
+        open={isModuleLockedModalOpen}
+        onClose={() => setIsModuleLockedModalOpen(false)}
+        editorName={currentEditorName}
+        unitId={requestedUnitId}
+      />
+      {module && (
+        <PublishModuleModal
+          openPublishModuleModal={publishModuleModalOpen}
+          handleClosePublishModuleModal={() => setPublishModuleModalOpen(false)}
+          moduleId={module.id}
+          onUpdateModule={() =>
+            history.push(
+              `${COURSE_PAGE}${unit ? `?selectedUnit=${unit?.id}` : ""}`,
+            )
+          }
+        />
+      )}
     </>
   );
 };
