@@ -44,6 +44,48 @@ class ActivityService {
           options: ["Option 1", "Option 2", "Option 3", "Option 4"],
           ...activityData,
         };
+      } else if (questionType === QuestionType.Table) {
+        activityDataToCreate = {
+          ...baseActivity,
+          columnLabels: ["Header", "Header", "Header", "Header", "Header"],
+          rowLabels: [["Row 1"], ["Row 2"], ["Row 3"], ["Row 4"], ["Row 5"]],
+          correctAnswers: [
+            [0, 0],
+            [1, 0],
+            [2, 0],
+            [3, 0],
+            [4, 0],
+          ],
+          headerColumnIncludes: "image_and_text",
+          ...activityData,
+        };
+      } else if (questionType === QuestionType.Matching) {
+        const media: Media[] = [
+          { id: "1", mediaType: "text", context: "" },
+          { id: "2", mediaType: "text", context: "" },
+          { id: "3", mediaType: "text", context: "" },
+          { id: "4", mediaType: "text", context: "" },
+          { id: "5", mediaType: "text", context: "" },
+          { id: "6", mediaType: "text", context: "" },
+          { id: "7", mediaType: "text", context: "" },
+          { id: "8", mediaType: "text", context: "" },
+          { id: "9", mediaType: "text", context: "" },
+        ];
+        activityDataToCreate = {
+          ...baseActivity,
+          media: {
+            "1": [media[0], media[1], media[2]],
+            "2": [media[3], media[4], media[5]],
+            "3": [media[6], media[7], media[8]],
+          },
+          correctAnswers: [
+            ["1", "4", "7"],
+            ["2", "5", "8"],
+            ["3", "6", "9"],
+          ],
+          rows: 3,
+          ...activityData,
+        };
       } else if (questionType === QuestionType.TextInput) {
         activityDataToCreate = {
           ...baseActivity,
@@ -87,7 +129,15 @@ class ActivityService {
       }
 
       await session.commitTransaction();
-      return updatedModule as unknown as CourseModuleDTO;
+      return {
+        pages: updatedModule.pages.map((page: CourseModuleDTO["pages"][number] | ObjectId | string) => {
+          if (typeof page === "string") return page;
+          if (page instanceof mongoose.Types.ObjectId) return page.toString();
+          if ("id" in page && page.id) return page.id;
+          if ("_id" in page && page._id) return page._id.toString();
+          return String(page);
+        }),
+      };
     } catch (e) {
       await session.abortTransaction();
       throw e;
