@@ -130,14 +130,16 @@ class ActivityService {
 
       await session.commitTransaction();
       return {
-        pages: updatedModule.pages.map((page: CourseModuleDTO["pages"][number] | ObjectId | string) => {
-          if (typeof page === "string") return page;
-          if (page instanceof mongoose.Types.ObjectId) return page.toString();
-          if ("id" in page && page.id) return page.id;
-          // eslint-disable-next-line no-underscore-dangle
-          if ("_id" in page && page._id) return page._id.toString();
-          return String(page);
-        }),
+        pages: updatedModule.pages.map(
+          (page: CourseModuleDTO["pages"][number] | ObjectId | string) => {
+            if (typeof page === "string") return page;
+            if (page instanceof mongoose.Types.ObjectId) return page.toString();
+            if ("id" in page && page.id) return page.id;
+            // eslint-disable-next-line no-underscore-dangle
+            if ("_id" in page && page._id) return page._id.toString();
+            return String(page);
+          },
+        ),
       };
     } catch (e) {
       await session.abortTransaction();
