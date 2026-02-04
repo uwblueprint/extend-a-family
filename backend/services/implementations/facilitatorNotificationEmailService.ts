@@ -28,8 +28,7 @@ function generateInitialsAvatarUrl(
   firstName: string,
   lastName: string,
 ): string {
-  const safeName =
-    `${firstName || ""} ${lastName || ""}`.trim() || "User";
+  const safeName = `${firstName || ""} ${lastName || ""}`.trim() || "User";
   const name = encodeURIComponent(safeName);
   return `https://ui-avatars.com/api/?name=${name}&background=E3F9FC&color=006C7D&size=48&font-size=0.4&bold=true&rounded=true`;
 }
