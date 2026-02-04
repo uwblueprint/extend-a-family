@@ -9,12 +9,22 @@ import MgNotification from "../models/notification.mgmodel";
 import AuthService from "../services/implementations/authService";
 import { HelpRequestService } from "../services/implementations/helpRequestService";
 import UserService from "../services/implementations/userService";
+import EmailService from "../services/implementations/emailService";
+import FacilitatorNotificationEmailService from "../services/implementations/facilitatorNotificationEmailService";
 import { getErrorMessage } from "../utilities/errorUtils";
+import nodemailerConfig from "../nodemailer.config";
+import logger from "../utilities/logger";
+
+const Logger = logger(__filename);
 
 const helpRequestRouter: Router = Router();
 
 const helpRequestService = new HelpRequestService();
 const authService = new AuthService(new UserService());
+const emailService = new EmailService(nodemailerConfig);
+const facilitatorNotificationService = new FacilitatorNotificationEmailService(
+  emailService,
+);
 
 helpRequestRouter.get("/", async (req, res) => {
   const accessToken = getAccessToken(req);
@@ -62,6 +72,16 @@ helpRequestRouter.post("/", createHelpRequestDtoValidator, async (req, res) => {
       user: req.body.facilitator,
       link: `/help-requests/${createdHelpRequest.id}`,
     });
+
+    try {
+      await facilitatorNotificationService.sendPendingNotificationEmails(
+        req.body.facilitator,
+      );
+    } catch (emailError: unknown) {
+      Logger.error(
+        `Failed to send email notification: ${getErrorMessage(emailError)}`,
+      );
+    }
 
     res.status(201).send(createdHelpRequest);
   } catch (error) {

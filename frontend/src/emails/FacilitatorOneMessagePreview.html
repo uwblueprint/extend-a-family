@@ -1,0 +1,198 @@
+<!--
+  Facilitator One Message Template
+  Dynamic fields:
+
+  Global:
+    {EAF_logo}             - Logo URL
+    {facilitator_name}     - Name of the facilitator
+    {email_settings_link}  - Link to change email settings
+
+  Message:
+    {learner_name}
+    {message_date}
+    {message_time}
+    {message_body}
+    {module_link}
+    {module_number}
+    {module_name}
+    {module_page}
+    {respond_link}
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Facilitator One Message Template</title>
+  </head>
+
+  <body style="margin: 0">
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="
+        font-family: Lexend Deca, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 140%;
+        letter-spacing: 0.32px;
+        color: #000;
+      "
+    >
+      <!-- TOP BANNER -->
+      <tr>
+        <td
+          style="
+            padding: 16px 32px;
+            text-align: center;
+            border-bottom: 2px solid #e5e7ff;
+            background: #f2f3ff;
+          "
+        >
+          <img
+            src="{EAF_logo}"
+            alt="Extend-A-Family logo"
+            style="height: 40px"
+          />
+        </td>
+      </tr>
+
+      <!-- SPACER -->
+      <tr>
+        <td height="32" style="line-height: 0">&nbsp;</td>
+      </tr>
+
+      <!-- MAIN CONTENT -->
+      <tr>
+        <td style="padding: 0 32px">
+          <p style="margin: 0 0 20px">Hi {facilitator_name},</p>
+
+          <p style="margin: 0 0 32px">
+            You have one new message from {learner_name}.
+          </p>
+
+          <!-- MESSAGE BOX -->
+          <table
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            style="background: #f8fafa; border-radius: 8px; padding: 20px"
+          >
+            <tr>
+              <!-- MESSAGE BODY -->
+              <td style="padding-bottom: 16px">{message_body}</td>
+            </tr>
+
+            <tr>
+              <!-- MESSAGE FOOTER -->
+              <td>
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td>
+                      <a
+                        href="{module_link}"
+                        style="color: #4f549e; text-decoration: none"
+                      >
+                        MODULE {module_number}: {module_name} &gt; {module_page}
+                      </a>
+                    </td>
+                    <td style="color: #7a7c7f; text-align: right">
+                      {message_date} at {message_time}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <!-- SPACER -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td height="32" style="line-height: 0">&nbsp;</td>
+            </tr>
+          </table>
+
+          <!-- RESPOND BUTTON -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="text-align: center">
+                <a
+                  href="{respond_link}"
+                  style="
+                    display: inline-block;
+                    background: #4f549e;
+                    padding: 10px 24px;
+                    border-radius: 4px;
+                    text-decoration: none;
+                    color: #fff;
+                    font-weight: 300;
+                    letter-spacing: 0.7px;
+                  "
+                >
+                  RESPOND
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- SPACER -->
+      <tr>
+        <td height="32" style="line-height: 0">&nbsp;</td>
+      </tr>
+
+      <!-- SIGNATURE -->
+      <tr>
+        <td style="padding: 0 32px">
+          <p style="margin: 0">
+            Happy learning,<br />
+            Extend-A-Family Waterloo Region 💙
+          </p>
+        </td>
+      </tr>
+
+      <!-- SPACER -->
+      <tr>
+        <td height="32" style="line-height: 0">&nbsp;</td>
+      </tr>
+
+      <!-- DIVIDER -->
+      <tr>
+        <td style="padding: 0 32px">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="border-top: 1px solid #d1d2d4; line-height: 1px">
+                &nbsp;
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- FOOTER -->
+      <tr>
+        <td
+          style="
+            padding: 32px 0;
+            text-align: center;
+            font-size: 12.5px;
+            font-weight: 300;
+            line-height: 120%;
+            letter-spacing: 0.625px;
+          "
+        >
+          YOU RECEIVED THIS EMAIL BECAUSE OF YOUR NOTIFICATION SETTINGS.<br />
+          <a
+            href="{email_settings_link}"
+            style="display: inline-block; margin-top: 8px; color: #000"
+          >
+            CHANGE EMAIL SETTINGS
+          </a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

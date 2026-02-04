@@ -7,6 +7,7 @@ export interface Notification extends Document {
   user: ObjectId;
   seen: boolean;
   read: boolean;
+  emailSent: boolean;
   createdAt: Date;
   link: string;
 }
@@ -32,6 +33,10 @@ export const NotificationSchema: Schema = new Schema(
       default: false,
     },
     read: {
+      type: Boolean,
+      default: false,
+    },
+    emailSent: {
       type: Boolean,
       default: false,
     },
