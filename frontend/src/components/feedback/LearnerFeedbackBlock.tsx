@@ -2,11 +2,28 @@ import { ExpandMore } from "@mui/icons-material";
 import { IconButton, Stack, Typography, useTheme } from "@mui/material";
 
 import * as React from "react";
+import { FeedbackPopulated } from "../../types/FeedbackTypes";
 import FeedbackCard, { RatingOfFive } from "./FeedbackCard";
 
-const LearnerFeedbackBlock = () => {
+interface LearnerFeedbackBlockProps {
+  learnerName: string;
+  feedbacks: FeedbackPopulated[];
+}
+
+const LearnerFeedbackBlock: React.FC<LearnerFeedbackBlockProps> = ({
+  learnerName,
+  feedbacks,
+}) => {
   const theme = useTheme();
   const [expanded, setExpanded] = React.useState(false);
+
+  // calculate average difficulty and liked
+  const avgDifficulty = feedbacks.length > 0
+    ? Math.round(feedbacks.reduce((sum, f) => sum + f.difficulty, 0) / feedbacks.length)
+    : 0;
+  const likedPercentage = feedbacks.length > 0
+    ? Math.round((feedbacks.filter(f => f.isLiked).length / feedbacks.length) * 100)
+    : 0;
 
   return (
     <Stack
@@ -28,27 +45,27 @@ const LearnerFeedbackBlock = () => {
         }}
       >
         <Typography variant="titleMedium" color={theme.palette.Neutral[700]}>
-          Olivia C.
+          {learnerName}
         </Typography>
         <Typography variant="titleMedium" color={theme.palette.Neutral[700]}>
-          Unit 1
+          {feedbacks.length} Feedback{feedbacks.length !== 1 ? 's' : ''}
         </Typography>
         <Stack direction="column" gap="24px" alignItems="center">
           <Stack direction="row" gap="64px" alignItems="center">
             <Stack direction="row" gap="16px" alignItems="center">
-              <RatingOfFive rating={3} />
+              <RatingOfFive rating={avgDifficulty} />
               <Typography
                 variant="titleMedium"
                 color={theme.palette.Neutral[600]}
               >
-                Easy
+                Avg Difficulty
               </Typography>
             </Stack>
             <Typography
               variant="titleMedium"
               color={theme.palette.Neutral[600]}
             >
-              100% Liked
+              {likedPercentage}% Liked
             </Typography>
             <IconButton
               sx={{
@@ -72,67 +89,13 @@ const LearnerFeedbackBlock = () => {
           flexWrap="wrap"
           sx={{ background: theme.palette.Neutral[200] }}
         >
-          {/* Mock feedback data */}
-          <FeedbackCard
-            feedback={{
-              id: "1",
-              learnerId: "1",
-              moduleId: "1",
-              isLiked: true,
-              difficulty: 3,
-              message: "Great lesson!",
-              createdAt: "2024-01-01",
-            }}
-            title="Feedback 1"
-          />
-          <FeedbackCard
-            feedback={{
-              id: "2",
-              learnerId: "2",
-              moduleId: "1",
-              isLiked: false,
-              difficulty: 4,
-              message: "Too hard.",
-              createdAt: "2024-01-02",
-            }}
-            title="Feedback 2"
-          />
-          <FeedbackCard
-            feedback={{
-              id: "3",
-              learnerId: "3",
-              moduleId: "1",
-              isLiked: true,
-              difficulty: 2,
-              message: "Loved it!",
-              createdAt: "2024-01-03",
-            }}
-            title="Feedback 3"
-          />
-          <FeedbackCard
-            feedback={{
-              id: "4",
-              learnerId: "4",
-              moduleId: "1",
-              isLiked: false,
-              difficulty: 5,
-              message: "Not engaging.",
-              createdAt: "2024-01-04",
-            }}
-            title="Feedback 4"
-          />
-          <FeedbackCard
-            feedback={{
-              id: "5",
-              learnerId: "5",
-              moduleId: "1",
-              isLiked: true,
-              difficulty: 1,
-              message: "Very easy to follow.",
-              createdAt: "2024-01-05",
-            }}
-            title="Feedback 5"
-          />
+          {feedbacks.map((feedback) => (
+            <FeedbackCard
+              key={feedback.id}
+              feedback={feedback}
+              title={feedback.moduleId.title}
+            />
+          ))}
         </Stack>
       )}
     </Stack>

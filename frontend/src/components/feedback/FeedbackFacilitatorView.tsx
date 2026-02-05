@@ -8,6 +8,9 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { useUser } from "../../hooks/useUser";
+import { useFeedbacks } from "../../contexts/FeedbacksContext"
+import { isCaseInsensitiveSubstring } from "../../utils/StringUtils";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
 import LearnerFeedbackBlock from "./LearnerFeedbackBlock";
 
@@ -16,10 +19,53 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
   const { role } = useUser();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { feedbacks } = useFeedbacks();
+  const { courseUnits } = useCourseUnits();
+  const [selectedUnit, setSelectedUnit] = useState<string>("");
+  const [selectedModule, setSelectedModule] = useState<string>("");
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
+
+  const filteredFeedbacks = feedbacks.filter((feedback) => {
+    // name filter
+    const fullName = `${feedback.learnerId.firstName} ${feedback.learnerId.lastName}`;
+    const matchesSearch =
+      !searchQuery ||
+      isCaseInsensitiveSubstring(feedback.learnerId.firstName, searchQuery) ||
+      isCaseInsensitiveSubstring(feedback.learnerId.lastName, searchQuery) ||
+      isCaseInsensitiveSubstring(fullName, searchQuery);
+
+    // unit filter
+    const matchesUnit =
+      !selectedUnit ||
+      courseUnits.some(
+        (unit) =>
+          unit.id === selectedUnit &&
+          unit.modules.some((m) => m.id === feedback.moduleId.id)
+      );
+
+    // Module filter
+    const matchesModule = !selectedModule || feedback.moduleId.id === selectedModule;
+
+    return matchesSearch && matchesUnit && matchesModule;
+  });
+
+  const groupedByLearner = filteredFeedbacks.reduce(
+    (acc, feedback) => {
+      const learnerId = feedback.learnerId.id;
+      if (!acc[learnerId]) {
+        acc[learnerId] = {
+          learnerName: feedback.learnerId,
+          feedbacks: [],
+        };
+      }
+      acc[learnerId].feedbacks.push(feedback);
+      return acc;
+    },
+    {} as Record<string, { learnerName: typeof feedbacks[0]["learnerId"]; feedbacks: typeof feedbacks }>
+  );
 
   return (
     <Stack
@@ -76,13 +122,19 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
           select
           variant="outlined"
           label="Unit"
+          value={selectedUnit}
+          onChange={(e) => {
+            setSelectedUnit(e.target.value);
+            setSelectedModule(""); // reset when unit changes
+          }}
           sx={{ minWidth: "200px" }}
         >
-          {["1.0", "2.0", "2.1"].map((roleOption) => (
-            <MenuItem key={roleOption} value={roleOption} onClick={() => {}}>
-              <Typography variant="labelMedium">
-                {roleOption.toUpperCase()}
-              </Typography>
+          <MenuItem value="">
+            <Typography variant="labelMedium">All Units</Typography>
+          </MenuItem>
+          {courseUnits.map((unit) => (
+            <MenuItem key={unit.id} value={unit.id}>
+              <Typography variant="labelMedium">{unit.title}</Typography>
             </MenuItem>
           ))}
         </TextField>
@@ -90,15 +142,22 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
           select
           variant="outlined"
           label="Module"
+          value={selectedModule}
+          onChange={(e) => setSelectedModule(e.target.value)}
+          disabled={!selectedUnit}
           sx={{ minWidth: "200px" }}
         >
-          {["1.0", "2.0", "2.1"].map((roleOption) => (
-            <MenuItem key={roleOption} value={roleOption} onClick={() => {}}>
-              <Typography variant="labelMedium">
-                {roleOption.toUpperCase()}
-              </Typography>
-            </MenuItem>
-          ))}
+          <MenuItem value="">
+            <Typography variant="labelMedium">All Modules</Typography>
+          </MenuItem>
+          {selectedUnit &&
+            courseUnits
+              .find((u) => u.id === selectedUnit)
+              ?.modules.map((module) => (
+                <MenuItem key={module.id} value={module.id}>
+                  <Typography variant="labelMedium">{module.title}</Typography>
+                </MenuItem>
+              ))}
         </TextField>
       </Stack>
       <hr
@@ -117,8 +176,13 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
         flexGrow="1"
         sx={{ overflow: "auto", minHeight: 0 }}
       >
-        <LearnerFeedbackBlock />
-        <LearnerFeedbackBlock />
+        {Object.entries(groupedByLearner).map(([learnerId, { learnerName, feedbacks: learnerFeedbacks }]) => (
+          <LearnerFeedbackBlock
+            key={learnerId}
+            learnerName={`${learnerName.firstName} ${learnerName.lastName.charAt(0)}.`}
+            feedbacks={learnerFeedbacks}
+          />
+        ))}
       </Stack>
     </Stack>
   );
