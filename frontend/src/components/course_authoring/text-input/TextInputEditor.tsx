@@ -1,5 +1,12 @@
 import { AddPhotoAlternate } from "@mui/icons-material";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { VisuallyHidden } from "@reach/visually-hidden";
 import React from "react";
 import ActivityAPIClient from "../../../APIClients/ActivityAPIClient";
@@ -202,17 +209,22 @@ const TextInputMainEditor = ({
             </Box>
           )}
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            rowGap: "24px",
-            columnGap: "34px",
-            flexWrap: "wrap",
-          }}
+        <Stack
+          direction="row"
+          alignItems="center"
+          gap="24px"
+          alignSelf="stretch"
         >
-          {" "}
-        </Box>
+          <TextField disabled placeholder="Enter your answer here" fullWidth />
+          {activity.units !== undefined && (
+            <Typography
+              variant="bodyMedium"
+              sx={{ color: theme.palette.Neutral[600] }}
+            >
+              {activity.units}
+            </Typography>
+          )}
+        </Stack>
       </Box>
     </Box>
   );

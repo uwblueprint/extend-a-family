@@ -95,15 +95,7 @@ export type TextInputValidation =
       mode: "numeric_range";
       min: number;
       max: number;
-      answers?: string[];
     };
-
-// export type TextInputValidation = {
-//   mode: "short_answer" | "numeric_range";
-//   answers?: string[];
-//   min?: number;
-//   max?: number;
-// };
 
 export interface TextInputActivity extends ActivityBase {
   type: QuestionType.TextInput;
@@ -111,6 +103,7 @@ export interface TextInputActivity extends ActivityBase {
   placeholder?: string;
   maxLength?: number;
   validation: TextInputValidation;
+  units?: string;
 }
 
 export type Activity =

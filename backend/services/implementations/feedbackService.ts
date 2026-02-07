@@ -88,5 +88,23 @@ class FeedbackService implements IFeedbackService {
       throw error;
     }
   }
+
+  async hasFeedback(
+    learnerId: string,
+    moduleId: string,
+  ): Promise<boolean> {
+    try {
+      const feedback = await MgFeedback.findOne({
+        learnerId,
+        moduleId,
+      });
+      return !!feedback;
+    } catch (error) {
+      Logger.error(
+        `Error checking if feedback exists: ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
 }
 export default FeedbackService;

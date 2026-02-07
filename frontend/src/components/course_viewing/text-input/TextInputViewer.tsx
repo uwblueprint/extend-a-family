@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Stack, TextField, Typography, useTheme } from "@mui/material";
 import * as React from "react";
 import { TextInputActivity } from "../../../types/CourseTypes";
 
@@ -19,17 +19,49 @@ const TextInputViewer = React.forwardRef<
   TextInputViewerProps
 >(({ activity, onWrongAnswer, onCorrectAnswer, isCompleted }, ref) => {
   const theme = useTheme();
+  const [userAnswer, setUserAnswer] = React.useState("");
+
+  const correctAnswer = () => {
+    if (activity.validation.mode === "short_answer") {
+      return activity.validation.answers[0];
+    }
+    if (activity.validation.mode === "numeric_range") {
+      return (
+        (activity.validation.min + activity.validation.max) /
+        2
+      ).toString();
+    }
+    return "";
+  };
 
   const checkAnswer = () => {
-    // No-op for now
+    if (activity.validation.mode === "short_answer") {
+      const isCorrect = activity.validation.answers.some(
+        (answer) =>
+          answer.toLowerCase().trim() === userAnswer.toLowerCase().trim(),
+      );
+      if (!isCorrect) {
+        onWrongAnswer();
+      } else {
+        onCorrectAnswer();
+      }
+    } else if (activity.validation.mode === "numeric_range") {
+      const userAnswerNum = parseFloat(userAnswer || "");
+      const isCorrect =
+        !Number.isNaN(userAnswerNum) &&
+        userAnswerNum >= activity.validation.min &&
+        userAnswerNum <= activity.validation.max;
+      if (!isCorrect) {
+        onWrongAnswer();
+      } else {
+        onCorrectAnswer();
+      }
+    }
   };
 
   React.useImperativeHandle(ref, () => ({
     checkAnswer,
   }));
-
-  // eslint-disable-next-line no-console
-  console.log({ isCompleted, onCorrectAnswer, onWrongAnswer });
 
   return (
     <Box
@@ -144,20 +176,38 @@ const TextInputViewer = React.forwardRef<
             </Box>
           )}
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            rowGap: "24px",
-            columnGap: "34px",
-            flexWrap: "wrap",
-          }}
-        />
+        <Stack
+          direction="row"
+          alignItems="center"
+          gap="24px"
+          alignSelf="stretch"
+        >
+          <TextField
+            placeholder="Enter your answer here"
+            fullWidth
+            value={isCompleted ? correctAnswer() : userAnswer}
+            disabled={isCompleted}
+            style={{
+              backgroundColor: isCompleted
+                ? theme.palette.Success.Light.Default
+                : undefined,
+            }}
+            onChange={(e) => setUserAnswer(e.target.value)}
+          />
+          {activity.units !== undefined && (
+            <Typography
+              variant="bodyMedium"
+              sx={{ color: theme.palette.Neutral[600] }}
+            >
+              {activity.units}
+            </Typography>
+          )}
+        </Stack>
       </Box>
     </Box>
   );
 });
 
-TextInputViewer.displayName = "MultipleChoiceViewer";
+TextInputViewer.displayName = "TextInputViewer";
 
 export default TextInputViewer;

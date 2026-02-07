@@ -130,10 +130,32 @@ const uploadImage = async (
   }
 };
 
+const hasFeedback = async (
+  learnerId: string,
+  moduleId: string,
+): Promise<boolean> => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const { data } = await baseAPIClient.get(
+      `/feedbacks/check?moduleId=${moduleId}&learnerId=${learnerId}`,
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data.hasFeedback;
+  } catch (error) {
+    return false;
+  }
+};
+
 export default {
   createActivity,
   updateActivity,
   updateActivityMainPicture,
   sendFeedback,
+  hasFeedback,
   uploadImage,
 };

@@ -206,7 +206,11 @@ const ViewModulePage = () => {
     return fetchedModule;
   }, [history, requestedModuleId, requestedUnitId, role]);
 
-  const { courseUnits: allUnits, isModuleCompleted } = useCourseUnits();
+  const {
+    courseUnits: allUnits,
+    isModuleCompleted,
+    refetchCourseProgress,
+  } = useCourseUnits();
 
   const isActivityCompleted = useCallback(
     (moduleId: string, activityId: string): boolean => {
@@ -791,6 +795,8 @@ const ViewModulePage = () => {
       try {
         const updatedProgress = await ProgressAPIClient.getLearnerProgress();
         setLearnerProgress(updatedProgress);
+        // Also update the course progress context so isModuleCompleted reflects the change
+        await refetchCourseProgress();
       } catch (error) {
         /* eslint-disable-next-line no-console */
         console.error("Failed to fetch updated learner progress:", error);
@@ -1431,7 +1437,7 @@ const ViewModulePage = () => {
               </Typography>
               <IconButton
                 disabled={
-                  role === "Learner"
+                  role === "Learner" && module && isModuleCompleted(module.id)
                     ? currentPage >= numPages
                     : currentPage >= numPages - 1
                 }
@@ -1570,6 +1576,8 @@ const ViewModulePage = () => {
             {isTextInputActivity(currentPageObject) && (
               <TextInputEditorSidebar
                 key={currentPageObject.id}
+                activity={currentPageObject}
+                setActivity={setActivity}
                 mode={currentPageObject.validation.mode}
                 setMode={(newMode: "short_answer" | "numeric_range") =>
                   setActivity((prev) => {
@@ -1637,6 +1645,10 @@ const ViewModulePage = () => {
                     );
                   }
                 }}
+                units={currentPageObject.units}
+                setUnits={(newUnits) =>
+                  setActivity((prev) => prev && { ...prev, units: newUnits })
+                }
               />
             )}
           </>

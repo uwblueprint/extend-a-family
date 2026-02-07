@@ -67,6 +67,7 @@ export interface TextInputActivity extends Activity {
   placeholder?: string;
   maxLength?: number;
   validation?: TextInputValidation;
+  units?: string;
 }
 
 const options2 = {
@@ -285,6 +286,10 @@ const TextInputActivitySchema = new Schema({
       validator: (v: number) => v > 0,
       message: "maxLength must be a positive number",
     },
+  },
+  units: {
+    type: String,
+    required: false,
   },
   validation: {
     type: {

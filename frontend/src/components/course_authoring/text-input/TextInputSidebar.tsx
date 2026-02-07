@@ -13,10 +13,17 @@ import {
 } from "@mui/material";
 import { Numbers, Subject, Close } from "@mui/icons-material";
 import IOSSwitch from "../../common/form/IOSSwitch";
+import {
+  Activity,
+  isTextInputActivity,
+  TextInputActivity,
+} from "../../../types/CourseTypes";
 
 interface TextInputEditorSidebarProps {
   mode: "short_answer" | "numeric_range";
   setMode: (value: "short_answer" | "numeric_range") => void;
+  activity: TextInputActivity;
+  setActivity: React.Dispatch<React.SetStateAction<Activity | undefined>>;
   hasImage: boolean;
   setHasImage: (value: boolean) => void;
   hasAdditionalContext: boolean;
@@ -25,11 +32,15 @@ interface TextInputEditorSidebarProps {
   setHint: (value: string) => void;
   correctAnswers: string[];
   setCorrectAnswers: (value: string[]) => void;
+  units?: string;
+  setUnits: (value?: string) => void;
 }
 
 export default function TextInputEditorSidebar({
   mode,
   setMode,
+  activity,
+  setActivity,
   hasImage,
   setHasImage,
   hasAdditionalContext,
@@ -38,11 +49,12 @@ export default function TextInputEditorSidebar({
   setHint,
   correctAnswers,
   setCorrectAnswers,
+  units,
+  setUnits,
 }: TextInputEditorSidebarProps) {
   const boxHeight = "calc(100vh - 68px)";
   const theme = useTheme();
   const [currentAnswer, setCurrentAnswer] = useState("");
-  const [hasUnits, setHasUnits] = useState(false);
 
   const handleAddAnswer = (ev: React.FormEvent) => {
     ev.preventDefault();
@@ -237,13 +249,15 @@ export default function TextInputEditorSidebar({
             >
               <Typography variant="bodySmall">Units</Typography>
               <IOSSwitch
-                checked={hasUnits}
-                onChange={(ev) => setHasUnits(ev.target.checked)}
+                checked={units !== undefined}
+                onChange={(ev) => setUnits(ev.target.checked ? "" : undefined)}
               />
             </Box>
-            {hasUnits && (
+            {units !== undefined && (
               <TextField
                 placeholder="Unit - ex. dollars, coins, etc."
+                defaultValue={units}
+                onChange={(e) => setUnits(e.target.value)}
                 sx={{ width: "100%" }}
               />
             )}
@@ -343,8 +357,42 @@ export default function TextInputEditorSidebar({
                   Set a number range for correct answers
                 </Typography>
                 <Stack direction="row" alignItems="center" gap="16px">
-                  <TextField type="number" label="Min" sx={{ width: "100%" }} />
-                  <TextField type="number" label="Max" sx={{ width: "100%" }} />
+                  <TextField
+                    type="number"
+                    label="Min"
+                    defaultValue={activity.validation.min}
+                    sx={{ width: "100%" }}
+                    onChange={(ev) =>
+                      setActivity((prev) => {
+                        if (!prev || !isTextInputActivity(prev)) return prev;
+                        return {
+                          ...prev,
+                          validation: {
+                            ...prev.validation,
+                            min: Number(ev.target.value),
+                          },
+                        };
+                      })
+                    }
+                  />
+                  <TextField
+                    type="number"
+                    label="Max"
+                    defaultValue={activity.validation.max}
+                    sx={{ width: "100%" }}
+                    onChange={(ev) =>
+                      setActivity((prev) => {
+                        if (!prev || !isTextInputActivity(prev)) return prev;
+                        return {
+                          ...prev,
+                          validation: {
+                            ...prev.validation,
+                            max: Number(ev.target.value),
+                          },
+                        };
+                      })
+                    }
+                  />
                 </Stack>
               </>
             )}
