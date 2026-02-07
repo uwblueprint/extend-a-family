@@ -2,7 +2,6 @@ import { Box, Button, Container, Typography, useTheme } from "@mui/material";
 import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
-import AUTHENTICATED_USER_KEY from "../../constants/AuthConstants";
 import { LANDING_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { useUser } from "../../hooks/useUser";
@@ -38,8 +37,6 @@ const CreatePasswordPage = (): React.ReactElement => {
 
     if (!changePasswordSuccess) {
       setAuthenticatedUser(null);
-      localStorage.removeItem(AUTHENTICATED_USER_KEY);
-      await AuthAPIClient.logout(authenticatedUser.id);
       // eslint-disable-next-line no-alert
       alert("Error occurred when changing your password. Please log in again.");
       return;
@@ -52,10 +49,7 @@ const CreatePasswordPage = (): React.ReactElement => {
       return;
     }
 
-    setAuthenticatedUser({
-      ...authenticatedUser,
-      status: "Active",
-    });
+    await AuthAPIClient.logout(authenticatedUser.id);
 
     if (isFormValid) {
       setIsPasswordConfirmed(true);

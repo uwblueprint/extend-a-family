@@ -2,17 +2,19 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { Box, Button, Container, Typography, useTheme } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router-dom";
-import { LANDING_PAGE } from "../../constants/Routes";
+import { WELCOME_PAGE } from "../../constants/Routes";
 import { useUser } from "../../hooks/useUser";
 import Logo from "../assets/logoColoured.png";
+import AuthContext from "../../contexts/AuthContext";
 
 const CreatePasswordConfirmationPage = (): React.ReactElement => {
   const user = useUser();
   const history = useHistory();
   const theme = useTheme();
+  const { setAuthenticatedUser } = React.useContext(AuthContext);
   const handleBackToHome = () => {
-    user.status = "Active";
-    history.push(LANDING_PAGE);
+    setAuthenticatedUser(null);
+    history.push(WELCOME_PAGE);
   };
 
   return (

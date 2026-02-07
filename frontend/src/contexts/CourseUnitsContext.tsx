@@ -12,6 +12,7 @@ import ProgressAPIClient, {
   ModuleCompletion,
 } from "../APIClients/ProgressAPIClient";
 import { CourseUnit } from "../types/CourseTypes";
+import AuthContext from "./AuthContext";
 
 interface CourseUnitsContextType {
   courseUnits: CourseUnit[];
@@ -158,10 +159,12 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     [courseUnits],
   );
 
+  const { authenticatedUser } = useContext(AuthContext);
+
   useEffect(() => {
     refetchCourseUnits();
     refetchCourseProgress();
-  }, []);
+  }, [authenticatedUser]);
 
   const value: CourseUnitsContextType = {
     courseUnits,

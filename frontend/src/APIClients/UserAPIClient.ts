@@ -200,7 +200,7 @@ const getCurrentUser = async (): Promise<User & { bookmarks: Bookmark[] }> => {
     });
     return data;
   } catch (error) {
-    throw new Error(`Failed to upload profile picture. Reason: ${error}`);
+    throw new Error(`Failed to get current user. Reason: ${error}`);
   }
 };
 

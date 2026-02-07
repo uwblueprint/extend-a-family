@@ -44,12 +44,12 @@ const logout = async (userId: string | undefined): Promise<boolean> => {
     "accessToken",
   )}`;
   try {
+    localStorage.removeItem(AUTHENTICATED_USER_KEY);
     await baseAPIClient.post(
       `/auth/logout/${userId}`,
       {},
       { headers: { Authorization: bearerToken } },
     );
-    localStorage.removeItem(AUTHENTICATED_USER_KEY);
     return true;
   } catch (error) {
     return false;
