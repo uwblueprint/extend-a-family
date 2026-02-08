@@ -62,7 +62,6 @@ export default function CourseUnitsPage() {
             <Box
               display="flex"
               alignItems="center"
-              paddingLeft="10px"
               justifyContent="space-between"
               gap="16px"
             >
