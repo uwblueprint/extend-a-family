@@ -22,6 +22,15 @@ interface IFeedbackService {
    * @throws error if feedback retrieval fails
    */
   getAllFeedback(): Promise<FeedbackDTO[]>;
+
+  /**
+   * Check if a learner has already submitted feedback for a module
+   * @param learnerId learner's id
+   * @param moduleId module's id
+   * @returns true if feedback exists, false otherwise
+   * @throws Error if check fails
+   */
+  hasFeedback(learnerId: string, moduleId: string): Promise<boolean>;
 }
 
 export default IFeedbackService;

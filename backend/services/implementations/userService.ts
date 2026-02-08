@@ -358,8 +358,11 @@ class UserService implements IUserService {
       const tokenUserId = await this.getUserIdByAuthId(decodedIdToken.uid);
       const currentUser = await this.getUserById(tokenUserId);
       const updatedUser: UpdateUserDTO = {
-        ...currentUser,
+        firstName: currentUser.firstName,
+        lastName: currentUser.lastName,
+        role: currentUser.role,
         status: newStatus,
+        profilePicture: currentUser.profilePicture,
       };
       await this.updateUserById(tokenUserId, updatedUser);
     } catch (error: unknown) {
@@ -376,7 +379,7 @@ class UserService implements IUserService {
     try {
       const user = await FacilitatorModel.findByIdAndUpdate(
         userId,
-        { approved: true },
+        { approved: true, status: "Active" },
         { new: true, runValidators: true, session },
       );
 

@@ -41,7 +41,7 @@ export default function CourseCard({
   return (
     <Card
       sx={{
-        maxWidth: isSmall ? 320 : 1044,
+        maxWidth: isSmall ? 320 : 688,
         display: "flex",
         flexDirection: "column",
         border: "none",

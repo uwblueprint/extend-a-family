@@ -2,6 +2,12 @@ import { Role } from "./AuthTypes";
 
 export type Status = "Invited" | "Active" | "PendingApproval";
 
+export type CourseProgressSummary = {
+  completedModules: number;
+  totalModules: number;
+  progressPercentage: number;
+};
+
 export type BaseUser = {
   id: string;
   firstName: string;
@@ -10,6 +16,7 @@ export type BaseUser = {
   role: Role;
   status: Status;
   profilePicture?: string;
+  courseProgress?: CourseProgressSummary;
 };
 
 export type Bookmark = {

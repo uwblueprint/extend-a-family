@@ -13,10 +13,12 @@ import {
   isMultipleChoiceActivity,
   isMultiSelectActivity,
   isTableActivity,
+  isTextInputActivity,
 } from "../../../types/CourseTypes";
 import MatchingViewer from "../../course_viewing/matching/MatchingViewer";
 import MultipleChoiceViewer from "../../course_viewing/multiple-choice/MultipleChoiceViewer";
 import TableViewer from "../../course_viewing/table/TableViewer";
+import TextInputViewer from "../../course_viewing/text-input/TextInputViewer";
 
 const PreviewLearnerModal = ({
   activity,
@@ -67,6 +69,7 @@ const PreviewLearnerModal = ({
             activity={activity}
             onWrongAnswer={() => {}}
             onCorrectAnswer={() => {}}
+            isCompleted={false}
           />
         )}
         {isTableActivity(activity) && (
@@ -74,6 +77,7 @@ const PreviewLearnerModal = ({
             activity={activity}
             onWrongAnswer={() => {}}
             onCorrectAnswer={() => {}}
+            isCompleted={false}
           />
         )}
         {isMatchingActivity(activity) && (
@@ -81,6 +85,15 @@ const PreviewLearnerModal = ({
             activity={activity}
             onWrongAnswer={() => {}}
             onCorrectAnswer={() => {}}
+            isCompleted={false}
+          />
+        )}
+        {isTextInputActivity(activity) && (
+          <TextInputViewer
+            activity={activity}
+            onWrongAnswer={() => {}}
+            onCorrectAnswer={() => {}}
+            isCompleted={false}
           />
         )}
       </Box>

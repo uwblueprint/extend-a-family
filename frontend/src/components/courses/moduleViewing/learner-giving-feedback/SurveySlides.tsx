@@ -25,6 +25,26 @@ const SurveySlides = ({ moduleId }: { moduleId: string }) => {
   const [moduleFeedbackText, setModuleFeedbackText] =
     React.useState<string>("");
   const { id: learnerId } = useLearner();
+  const [filledOut, setFilledOut] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
+
+  React.useEffect(() => {
+    const checkFeedbackStatus = async () => {
+      try {
+        const hasFeedback = await ActivityAPIClient.hasFeedback(
+          learnerId,
+          moduleId,
+        );
+        setFilledOut(hasFeedback);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error("Error checking feedback status:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkFeedbackStatus();
+  }, [learnerId, moduleId]);
 
   const submitFeedback = async () => {
     await ActivityAPIClient.sendFeedback({
@@ -34,7 +54,16 @@ const SurveySlides = ({ moduleId }: { moduleId: string }) => {
       difficulty: moduleEaseRating,
       message: moduleFeedbackText,
     });
+    setFilledOut(true);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (filledOut) {
+    return <ThanksForTheFeedbackSlide />;
+  }
 
   switch (formStage) {
     case SurveyFormStage.DidYouLikeTheContent:
