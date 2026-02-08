@@ -27,7 +27,9 @@ export default function MultipleChoiceViewOption({
     iconElement = <Check />;
   } else if (isMultiSelect) {
     if (selected) {
-      iconElement = <CheckBox />;
+      iconElement = (
+        <CheckBox sx={{ color: theme.palette.Learner.Dark.Default }} />
+      );
     } else {
       iconElement = <CheckBoxOutlineBlank />;
     }

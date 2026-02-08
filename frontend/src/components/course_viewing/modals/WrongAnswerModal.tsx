@@ -6,7 +6,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 import activityWrongAnswerTitles from "../../../constants/ActivityWrongAnswerTitles";
 
 export type WrongAnswerModalProps = {
@@ -21,16 +21,30 @@ const WrongAnswerModal: React.FC<WrongAnswerModalProps> = ({
   hint,
 }) => {
   const theme = useTheme();
+  const [lastUpdated, setLastUpdated] = React.useState(Date.now());
+  const prevOpen = React.useRef(open);
+
+  React.useEffect(() => {
+    if (!prevOpen.current && open) {
+      setLastUpdated(Date.now());
+    }
+    prevOpen.current = open;
+  }, [open]);
+
+  const title = useMemo(
+    () =>
+      hint
+        ? "Hint"
+        : activityWrongAnswerTitles[
+            Math.floor(Math.random() * activityWrongAnswerTitles.length)
+          ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hint, lastUpdated],
+  );
 
   const handleClose = () => {
     onClose();
   };
-
-  const title = hint
-    ? "Hint"
-    : activityWrongAnswerTitles[
-        Math.floor(Math.random() * activityWrongAnswerTitles.length)
-      ];
 
   return (
     <Dialog
@@ -85,7 +99,7 @@ const WrongAnswerModal: React.FC<WrongAnswerModalProps> = ({
             color: "white",
             alignSelf: "flex-end",
           }}
-          onClick={onClose}
+          onClick={handleClose}
         >
           <Typography variant="labelLarge">Try Again</Typography>
           <RefreshIcon />
