@@ -1,15 +1,15 @@
+import { Add } from "@mui/icons-material";
 import { Button, Grid, Typography, useTheme } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Add } from "@mui/icons-material";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
 import useCourseModules from "../../hooks/useCourseModules";
 import { useUser } from "../../hooks/useUser";
 import { CourseModule, ModuleStatus } from "../../types/CourseTypes";
 import ModuleCardAdmin from "./library-viewing/ModuleCardAdmin";
-import ModuleCardLearner from "./library-viewing/ModuleCardLearner";
 import ModuleCardFacilitator from "./library-viewing/ModuleCardFacilitator";
+import ModuleCardLearner from "./library-viewing/ModuleCardLearner";
 import CreateModuleModal from "./modals/CreateModuleModal";
 
 interface ModuleGridProps {
@@ -90,7 +90,10 @@ export default function CourseModulesGrid({
 
   if (loading)
     return <Typography paddingLeft="10px">Loading modules...</Typography>;
-  if (error) return <Typography color="error">{error}</Typography>;
+  if (error)
+    return (
+      <Typography color="error">Failed to fetch modules: {error}</Typography>
+    );
 
   // Filter modules based on search query
   const filteredModules = courseModules.filter((module) =>

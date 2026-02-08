@@ -1,13 +1,13 @@
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { Search } from "@mui/icons-material";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import { useUser } from "../../hooks/useUser";
 import { CourseUnit } from "../../types/CourseTypes";
+import StartAdornedTextField from "../common/form/StartAdornedTextField";
 import CourseModulesGrid from "./CourseModulesGrid";
 import UnitSidebar from "./sidebar/UnitSidebar";
-import StartAdornedTextField from "../common/form/StartAdornedTextField";
-import { useUser } from "../../hooks/useUser";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
@@ -135,7 +135,7 @@ export default function CourseUnitsPage() {
             />
           </Stack>
         ) : (
-          <Typography>Loading units...</Typography>
+          <></>
         )}
       </Box>
     </Box>

@@ -2,32 +2,31 @@ import { useCallback, useEffect, useState } from "react";
 import CourseAPIClient from "../APIClients/CourseAPIClient";
 import { CourseModule } from "../types/CourseTypes";
 
+// Module-level cache so it persists across component remounts and unitId changes
+const moduleDataCache: Record<string, CourseModule[]> = {};
+
 const useCourseModules = (unitId: string) => {
-  const [courseModules, setCourseModules] = useState<CourseModule[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const cached = moduleDataCache[unitId];
+  const [courseModules, setCourseModules] = useState<CourseModule[]>(
+    cached ?? [],
+  );
+  const [loading, setLoading] = useState<boolean>(!cached);
   const [error, setError] = useState<string | null>(null);
 
-  const [moduleDataCache, setModuleDataCache] = useState<
-    Record<string, CourseModule[]>
-  >({});
-
   const fetchCourseModules = useCallback(async () => {
+    if (moduleDataCache[unitId]) {
+      setCourseModules(moduleDataCache[unitId]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
     try {
-      if (moduleDataCache[unitId]) {
-        setCourseModules(moduleDataCache[unitId]);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
       const data = await CourseAPIClient.getModules(unitId);
+      moduleDataCache[unitId] = data;
       setCourseModules(data);
-      setModuleDataCache((prevCache) => {
-        const newCache = { ...prevCache };
-        newCache[unitId] = data;
-        return newCache;
-      });
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -37,15 +36,14 @@ const useCourseModules = (unitId: string) => {
     } finally {
       setLoading(false);
     }
-  }, [unitId, moduleDataCache]);
+  }, [unitId]);
 
   useEffect(() => {
-    if (!unitId) return; // Prevent API call if unitId is empty
-
+    if (!unitId) return;
     fetchCourseModules();
   }, [fetchCourseModules, unitId]);
 
-  return { courseModules, loading, error, moduleDataCache };
+  return { courseModules, loading, error };
 };
 
 export default useCourseModules;

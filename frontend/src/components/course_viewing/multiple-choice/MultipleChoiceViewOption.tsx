@@ -32,7 +32,11 @@ export default function MultipleChoiceViewOption({
       iconElement = <CheckBoxOutlineBlank />;
     }
   } else if (selected) {
-    iconElement = <RadioButtonCheckedOutlined />;
+    iconElement = (
+      <RadioButtonCheckedOutlined
+        sx={{ color: theme.palette.Learner.Dark.Default }}
+      />
+    );
   } else {
     iconElement = <RadioButtonUncheckedOutlined />;
   }
@@ -42,7 +46,16 @@ export default function MultipleChoiceViewOption({
     backgroundColor = "#F5FFDF"; // light green
   } else if (selected) {
     // eslint-disable-next-line prefer-destructuring
-    backgroundColor = theme.palette.Neutral[100];
+    backgroundColor = theme.palette.Learner.Light.Default;
+  }
+
+  let border: string | null = null;
+  if (displayCorrect) {
+    border = `1px solid ${theme.palette.Learner.Dark.Default}`; // darker green border
+  } else if (selected) {
+    border = `1px solid ${theme.palette.Learner.Dark.Default}`;
+  } else {
+    border = `1px solid ${theme.palette.Neutral[400]}`;
   }
 
   return (
@@ -68,9 +81,20 @@ export default function MultipleChoiceViewOption({
           justifyContent: "flex-start",
           position: "relative",
 
-          border: `1px solid ${theme.palette.Neutral[400]}`,
+          border,
           borderRadius: "4px",
           backgroundColor,
+
+          "&:hover": {
+            backgroundColor: selected ? undefined : theme.palette.Neutral[200],
+            cursor: "pointer",
+          },
+
+          "&:active": {
+            backgroundColor: selected
+              ? theme.palette.Learner.Light.Pressed
+              : theme.palette.Neutral[300],
+          },
         }}
       >
         <Box

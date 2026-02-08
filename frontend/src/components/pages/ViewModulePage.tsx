@@ -46,6 +46,8 @@ import {
 } from "../../constants/ActivityLabels";
 import * as Routes from "../../constants/Routes";
 import { COURSE_PAGE } from "../../constants/Routes";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
+import { useSocket } from "../../contexts/SocketContext";
 import useActivity from "../../hooks/useActivity";
 import useQueryParams from "../../hooks/useQueryParams";
 import { useUser } from "../../hooks/useUser";
@@ -53,17 +55,17 @@ import {
   Activity,
   CourseModule,
   CourseUnit,
+  HeaderColumnIncludesTypes,
   isActivityPage,
   isLessonPage,
   isMatchingActivity,
   isMultipleChoiceActivity,
   isMultiSelectActivity,
   isTableActivity,
-  HeaderColumnIncludesTypes,
-  Media,
-  QuestionType,
-  ModuleStatus,
   isTextInputActivity,
+  Media,
+  ModuleStatus,
+  QuestionType,
 } from "../../types/CourseTypes";
 import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
@@ -78,12 +80,17 @@ import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/Multip
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import TableMainEditor from "../course_authoring/table/TableEditor";
 import TableSidebar from "../course_authoring/table/TableSidebar";
+import TextInputEditor from "../course_authoring/text-input/TextInputEditor";
+import TextInputEditorSidebar from "../course_authoring/text-input/TextInputSidebar";
 import MatchingViewer from "../course_viewing/matching/MatchingViewer";
+import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
+import PublishModuleModal from "../course_viewing/modals/PublishModuleModal";
 import WrongAnswerModal from "../course_viewing/modals/WrongAnswerModal";
 import MultipleChoiceViewer, {
   ActivityViewerHandle,
 } from "../course_viewing/multiple-choice/MultipleChoiceViewer";
 import TableViewer from "../course_viewing/table/TableViewer";
+import TextInputViewer from "../course_viewing/text-input/TextInputViewer";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
@@ -91,13 +98,6 @@ import NeedHelpModal from "../help/NeedHelpModal";
 import DeletePageModal from "./DeletePageModal";
 import ModuleLockedModal from "./ModuleLockedModal";
 import "./ViewModulePage.css";
-import { useCourseUnits } from "../../contexts/CourseUnitsContext";
-import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
-import { useSocket } from "../../contexts/SocketContext";
-import PublishModuleModal from "../course_viewing/modals/PublishModuleModal";
-import TextInputEditorSidebar from "../course_authoring/text-input/TextInputSidebar";
-import TextInputEditor from "../course_authoring/text-input/TextInputEditor";
-import TextInputViewer from "../course_viewing/text-input/TextInputViewer";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -156,6 +156,8 @@ const ViewModulePage = () => {
     mouseX: number;
     mouseY: number;
     pageIndex: number;
+    addToEnd: boolean;
+    open: boolean;
   } | null>(null);
   const [activityMenuAnchor, setActivityMenuAnchor] =
     useState<null | HTMLElement>(null);
@@ -268,14 +270,16 @@ const ViewModulePage = () => {
   }, [activity]);
 
   const handleContextMenu = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>, pageIndex: number) => {
+    (event: React.MouseEvent, pageIndex: number, addToEnd = false) => {
       event.preventDefault();
       setContextMenu((prev) =>
-        prev === null
+        prev === null || !prev.open
           ? {
               mouseX: event.clientX + 2,
               mouseY: event.clientY - 6,
               pageIndex,
+              addToEnd,
+              open: true,
             }
           : null,
       );
@@ -284,7 +288,7 @@ const ViewModulePage = () => {
   );
 
   const handleCloseContextMenu = useCallback(() => {
-    setContextMenu(null);
+    setContextMenu((prev) => (prev ? { ...prev, open: false } : null));
   }, []);
 
   const handleUploadPdfAbove = () => {
@@ -367,7 +371,6 @@ const ViewModulePage = () => {
     if (contextMenu === null) return;
     setSelectedPageIndexForActivity(contextMenu.pageIndex);
     setActivityMenuAnchor(event.currentTarget);
-    handleCloseContextMenu();
   };
 
   const handleActivityTypeSelect = async (questionType: QuestionType) => {
@@ -385,6 +388,7 @@ const ViewModulePage = () => {
       /* eslint-disable-next-line no-console */
       console.error("Failed to create activity:", error);
     }
+    handleCloseContextMenu();
     setActivityMenuAnchor(null);
     setSelectedPageIndexForActivity(null);
   };
@@ -1437,11 +1441,18 @@ const ViewModulePage = () => {
               </Typography>
               <IconButton
                 disabled={
-                  role === "Learner" && module && isModuleCompleted(module.id)
+                  role !== "Administrator" &&
+                  (role === "Learner" && module && isModuleCompleted(module.id)
                     ? currentPage >= numPages
-                    : currentPage >= numPages - 1
+                    : currentPage >= numPages - 1)
                 }
-                onClick={() => setCurrentPage(currentPage + 1)}
+                onClick={(event) => {
+                  if (role === "Administrator" && currentPage + 1 >= numPages) {
+                    handleContextMenu(event, currentPage, true);
+                  } else {
+                    setCurrentPage(currentPage + 1);
+                  }
+                }}
                 sx={{
                   border: "1px solid black",
                   height: "48px",
@@ -1679,23 +1690,30 @@ const ViewModulePage = () => {
         />
       )}
       <Menu
-        open={contextMenu !== null}
+        open={contextMenu !== null && contextMenu.open}
         onClose={handleCloseContextMenu}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu !== null
+          contextMenu !== null && contextMenu.open
             ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
             : undefined
         }
       >
-        <MenuItem
-          onClick={handleUploadPdfAbove}
-          disabled={isUploadingPdf || isDeletingFromContext}
-        >
-          <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
-            <ArrowCircleUp /> Insert pages above
-          </Stack>
-        </MenuItem>
+        {!contextMenu?.addToEnd && (
+          <MenuItem
+            onClick={handleUploadPdfAbove}
+            disabled={isUploadingPdf || isDeletingFromContext}
+          >
+            <Stack
+              direction="row"
+              alignItems="center"
+              gap="12px"
+              paddingY="8px"
+            >
+              <ArrowCircleUp /> Insert pages above
+            </Stack>
+          </MenuItem>
+        )}
         <MenuItem
           onClick={handleUploadPdfBelow}
           disabled={isUploadingPdf || isDeletingFromContext}
@@ -1712,28 +1730,30 @@ const ViewModulePage = () => {
             <Add /> Create activity
           </Stack>
         </MenuItem>
-        <MenuItem
-          onClick={handleDeletePageFromContext}
-          disabled={isUploadingPdf || isDeletingFromContext}
-        >
-          <Stack
-            direction="row"
-            alignItems="center"
-            gap="12px"
-            color={theme.palette.Error.Dark.Default}
-            paddingY="8px"
+        {!contextMenu?.addToEnd && (
+          <MenuItem
+            onClick={handleDeletePageFromContext}
+            disabled={isUploadingPdf || isDeletingFromContext}
           >
-            <DeleteOutline /> Delete page
-          </Stack>
-        </MenuItem>
+            <Stack
+              direction="row"
+              alignItems="center"
+              gap="12px"
+              color={theme.palette.Error.Dark.Default}
+              paddingY="8px"
+            >
+              <DeleteOutline /> Delete page
+            </Stack>
+          </MenuItem>
+        )}
       </Menu>
       <Menu
         id="activity-type-menu"
         anchorEl={activityMenuAnchor}
         open={Boolean(activityMenuAnchor)}
         onClose={() => {
-          setActivityMenuAnchor(null);
           setSelectedPageIndexForActivity(null);
+          setActivityMenuAnchor(null);
         }}
         MenuListProps={{
           "aria-labelledby": "activity-type-button",
@@ -1741,7 +1761,12 @@ const ViewModulePage = () => {
       >
         {Object.values(QuestionType).map((type) => (
           <MenuItem key={type} onClick={() => handleActivityTypeSelect(type)}>
-            <Stack direction="row" alignItems="center" gap="8px">
+            <Stack
+              direction="row"
+              alignItems="center"
+              gap="8px"
+              color={theme.palette.Administrator.Dark.Default}
+            >
               {questionTypeIcons[type]} {questionTypeLabels[type]}
             </Stack>
           </MenuItem>
