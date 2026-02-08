@@ -21,12 +21,22 @@ const ProfilePicture = ({
   return (
     <Box
       sx={{
+        position: "relative",
         display: "flex",
         width: `${size}px`,
         height: `${size}px`,
         justifyContent: "center",
         alignItems: "center",
         borderRadius: "5000px",
+        cursor: setUploadModalOpen ? "pointer" : "default",
+        ...(!!setUploadModalOpen && {
+          "&:hover .avatar-overlay": {
+            opacity: 1,
+          },
+          "&:hover .avatar-text": {
+            display: "none",
+          },
+        }),
       }}
       onClick={() => {
         if (setUploadModalOpen) {
@@ -39,23 +49,11 @@ const ProfilePicture = ({
           width: "100%",
           height: "100%",
           bgcolor: theme.palette[user.role].Light.Hover,
-          ...(!!setUploadModalOpen && {
-            "&:hover": {
-              backgroundColor: "rgba(0, 0, 0, 0.6)",
-
-              "& .avatar-text": {
-                display: "none",
-              },
-
-              "& .camera-icon": {
-                display: "block",
-              },
-            },
-          }),
         }}
         src={sourceUrl}
       >
         <Typography
+          className="avatar-text"
           sx={{
             color: theme.palette[user.role].Dark.Default,
             fontSize: 0.375 * size,
@@ -65,16 +63,33 @@ const ProfilePicture = ({
         >
           {`${user.firstName.charAt(0) || ""}${user.lastName.charAt(0) || ""}`}
         </Typography>
-        <CameraAlt
-          className="camera-icon"
+      </Avatar>
+      {!!setUploadModalOpen && (
+        <Box
+          className="avatar-overlay"
           sx={{
             position: "absolute",
-            display: "none",
-            color: "white",
-            fontSize: 0.4 * size,
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            borderRadius: "50%",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            opacity: 0,
+            transition: "opacity 0.2s",
           }}
-        />
-      </Avatar>
+        >
+          <CameraAlt
+            sx={{
+              color: "white",
+              fontSize: 0.4 * size,
+            }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

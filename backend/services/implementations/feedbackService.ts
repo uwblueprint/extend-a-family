@@ -89,10 +89,7 @@ class FeedbackService implements IFeedbackService {
     }
   }
 
-  async hasFeedback(
-    learnerId: string,
-    moduleId: string,
-  ): Promise<boolean> {
+  async hasFeedback(learnerId: string, moduleId: string): Promise<boolean> {
     try {
       const feedback = await MgFeedback.findOne({
         learnerId,

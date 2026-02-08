@@ -5,12 +5,14 @@ import ResetPassword from "../../auth/ResetPassword";
 import Logout from "../../auth/Logout";
 import MyAccountButton from "../../auth/MyAccountButton";
 import ProfilePicture from "../../profile/ProfilePicture";
+import { useUser } from "../../../hooks/useUser";
 
 const UserButton = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
   );
   const theme = useTheme();
+  const { profilePicture } = useUser();
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
@@ -31,7 +33,7 @@ const UserButton = () => {
         onClick={handleClick}
         sx={{ color: theme.palette.Neutral[400] }}
       >
-        <ProfilePicture size={24} />
+        <ProfilePicture size={24} sourceUrl={profilePicture} />
       </IconButton>
       <Popover
         id={id}
