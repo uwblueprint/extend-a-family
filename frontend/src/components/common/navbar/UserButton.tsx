@@ -1,11 +1,10 @@
-import React from "react";
 import { Box, IconButton, Popover, useTheme } from "@mui/material";
-import RefreshCredentials from "../../auth/RefreshCredentials";
-import ResetPassword from "../../auth/ResetPassword";
+import React from "react";
+import { useUser } from "../../../hooks/useUser";
 import Logout from "../../auth/Logout";
 import MyAccountButton from "../../auth/MyAccountButton";
+import ResetPassword from "../../auth/ResetPassword";
 import ProfilePicture from "../../profile/ProfilePicture";
-import { useUser } from "../../../hooks/useUser";
 
 const UserButton = () => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
@@ -47,9 +46,8 @@ const UserButton = () => {
       >
         <Box display="flex" sx={{ flexDirection: "column" }}>
           <MyAccountButton />
-          <Logout />
-          <RefreshCredentials />
           <ResetPassword />
+          <Logout />
         </Box>
       </Popover>
     </>
