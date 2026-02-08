@@ -1,4 +1,9 @@
-import { defaultLoginLink, defaultLogoURL } from "./constants";
+import {
+  defaultLoginLink,
+  defaultLogoHeight,
+  defaultLogoURL,
+  defaultLogoWidth,
+} from "./constants";
 
 const facilitatorApprovedEmail = (
   loginLink: string = defaultLoginLink,
@@ -28,7 +33,7 @@ const facilitatorApprovedEmail = (
         border-bottom: 2px solid #E5E7FF;
         background: #F2F3FF;
       ">
-        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="height: 40px" />
+        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="width: ${defaultLogoWidth}; height: ${defaultLogoHeight}" />
       </td>
     </tr>
 
