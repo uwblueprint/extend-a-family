@@ -113,6 +113,7 @@ export default function CourseUnitsPage() {
                 focusedBorderColor={theme.palette[role].Dark.Default}
                 sx={{
                   minWidth: "225px",
+                  width: "450px",
                   borderRadius: "8px",
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
