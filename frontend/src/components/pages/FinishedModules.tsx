@@ -13,7 +13,11 @@ import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 const FinishedModules = (): React.ReactElement => {
   const theme = useTheme();
   const history = useHistory();
-  const { courseUnits: units } = useCourseUnits();
+  const {
+    courseUnits: units,
+    isModuleCompleted,
+    getModuleCompletionDate,
+  } = useCourseUnits();
   const [modules, setModules] = useState<{ [unitId: string]: CourseModule[] }>(
     {},
   );
@@ -55,6 +59,25 @@ const FinishedModules = (): React.ReactElement => {
     loadData();
   }, [units]);
 
+  // Filter modules to only include completed ones
+  const completedModules = useMemo(() => {
+    const filtered: { [unitId: string]: CourseModule[] } = {};
+    Object.entries(modules).forEach(([unitId, unitModules]) => {
+      filtered[unitId] = unitModules.filter((module) =>
+        isModuleCompleted(module.id),
+      );
+    });
+    return filtered;
+  }, [modules, isModuleCompleted]);
+
+  // Filter units to only show those with completed modules
+  const unitsWithCompletedModules = useMemo(() => {
+    return units.filter(
+      (unit) =>
+        completedModules[unit.id] && completedModules[unit.id].length > 0,
+    );
+  }, [units, completedModules]);
+
   // Handler to receive unit open state
   const handleUnitOpenStateChange = (unitId: string, isOpen: boolean) => {
     setUnitOpenMap((prev) => ({ ...prev, [unitId]: isOpen }));
@@ -62,21 +85,25 @@ const FinishedModules = (): React.ReactElement => {
 
   // Check if all units are currently expanded
   const allUnitsExpanded = useMemo(() => {
-    if (units.length === 0) return false;
+    if (unitsWithCompletedModules.length === 0) return false;
     const reportedCount = Object.keys(unitOpenMap).length;
-    if (reportedCount < units.length) return false;
+    if (reportedCount < unitsWithCompletedModules.length) return false;
 
-    return units.every((unit) => unitOpenMap[unit.id] === true);
-  }, [unitOpenMap, units]);
+    return unitsWithCompletedModules.every(
+      (unit) => unitOpenMap[unit.id] === true,
+    );
+  }, [unitOpenMap, unitsWithCompletedModules]);
 
   // Check if all units are currently collapsed
   const allUnitsCollapsed = useMemo(() => {
-    if (units.length === 0) return false;
+    if (unitsWithCompletedModules.length === 0) return false;
     const reportedCount = Object.keys(unitOpenMap).length;
-    if (reportedCount < units.length) return false;
+    if (reportedCount < unitsWithCompletedModules.length) return false;
 
-    return units.every((unit) => unitOpenMap[unit.id] === false);
-  }, [unitOpenMap, units]);
+    return unitsWithCompletedModules.every(
+      (unit) => unitOpenMap[unit.id] === false,
+    );
+  }, [unitOpenMap, unitsWithCompletedModules]);
 
   // Update button state based on unit states
   useEffect(() => {
@@ -113,7 +140,7 @@ const FinishedModules = (): React.ReactElement => {
 
       {/* Main Content */}
       <Box sx={{ flexGrow: 1, p: "48px", mb: "48px", overflowY: "scroll" }}>
-        {!loading && !error && units.length > 0 && (
+        {!loading && !error && unitsWithCompletedModules.length > 0 && (
           <Box
             display="flex"
             alignItems="center"
@@ -148,13 +175,14 @@ const FinishedModules = (): React.ReactElement => {
         )}
 
         <FinishedModulesContent
-          units={units}
-          modules={modules}
+          units={unitsWithCompletedModules}
+          modules={completedModules}
           loading={loading}
           error={error}
           allExpanded={expandAllValue}
           expandAllStamp={expandAllStamp}
           onUnitOpenStateChange={handleUnitOpenStateChange}
+          getModuleCompletionDate={getModuleCompletionDate}
         />
       </Box>
     </Box>

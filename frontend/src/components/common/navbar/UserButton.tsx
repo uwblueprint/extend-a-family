@@ -1,9 +1,9 @@
-import React from "react";
 import { Box, IconButton, Popover, useTheme } from "@mui/material";
-import RefreshCredentials from "../../auth/RefreshCredentials";
-import ResetPassword from "../../auth/ResetPassword";
+import React from "react";
+import { useUser } from "../../../hooks/useUser";
 import Logout from "../../auth/Logout";
 import MyAccountButton from "../../auth/MyAccountButton";
+import ResetPassword from "../../auth/ResetPassword";
 import ProfilePicture from "../../profile/ProfilePicture";
 
 const UserButton = () => {
@@ -11,6 +11,7 @@ const UserButton = () => {
     null,
   );
   const theme = useTheme();
+  const { profilePicture } = useUser();
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
@@ -31,7 +32,7 @@ const UserButton = () => {
         onClick={handleClick}
         sx={{ color: theme.palette.Neutral[400] }}
       >
-        <ProfilePicture size={24} />
+        <ProfilePicture size={24} sourceUrl={profilePicture} />
       </IconButton>
       <Popover
         id={id}
@@ -45,9 +46,8 @@ const UserButton = () => {
       >
         <Box display="flex" sx={{ flexDirection: "column" }}>
           <MyAccountButton />
-          <Logout />
-          <RefreshCredentials />
           <ResetPassword />
+          <Logout />
         </Box>
       </Popover>
     </>

@@ -6,7 +6,6 @@ export enum QuestionType {
   Matching = "Matching",
   Table = "Table",
   TextInput = "TextInput",
-  Custom = "Custom",
 }
 
 export interface ActivityDTO extends CoursePageDTO {

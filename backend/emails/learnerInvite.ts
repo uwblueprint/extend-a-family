@@ -1,4 +1,9 @@
-import { defaultLoginLink, defaultLogoURL } from "./constants";
+import {
+  defaultLoginLink,
+  defaultLogoHeight,
+  defaultLogoURL,
+  defaultLogoWidth,
+} from "./constants";
 
 const learnerInviteEmail = (
   learnerName: string,
@@ -32,7 +37,7 @@ const learnerInviteEmail = (
         border-bottom: 2px solid #C8F3FA;
         background: #E3F9FC;
       ">
-        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="height: 40px" />
+        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="width: ${defaultLogoWidth}; height: ${defaultLogoHeight}" />
       </td>
     </tr>
 

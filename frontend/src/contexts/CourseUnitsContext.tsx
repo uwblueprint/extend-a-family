@@ -6,7 +6,13 @@ import React, {
   useState,
 } from "react";
 import CourseAPIClient from "../APIClients/CourseAPIClient";
+import ProgressAPIClient, {
+  CourseProgress,
+  LearnerProgress,
+  ModuleCompletion,
+} from "../APIClients/ProgressAPIClient";
 import { CourseUnit } from "../types/CourseTypes";
+import AuthContext from "./AuthContext";
 
 interface CourseUnitsContextType {
   courseUnits: CourseUnit[];
@@ -17,6 +23,11 @@ interface CourseUnitsContextType {
   editUnit: (unitId: string, title: string) => Promise<void>;
   deleteUnit: (unitId: string) => Promise<void>;
   moduleDisplayIndex: (moduleId: string) => number;
+  // Progress-related fields
+  courseProgress: CourseProgress | null;
+  refetchCourseProgress: () => Promise<void>;
+  isModuleCompleted: (moduleId: string) => boolean;
+  getModuleCompletionDate: (moduleId: string) => string | null;
 }
 
 const CourseUnitsContext = createContext<CourseUnitsContextType | undefined>(
@@ -41,6 +52,46 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [courseProgress, setCourseProgress] = useState<CourseProgress | null>(
+    null,
+  );
+  const [learnerProgress, setLearnerProgress] =
+    useState<LearnerProgress | null>(null);
+
+  const refetchCourseProgress = async () => {
+    try {
+      const [progress, fullProgress] = await Promise.all([
+        ProgressAPIClient.getCourseProgress(),
+        ProgressAPIClient.getLearnerProgress(),
+      ]);
+      setCourseProgress(progress);
+      setLearnerProgress(fullProgress);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to fetch course progress:", err);
+    }
+  };
+
+  const isModuleCompleted = useCallback(
+    (moduleId: string): boolean => {
+      if (!learnerProgress) return false;
+      return learnerProgress.moduleCompletions.some(
+        (mc: ModuleCompletion) => mc.moduleId === moduleId,
+      );
+    },
+    [learnerProgress],
+  );
+
+  const getModuleCompletionDate = useCallback(
+    (moduleId: string): string | null => {
+      if (!learnerProgress) return null;
+      const completion = learnerProgress.moduleCompletions.find(
+        (mc: ModuleCompletion) => mc.moduleId === moduleId,
+      );
+      return completion ? completion.completedAt : null;
+    },
+    [learnerProgress],
+  );
 
   const refetchCourseUnits = async () => {
     setIsLoading(true);
@@ -108,9 +159,12 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     [courseUnits],
   );
 
+  const { authenticatedUser } = useContext(AuthContext);
+
   useEffect(() => {
     refetchCourseUnits();
-  }, []);
+    refetchCourseProgress();
+  }, [authenticatedUser]);
 
   const value: CourseUnitsContextType = {
     courseUnits,
@@ -121,6 +175,10 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     editUnit,
     deleteUnit,
     moduleDisplayIndex,
+    courseProgress,
+    refetchCourseProgress,
+    isModuleCompleted,
+    getModuleCompletionDate,
   };
 
   return (

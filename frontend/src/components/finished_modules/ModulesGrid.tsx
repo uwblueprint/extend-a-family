@@ -6,9 +6,14 @@ import { CourseModule } from "../../types/CourseTypes";
 interface ModulesGridProps {
   modules: CourseModule[];
   unitId: string;
+  getModuleCompletionDate?: (moduleId: string) => string | null;
 }
 
-const ModulesGrid: React.FC<ModulesGridProps> = ({ modules, unitId }) => {
+const ModulesGrid: React.FC<ModulesGridProps> = ({
+  modules,
+  unitId,
+  getModuleCompletionDate,
+}) => {
   return (
     <Grid container spacing={3}>
       {modules.map((module, index) => (
@@ -18,6 +23,11 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ modules, unitId }) => {
           index={index}
           unitId={unitId}
           isSidebarOpen={false}
+          completionDate={
+            getModuleCompletionDate
+              ? getModuleCompletionDate(module.id)
+              : undefined
+          }
         />
       ))}
     </Grid>

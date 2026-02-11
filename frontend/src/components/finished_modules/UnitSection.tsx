@@ -17,6 +17,7 @@ interface UnitSectionProps {
   expandAll?: boolean;
   expandAllStamp?: number;
   onToggle?: (isOpen: boolean) => void;
+  getModuleCompletionDate?: (moduleId: string) => string | null;
 }
 
 const UnitSection: React.FC<UnitSectionProps> = ({
@@ -25,6 +26,7 @@ const UnitSection: React.FC<UnitSectionProps> = ({
   expandAll = false,
   expandAllStamp,
   onToggle,
+  getModuleCompletionDate,
 }) => {
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
@@ -96,7 +98,11 @@ const UnitSection: React.FC<UnitSectionProps> = ({
           padding: "32px 32px 42px 32px",
         }}
       >
-        <ModulesGrid modules={modules} unitId={unit.id} />
+        <ModulesGrid
+          modules={modules}
+          unitId={unit.id}
+          getModuleCompletionDate={getModuleCompletionDate}
+        />
       </AccordionDetails>
     </Accordion>
   );

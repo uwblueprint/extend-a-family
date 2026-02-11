@@ -61,7 +61,7 @@ const Home = (): React.ReactElement => {
             sx={{
               display: "flex",
               flexWrap: "wrap",
-              justifyContent: "space-between",
+              gap: "20px",
             }}
           >
             <CourseCard />
@@ -72,7 +72,8 @@ const Home = (): React.ReactElement => {
           <Stack
             direction="row"
             width="100%"
-            justifyContent="space-between"
+            gap="20px"
+            flexWrap="wrap"
             marginTop="70px"
             marginBottom="70px"
           >

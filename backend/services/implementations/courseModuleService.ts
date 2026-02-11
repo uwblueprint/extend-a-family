@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { ClientSession, Schema, startSession } from "mongoose";
+import { ClientSession, startSession } from "mongoose";
 import { PDFDocument } from "pdf-lib";
 import MgCourseModule, {
   CourseModule,
@@ -8,6 +8,7 @@ import CoursePageModel, {
   LessonPageModel,
 } from "../../models/coursepage.mgmodel";
 import MgCourseUnit, { CourseUnit } from "../../models/courseunit.mgmodel";
+import feedbackMgmodel from "../../models/feedback.mgmodel";
 import {
   CourseModuleDTO,
   CourseModuleLeanDTO,
@@ -19,7 +20,6 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ICourseModuleService from "../interfaces/courseModuleService";
 import FileStorageService from "./fileStorageService";
-import feedbackMgmodel from "../../models/feedback.mgmodel";
 
 const Logger = logger(__filename);
 
@@ -75,6 +75,7 @@ class CourseModuleService implements ICourseModuleService {
       const courseModule: CourseModule | null = await MgCourseModule.findById(
         courseModuleId,
       )
+        .populate("pages")
         .lean()
         .exec();
       if (!courseModule) {
@@ -94,19 +95,10 @@ class CourseModuleService implements ICourseModuleService {
         );
       }
 
-      const fetchPage = async (page: Schema.Types.ObjectId) => {
-        const pageObject = await CoursePageModel.findById(page).lean().exec();
-        if (!pageObject) {
-          throw new Error(`Page with id ${page} not found.`);
-        }
-        return pageObject;
-      };
-      const pageObjects = Promise.all(courseModule.pages.map(fetchPage));
       return {
         ...courseModule,
         unitId: courseUnit._id.toString(), // eslint-disable-line no-underscore-dangle
-        pages: await pageObjects,
-      };
+      } as unknown as CourseModuleDTO;
     } catch (error) {
       Logger.error(
         `Failed to get course module with id: ${courseModuleId}. Reason = ${getErrorMessage(

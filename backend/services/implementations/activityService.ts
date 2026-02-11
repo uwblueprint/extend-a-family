@@ -100,6 +100,14 @@ class ActivityService {
           ],
           rows: 3,
         };
+      } else if (questionType === QuestionType.TextInput) {
+        activityData = {
+          ...baseActivity,
+          validation: {
+            mode: "short_answer",
+            answers: [],
+          },
+        };
       } else {
         activityData = baseActivity;
       }

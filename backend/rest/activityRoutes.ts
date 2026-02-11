@@ -1,12 +1,17 @@
 import express, { Request, Response, Router } from "express";
 import multer from "multer";
-import { isAuthorizedByRole } from "../middlewares/auth";
+import { getAccessToken, isAuthorizedByRole } from "../middlewares/auth";
 import {
   checkModuleEditable,
   uploadPictureValidator,
 } from "../middlewares/validators/activityValidators";
 import activityService from "../services/implementations/activityService";
 import FileStorageService from "../services/implementations/fileStorageService";
+import LearnerProgressService from "../services/implementations/learnerProgressService";
+import AuthService from "../services/implementations/authService";
+import UserService from "../services/implementations/userService";
+import EmailService from "../services/implementations/emailService";
+import nodemailerConfig from "../nodemailer.config";
 import IFileStorageService from "../services/interfaces/fileStorageService";
 import { QuestionType } from "../types/activityTypes";
 import { getErrorMessage } from "../utilities/errorUtils";
@@ -18,6 +23,11 @@ const upload = multer({ storage });
 const firebaseStorageService: IFileStorageService = new FileStorageService(
   process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
 );
+
+const userService = new UserService();
+const emailService = new EmailService(nodemailerConfig);
+const authService = new AuthService(userService, emailService);
+const progressService = new LearnerProgressService();
 
 /**
  * Create Activity (Transactional)
@@ -85,12 +95,15 @@ activityRouter.delete(
 
 /**
  * Get Activity
+ * Returns activity data with completion status for learners.
  */
 activityRouter.get(
   "/:activityId/:questionType",
   isAuthorizedByRole(new Set(["Administrator", "Facilitator", "Learner"])),
   async (req: Request, res: Response): Promise<void> => {
     const { activityId, questionType } = req.params;
+    const accessToken = getAccessToken(req);
+
     try {
       const activity = await activityService.getActivity(
         activityId,
@@ -100,7 +113,27 @@ activityRouter.get(
         res.status(404).send("Activity not found");
         return;
       }
-      res.status(200).json(activity);
+
+      // For learners, include completion status
+      let isCompleted = false;
+      if (accessToken) {
+        try {
+          const userId = await authService.getUserIdFromAccessToken(
+            accessToken,
+          );
+          const user = await userService.getUserById(userId.toString());
+          if (user.role === "Learner") {
+            isCompleted = await progressService.isActivityCompleted(
+              userId.toString(),
+              activityId,
+            );
+          }
+        } catch {
+          // If we can't get completion status, just return the activity without it
+        }
+      }
+
+      res.status(200).json({ ...activity, isCompleted });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Server error";
       res.status(500).send(message);
