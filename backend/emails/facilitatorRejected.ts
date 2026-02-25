@@ -1,4 +1,8 @@
-import { defaultLogoURL } from "./constants";
+import {
+  defaultLogoHeight,
+  defaultLogoURL,
+  defaultLogoWidth,
+} from "./constants";
 
 const facilitatorRejectedEmail = (): string => `
 <html lang="en">
@@ -26,7 +30,7 @@ const facilitatorRejectedEmail = (): string => `
         border-bottom: 2px solid #E5E7FF;
         background: #F2F3FF;
       ">
-        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="height: 40px" />
+        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="width: ${defaultLogoWidth}; height: ${defaultLogoHeight}" />
       </td>
     </tr>
 

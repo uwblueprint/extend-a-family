@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import FeedbackAPIClient from "../APIClients/FeedbackAPIClient";
 import { FeedbackPopulated } from "../types/FeedbackTypes";
+import AuthContext from "./AuthContext";
 
 interface FeedbacksContextType {
   feedbacks: FeedbackPopulated[];
@@ -100,9 +101,11 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  const { authenticatedUser } = useContext(AuthContext);
+
   useEffect(() => {
     refetchFeedbacks();
-  }, []);
+  }, [authenticatedUser]);
 
   const value = {
     feedbacks,

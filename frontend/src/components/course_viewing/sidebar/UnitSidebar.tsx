@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
+import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 import { useUser } from "../../../hooks/useUser";
 import { CourseUnit, UnitSidebarModalType } from "../../../types/CourseTypes";
 import { isAdministrator } from "../../../types/UserTypes";
@@ -22,7 +23,6 @@ import CreateUnitModal from "../modals/CreateUnitModal";
 import DeleteUnitModal from "../modals/DeleteUnitModal";
 import EditUnitModal from "../modals/EditUnitModal";
 import ContextMenu from "./ContextMenu";
-import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 
 interface UnitSideBarProps {
   handleClose: () => void;
@@ -47,7 +47,11 @@ export default function UnitSidebar({
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
 
-  const { courseUnits, refetchCourseUnits } = useCourseUnits();
+  const {
+    courseUnits,
+    refetchCourseUnits,
+    isLoading: isCourseUnitsLoading,
+  } = useCourseUnits();
 
   useEffect(() => {
     if (!courseUnits || !courseUnits.length) return;
@@ -206,62 +210,68 @@ export default function UnitSidebar({
           onClose={handleContextMenuClose}
           onModalOpen={handleOpenModal}
         />
-        <List sx={{ width: "100%" }}>
-          {courseUnits.map((unit, index) => {
-            return (
-              <ListItem
-                key={unit.id}
-                disablePadding
-                sx={{
-                  borderBottom: 1,
-                  borderColor:
-                    index !== courseUnits.length - 1
-                      ? "#DBE4E7"
-                      : "transparent",
-                }}
-              >
-                <ListItemButton
+        {isCourseUnitsLoading ? (
+          <Box display="flex" justifyContent="center">
+            <Typography variant="bodyMedium">Loading units...</Typography>
+          </Box>
+        ) : (
+          <List sx={{ width: "100%" }}>
+            {courseUnits.map((unit, index) => {
+              return (
+                <ListItem
                   key={unit.id}
+                  disablePadding
                   sx={{
-                    py: "15px",
-                    px: "32px",
-                    backgroundColor:
-                      selectedUnit?.id === unit.id
-                        ? theme.palette[user.role].Light.Selected
+                    borderBottom: 1,
+                    borderColor:
+                      index !== courseUnits.length - 1
+                        ? "#DBE4E7"
                         : "transparent",
-                    "&:hover": {
-                      backgroundColor: theme.palette[user.role].Light.Hover,
-                    },
                   }}
-                  onClick={(event) => handleListItemClick(event, index)}
                 >
-                  <ListItemText
-                    disableTypography
-                    primary={`${unit.displayIndex}. ${unit.title}`}
-                    sx={
-                      selectedUnit?.id === unit.id
-                        ? theme.typography.labelLargeProminent
-                        : theme.typography.bodyMedium
-                    }
-                  />
-                  {isAdministrator(user) && (
-                    <IconButton
-                      edge="end"
-                      onClick={(event) => {
-                        event.stopPropagation(); // Prevent triggering the list item click
-                        handleContextMenuOpen(event, unit); // Custom function to handle button click
-                      }}
-                      sx={{ marginLeft: "16px" }}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
-                  )}
-                </ListItemButton>
-              </ListItem>
-            );
-          })}
-        </List>
-        {isAdministrator(user) && (
+                  <ListItemButton
+                    key={unit.id}
+                    sx={{
+                      py: "15px",
+                      px: "32px",
+                      backgroundColor:
+                        selectedUnit?.id === unit.id
+                          ? theme.palette[user.role].Light.Selected
+                          : "transparent",
+                      "&:hover": {
+                        backgroundColor: theme.palette[user.role].Light.Hover,
+                      },
+                    }}
+                    onClick={(event) => handleListItemClick(event, index)}
+                  >
+                    <ListItemText
+                      disableTypography
+                      primary={`${unit.displayIndex}. ${unit.title}`}
+                      sx={
+                        selectedUnit?.id === unit.id
+                          ? theme.typography.labelLargeProminent
+                          : theme.typography.bodyMedium
+                      }
+                    />
+                    {isAdministrator(user) && (
+                      <IconButton
+                        edge="end"
+                        onClick={(event) => {
+                          event.stopPropagation(); // Prevent triggering the list item click
+                          handleContextMenuOpen(event, unit); // Custom function to handle button click
+                        }}
+                        sx={{ marginLeft: "16px" }}
+                      >
+                        <MoreVertIcon />
+                      </IconButton>
+                    )}
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </List>
+        )}
+        {isAdministrator(user) && !isCourseUnitsLoading && (
           <Button
             variant="contained"
             onClick={handleOpenCreateUnitModal}

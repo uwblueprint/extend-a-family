@@ -10,7 +10,7 @@ export enum QuestionType {
   MultiSelect = "MultiSelect",
   Table = "Table",
   Matching = "Matching",
-  Input = "Input",
+  TextInput = "TextInput",
 }
 
 export type PageType = "Lesson" | QuestionType;
@@ -84,11 +84,34 @@ export interface TableActivity extends ActivityBase {
   headerColumnIncludes: HeaderColumnIncludesTypes;
 }
 
+export type TextInputValidation =
+  | {
+      mode: "short_answer";
+      answers: string[];
+      min?: number;
+      max?: number;
+    }
+  | {
+      mode: "numeric_range";
+      min: number;
+      max: number;
+    };
+
+export interface TextInputActivity extends ActivityBase {
+  type: QuestionType.TextInput;
+  questionType: QuestionType.TextInput;
+  placeholder?: string;
+  maxLength?: number;
+  validation: TextInputValidation;
+  units?: string;
+}
+
 export type Activity =
   | MultipleChoiceActivity
   | MultiSelectActivity
   | MatchingActivity
-  | TableActivity;
+  | TableActivity
+  | TextInputActivity;
 
 export type CoursePage = LessonPage | Activity;
 
@@ -124,6 +147,12 @@ export function isTableActivity(
   activity: CoursePage,
 ): activity is TableActivity {
   return activity.type === QuestionType.Table;
+}
+
+export function isTextInputActivity(
+  activity: CoursePage,
+): activity is TextInputActivity {
+  return activity.type === QuestionType.TextInput;
 }
 
 export enum ModuleStatus {

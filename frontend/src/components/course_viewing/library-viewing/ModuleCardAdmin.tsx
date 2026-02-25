@@ -31,9 +31,9 @@ import BlankImg from "../../assets/blankSlide.png";
 import ChangeThumbnailModal from "../modals/ChangeThumbnailModal";
 import DeleteModuleModal from "../modals/DeleteModuleModal";
 import EditModuleModal from "../modals/EditModuleModal";
-import UnpublishModuleModal from "../modals/UnpublishModuleModal";
 import EditPublishedModuleModal from "../modals/EditPublishedModuleModal";
 import PublishModuleModal from "../modals/PublishModuleModal";
+import UnpublishModuleModal from "../modals/UnpublishModuleModal";
 
 const ItemType = "MODULE_CARD";
 
@@ -274,7 +274,12 @@ const ModuleCardAdmin = ({
         component="img"
         image={module.imageURL ? module.imageURL : BlankImg}
         alt={module.title}
-        sx={{ aspectRatio: "16 / 9" }}
+        sx={{
+          aspectRatio: "16 / 9",
+          borderRadius: "4px",
+          width: "100%",
+          objectFit: "contain",
+        }}
       />
       <Stack
         direction="row"

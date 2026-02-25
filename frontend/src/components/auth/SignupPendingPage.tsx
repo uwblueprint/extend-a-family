@@ -3,13 +3,13 @@ import { Box, Button, Container, Typography, useTheme } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useHistory } from "react-router-dom";
 import logo from "../assets/logoColoured.png";
-import { useUser } from "../../hooks/useUser";
-import { LANDING_PAGE } from "../../constants/Routes";
+import { WELCOME_PAGE } from "../../constants/Routes";
+import AuthContext from "../../contexts/AuthContext";
 
 const SignupPending = (): React.ReactElement => {
   const theme = useTheme();
-  const { refreshUser } = useUser();
   const history = useHistory();
+  const { setAuthenticatedUser } = React.useContext(AuthContext);
   return (
     <Container
       sx={{
@@ -78,12 +78,12 @@ const SignupPending = (): React.ReactElement => {
               justifyContent: "center",
               alignItems: "center",
             }}
-            onClick={async () => {
-              await refreshUser();
-              history.push(LANDING_PAGE);
+            onClick={() => {
+              setAuthenticatedUser(null);
+              history.push(WELCOME_PAGE);
             }}
           >
-            <Typography variant="labelLarge">Refresh</Typography>
+            <Typography variant="labelLarge">Retry</Typography>
           </Button>
         </Box>
       </Box>

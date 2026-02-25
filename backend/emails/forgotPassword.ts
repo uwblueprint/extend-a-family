@@ -1,4 +1,8 @@
-import { defaultLogoURL } from "./constants";
+import {
+  defaultLogoHeight,
+  defaultLogoURL,
+  defaultLogoWidth,
+} from "./constants";
 
 const forgotPasswordEmail = (
   name: string,
@@ -33,7 +37,7 @@ const forgotPasswordEmail = (
         border-bottom: 2px solid ${bannerBorder};
         background: ${bannerBackground};
       ">
-        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="height: 40px" />
+        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="width: ${defaultLogoWidth}; height: ${defaultLogoHeight}" />
       </td>
     </tr>
 

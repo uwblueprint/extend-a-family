@@ -1,4 +1,9 @@
-import { defaultLoginLink, defaultLogoURL } from "./constants";
+import {
+  defaultLoginLink,
+  defaultLogoHeight,
+  defaultLogoURL,
+  defaultLogoWidth,
+} from "./constants";
 
 const adminInviteEmail = (
   verifyEmailLink: string,
@@ -30,7 +35,7 @@ const adminInviteEmail = (
         border-bottom: 2px solid #FFE6DD;
         background: #FCC4B1;
       ">
-        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="height: 40px" />
+        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="width: ${defaultLogoWidth}; height: ${defaultLogoHeight}" />
       </td>
     </tr>
 
