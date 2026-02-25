@@ -19,13 +19,27 @@ const ModuleCardLearner = ({
   index,
   unitId,
   isSidebarOpen,
+  completionDate,
 }: {
   module: CourseModule;
   index: number;
   unitId: string;
   isSidebarOpen: boolean;
+  completionDate?: string | null;
 }) => {
   const theme = useTheme();
+
+  // Format completion date for display
+  const formatCompletionDate = (dateString?: string | null) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   return (
     <Grid
       item
@@ -94,19 +108,23 @@ const ModuleCardLearner = ({
             >
               {module.title}
             </Typography>
-            <Stack
-              direction="row"
-              padding="4px 8px"
-              justifyContent="center"
-              alignItems="center"
-              gap="8px"
-              borderRadius="4px"
-              bgcolor={theme.palette.Success.Light.Hover}
-              color={theme.palette.Success.Dark.Default}
-            >
-              <CheckCircle sx={{ fontSize: 15 }} />
-              <Typography variant="labelMedium">FINISHED ON [DATE]</Typography>
-            </Stack>
+            {completionDate && (
+              <Stack
+                direction="row"
+                padding="4px 8px"
+                justifyContent="center"
+                alignItems="center"
+                gap="8px"
+                borderRadius="4px"
+                bgcolor={theme.palette.Success.Light.Hover}
+                color={theme.palette.Success.Dark.Default}
+              >
+                <CheckCircle sx={{ fontSize: 15 }} />
+                <Typography variant="labelMedium">
+                  FINISHED ON {formatCompletionDate(completionDate)}
+                </Typography>
+              </Stack>
+            )}
           </CardContent>
         </CardActionArea>
       </Card>

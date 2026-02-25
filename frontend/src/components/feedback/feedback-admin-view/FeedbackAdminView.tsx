@@ -212,13 +212,19 @@ const FeedbackAdminView = () => {
       <Stack
         direction="column"
         gap="32px"
+        width="100%"
         padding="48px"
         alignItems="flex-start"
         flex="1 0 0"
         alignSelf="stretch"
         sx={{ overflow: "auto", minHeight: 0 }}
       >
-        <Stack direction="column" alignItems="flex-start" gap="16px">
+        <Stack
+          direction="column"
+          alignItems="flex-start"
+          gap="16px"
+          width="100%"
+        >
           <Stack direction="row" justifyContent="space-between" width="100%">
             <Stack
               direction="column"

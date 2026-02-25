@@ -117,6 +117,8 @@ const MyAccount = (): React.ReactElement => {
           flex: "1 0 0",
           alignSelf: "stretch",
           background: theme.palette.Neutral[200],
+          overflowY: "scroll",
+          height: "100%",
         }}
       >
         <MainPageButton />

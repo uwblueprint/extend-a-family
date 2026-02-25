@@ -1,4 +1,9 @@
-import { defaultLoginLink } from "./constants";
+import {
+  defaultLoginLink,
+  defaultLogoHeight,
+  defaultLogoURL,
+  defaultLogoWidth,
+} from "./constants";
 
 const facilitatorApprovedEmail = (
   loginLink: string = defaultLoginLink,
@@ -28,7 +33,7 @@ const facilitatorApprovedEmail = (
         border-bottom: 2px solid #E5E7FF;
         background: #F2F3FF;
       ">
-        <img src="https://firebasestorage.googleapis.com/v0/b/extendafamily-7613e.appspot.com/o/eaf-logo.png?alt=media&token=9f3f5da0-264e-42a5-85a7-0c1fb120b27c" alt="Extend-A-Family logo" style="height: 40px" />
+        <img src="${defaultLogoURL}" alt="Extend-A-Family logo" style="width: ${defaultLogoWidth}; height: ${defaultLogoHeight}" />
       </td>
     </tr>
 

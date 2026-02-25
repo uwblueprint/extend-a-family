@@ -25,6 +25,32 @@ feedbackRouter.get(
 );
 
 /* 
+Check if a learner has already submitted feedback for a module
+- requires moduleId and learnerId in query params
+- Ex. /feedbacks/check?moduleId=123&learnerId=456
+*/
+feedbackRouter.get(
+  "/check",
+  isAuthorizedByRole(new Set(["Learner"])),
+  async (req, res) => {
+    try {
+      const { moduleId, learnerId } = req.query;
+      if (!moduleId || !learnerId) {
+        res.status(400).send("moduleId and learnerId are required");
+        return;
+      }
+      const hasFeedback = await feedbackService.hasFeedback(
+        learnerId as string,
+        moduleId as string,
+      );
+      res.status(200).json({ hasFeedback });
+    } catch (error) {
+      res.status(500).send(getErrorMessage(error));
+    }
+  },
+);
+
+/* 
 Get a Feedback by its ID 
 - requires feedbackId in request params 
 - Ex. /feedbacks/67a161bf247f830154519e69

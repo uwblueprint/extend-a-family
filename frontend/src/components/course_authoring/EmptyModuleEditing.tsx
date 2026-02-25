@@ -172,6 +172,7 @@ export const AddYourFirstPageSlide = ({
             <Typography variant="labelLarge">Upload page(s)</Typography>
             <VisuallyHiddenInput
               type="file"
+              accept="application/pdf"
               onChange={handleFileChange}
               multiple
             />
@@ -205,18 +206,18 @@ export const AddYourFirstPageSlide = ({
             MenuListProps={{
               "aria-labelledby": "activity-type-button",
             }}
-            PaperProps={{
-              sx: {
-                width: anchorEl?.offsetWidth,
-              },
-            }}
           >
             {Object.values(QuestionType).map((type) => (
               <MenuItem
                 key={type}
                 onClick={() => handleActivityTypeSelect(type)}
               >
-                <Stack direction="row" alignItems="center" gap="8px">
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  gap="8px"
+                  color={theme.palette.Administrator.Dark.Default}
+                >
                   {questionTypeIcons[type]} {questionTypeLabels[type]}
                 </Stack>
               </MenuItem>

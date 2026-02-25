@@ -33,9 +33,12 @@ import {
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import ActivityAPIClient from "../../APIClients/ActivityAPIClient";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import ProgressAPIClient, {
+  LearnerProgress,
+} from "../../APIClients/ProgressAPIClient";
 import UserAPIClient from "../../APIClients/UserAPIClient";
 import {
   questionTypeIcons,
@@ -43,6 +46,8 @@ import {
 } from "../../constants/ActivityLabels";
 import * as Routes from "../../constants/Routes";
 import { COURSE_PAGE } from "../../constants/Routes";
+import { useCourseUnits } from "../../contexts/CourseUnitsContext";
+import { useSocket } from "../../contexts/SocketContext";
 import useActivity from "../../hooks/useActivity";
 import useQueryParams from "../../hooks/useQueryParams";
 import { useUser } from "../../hooks/useUser";
@@ -50,16 +55,17 @@ import {
   Activity,
   CourseModule,
   CourseUnit,
+  HeaderColumnIncludesTypes,
   isActivityPage,
   isLessonPage,
   isMatchingActivity,
   isMultipleChoiceActivity,
   isMultiSelectActivity,
   isTableActivity,
-  HeaderColumnIncludesTypes,
+  isTextInputActivity,
   Media,
-  QuestionType,
   ModuleStatus,
+  QuestionType,
 } from "../../types/CourseTypes";
 import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
@@ -74,20 +80,24 @@ import MultipleChoiceMainEditor from "../course_authoring/multiple-choice/Multip
 import MultipleChoiceEditorSidebar from "../course_authoring/multiple-choice/MultipleChoiceSidebar";
 import TableMainEditor from "../course_authoring/table/TableEditor";
 import TableSidebar from "../course_authoring/table/TableSidebar";
+import TextInputEditor from "../course_authoring/text-input/TextInputEditor";
+import TextInputEditorSidebar from "../course_authoring/text-input/TextInputSidebar";
 import MatchingViewer from "../course_viewing/matching/MatchingViewer";
+import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
+import PublishModuleModal from "../course_viewing/modals/PublishModuleModal";
 import WrongAnswerModal from "../course_viewing/modals/WrongAnswerModal";
 import MultipleChoiceViewer, {
   ActivityViewerHandle,
 } from "../course_viewing/multiple-choice/MultipleChoiceViewer";
 import TableViewer from "../course_viewing/table/TableViewer";
+import TextInputViewer from "../course_viewing/text-input/TextInputViewer";
 import FeedbackThumbnail from "../courses/moduleViewing/learner-giving-feedback/FeedbackThumbnail";
 import SurveySlides from "../courses/moduleViewing/learner-giving-feedback/SurveySlides";
 import ModuleSidebarThumbnail from "../courses/moduleViewing/Thumbnail";
 import NeedHelpModal from "../help/NeedHelpModal";
 import DeletePageModal from "./DeletePageModal";
+import ModuleLockedModal from "./ModuleLockedModal";
 import "./ViewModulePage.css";
-import { useCourseUnits } from "../../contexts/CourseUnitsContext";
-import EditPublishedModuleModal from "../course_viewing/modals/EditPublishedModuleModal";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -104,8 +114,9 @@ const ViewModulePage = () => {
   const requestedModuleId = queryParams.get("moduleId") || "";
   const requestedPageId = queryParams.get("pageId") || "";
   const requestedUnitId = queryParams.get("unitId") || "";
-  const { role } = useUser();
   const history = useHistory();
+  const { role, id: userId, firstName, lastName } = useUser();
+  const socket = useSocket();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -115,6 +126,8 @@ const ViewModulePage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [module, setModule] = useState<CourseModule | null>(null);
   const [unit, setUnit] = useState<CourseUnit | null>(null);
+  const [learnerProgress, setLearnerProgress] =
+    useState<LearnerProgress | null>(null);
   const lessonPageRef = useRef<HTMLDivElement>(null);
   const activityPageRef = useRef<HTMLDivElement>(null);
   const lessonPageContainerRef = useRef<HTMLDivElement>(null);
@@ -130,8 +143,8 @@ const ViewModulePage = () => {
   const numPages = module?.pages.length || 0;
   const [editPublishedModuleModalOpen, setEditPublishedModuleModalOpen] =
     useState(false);
+  const [publishModuleModalOpen, setPublishModuleModalOpen] = useState(false);
 
-  const isFeedbackSurveyPage = role === "Learner" && currentPage === numPages;
   const isEmptyModuleEditing =
     role === "Administrator" && module && numPages === 0;
 
@@ -143,6 +156,8 @@ const ViewModulePage = () => {
     mouseX: number;
     mouseY: number;
     pageIndex: number;
+    addToEnd: boolean;
+    open: boolean;
   } | null>(null);
   const [activityMenuAnchor, setActivityMenuAnchor] =
     useState<null | HTMLElement>(null);
@@ -153,6 +168,12 @@ const ViewModulePage = () => {
   const [isSnackbarSuccess, setIsSnackbarSuccess] = useState(true);
   const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [isDeletingFromContext, setIsDeletingFromContext] = useState(false);
+  const [isModuleLockedModalOpen, setIsModuleLockedModalOpen] = useState(false);
+  const [currentEditorName, setCurrentEditorName] = useState("");
+  const [hasEditingLock, setHasEditingLock] = useState(false);
+
+  // Only allow editing if administrator has acquired the editing lock
+  const canEdit = role === "Administrator" && hasEditingLock;
 
   const [hasImage, setHasImage] = useState(
     (currentPageObject &&
@@ -187,7 +208,33 @@ const ViewModulePage = () => {
     return fetchedModule;
   }, [history, requestedModuleId, requestedUnitId, role]);
 
-  const { courseUnits: allUnits } = useCourseUnits();
+  const {
+    courseUnits: allUnits,
+    isModuleCompleted,
+    refetchCourseProgress,
+  } = useCourseUnits();
+
+  const isActivityCompleted = useCallback(
+    (moduleId: string, activityId: string): boolean => {
+      if (!learnerProgress) return false;
+      return learnerProgress.completedActivities.includes(activityId);
+    },
+    [learnerProgress],
+  );
+
+  const displayActivityCompleted =
+    role === "Facilitator" ||
+    (module &&
+      currentPageObject &&
+      isActivityCompleted(module.id, currentPageObject.id)) ||
+    false;
+
+  const isFeedbackSurveyPage =
+    role === "Learner" &&
+    currentPage === numPages &&
+    module !== null &&
+    isModuleCompleted(module.id);
+
   const fetchUnit = useCallback(async () => {
     const foundUnit = allUnits.find((u) =>
       u.modules.some((m) => m.id === requestedModuleId),
@@ -223,14 +270,16 @@ const ViewModulePage = () => {
   }, [activity]);
 
   const handleContextMenu = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>, pageIndex: number) => {
+    (event: React.MouseEvent, pageIndex: number, addToEnd = false) => {
       event.preventDefault();
       setContextMenu((prev) =>
-        prev === null
+        prev === null || !prev.open
           ? {
               mouseX: event.clientX + 2,
               mouseY: event.clientY - 6,
               pageIndex,
+              addToEnd,
+              open: true,
             }
           : null,
       );
@@ -239,7 +288,7 @@ const ViewModulePage = () => {
   );
 
   const handleCloseContextMenu = useCallback(() => {
-    setContextMenu(null);
+    setContextMenu((prev) => (prev ? { ...prev, open: false } : null));
   }, []);
 
   const handleUploadPdfAbove = () => {
@@ -322,7 +371,6 @@ const ViewModulePage = () => {
     if (contextMenu === null) return;
     setSelectedPageIndexForActivity(contextMenu.pageIndex);
     setActivityMenuAnchor(event.currentTarget);
-    handleCloseContextMenu();
   };
 
   const handleActivityTypeSelect = async (questionType: QuestionType) => {
@@ -340,6 +388,7 @@ const ViewModulePage = () => {
       /* eslint-disable-next-line no-console */
       console.error("Failed to create activity:", error);
     }
+    handleCloseContextMenu();
     setActivityMenuAnchor(null);
     setSelectedPageIndexForActivity(null);
   };
@@ -530,6 +579,90 @@ const ViewModulePage = () => {
     fetchBookmarks();
   }, [fetchBookmarks]);
 
+  useEffect(() => {
+    const fetchLearnerProgress = async () => {
+      if (role === "Learner") {
+        try {
+          const progress = await ProgressAPIClient.getLearnerProgress();
+          setLearnerProgress(progress);
+        } catch (error) {
+          /* eslint-disable-next-line no-console */
+          console.error("Failed to fetch learner progress:", error);
+        }
+      }
+    };
+    fetchLearnerProgress();
+  }, [role]);
+
+  // Module editing lock management (Administrators only)
+  useEffect(() => {
+    if (role !== "Administrator" || !socket || !requestedModuleId) {
+      return;
+    }
+
+    const userName = `${firstName} ${lastName}`;
+
+    // Request lock when component mounts
+    socket.emit("moduleEditing:acquireLock", {
+      moduleId: requestedModuleId,
+      userId,
+      userName,
+    });
+
+    // Listen for lock acquisition success
+    const handleLockAcquired = (data: { moduleId: string }) => {
+      if (data.moduleId === requestedModuleId) {
+        setHasEditingLock(true);
+      }
+    };
+
+    // Listen for lock denial (someone else is editing)
+    const handleLockDenied = (data: {
+      moduleId: string;
+      currentEditor: { userId: string; userName: string };
+    }) => {
+      if (data.moduleId === requestedModuleId) {
+        setCurrentEditorName(data.currentEditor.userName);
+        setIsModuleLockedModalOpen(true);
+        setHasEditingLock(false);
+      }
+    };
+
+    // Listen for errors
+    const handleLockError = (data: { moduleId: string; message: string }) => {
+      if (data.moduleId === requestedModuleId) {
+        /* eslint-disable-next-line no-console */
+        console.error("Module editing lock error:", data.message);
+      }
+    };
+
+    socket.on("moduleEditing:lockAcquired", handleLockAcquired);
+    socket.on("moduleEditing:lockDenied", handleLockDenied);
+    socket.on("moduleEditing:error", handleLockError);
+
+    // Release lock when component unmounts or module changes
+    // eslint-disable-next-line consistent-return
+    return () => {
+      if (hasEditingLock) {
+        socket.emit("moduleEditing:releaseLock", {
+          moduleId: requestedModuleId,
+          userId,
+        });
+      }
+      socket.off("moduleEditing:lockAcquired", handleLockAcquired);
+      socket.off("moduleEditing:lockDenied", handleLockDenied);
+      socket.off("moduleEditing:error", handleLockError);
+    };
+  }, [
+    role,
+    socket,
+    requestedModuleId,
+    userId,
+    firstName,
+    lastName,
+    hasEditingLock,
+  ]);
+
   const handleDeletePage = async () => {
     if (!module || !currentPageObject) return;
 
@@ -645,179 +778,260 @@ const ViewModulePage = () => {
     [draggedIndex, module, currentPage],
   );
 
-  const onCorrectAnswer = () => {
+  const onCorrectAnswer = async () => {
     setIsSnackbarSuccess(true);
     setUploadSnackbarMessage("Correct! Please move on to the next page.");
     setUploadSnackbarOpen(true);
+
+    // Track activity completion for learners
+    if (role === "Learner" && currentPageObject && module) {
+      const activityId = currentPageObject.id;
+      const result = await ProgressAPIClient.completeActivity(
+        activityId,
+        module.id,
+      );
+      if (result?.moduleCompleted) {
+        // Module was just completed, could show a celebration message
+        // eslint-disable-next-line no-console
+        console.log("Module completed!");
+      }
+      // Refetch learner progress to update completion status
+      try {
+        const updatedProgress = await ProgressAPIClient.getLearnerProgress();
+        setLearnerProgress(updatedProgress);
+        // Also update the course progress context so isModuleCompleted reflects the change
+        await refetchCourseProgress();
+      } catch (error) {
+        /* eslint-disable-next-line no-console */
+        console.error("Failed to fetch updated learner progress:", error);
+      }
+    }
   };
 
   const SideBar = useMemo(
     () => (
-      <Box
+      <Stack
+        direction="column"
         width="auto"
         minWidth="fit-content"
         maxHeight={boxHeight}
-        padding="24px"
-        sx={{
-          backgroundColor: theme.palette.Neutral[200],
-          overflowY: "auto",
-          gapY: "24px",
-          ...(isFullScreen && { display: "none" }),
-        }}
-        className="no-scrollbar"
+        border="1px solid"
+        borderColor={theme.palette.Neutral[300]}
       >
-        {isEmptyModuleEditing && <EmptyModuleLeftSidebar />}
-        {module?.pages
-          .map((page, index) => (
-            <ModuleSidebarThumbnail
-              key={`thumbnail_${index}`}
-              index={index}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              thumbnailRefs={thumbnailRefs}
-              isBookmarked={isPageBookmarked(page.id)}
-              onContextMenu={
-                role === "Administrator" ? handleContextMenu : undefined
-              }
-              isDraggable={role === "Administrator"}
-              onDragStart={
-                role === "Administrator" ? handleDragStart : undefined
-              }
-              onDragOver={role === "Administrator" ? handleDragOver : undefined}
-              onDragLeave={
-                role === "Administrator" ? handleDragLeave : undefined
-              }
-              onDrop={role === "Administrator" ? handleDrop : undefined}
-              isDragging={draggedIndex === index}
-              isDropTarget={hoverIndex === index && draggedIndex !== null}
-            >
-              {isLessonPage(page) && (
-                <Document
-                  file={page.pdfUrl}
-                  options={options}
-                  loading={
-                    <Typography variant="bodyMedium">Loading...</Typography>
-                  }
-                >
-                  <Thumbnail
-                    pageNumber={page.pageIndex}
-                    height={130}
-                    scale={1.66}
-                  />
-                </Document>
-              )}
-              {isActivityPage(page) && (
-                <Box
-                  height={168}
-                  width={224}
-                  flexShrink={0}
-                  sx={{
-                    display: "inline-flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "white",
-                    borderRadius: "4px",
-                    border: `1px solid ${theme.palette.Learner.Dark.Default}`,
-                    background: theme.palette.Learner.Light.Default,
-                    color: theme.palette.Learner.Dark.Default,
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    justifyContent="center"
-                    alignItems="center"
-                    gap="8px"
-                  >
-                    {questionTypeIcons[page.questionType]}
-                    <Stack
-                      direction="column"
-                      justifyContent="center"
-                      alignItems="flex-start"
-                    >
-                      <Typography variant="bodyMedium">
-                        Activity{" "}
-                        {(() => {
-                          const unitNumber = unit?.displayIndex ?? 0;
-                          const moduleNumber =
-                            (unit?.modules.findIndex(
-                              (m) => m.id === module?.id,
-                            ) ?? -1) + 1;
-                          const activityNumber =
-                            module?.pages
-                              .slice(0, index + 1)
-                              .filter(isActivityPage).length ?? 0;
-                          return `${unitNumber}.${moduleNumber}.${activityNumber}`;
-                        })()}
-                      </Typography>
-                      <Typography variant="labelSmall" textAlign="center">
-                        {questionTypeLabels[page.questionType]}
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </Box>
-              )}
-            </ModuleSidebarThumbnail>
-          ))
-          .concat(
-            role === "Learner" ? (
+        <Box
+          width="auto"
+          minWidth="fit-content"
+          maxHeight={boxHeight}
+          flexGrow={1}
+          padding="24px"
+          sx={{
+            backgroundColor: theme.palette.Neutral[200],
+            overflowY: "auto",
+            gapY: "24px",
+            ...(isFullScreen && { display: "none" }),
+          }}
+          className="no-scrollbar"
+        >
+          {isEmptyModuleEditing && <EmptyModuleLeftSidebar />}
+          {module?.pages
+            .map((page, index) => (
               <ModuleSidebarThumbnail
-                key="feedback_thumbnail"
-                index={numPages}
+                key={`thumbnail_${index}`}
+                index={index}
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
                 thumbnailRefs={thumbnailRefs}
+                isBookmarked={isPageBookmarked(page.id)}
+                onContextMenu={canEdit ? handleContextMenu : undefined}
+                isDraggable={canEdit}
+                onDragStart={canEdit ? handleDragStart : undefined}
+                onDragOver={canEdit ? handleDragOver : undefined}
+                onDragLeave={canEdit ? handleDragLeave : undefined}
+                onDrop={canEdit ? handleDrop : undefined}
+                isDragging={draggedIndex === index}
+                isDropTarget={hoverIndex === index && draggedIndex !== null}
               >
-                <FeedbackThumbnail />
+                {isLessonPage(page) && (
+                  <Document
+                    file={page.pdfUrl}
+                    options={options}
+                    loading={
+                      <Typography variant="bodyMedium">Loading...</Typography>
+                    }
+                  >
+                    <Thumbnail
+                      pageNumber={page.pageIndex}
+                      height={130}
+                      scale={1.66}
+                    />
+                  </Document>
+                )}
+                {isActivityPage(page) && (
+                  <Box
+                    height={168}
+                    width={224}
+                    flexShrink={0}
+                    sx={{
+                      display: "inline-flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "white",
+                      borderRadius: "4px",
+                      border: `1px solid ${theme.palette.Learner.Dark.Default}`,
+                      background: isActivityCompleted(module.id, page.id)
+                        ? theme.palette.Success.Light.Default
+                        : theme.palette.Learner.Light.Default,
+                      color: isActivityCompleted(module.id, page.id)
+                        ? theme.palette.Success.Dark.Default
+                        : theme.palette.Learner.Dark.Default,
+                    }}
+                  >
+                    {isActivityCompleted(module.id, page.id) && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          position: "absolute",
+                          top: 0,
+                          width: "224px",
+                          padding: "4px 16px 4px 8px",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: "10px",
+                          backgroundColor: theme.palette.Success.Dark.Default,
+                        }}
+                      >
+                        <Typography
+                          variant="labelSmall"
+                          textAlign="center"
+                          color="white"
+                        >
+                          Completed
+                        </Typography>
+                      </Box>
+                    )}
+                    <Stack
+                      direction="row"
+                      justifyContent="center"
+                      alignItems="center"
+                      gap="8px"
+                    >
+                      {questionTypeIcons[page.questionType]}
+                      <Stack
+                        direction="column"
+                        justifyContent="center"
+                        alignItems="flex-start"
+                      >
+                        <Typography variant="bodyMedium">
+                          Activity{" "}
+                          {(() => {
+                            const unitNumber = unit?.displayIndex ?? 0;
+                            const moduleNumber =
+                              (unit?.modules.findIndex(
+                                (m) => m.id === module?.id,
+                              ) ?? -1) + 1;
+                            const activityNumber =
+                              module?.pages
+                                .slice(0, index + 1)
+                                .filter(isActivityPage).length ?? 0;
+                            return `${unitNumber}.${moduleNumber}.${activityNumber}`;
+                          })()}
+                        </Typography>
+                        <Typography variant="labelSmall" textAlign="center">
+                          {questionTypeLabels[page.questionType]}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Box>
+                )}
               </ModuleSidebarThumbnail>
-            ) : (
-              []
-            ),
+            ))
+            .concat(
+              role === "Learner" && module && isModuleCompleted(module.id) ? (
+                <ModuleSidebarThumbnail
+                  key="feedback_thumbnail"
+                  index={numPages}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  thumbnailRefs={thumbnailRefs}
+                >
+                  <FeedbackThumbnail />
+                </ModuleSidebarThumbnail>
+              ) : (
+                []
+              ),
+            )}
+          {canEdit && draggedIndex !== null && module?.pages && (
+            <Box
+              onDragOver={(e) => {
+                e.preventDefault();
+                setHoverIndex(module.pages.length);
+              }}
+              onDragLeave={() => setHoverIndex(null)}
+              onDrop={() => handleDrop(module.pages.length)}
+              sx={{
+                minHeight: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                marginTop: "-10px",
+                "&::before":
+                  hoverIndex === module.pages.length
+                    ? {
+                        content: '""',
+                        position: "absolute",
+                        top: "0",
+                        left: 0,
+                        right: 0,
+                        height: "3px",
+                        backgroundColor: theme.palette.Learner.Dark.Default,
+                        borderRadius: "2px",
+                        zIndex: 10,
+                      }
+                    : {},
+              }}
+            />
           )}
-        {role === "Administrator" && draggedIndex !== null && module?.pages && (
+        </Box>
+        {role === "Administrator" && module && (
           <Box
-            onDragOver={(e) => {
-              e.preventDefault();
-              setHoverIndex(module.pages.length);
-            }}
-            onDragLeave={() => setHoverIndex(null)}
-            onDrop={() => handleDrop(module.pages.length)}
+            padding="16px 24px"
             sx={{
-              minHeight: "40px",
               display: "flex",
+              width: "100%",
+              padding: "16px 24px",
               alignItems: "center",
               justifyContent: "center",
-              position: "relative",
-              marginTop: "-10px",
-              "&::before":
-                hoverIndex === module.pages.length
-                  ? {
-                      content: '""',
-                      position: "absolute",
-                      top: "0",
-                      left: 0,
-                      right: 0,
-                      height: "3px",
-                      backgroundColor: theme.palette.Learner.Dark.Default,
-                      borderRadius: "2px",
-                      zIndex: 10,
-                    }
-                  : {},
+              borderTop: `1px solid ${theme.palette.Neutral[300]}`,
             }}
-          />
+          >
+            <Button
+              sx={{
+                borderRadius: "4px",
+                backgroundColor: theme.palette[role].Dark.Default,
+                color: "white",
+                width: "100%",
+                height: "40px",
+              }}
+              onClick={() => setPublishModuleModalOpen(true)}
+            >
+              <Typography variant="labelLarge">Publish Module</Typography>
+            </Button>
+          </Box>
         )}
-      </Box>
+      </Stack>
     ),
     [
-      theme.palette.Neutral,
-      theme.palette.Learner.Dark.Default,
-      theme.palette.Learner.Light.Default,
+      theme.palette,
       isFullScreen,
       isEmptyModuleEditing,
-      module?.pages,
-      module?.id,
+      module,
       role,
+      isModuleCompleted,
       numPages,
       currentPage,
+      canEdit,
       draggedIndex,
       hoverIndex,
       isPageBookmarked,
@@ -826,6 +1040,7 @@ const ViewModulePage = () => {
       handleDragOver,
       handleDragLeave,
       handleDrop,
+      isActivityCompleted,
       unit?.displayIndex,
       unit?.modules,
     ],
@@ -872,9 +1087,7 @@ const ViewModulePage = () => {
   };
 
   const isRightSidebarOpen =
-    role === "Administrator" &&
-    currentPageObject &&
-    isActivityPage(currentPageObject);
+    canEdit && currentPageObject && isActivityPage(currentPageObject);
 
   const getGridTemplateColumns = () => {
     if (isRightSidebarOpen) {
@@ -915,13 +1128,13 @@ const ViewModulePage = () => {
               width="100%"
             >
               <Box display="inline-flex" alignItems="center" gap="8px">
-                <IconButton
-                  href={`${COURSE_PAGE}${
-                    unit ? `?selectedUnit=${unit.id}` : ""
-                  }`}
+                <Link
+                  to={`${COURSE_PAGE}${unit ? `?selectedUnit=${unit.id}` : ""}`}
                 >
-                  <ArrowBack sx={{ fontSize: "24px" }} />
-                </IconButton>
+                  <IconButton>
+                    <ArrowBack sx={{ fontSize: "24px" }} />
+                  </IconButton>
+                </Link>
                 <Typography variant="headlineLarge">{module?.title}</Typography>
               </Box>
               {role === "Learner" && (
@@ -998,73 +1211,94 @@ const ViewModulePage = () => {
                 />
               </Document>
             )}
-            {currentPageObject && isActivityPage(currentPageObject) && (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                sx={{
-                  transform: `scale(${activityPageScale})`,
-                }}
-                ref={activityPageRef}
-              >
-                {activity &&
-                  (isMultipleChoiceActivity(activity) ||
+            {currentPageObject &&
+              isActivityPage(currentPageObject) &&
+              activity && (
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{
+                    transform: `scale(${activityPageScale})`,
+                  }}
+                  ref={activityPageRef}
+                >
+                  {(isMultipleChoiceActivity(activity) ||
                     isMultiSelectActivity(activity)) &&
-                  (role === "Administrator" ? (
-                    <MultipleChoiceMainEditor
-                      activity={activity}
-                      key={activity.id}
-                      setActivity={setActivity}
-                      hasImage={hasImage}
-                      hasAdditionalContext={hasAdditionalContext}
-                    />
-                  ) : (
-                    <MultipleChoiceViewer
-                      activity={activity}
-                      onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
-                      onCorrectAnswer={onCorrectAnswer}
-                      key={activity.id}
-                      ref={activityViewerRef}
-                    />
-                  ))}
-                {activity &&
-                  isTableActivity(activity) &&
-                  (role === "Administrator" ? (
-                    <TableMainEditor
-                      activity={activity}
-                      key={activity.id}
-                      setActivity={setActivity}
-                    />
-                  ) : (
-                    <TableViewer
-                      activity={activity}
-                      onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
-                      onCorrectAnswer={onCorrectAnswer}
-                      key={activity.id}
-                      ref={activityViewerRef}
-                    />
-                  ))}
-                {activity &&
-                  isMatchingActivity(activity) &&
-                  (role === "Administrator" ? (
-                    <MatchingEditor
-                      activity={activity}
-                      key={activity.id}
-                      setActivity={setActivity}
-                    />
-                  ) : (
-                    <MatchingViewer
-                      activity={activity}
-                      onWrongAnswer={() => setIsRetryButtonDisplayed(true)}
-                      onCorrectAnswer={onCorrectAnswer}
-                      key={activity.id}
-                      ref={activityViewerRef}
-                      scale={activityPageScale}
-                    />
-                  ))}
-              </Box>
-            )}
+                    (canEdit ? (
+                      <MultipleChoiceMainEditor
+                        activity={activity}
+                        key={activity.id}
+                        setActivity={setActivity}
+                        hasImage={hasImage}
+                        hasAdditionalContext={hasAdditionalContext}
+                      />
+                    ) : (
+                      <MultipleChoiceViewer
+                        activity={activity}
+                        onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                        onCorrectAnswer={onCorrectAnswer}
+                        isCompleted={displayActivityCompleted}
+                        key={activity.id}
+                        ref={activityViewerRef}
+                      />
+                    ))}
+                  {isTableActivity(activity) &&
+                    (canEdit ? (
+                      <TableMainEditor
+                        activity={activity}
+                        key={activity.id}
+                        setActivity={setActivity}
+                      />
+                    ) : (
+                      <TableViewer
+                        activity={activity}
+                        onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                        onCorrectAnswer={onCorrectAnswer}
+                        isCompleted={displayActivityCompleted}
+                        key={activity.id}
+                        ref={activityViewerRef}
+                      />
+                    ))}
+                  {isMatchingActivity(activity) &&
+                    (canEdit ? (
+                      <MatchingEditor
+                        activity={activity}
+                        key={activity.id}
+                        setActivity={setActivity}
+                      />
+                    ) : (
+                      <MatchingViewer
+                        activity={activity}
+                        onWrongAnswer={() => setIsRetryButtonDisplayed(true)}
+                        onCorrectAnswer={onCorrectAnswer}
+                        isCompleted={displayActivityCompleted}
+                        key={activity.id}
+                        ref={activityViewerRef}
+                        scale={activityPageScale}
+                      />
+                    ))}
+                  {isTextInputActivity(activity) &&
+                    (canEdit ? (
+                      <TextInputEditor
+                        activity={activity}
+                        key={activity.id}
+                        setActivity={setActivity}
+                        hasImage={hasImage}
+                        hasAdditionalContext={hasAdditionalContext}
+                      />
+                    ) : (
+                      <TextInputViewer
+                        activity={activity}
+                        onWrongAnswer={() => setIsWrongAnswerModalOpen(true)}
+                        onCorrectAnswer={onCorrectAnswer}
+                        isCompleted={displayActivityCompleted}
+                        key={activity.id}
+                        ref={activityViewerRef}
+                      />
+                    ))}
+                </Box>
+              )}
             {isFeedbackSurveyPage && module && (
               <SurveySlides moduleId={module.id} />
             )}
@@ -1083,39 +1317,41 @@ const ViewModulePage = () => {
             }}
           >
             <Box display="flex" gap="12px">
-              {role === "Learner" && isActivityPage(currentPageObject) && (
-                <Button
-                  sx={{
-                    height: "48px",
-                    paddingLeft: "16px",
-                    paddingRight: "24px",
-                    paddingY: "10px",
-                    gap: "8px",
-                    border: "1px solid",
-                    borderColor: theme.palette.Neutral[500],
-                    borderRadius: "4px",
-                    backgroundColor: theme.palette.Learner.Dark.Default,
-                    color: "white",
-                  }}
-                  onClick={() => {
-                    if (isRetryButtonDisplayed) {
-                      activityViewerRef.current?.onRetry?.();
-                      setIsRetryButtonDisplayed(false);
-                    } else {
-                      activityViewerRef.current?.checkAnswer();
-                    }
-                  }}
-                >
-                  {!isWrongAnswerModalOpen && <CheckCircleOutline />}
-                  <Typography variant="labelLarge">
-                    {isRetryButtonDisplayed || isWrongAnswerModalOpen
-                      ? "Retry"
-                      : "Check Answer"}
-                  </Typography>
-                  {isRetryButtonDisplayed ||
-                    (isWrongAnswerModalOpen && <Refresh />)}
-                </Button>
-              )}
+              {role === "Learner" &&
+                isActivityPage(currentPageObject) &&
+                !displayActivityCompleted && (
+                  <Button
+                    sx={{
+                      height: "48px",
+                      paddingLeft: "16px",
+                      paddingRight: "24px",
+                      paddingY: "10px",
+                      gap: "8px",
+                      border: "1px solid",
+                      borderColor: theme.palette.Neutral[500],
+                      borderRadius: "4px",
+                      backgroundColor: theme.palette.Learner.Dark.Default,
+                      color: "white",
+                    }}
+                    onClick={() => {
+                      if (isRetryButtonDisplayed) {
+                        activityViewerRef.current?.onRetry?.();
+                        setIsRetryButtonDisplayed(false);
+                      } else {
+                        activityViewerRef.current?.checkAnswer();
+                      }
+                    }}
+                  >
+                    {!isWrongAnswerModalOpen && <CheckCircleOutline />}
+                    <Typography variant="labelLarge">
+                      {isRetryButtonDisplayed || isWrongAnswerModalOpen
+                        ? "Retry"
+                        : "Check Answer"}
+                    </Typography>
+                    {isRetryButtonDisplayed ||
+                      (isWrongAnswerModalOpen && <Refresh />)}
+                  </Button>
+                )}
               {role !== "Administrator" && (
                 <Button
                   sx={{
@@ -1135,7 +1371,7 @@ const ViewModulePage = () => {
                   <Typography variant="labelLarge">Fullscreen</Typography>
                 </Button>
               )}
-              {role === "Administrator" && (
+              {canEdit && (
                 <>
                   <Button
                     sx={{
@@ -1205,11 +1441,18 @@ const ViewModulePage = () => {
               </Typography>
               <IconButton
                 disabled={
-                  role === "Learner"
+                  role !== "Administrator" &&
+                  (role === "Learner" && module && isModuleCompleted(module.id)
                     ? currentPage >= numPages
-                    : currentPage >= numPages - 1
+                    : currentPage >= numPages - 1)
                 }
-                onClick={() => setCurrentPage(currentPage + 1)}
+                onClick={(event) => {
+                  if (role === "Administrator" && currentPage + 1 >= numPages) {
+                    handleContextMenu(event, currentPage, true);
+                  } else {
+                    setCurrentPage(currentPage + 1);
+                  }
+                }}
                 sx={{
                   border: "1px solid black",
                   height: "48px",
@@ -1222,7 +1465,7 @@ const ViewModulePage = () => {
             </Box>
           </Box>
         </Box>
-        {currentPageObject && role === "Administrator" && (
+        {currentPageObject && canEdit && (
           <>
             <Divider orientation="vertical" flexItem />
             {(isMultipleChoiceActivity(currentPageObject) ||
@@ -1341,6 +1584,84 @@ const ViewModulePage = () => {
                 }}
               />
             )}
+            {isTextInputActivity(currentPageObject) && (
+              <TextInputEditorSidebar
+                key={currentPageObject.id}
+                activity={currentPageObject}
+                setActivity={setActivity}
+                mode={currentPageObject.validation.mode}
+                setMode={(newMode: "short_answer" | "numeric_range") =>
+                  setActivity((prev) => {
+                    if (!prev || !isTextInputActivity(prev)) return prev;
+                    return {
+                      ...prev,
+                      validation: {
+                        answers:
+                          prev.validation.mode === "short_answer"
+                            ? prev.validation.answers
+                            : [],
+                        min:
+                          prev.validation.mode === "numeric_range"
+                            ? prev.validation.min
+                            : 0,
+                        max:
+                          prev.validation.mode === "numeric_range"
+                            ? prev.validation.max
+                            : 0,
+                        ...prev.validation,
+                        mode: newMode,
+                      },
+                    };
+                  })
+                }
+                correctAnswers={
+                  currentPageObject.validation.mode === "short_answer"
+                    ? currentPageObject.validation.answers
+                    : []
+                }
+                setCorrectAnswers={(newCorrectAnswers) =>
+                  setActivity((prev) => {
+                    if (
+                      !prev ||
+                      !isTextInputActivity(prev) ||
+                      prev.validation.mode !== "short_answer"
+                    )
+                      return prev;
+                    return {
+                      ...prev,
+                      validation: {
+                        ...prev.validation,
+                        answers: newCorrectAnswers,
+                      },
+                    };
+                  })
+                }
+                hint={currentPageObject.hint || ""}
+                setHint={(newHint: string) => {
+                  setActivity((prev) => prev && { ...prev, hint: newHint });
+                }}
+                hasImage={hasImage}
+                setHasImage={(newHasImage) => {
+                  setHasImage(newHasImage);
+                  if (!newHasImage) {
+                    setActivity((prev) => prev && { ...prev, imageUrl: "" });
+                  }
+                }}
+                hasAdditionalContext={hasAdditionalContext}
+                setHasAdditionalContext={(newHasAdditionalContext) => {
+                  setHasAdditionalContext(newHasAdditionalContext);
+                  if (!newHasAdditionalContext) {
+                    setActivity(
+                      (prev) => prev && { ...prev, additionalContext: "" },
+                    );
+                  }
+                }}
+                units={currentPageObject.units}
+                setUnits={(newUnits) =>
+                  setActivity((prev) => prev && { ...prev, units: newUnits })
+                }
+              />
+            )}
           </>
         )}
       </Box>
@@ -1369,23 +1690,30 @@ const ViewModulePage = () => {
         />
       )}
       <Menu
-        open={contextMenu !== null}
+        open={contextMenu !== null && contextMenu.open}
         onClose={handleCloseContextMenu}
         anchorReference="anchorPosition"
         anchorPosition={
-          contextMenu !== null
+          contextMenu !== null && contextMenu.open
             ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
             : undefined
         }
       >
-        <MenuItem
-          onClick={handleUploadPdfAbove}
-          disabled={isUploadingPdf || isDeletingFromContext}
-        >
-          <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
-            <ArrowCircleUp /> Insert pages above
-          </Stack>
-        </MenuItem>
+        {!contextMenu?.addToEnd && (
+          <MenuItem
+            onClick={handleUploadPdfAbove}
+            disabled={isUploadingPdf || isDeletingFromContext}
+          >
+            <Stack
+              direction="row"
+              alignItems="center"
+              gap="12px"
+              paddingY="8px"
+            >
+              <ArrowCircleUp /> Insert pages above
+            </Stack>
+          </MenuItem>
+        )}
         <MenuItem
           onClick={handleUploadPdfBelow}
           disabled={isUploadingPdf || isDeletingFromContext}
@@ -1402,28 +1730,30 @@ const ViewModulePage = () => {
             <Add /> Create activity
           </Stack>
         </MenuItem>
-        <MenuItem
-          onClick={handleDeletePageFromContext}
-          disabled={isUploadingPdf || isDeletingFromContext}
-        >
-          <Stack
-            direction="row"
-            alignItems="center"
-            gap="12px"
-            color={theme.palette.Error.Dark.Default}
-            paddingY="8px"
+        {!contextMenu?.addToEnd && (
+          <MenuItem
+            onClick={handleDeletePageFromContext}
+            disabled={isUploadingPdf || isDeletingFromContext}
           >
-            <DeleteOutline /> Delete page
-          </Stack>
-        </MenuItem>
+            <Stack
+              direction="row"
+              alignItems="center"
+              gap="12px"
+              color={theme.palette.Error.Dark.Default}
+              paddingY="8px"
+            >
+              <DeleteOutline /> Delete page
+            </Stack>
+          </MenuItem>
+        )}
       </Menu>
       <Menu
         id="activity-type-menu"
         anchorEl={activityMenuAnchor}
         open={Boolean(activityMenuAnchor)}
         onClose={() => {
-          setActivityMenuAnchor(null);
           setSelectedPageIndexForActivity(null);
+          setActivityMenuAnchor(null);
         }}
         MenuListProps={{
           "aria-labelledby": "activity-type-button",
@@ -1431,7 +1761,12 @@ const ViewModulePage = () => {
       >
         {Object.values(QuestionType).map((type) => (
           <MenuItem key={type} onClick={() => handleActivityTypeSelect(type)}>
-            <Stack direction="row" alignItems="center" gap="8px">
+            <Stack
+              direction="row"
+              alignItems="center"
+              gap="8px"
+              color={theme.palette.Administrator.Dark.Default}
+            >
               {questionTypeIcons[type]} {questionTypeLabels[type]}
             </Stack>
           </MenuItem>
@@ -1532,6 +1867,24 @@ const ViewModulePage = () => {
           }
         }}
       />
+      <ModuleLockedModal
+        open={isModuleLockedModalOpen}
+        onClose={() => setIsModuleLockedModalOpen(false)}
+        editorName={currentEditorName}
+        unitId={requestedUnitId}
+      />
+      {module && (
+        <PublishModuleModal
+          openPublishModuleModal={publishModuleModalOpen}
+          handleClosePublishModuleModal={() => setPublishModuleModalOpen(false)}
+          moduleId={module.id}
+          onUpdateModule={() =>
+            history.push(
+              `${COURSE_PAGE}${unit ? `?selectedUnit=${unit?.id}` : ""}`,
+            )
+          }
+        />
+      )}
     </>
   );
 };

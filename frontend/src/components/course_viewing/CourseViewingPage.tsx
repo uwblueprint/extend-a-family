@@ -1,13 +1,13 @@
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { Search } from "@mui/icons-material";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import { useUser } from "../../hooks/useUser";
 import { CourseUnit } from "../../types/CourseTypes";
+import StartAdornedTextField from "../common/form/StartAdornedTextField";
 import CourseModulesGrid from "./CourseModulesGrid";
 import UnitSidebar from "./sidebar/UnitSidebar";
-import StartAdornedTextField from "../common/form/StartAdornedTextField";
-import { useUser } from "../../hooks/useUser";
 
 export default function CourseUnitsPage() {
   const theme = useTheme();
@@ -62,8 +62,8 @@ export default function CourseUnitsPage() {
             <Box
               display="flex"
               alignItems="center"
-              paddingLeft="10px"
               justifyContent="space-between"
+              gap="16px"
             >
               <Box display="flex" alignItems="center">
                 {!sidebarOpen && (
@@ -111,7 +111,8 @@ export default function CourseUnitsPage() {
                 }
                 focusedBorderColor={theme.palette[role].Dark.Default}
                 sx={{
-                  minWidth: "400px",
+                  minWidth: "225px",
+                  width: "450px",
                   borderRadius: "8px",
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
@@ -133,7 +134,7 @@ export default function CourseUnitsPage() {
             />
           </Stack>
         ) : (
-          <Typography>Loading units...</Typography>
+          <></>
         )}
       </Box>
     </Box>

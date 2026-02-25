@@ -17,6 +17,7 @@ import CoursePageService from "../services/implementations/coursePageService";
 import EmailService from "../services/implementations/emailService";
 import FileStorageService from "../services/implementations/fileStorageService";
 import UserService from "../services/implementations/userService";
+import LearnerProgressService from "../services/implementations/learnerProgressService";
 import IAuthService from "../services/interfaces/authService";
 import ICoursePageService from "../services/interfaces/coursePageService";
 import IEmailService from "../services/interfaces/emailService";
@@ -43,6 +44,7 @@ const coursePageService: ICoursePageService = new CoursePageService();
 const firebaseStorageService: FileStorageService = new FileStorageService(
   process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "",
 );
+const progressService = new LearnerProgressService();
 
 userRouter.post(
   "/:userId/uploadProfilePicture",
@@ -387,7 +389,10 @@ userRouter.get(
   },
 );
 
-/* Facilitator will be able to view a list of all their learners */
+/**
+ * GET /users/facilitator/myLearners
+ * Facilitator will be able to view a list of all their learners with course progress.
+ */
 userRouter.get(
   "/facilitator/myLearners",
   isAuthorizedByRole(new Set(["Facilitator"])),
@@ -411,7 +416,26 @@ userRouter.get(
             return learner;
           }),
         );
-        res.status(200).json(learners);
+
+        // Get course progress for all learners in one efficient call
+        const learnerIds = learners.map((l) => l.id);
+        const progressMap = await progressService.getCourseProgressForLearners(
+          learnerIds,
+        );
+
+        // Attach progress to each learner
+        const learnersWithProgress = learners.map((learner) => ({
+          ...learner,
+          courseProgress: progressMap.get(learner.id) || {
+            totalActivities: 0,
+            completedActivities: 0,
+            progressPercentage: 0,
+            totalModules: 0,
+            completedModules: 0,
+          },
+        }));
+
+        res.status(200).json(learnersWithProgress);
       } else {
         throw new Error("Unathorized: User retrieved is not a facilitator.");
       }

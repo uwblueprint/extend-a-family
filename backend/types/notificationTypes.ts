@@ -6,6 +6,7 @@ export type NotificationDTO = {
   message: string;
   seen: boolean;
   read: boolean;
+  emailSent: boolean;
   createdAt: Date;
   user: ObjectId;
   link: string;
@@ -21,6 +22,7 @@ export type UpdateNotificationDTO = {
   message?: string;
   seen?: boolean;
   read?: boolean;
+  emailSent?: boolean;
   link?: string;
 };
 

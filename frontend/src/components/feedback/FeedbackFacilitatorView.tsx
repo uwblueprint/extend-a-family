@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { useUser } from "../../hooks/useUser";
-import { useFeedbacks } from "../../contexts/FeedbacksContext"
+import { useFeedbacks } from "../../contexts/FeedbacksContext";
 import { isCaseInsensitiveSubstring } from "../../utils/StringUtils";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 import StartAdornedTextField from "../common/form/StartAdornedTextField";
@@ -43,29 +43,27 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
       courseUnits.some(
         (unit) =>
           unit.id === selectedUnit &&
-          unit.modules.some((m) => m.id === feedback.moduleId.id)
+          unit.modules.some((m) => m.id === feedback.moduleId.id),
       );
 
     // Module filter
-    const matchesModule = !selectedModule || feedback.moduleId.id === selectedModule;
+    const matchesModule =
+      !selectedModule || feedback.moduleId.id === selectedModule;
 
     return matchesSearch && matchesUnit && matchesModule;
   });
 
-  const groupedByLearner = filteredFeedbacks.reduce(
-    (acc, feedback) => {
-      const learnerId = feedback.learnerId.id;
-      if (!acc[learnerId]) {
-        acc[learnerId] = {
-          learnerName: feedback.learnerId,
-          feedbacks: [],
-        };
-      }
-      acc[learnerId].feedbacks.push(feedback);
-      return acc;
-    },
-    {} as Record<string, { learnerName: typeof feedbacks[0]["learnerId"]; feedbacks: typeof feedbacks }>
-  );
+  const groupedByLearner = filteredFeedbacks.reduce((acc, feedback) => {
+    const learnerId = feedback.learnerId.id;
+    if (!acc[learnerId]) {
+      acc[learnerId] = {
+        learnerName: feedback.learnerId,
+        feedbacks: [],
+      };
+    }
+    acc[learnerId].feedbacks.push(feedback);
+    return acc;
+  }, {} as Record<string, { learnerName: (typeof feedbacks)[0]["learnerId"]; feedbacks: typeof feedbacks }>);
 
   return (
     <Stack
@@ -176,13 +174,17 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
         flexGrow="1"
         sx={{ overflow: "auto", minHeight: 0 }}
       >
-        {Object.entries(groupedByLearner).map(([learnerId, { learnerName, feedbacks: learnerFeedbacks }]) => (
-          <LearnerFeedbackBlock
-            key={learnerId}
-            learnerName={`${learnerName.firstName} ${learnerName.lastName.charAt(0)}.`}
-            feedbacks={learnerFeedbacks}
-          />
-        ))}
+        {Object.entries(groupedByLearner).map(
+          ([learnerId, { learnerName, feedbacks: learnerFeedbacks }]) => (
+            <LearnerFeedbackBlock
+              key={learnerId}
+              learnerName={`${
+                learnerName.firstName
+              } ${learnerName.lastName.charAt(0)}.`}
+              feedbacks={learnerFeedbacks}
+            />
+          ),
+        )}
       </Stack>
     </Stack>
   );

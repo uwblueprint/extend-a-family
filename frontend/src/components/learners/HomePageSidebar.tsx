@@ -13,7 +13,10 @@ import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 
 export default function LearnerUnitSidebar() {
   const theme = useTheme();
-  const { courseUnits } = useCourseUnits();
+  const { courseUnits, courseProgress } = useCourseUnits();
+
+  // Calculate overall progress percentage
+  const progressValue = courseProgress?.progressPercentage ?? 0;
 
   return (
     <Drawer
@@ -98,7 +101,7 @@ export default function LearnerUnitSidebar() {
           display="flex"
           justifyContent="center"
         >
-          <CircularProgressWithLabel value={75} />
+          <CircularProgressWithLabel value={progressValue} />
         </Box>
       </Box>
     </Drawer>

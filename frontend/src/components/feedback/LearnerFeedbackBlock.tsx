@@ -18,12 +18,19 @@ const LearnerFeedbackBlock: React.FC<LearnerFeedbackBlockProps> = ({
   const [expanded, setExpanded] = React.useState(false);
 
   // calculate average difficulty and liked
-  const avgDifficulty = feedbacks.length > 0
-    ? Math.round(feedbacks.reduce((sum, f) => sum + f.difficulty, 0) / feedbacks.length)
-    : 0;
-  const likedPercentage = feedbacks.length > 0
-    ? Math.round((feedbacks.filter(f => f.isLiked).length / feedbacks.length) * 100)
-    : 0;
+  const avgDifficulty =
+    feedbacks.length > 0
+      ? Math.round(
+          feedbacks.reduce((sum, f) => sum + f.difficulty, 0) /
+            feedbacks.length,
+        )
+      : 0;
+  const likedPercentage =
+    feedbacks.length > 0
+      ? Math.round(
+          (feedbacks.filter((f) => f.isLiked).length / feedbacks.length) * 100,
+        )
+      : 0;
 
   return (
     <Stack
@@ -48,7 +55,7 @@ const LearnerFeedbackBlock: React.FC<LearnerFeedbackBlockProps> = ({
           {learnerName}
         </Typography>
         <Typography variant="titleMedium" color={theme.palette.Neutral[700]}>
-          {feedbacks.length} Feedback{feedbacks.length !== 1 ? 's' : ''}
+          {feedbacks.length} Feedback{feedbacks.length !== 1 ? "s" : ""}
         </Typography>
         <Stack direction="column" gap="24px" alignItems="center">
           <Stack direction="row" gap="64px" alignItems="center">
