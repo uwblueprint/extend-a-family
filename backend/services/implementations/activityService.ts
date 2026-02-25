@@ -89,17 +89,6 @@ class ActivityService {
       } else if (questionType === QuestionType.TextInput) {
         activityDataToCreate = {
           ...baseActivity,
-          placeholder: "Enter your answer here",
-          maxLength: 200,
-          validation: {
-            mode: "short_answer",
-            answers: [],
-          },
-          ...activityData,
-        };
-      } else if (questionType === QuestionType.TextInput) {
-        activityData = {
-          ...baseActivity,
           validation: {
             mode: "short_answer",
             answers: [],
