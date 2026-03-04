@@ -88,8 +88,7 @@ export default function CourseModulesGrid({
     [saveModuleOrder],
   );
 
-  if (loading)
-    return <Typography paddingLeft="10px">Loading modules...</Typography>;
+  if (loading) return <Typography>Loading modules...</Typography>;
   if (error)
     return (
       <Typography color="error">Failed to fetch modules: {error}</Typography>
@@ -102,45 +101,51 @@ export default function CourseModulesGrid({
 
   const content = (
     <>
-      <Grid container gap={role === "Learner" ? 0 : "30px"}>
-        {filteredModules.map((module: CourseModule, index: number) => {
-          switch (role) {
-            case "Administrator":
-              return (
-                <ModuleCardAdmin
-                  key={module.id}
-                  module={module}
-                  unitId={unitId}
-                  index={index}
-                  onModuleUpdate={handleModuleUpdate}
-                  onModuleDelete={handleModuleDelete}
-                  moveModule={moveModule}
-                />
-              );
-            case "Facilitator":
-              return (
-                <ModuleCardFacilitator
-                  key={module.id}
-                  module={module}
-                  index={index}
-                />
-              );
-            case "Learner":
-            default:
-              return (
-                module.status === ModuleStatus.published && (
-                  <ModuleCardLearner
+      {filteredModules.length === 0 ? (
+        <Typography color="text.secondary">
+          No modules in this unit yet
+        </Typography>
+      ) : (
+        <Grid container gap={role === "Learner" ? 0 : "30px"}>
+          {filteredModules.map((module: CourseModule, index: number) => {
+            switch (role) {
+              case "Administrator":
+                return (
+                  <ModuleCardAdmin
+                    key={module.id}
+                    module={module}
+                    unitId={unitId}
+                    index={index}
+                    onModuleUpdate={handleModuleUpdate}
+                    onModuleDelete={handleModuleDelete}
+                    moveModule={moveModule}
+                  />
+                );
+              case "Facilitator":
+                return (
+                  <ModuleCardFacilitator
                     key={module.id}
                     module={module}
                     index={index}
-                    unitId={unitId}
-                    isSidebarOpen={isSidebarOpen}
                   />
-                )
-              );
-          }
-        })}
-      </Grid>
+                );
+              case "Learner":
+              default:
+                return (
+                  module.status === ModuleStatus.published && (
+                    <ModuleCardLearner
+                      key={module.id}
+                      module={module}
+                      index={index}
+                      unitId={unitId}
+                      isSidebarOpen={isSidebarOpen}
+                    />
+                  )
+                );
+            }
+          })}
+        </Grid>
+      )}
       {role === "Administrator" && (
         <Button
           type="button"
