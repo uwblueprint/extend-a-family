@@ -56,6 +56,7 @@ const ContextMenu = ({ anchorEl, onClose, onModalOpen }: ContextMenuProps) => {
         sx={{
           height: "48px",
         }}
+        onClick={() => onModalOpen(UnitSidebarModalType.Move)}
       >
         <ListItemIcon>
           <MoveDownIcon
