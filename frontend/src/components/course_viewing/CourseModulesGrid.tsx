@@ -88,8 +88,7 @@ export default function CourseModulesGrid({
     [saveModuleOrder],
   );
 
-  if (loading)
-    return <Typography>Loading modules...</Typography>;
+  if (loading) return <Typography>Loading modules...</Typography>;
   if (error)
     return (
       <Typography color="error">Failed to fetch modules: {error}</Typography>
