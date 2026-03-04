@@ -3,7 +3,6 @@ import { Theme } from "@mui/material/styles";
 import React from "react";
 
 interface ContentScreenContentProps {
-  handleBackToHome: () => void;
   handleNext: () => Promise<void>;
   helpText: string;
   setHelpText: (text: string) => void;
@@ -12,7 +11,6 @@ interface ContentScreenContentProps {
 }
 
 const ContentScreenContent: React.FC<ContentScreenContentProps> = ({
-  handleBackToHome,
   handleNext,
   helpText,
   setHelpText,
@@ -106,20 +104,6 @@ const ContentScreenContent: React.FC<ContentScreenContentProps> = ({
           alignSelf: "stretch",
         }}
       >
-        <Typography
-          variant="labelMedium"
-          onClick={handleBackToHome}
-          sx={{
-            color: theme.palette.Learner.Dark.Default,
-            cursor: "pointer",
-            "&:hover": {
-              opacity: 0.8,
-            },
-          }}
-        >
-          Back to Home
-        </Typography>
-
         <Button
           onClick={handleNext}
           disabled={isSubmitting || !helpText.trim()}

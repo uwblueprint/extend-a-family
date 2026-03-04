@@ -3,13 +3,11 @@ import { Theme } from "@mui/material/styles";
 import React from "react";
 
 interface ConfirmationScreenContentProps {
-  handleBackToHome: () => void;
   handleBackToContent: () => void;
   theme: Theme;
 }
 
 const ConfirmationScreenContent: React.FC<ConfirmationScreenContentProps> = ({
-  handleBackToHome,
   handleBackToContent,
   theme,
 }) => {
@@ -102,23 +100,6 @@ const ConfirmationScreenContent: React.FC<ConfirmationScreenContentProps> = ({
           alignSelf: "stretch",
         }}
       >
-        <Typography
-          variant="labelMedium"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleBackToHome();
-          }}
-          sx={{
-            color: theme.palette.Learner.Dark.Default,
-            cursor: "pointer",
-            "&:hover": {
-              opacity: 0.8,
-            },
-          }}
-        >
-          Back to Home
-        </Typography>
-
         <Button
           onClick={(e) => {
             e.stopPropagation();
