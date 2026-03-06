@@ -179,8 +179,9 @@ authRouter.post(
   async (req, res) => {
     try {
       const temporaryPassword = generate({
-        length: 20,
+        length: 12,
         numbers: true,
+        excludeSimilarCharacters: true,
       });
       const invitedAdminUser = await userService.createUser({
         firstName: req.body.firstName,
@@ -209,8 +210,9 @@ authRouter.post(
     );
     try {
       const temporaryPassword = generate({
-        length: 20,
+        length: 12,
         numbers: true,
+        excludeSimilarCharacters: true,
       });
       const invitedLearnerUser = await userService.createLearner(
         {
