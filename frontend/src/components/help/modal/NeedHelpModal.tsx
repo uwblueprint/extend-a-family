@@ -5,7 +5,6 @@ import { useUser } from "../../../hooks/useUser";
 import { isAuthenticatedLearner } from "../../../types/AuthTypes";
 import HelpRequestAPIClient from "../../../APIClients/HelpRequestAPIClient";
 import { NeedHelpModalProps, ModalScreen } from "./types";
-import HomeScreenContent from "./HomeScreenContent";
 import ContentScreenContent from "./ContentScreenContent";
 import ConfirmationScreenContent from "./ConfirmationScreenContent";
 import ErrorScreenContent from "./ErrorScreenContent";
@@ -19,23 +18,9 @@ const NeedHelpModal: React.FC<NeedHelpModalProps> = ({
 }) => {
   const theme = useTheme();
   const user = useUser();
-  const [currentScreen, setCurrentScreen] = useState<ModalScreen>("home");
+  const [currentScreen, setCurrentScreen] = useState<ModalScreen>("content");
   const [helpText, setHelpText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleContentClick = () => {
-    setCurrentScreen("content");
-  };
-
-  const handleNavigationClick = () => {
-    // TODO: Implement navigation help functionality
-    onClose();
-  };
-
-  const handleBackToHome = () => {
-    setCurrentScreen("home");
-    setHelpText("");
-  };
 
   const handleNext = async () => {
     if (!isAuthenticatedLearner(user)) {
@@ -101,21 +86,9 @@ const NeedHelpModal: React.FC<NeedHelpModalProps> = ({
 
   const renderContent = () => {
     switch (currentScreen) {
-      case "content":
-        return (
-          <ContentScreenContent
-            handleBackToHome={handleBackToHome}
-            handleNext={handleNext}
-            helpText={helpText}
-            setHelpText={setHelpText}
-            isSubmitting={isSubmitting}
-            theme={theme}
-          />
-        );
       case "confirmation":
         return (
           <ConfirmationScreenContent
-            handleBackToHome={handleBackToHome}
             handleBackToContent={handleBackToContent}
             theme={theme}
           />
@@ -129,9 +102,11 @@ const NeedHelpModal: React.FC<NeedHelpModalProps> = ({
         );
       default:
         return (
-          <HomeScreenContent
-            handleContentClick={handleContentClick}
-            handleNavigationClick={handleNavigationClick}
+          <ContentScreenContent
+            handleNext={handleNext}
+            helpText={helpText}
+            setHelpText={setHelpText}
+            isSubmitting={isSubmitting}
             theme={theme}
           />
         );
