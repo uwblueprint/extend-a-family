@@ -99,7 +99,7 @@ const ContentScreenContent: React.FC<ContentScreenContentProps> = ({
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           alignItems: "center",
           alignSelf: "stretch",
         }}
