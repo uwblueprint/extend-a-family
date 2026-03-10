@@ -20,6 +20,7 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ICourseModuleService from "../interfaces/courseModuleService";
 import FileStorageService from "./fileStorageService";
+import { Role } from "../../types/userTypes";
 
 const Logger = logger(__filename);
 
@@ -43,10 +44,14 @@ class CourseModuleService implements ICourseModuleService {
 
   async getCourseModules(
     courseUnitId: string,
+    role?: Role,
   ): Promise<Array<CourseModuleDTO>> {
     try {
       const courseUnit = await MgCourseUnit.findById(courseUnitId)
-        .populate("modules")
+        .populate({
+          path: "modules",
+          match: role === "Learner" ? { status: ModuleStatus.Published } : {},
+        })
         .lean()
         .exec();
 
