@@ -55,6 +55,40 @@ const UserTable: React.FC<UserTableProps> = ({
   const [page, setPage] = React.useState(0);
   const [usersPerPage, setUsersPerPage] = React.useState(defaultUsersPerPage);
 
+  // Loading state for approve/reject (by user id)
+  const [approvingUserId, setApprovingUserId] = React.useState<string | null>(
+    null,
+  );
+  const [rejectingUserId, setRejectingUserId] = React.useState<string | null>(
+    null,
+  );
+
+  const handleApproveClick = React.useCallback(
+    async (userId: string) => {
+      if (!handleApproveFacilitator) return;
+      setApprovingUserId(userId);
+      try {
+        await handleApproveFacilitator(userId);
+      } finally {
+        setApprovingUserId(null);
+      }
+    },
+    [handleApproveFacilitator],
+  );
+
+  const handleRejectClick = React.useCallback(
+    async (userId: string) => {
+      if (!handleRejectFacilitator) return;
+      setRejectingUserId(userId);
+      try {
+        await handleRejectFacilitator(userId);
+      } finally {
+        setRejectingUserId(null);
+      }
+    },
+    [handleRejectFacilitator],
+  );
+
   const emptyRows =
     page > 0
       ? Math.max(0, (1 + page) * usersPerPage - filteredUsers.length)
@@ -219,11 +253,17 @@ const UserTable: React.FC<UserTableProps> = ({
                                 borderColor: "#663625",
                               },
                             }}
-                            onClick={() => handleApproveFacilitator?.(user.id)}
+                            disabled={
+                              approvingUserId === user.id ||
+                              rejectingUserId === user.id
+                            }
+                            onClick={() => handleApproveClick(user.id)}
                           >
                             <Check sx={{ width: "18px", height: "18px" }} />
                             <Typography variant="labelLarge">
-                              APPROVE
+                              {approvingUserId === user.id
+                                ? "Approving..."
+                                : "APPROVE"}
                             </Typography>
                           </Button>
                           <Button
@@ -241,10 +281,18 @@ const UserTable: React.FC<UserTableProps> = ({
                                 borderColor: "#801313",
                               },
                             }}
-                            onClick={() => handleRejectFacilitator?.(user.id)}
+                            disabled={
+                              approvingUserId === user.id ||
+                              rejectingUserId === user.id
+                            }
+                            onClick={() => handleRejectClick(user.id)}
                           >
                             <Close sx={{ width: "18px", height: "18px" }} />
-                            <Typography variant="labelLarge">REJECT</Typography>
+                            <Typography variant="labelLarge">
+                              {rejectingUserId === user.id
+                                ? "Rejecting..."
+                                : "REJECT"}
+                            </Typography>
                           </Button>
                         </>
                       ) : (

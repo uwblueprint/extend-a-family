@@ -3,7 +3,6 @@ import React from "react";
 import { useUser } from "../../../hooks/useUser";
 import Logout from "../../auth/Logout";
 import MyAccountButton from "../../auth/MyAccountButton";
-import ResetPassword from "../../auth/ResetPassword";
 import ProfilePicture from "../../profile/ProfilePicture";
 
 const UserButton = () => {
@@ -46,7 +45,6 @@ const UserButton = () => {
       >
         <Box display="flex" sx={{ flexDirection: "column" }}>
           <MyAccountButton />
-          <ResetPassword />
           <Logout />
         </Box>
       </Popover>
