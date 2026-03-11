@@ -99,9 +99,16 @@ export default function CourseModulesGrid({
     module.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  // For learners, only published modules are visible
+  const visibleModuleCount =
+    role === "Learner"
+      ? filteredModules.filter((m) => m.status === ModuleStatus.published)
+          .length
+      : filteredModules.length;
+
   const content = (
     <>
-      {filteredModules.length === 0 ? (
+      {visibleModuleCount === 0 ? (
         <Typography color="text.secondary">
           No modules in this unit yet
         </Typography>
