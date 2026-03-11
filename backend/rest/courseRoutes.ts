@@ -208,36 +208,33 @@ courseRouter.get(
     const accessToken = getAccessToken(req);
 
     try {
+      if (!accessToken) {
+        throw new Error("No access token provided to protected route");
+      }
+
+      const userId = await authService.getUserIdFromAccessToken(accessToken);
+      const user = await userService.getUserById(userId.toString());
+
       const courseModules = await courseModuleService.getCourseModules(
         req.params.unitId,
+        user.role,
       );
 
-      // For learners, include module progress for each module
-      if (accessToken) {
-        try {
-          const userId = await authService.getUserIdFromAccessToken(
-            accessToken,
-          );
-          const user = await userService.getUserById(userId.toString());
-          if (user.role === "Learner") {
-            const modulesWithProgress = await Promise.all(
-              courseModules.map(async (module) => {
-                const moduleProgress = await progressService.getModuleProgress(
-                  userId.toString(),
-                  module.id,
-                );
-                return {
-                  ...module,
-                  progress: moduleProgress,
-                };
-              }),
+      if (user.role === "Learner") {
+        const modulesWithProgress = await Promise.all(
+          courseModules.map(async (module) => {
+            const moduleProgress = await progressService.getModuleProgress(
+              userId.toString(),
+              module.id,
             );
-            res.status(200).json(modulesWithProgress);
-            return;
-          }
-        } catch {
-          // If we can't get progress, just return modules without it
-        }
+            return {
+              ...module,
+              progress: moduleProgress,
+            };
+          }),
+        );
+        res.status(200).json(modulesWithProgress);
+        return;
       }
 
       res.status(200).json(courseModules);
