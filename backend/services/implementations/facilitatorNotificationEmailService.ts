@@ -61,7 +61,7 @@ class FacilitatorNotificationEmailService
         return;
       }
 
-      const threshold = facilitator.emailPrefrence?? 1;
+      const threshold = facilitator.emailPrefrence ?? 1;
 
       if (unsentNotifications.length < threshold) {
         return;
