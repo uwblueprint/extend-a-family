@@ -27,6 +27,7 @@ const SurveySlides = ({ moduleId }: { moduleId: string }) => {
   const { id: learnerId } = useLearner();
   const [filledOut, setFilledOut] = React.useState<boolean>(false);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const checkFeedbackStatus = async () => {
@@ -47,14 +48,21 @@ const SurveySlides = ({ moduleId }: { moduleId: string }) => {
   }, [learnerId, moduleId]);
 
   const submitFeedback = async () => {
-    await ActivityAPIClient.sendFeedback({
-      learnerId,
-      moduleId,
-      isLiked: contentLiked,
-      difficulty: moduleEaseRating,
-      message: moduleFeedbackText,
-    });
-    setFilledOut(true);
+    setIsSubmitting(true);
+    try {
+      const result = await ActivityAPIClient.sendFeedback({
+        learnerId,
+        moduleId,
+        isLiked: contentLiked,
+        difficulty: moduleEaseRating,
+        message: moduleFeedbackText,
+      });
+      if (result) {
+        setFilledOut(true);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isLoading) {
@@ -95,9 +103,10 @@ const SurveySlides = ({ moduleId }: { moduleId: string }) => {
         <WhatDidYouThink
           text={moduleFeedbackText}
           onChange={setModuleFeedbackText}
-          onSubmit={() => {
-            setFormStage(SurveyFormStage.ThanksForTheFeedback);
-            submitFeedback();
+          isSubmitting={isSubmitting}
+          onSubmit={async () => {
+            if (isSubmitting) return;
+            await submitFeedback();
           }}
         />
       );
