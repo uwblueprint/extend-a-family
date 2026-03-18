@@ -408,6 +408,7 @@ const ModuleCardAdmin = ({
         startIcon={<EditOutlined />}
         sx={{
           width: "100%",
+          marginTop: "auto",
           padding: "10px 24px 10px 16px",
           color: theme.palette.Administrator.Dark.Default,
 
