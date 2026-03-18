@@ -1106,7 +1106,6 @@ const ViewModulePage = () => {
           display: "grid",
           gridTemplateColumns: getGridTemplateColumns(),
           width: "100%",
-          minHeight: "100vh",
           overflowX: "auto",
         }}
       >
@@ -1117,7 +1116,6 @@ const ViewModulePage = () => {
           padding={isFullScreen ? "0px" : "40px"}
           display="flex"
           flexDirection="column"
-          gap="24px"
           height={boxHeight}
         >
           {!isFullScreen && (
