@@ -187,13 +187,22 @@ const MatchingViewer = React.forwardRef<
     );
 
     const column1 = React.useRef(
-      shuffleColumn(activity.media["1"] || []),
+      isCompleted
+        ? activity.media["1"]?.map((item, idx) => ({ ...item, rowIdx: idx })) ||
+            []
+        : shuffleColumn(activity.media["1"] || []),
     ).current;
     const column2 = React.useRef(
-      shuffleColumn(activity.media["2"] || []),
+      isCompleted
+        ? activity.media["2"]?.map((item, idx) => ({ ...item, rowIdx: idx })) ||
+            []
+        : shuffleColumn(activity.media["2"] || []),
     ).current;
     const column3 = React.useRef(
-      shuffleColumn(activity.media["3"] || []),
+      isCompleted
+        ? activity.media["3"]?.map((item, idx) => ({ ...item, rowIdx: idx })) ||
+            []
+        : shuffleColumn(activity.media["3"] || []),
     ).current;
 
     const handleLeftClick = (rowIdx?: number) => () => {
@@ -499,6 +508,7 @@ const MatchingViewer = React.forwardRef<
                   <Stack
                     direction="row"
                     justifyContent="space-between"
+                    alignItems="center"
                     key={rowIndex}
                   >
                     <MatchingBox
