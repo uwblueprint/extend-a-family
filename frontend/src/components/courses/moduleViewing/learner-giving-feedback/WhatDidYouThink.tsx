@@ -5,10 +5,12 @@ const WhatDidYouThink = ({
   text,
   onChange,
   onSubmit,
+  isSubmitting,
 }: {
   text: string;
   onChange: (newValue: string) => void;
-  onSubmit: () => void;
+  onSubmit: () => void | Promise<void>;
+  isSubmitting: boolean;
 }) => {
   const theme = useTheme();
   const charactersLeft = 500 - text.length;
@@ -95,8 +97,13 @@ const WhatDidYouThink = ({
             >
               {charactersLeft} characters left
             </Typography>
-            <Button variant="contained" color="primary" onClick={onSubmit}>
-              Submit
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={onSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
           </Box>
         </Box>
