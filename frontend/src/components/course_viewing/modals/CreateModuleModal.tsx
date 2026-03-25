@@ -20,7 +20,9 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { useHistory } from "react-router-dom";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
+import { VIEW_PAGE } from "../../../constants/Routes";
 import AuthContext from "../../../contexts/AuthContext";
 import { CourseModule } from "../../../types/CourseTypes";
 
@@ -37,6 +39,8 @@ const CreateModuleModal = ({
   unitId,
   onCreate,
 }: CreateModuleModalProps) => {
+  const history = useHistory();
+
   const { authenticatedUser } = useContext(AuthContext);
   const theme = useTheme();
   const [image, setImage] = useState<FormData | null>(null);
@@ -88,6 +92,7 @@ const CreateModuleModal = ({
       ...res,
       ...{ imageURL },
     });
+    history.push(`${VIEW_PAGE}?moduleId=${res.id}`);
   };
 
   useEffect(() => {

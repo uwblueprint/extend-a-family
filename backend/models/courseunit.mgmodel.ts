@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, ObjectId } from "mongoose";
+import mongoose, { Document, ObjectId, Schema } from "mongoose";
 
 export interface CourseUnit extends Document {
   id: string;
@@ -33,6 +33,18 @@ CourseUnitSchema.set("toObject", {
     // eslint-disable-next-line no-underscore-dangle
     delete ret._id;
   },
+});
+
+// eslint-disable-next-line func-names
+CourseUnitSchema.pre("save", function (next) {
+  (this as unknown as CourseUnit).modules.forEach((moduleId, index) => {
+    mongoose
+      .model("CourseModule")
+      .findByIdAndUpdate(moduleId, { displayIndex: index + 1 }, { new: true })
+      .exec();
+    (this as unknown as CourseUnit).modules[index] = moduleId;
+  });
+  next();
 });
 
 export default mongoose.model<CourseUnit>("CourseUnit", CourseUnitSchema);
