@@ -10,7 +10,7 @@ export const defaultReplyToEmail = "pranol.mathan@eafwr.on.ca";
 export const defaultFrontendUrl =
   process.env.FRONTEND_URL || "https://eaf.jimmyliu.dev";
 
-export const emailSettingsPath = "/settings/notifications";
+export const emailSettingsPath = "/account";
 
 export const ROLE_COLORS = {
   Learner: {

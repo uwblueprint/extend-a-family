@@ -1,26 +1,26 @@
-import { ObjectId, Schema } from "mongoose";
 import { escape } from "html-escaper";
-import IFacilitatorNotificationEmailService from "../interfaces/facilitatorNotificationEmailService";
-import IEmailService from "../interfaces/emailService";
-import MgNotification, {
-  Notification,
-} from "../../models/notification.mgmodel";
-import MgHelpRequest from "../../models/helprequest.mgmodel";
-import MgUser, { FacilitatorModel } from "../../models/user.mgmodel";
-import MgCourseUnit from "../../models/courseunit.mgmodel";
-import MgCourseModule from "../../models/coursemodule.mgmodel";
-import CoursePageModel from "../../models/coursepage.mgmodel";
-import { EnrichedNotificationData } from "../../types/facilitatorNotificationTypes";
-import { getErrorMessage } from "../../utilities/errorUtils";
-import logger from "../../utilities/logger";
+import { ObjectId, Schema } from "mongoose";
 import {
-  defaultLogoURL,
   defaultFrontendUrl,
+  defaultLogoURL,
   emailSettingsPath,
 } from "../../emails/constants";
 import { buildFacilitatorEmailNotificationTemplate } from "../../emails/facilitatorEmailNotification";
-import { buildSingleMessage } from "../../emails/singleMessageTemplate";
 import { buildMultiMessage } from "../../emails/multiMessageTemplate";
+import { buildSingleMessage } from "../../emails/singleMessageTemplate";
+import MgCourseModule from "../../models/coursemodule.mgmodel";
+import CoursePageModel from "../../models/coursepage.mgmodel";
+import MgCourseUnit from "../../models/courseunit.mgmodel";
+import MgHelpRequest from "../../models/helprequest.mgmodel";
+import MgNotification, {
+  Notification,
+} from "../../models/notification.mgmodel";
+import MgUser, { FacilitatorModel } from "../../models/user.mgmodel";
+import { EnrichedNotificationData } from "../../types/facilitatorNotificationTypes";
+import { getErrorMessage } from "../../utilities/errorUtils";
+import logger from "../../utilities/logger";
+import IEmailService from "../interfaces/emailService";
+import IFacilitatorNotificationEmailService from "../interfaces/facilitatorNotificationEmailService";
 
 const Logger = logger(__filename);
 
@@ -63,11 +63,14 @@ class FacilitatorNotificationEmailService
 
       const threshold = facilitator.emailPrefrence ?? 1;
 
+      // if threshold is -1, the user never wants to receive email notifications
+      if (threshold < 0) return;
+
       if (unsentNotifications.length < threshold) {
         return;
       }
 
-      const notificationsToSend = unsentNotifications.slice(0, threshold);
+      const notificationsToSend = unsentNotifications;
 
       const enrichedData =
         await FacilitatorNotificationEmailService.gatherNotificationData(
@@ -184,8 +187,8 @@ class FacilitatorNotificationEmailService
           learner.profilePicture ||
           generateInitialsAvatarUrl(learner.firstName, learner.lastName);
 
-        const moduleLink = `${defaultFrontendUrl}/units/${unit.id}/modules/${module.id}`;
-        const respondLink = `${defaultFrontendUrl}/help-requests/${helpRequest.id}`;
+        const moduleLink = `${defaultFrontendUrl}/view-page?moduleId=${module.id}&pageId=${page.id}`;
+        const respondLink = `mailto:${learner.email}?subject=Your help request for ${module.title}&body=Hi ${learner.firstName},%0D%0A%0D%0AI am responding to your help request for Unit ${unit.displayIndex} Module ${module.displayIndex}: ${module.title} - ${page.title} on Smart Saving Smart Spending.%0D%0A%0D%0A[Write your message here]%0D%0A%0D%0ABest regards,%0D%0A[Your Name]`;
 
         const { messageDate, messageTime } =
           FacilitatorNotificationEmailService.formatDateTime(
