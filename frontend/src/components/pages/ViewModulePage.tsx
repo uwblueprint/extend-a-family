@@ -926,10 +926,7 @@ const ViewModulePage = () => {
                           Activity{" "}
                           {(() => {
                             const unitNumber = unit?.displayIndex ?? 0;
-                            const moduleNumber =
-                              (unit?.modules.findIndex(
-                                (m) => m.id === module?.id,
-                              ) ?? -1) + 1;
+                            const moduleNumber = module.displayIndex;
                             const activityNumber =
                               module?.pages
                                 .slice(0, index + 1)
@@ -1042,7 +1039,6 @@ const ViewModulePage = () => {
       handleDrop,
       isActivityCompleted,
       unit?.displayIndex,
-      unit?.modules,
     ],
   );
 
@@ -1106,7 +1102,6 @@ const ViewModulePage = () => {
           display: "grid",
           gridTemplateColumns: getGridTemplateColumns(),
           width: "100%",
-          minHeight: "100vh",
           overflowX: "auto",
         }}
       >
@@ -1117,7 +1112,6 @@ const ViewModulePage = () => {
           padding={isFullScreen ? "0px" : "40px"}
           display="flex"
           flexDirection="column"
-          gap="24px"
           height={boxHeight}
         >
           {!isFullScreen && (

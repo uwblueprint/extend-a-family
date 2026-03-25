@@ -21,7 +21,7 @@ const TextInputViewer = React.forwardRef<
   const theme = useTheme();
   const [userAnswer, setUserAnswer] = React.useState("");
 
-  const correctAnswer = () => {
+  const sampleCorrectAnswer = () => {
     if (activity.validation.mode === "short_answer") {
       return activity.validation.answers[0];
     }
@@ -185,7 +185,7 @@ const TextInputViewer = React.forwardRef<
           <TextField
             placeholder="Enter your answer here"
             fullWidth
-            value={isCompleted ? correctAnswer() : userAnswer}
+            value={isCompleted ? sampleCorrectAnswer() : userAnswer}
             disabled={isCompleted}
             style={{
               backgroundColor: isCompleted

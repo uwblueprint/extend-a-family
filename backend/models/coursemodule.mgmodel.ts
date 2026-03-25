@@ -8,6 +8,7 @@ export interface CourseModule extends Document {
   pages: [ObjectId];
   imageURL: string;
   status: ModuleStatus;
+  displayIndex: number;
 }
 
 export const CourseModuleSchema: Schema = new Schema({
@@ -30,6 +31,10 @@ export const CourseModuleSchema: Schema = new Schema({
     default: "draft",
     required: true,
   },
+  displayIndex: {
+    type: Number,
+    required: true,
+  },
 });
 
 CourseModuleSchema.plugin(mongooseLeanId);
@@ -43,6 +48,20 @@ CourseModuleSchema.set("toObject", {
     // eslint-disable-next-line no-underscore-dangle
     delete ret._id;
   },
+});
+
+// eslint-disable-next-line func-names
+CourseModuleSchema.pre("save", function (next) {
+  let pageIndex = 1;
+  (this as unknown as CourseModule).pages.forEach((page, index) => {
+    mongoose
+      .model("CoursePage")
+      .findByIdAndUpdate(page, { pageIndex }, { new: true })
+      .exec();
+    pageIndex += 1;
+    (this as unknown as CourseModule).pages[index] = page;
+  });
+  next();
 });
 
 export default mongoose.model<CourseModule>("CourseModule", CourseModuleSchema);

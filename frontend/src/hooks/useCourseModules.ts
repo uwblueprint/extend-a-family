@@ -38,12 +38,16 @@ const useCourseModules = (unitId: string) => {
     }
   }, [unitId]);
 
+  const invalidateCache = useCallback(() => {
+    delete moduleDataCache[unitId];
+  }, [unitId]);
+
   useEffect(() => {
     if (!unitId) return;
     fetchCourseModules();
   }, [fetchCourseModules, unitId]);
 
-  return { courseModules, loading, error };
+  return { courseModules, loading, error, invalidateCache };
 };
 
 export default useCourseModules;
