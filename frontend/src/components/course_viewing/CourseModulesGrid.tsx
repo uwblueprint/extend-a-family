@@ -3,7 +3,9 @@ import { Button, Grid, Typography, useTheme } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useHistory } from "react-router-dom";
 import CourseAPIClient from "../../APIClients/CourseAPIClient";
+import { VIEW_PAGE } from "../../constants/Routes";
 import useCourseModules from "../../hooks/useCourseModules";
 import { useUser } from "../../hooks/useUser";
 import { CourseModule, ModuleStatus } from "../../types/CourseTypes";
@@ -23,10 +25,12 @@ export default function CourseModulesGrid({
   isSidebarOpen,
   searchQuery = "",
 }: ModuleGridProps) {
+  const history = useHistory();
   const {
     courseModules: initialModules,
     loading,
     error,
+    invalidateCache,
   } = useCourseModules(unitId);
   const [courseModules, setCourseModules] = useState<CourseModule[]>([]);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -192,7 +196,9 @@ export default function CourseModulesGrid({
         setUploadModalOpen={setUploadModalOpen}
         unitId={unitId}
         onCreate={(newModule) => {
+          invalidateCache();
           setCourseModules((prev) => [...prev, newModule]);
+          history.push(`${VIEW_PAGE}?moduleId=${newModule.id}`);
         }}
       />
     </>
