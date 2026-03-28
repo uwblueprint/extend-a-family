@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useState,
 } from "react";
+import { arrayMove } from "@dnd-kit/sortable";
 import CourseAPIClient from "../APIClients/CourseAPIClient";
 import ProgressAPIClient, {
   CourseProgress,
@@ -18,6 +19,7 @@ interface CourseUnitsContextType {
   courseUnits: CourseUnit[];
   isLoading: boolean;
   error: boolean;
+  selectedIndex: number;
   refetchCourseUnits: () => Promise<void>;
   createUnit: (title: string) => Promise<void>;
   editUnit: (unitId: string, title: string) => Promise<void>;
@@ -28,6 +30,10 @@ interface CourseUnitsContextType {
   refetchCourseProgress: () => Promise<void>;
   isModuleCompleted: (moduleId: string) => boolean;
   getModuleCompletionDate: (moduleId: string) => string | null;
+  rearangeUnits: () => Promise<void>;
+  changeSelectedIndex: (index: number) => Promise<void>;
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  handleDrag: (event: any) => Promise<void>;
 }
 
 const CourseUnitsContext = createContext<CourseUnitsContextType | undefined>(
@@ -57,6 +63,8 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
   );
   const [learnerProgress, setLearnerProgress] =
     useState<LearnerProgress | null>(null);
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const refetchCourseProgress = async () => {
     try {
@@ -143,6 +151,37 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     }
   };
 
+  const rearangeUnits = async () => {
+    const newUnitMap: Map<string, number> = new Map();
+    /* eslint-disable  no-restricted-syntax */
+    /* eslint-disable  guard-for-in */
+    for (const idx in courseUnits) {
+      const courseObj = courseUnits[idx];
+      /* eslint-disable  radix */
+      const updatedIdx = parseInt(idx, undefined) + 1;
+
+      if (courseObj.displayIndex !== updatedIdx) {
+        newUnitMap.set(courseUnits[idx].id, updatedIdx);
+      }
+    }
+    if (newUnitMap.size > 0) {
+      const data = await CourseAPIClient.rearangeUnits(newUnitMap);
+      if (data) {
+        const updatesUnits = courseUnits.map((unit, index) => {
+          return {
+            ...unit,
+            displayIndex: index + 1,
+          };
+        });
+        setCourseUnits(updatesUnits);
+      }
+    }
+  };
+
+  const changeSelectedIndex = async (index: number) => {
+    setSelectedIndex(index);
+  };
+
   const moduleDisplayIndex = useCallback(
     (moduleId: string): number => {
       let displayIndex = -1;
@@ -159,6 +198,21 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     [courseUnits],
   );
 
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  const handleDrag = async (event: any) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    if (active.id !== over.id) {
+      setCourseUnits((items) => {
+        const oldIndex = items.findIndex((u) => u.id === active.id);
+        const newIndex = items.findIndex((u) => u.id === over.id);
+        setSelectedIndex(newIndex);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   const { authenticatedUser } = useContext(AuthContext);
 
   useEffect(() => {
@@ -170,15 +224,19 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     courseUnits,
     isLoading,
     error,
+    selectedIndex,
     refetchCourseUnits,
     createUnit,
     editUnit,
     deleteUnit,
+    rearangeUnits,
     moduleDisplayIndex,
     courseProgress,
     refetchCourseProgress,
     isModuleCompleted,
     getModuleCompletionDate,
+    changeSelectedIndex,
+    handleDrag,
   };
 
   return (

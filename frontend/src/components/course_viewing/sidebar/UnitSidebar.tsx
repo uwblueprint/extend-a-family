@@ -1,19 +1,12 @@
 import AddIcon from "@mui/icons-material/Add";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import {
-  Box,
-  Button,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, Drawer, List, Typography, useTheme } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import {
+  verticalListSortingStrategy,
+  SortableContext,
+} from "@dnd-kit/sortable";
+import { DndContext, closestCorners } from "@dnd-kit/core";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 import { useUser } from "../../../hooks/useUser";
@@ -23,6 +16,7 @@ import CreateUnitModal from "../modals/CreateUnitModal";
 import DeleteUnitModal from "../modals/DeleteUnitModal";
 import EditUnitModal from "../modals/EditUnitModal";
 import ContextMenu from "./ContextMenu";
+import Unit from "./Unit";
 
 interface UnitSideBarProps {
   handleClose: () => void;
@@ -46,11 +40,17 @@ export default function UnitSidebar({
   const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
+  const [rearrangeUnitsMode, setRearrangeUnitsMode] = useState(false);
+  // const [selectedIndex, setSelectedIndex] = useState(0)
 
   const {
     courseUnits,
     refetchCourseUnits,
     isLoading: isCourseUnitsLoading,
+    rearangeUnits,
+    selectedIndex,
+    changeSelectedIndex,
+    handleDrag,
   } = useCourseUnits();
 
   useEffect(() => {
@@ -134,6 +134,15 @@ export default function UnitSidebar({
     setOpenDeleteUnitModal(false);
   };
 
+  const handleOpenMoveUnitModal = () => {
+    setRearrangeUnitsMode(true);
+  };
+
+  const handleCloseMoveUnitModal = () => {
+    setRearrangeUnitsMode(false);
+    rearangeUnits();
+  };
+
   const handleOpenModal = (action: string) => {
     handleContextMenuClose();
     switch (action) {
@@ -146,6 +155,9 @@ export default function UnitSidebar({
       case UnitSidebarModalType.Edit:
         handleOpenEditUnitModal();
         break;
+      case UnitSidebarModalType.Move:
+        handleOpenMoveUnitModal();
+        break;
       default:
     }
   };
@@ -155,6 +167,7 @@ export default function UnitSidebar({
     index: number,
   ) => {
     setSelectedUnit(courseUnits[index]);
+    changeSelectedIndex(index);
   };
 
   return (
@@ -210,95 +223,105 @@ export default function UnitSidebar({
           onClose={handleContextMenuClose}
           onModalOpen={handleOpenModal}
         />
+        {rearrangeUnitsMode && (
+          <Box
+            p="12px"
+            paddingLeft="32px"
+            paddingRight="32px"
+            paddingBottom="24px"
+            paddingTop="16px"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Button
+              type="button"
+              sx={{
+                p: "8px",
+                height: "40px",
+                color: theme.palette.Administrator.Dark.Default,
+                lineHeight: "1.5",
+                alignSelf: "stretch",
+                width: "100%",
+                fontSize: theme.typography.titleSmall,
+                fontFamily: "Lexend Deca",
+                fontWeight: 300,
+                borderStyle: "solid",
+                borderWidth: "1px",
+              }}
+              onClick={handleCloseMoveUnitModal}
+            >
+              SAVE CHANGES
+            </Button>
+          </Box>
+        )}
         {isCourseUnitsLoading ? (
           <Box display="flex" justifyContent="center">
             <Typography variant="bodyMedium">Loading units...</Typography>
           </Box>
         ) : (
           <List sx={{ width: "100%" }}>
-            {courseUnits.map((unit, index) => {
-              return (
-                <ListItem
-                  key={unit.id}
-                  disablePadding
-                  sx={{
-                    borderBottom: 1,
-                    borderColor:
-                      index !== courseUnits.length - 1
-                        ? "#DBE4E7"
-                        : "transparent",
-                  }}
+            <Box sx={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+              <List sx={{ width: "100%" }}>
+                <DndContext
+                  collisionDetection={closestCorners}
+                  onDragEnd={handleDrag}
                 >
-                  <ListItemButton
-                    key={unit.id}
-                    sx={{
-                      py: "15px",
-                      px: "32px",
-                      backgroundColor:
-                        selectedUnit?.id === unit.id
-                          ? theme.palette[user.role].Light.Selected
-                          : "transparent",
-                      "&:hover": {
-                        backgroundColor: theme.palette[user.role].Light.Hover,
-                      },
-                    }}
-                    onClick={(event) => handleListItemClick(event, index)}
+                  <SortableContext
+                    items={courseUnits.map((u) => u.id)}
+                    strategy={verticalListSortingStrategy}
                   >
-                    <ListItemText
-                      disableTypography
-                      primary={`${unit.displayIndex}. ${unit.title}`}
-                      sx={
-                        selectedUnit?.id === unit.id
-                          ? theme.typography.labelLargeProminent
-                          : theme.typography.bodyMedium
-                      }
-                    />
-                    {isAdministrator(user) && (
-                      <IconButton
-                        edge="end"
-                        onClick={(event) => {
-                          event.stopPropagation(); // Prevent triggering the list item click
-                          handleContextMenuOpen(event, unit); // Custom function to handle button click
-                        }}
-                        sx={{ marginLeft: "16px" }}
-                      >
-                        <MoreVertIcon />
-                      </IconButton>
-                    )}
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
+                    {courseUnits.map((unit, index) => {
+                      return (
+                        <Unit
+                          key={index}
+                          index={index}
+                          unit={unit}
+                          courseLength={courseUnits.length}
+                          handleListItemClick={handleListItemClick}
+                          selectedIndex={selectedIndex}
+                          userRole={user.role}
+                          rearrangeUnitsMode={rearrangeUnitsMode}
+                          isAdmin={isAdministrator(user)}
+                          handleContextMenuOpen={handleContextMenuOpen}
+                        />
+                      );
+                    })}
+                  </SortableContext>
+                </DndContext>
+              </List>
+            </Box>
           </List>
         )}
-        {isAdministrator(user) && !isCourseUnitsLoading && (
-          <Button
-            variant="contained"
-            onClick={handleOpenCreateUnitModal}
-            disableElevation
-            startIcon={<AddIcon />}
-            sx={{
-              width: "100%",
-              height: "40px",
-              maxWidth: "236px",
-              backgroundColor: theme.palette[user.role].Dark.Default,
-              alignItems: "center",
-              marginTop: "24px",
-              marginBottom: "24px",
-              marginLeft: "32px",
-              marginRight: "32px",
-            }}
-          >
-            <Typography
-              variant="labelLarge"
-              style={{
-                color: theme.palette.Neutral[100],
+        {isAdministrator(user) &&
+          !rearrangeUnitsMode &&
+          !isCourseUnitsLoading && (
+            <Button
+              variant="contained"
+              onClick={handleOpenCreateUnitModal}
+              disableElevation
+              startIcon={<AddIcon />}
+              sx={{
+                width: "100%",
+                height: "40px",
+                maxWidth: "236px",
+                backgroundColor: theme.palette[user.role].Dark.Default,
+                alignItems: "center",
+                marginTop: "24px",
+                marginBottom: "24px",
+                marginLeft: "32px",
+                marginRight: "32px",
               }}
             >
-              Create Unit
-            </Typography>
-          </Button>
-        )}
+              <Typography
+                variant="labelLarge"
+                style={{
+                  color: theme.palette.Neutral[100],
+                }}
+              >
+                Create Unit
+              </Typography>
+            </Button>
+          )}
       </Box>
 
       <CreateUnitModal

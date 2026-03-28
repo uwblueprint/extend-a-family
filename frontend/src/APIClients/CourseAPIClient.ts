@@ -314,6 +314,26 @@ const unpublishModule = async (
   }
 };
 
+const rearangeUnits = async (newArangement: Map<string, number>) => {
+  const bearerToken = `Bearer ${getLocalStorageObjProperty(
+    AUTHENTICATED_USER_KEY,
+    "accessToken",
+  )}`;
+  try {
+    const arangement = Object.fromEntries(newArangement);
+    const { data } = await baseAPIClient.put(
+      `/course/rearangeUnits`,
+      { arangement },
+      {
+        headers: { Authorization: bearerToken },
+      },
+    );
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default {
   getUnits,
   createUnit,
@@ -331,4 +351,5 @@ export default {
   reorderModules,
   publishModule,
   unpublishModule,
+  rearangeUnits,
 };

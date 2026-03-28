@@ -105,7 +105,9 @@ courseRouter.put(
       }
       await Promise.all(
         updatedUnits.map((unit) =>
-          courseUnitService.updateCourseUnit(unit.id, unit),
+          courseUnitService.updateCourseUnit(unit.id, {
+            displayIndex: unit.displayIndex,
+          }),
         ),
       );
       res.status(200).send("success");
