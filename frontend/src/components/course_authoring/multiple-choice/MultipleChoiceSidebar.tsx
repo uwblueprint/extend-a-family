@@ -186,17 +186,17 @@ export default function MultipleChoiceEditorSidebar({
 
                 borderRadius: "4px",
                 border: "1px solid #1D1B201F",
+                opacity: isAddOptionDisabled ? 0.38 : undefined,
+                "&:hover": {
+                  backgroundColor: isAddOptionDisabled
+                    ? undefined
+                    : theme.palette.Administrator.Light.Hover,
+                },
               }}
               onClick={onAddQuestionOption}
               disabled={isAddOptionDisabled}
             >
-              <Typography
-                variant="labelLarge"
-                sx={{
-                  color: "#171D1D",
-                  opacity: 0.38,
-                }}
-              >
+              <Typography variant="labelLarge" sx={{ color: "#171D1D" }}>
                 + Add option
               </Typography>
             </Button>

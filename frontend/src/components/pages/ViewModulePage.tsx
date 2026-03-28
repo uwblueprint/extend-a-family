@@ -356,6 +356,7 @@ const ViewModulePage = () => {
           setUploadSnackbarMessage(
             `${pagesAdded} page${pagesAdded !== 1 ? "s" : ""} uploaded`,
           );
+          setCurrentPage(contextMenu.pageIndex + 1);
         } catch (error) {
           /* eslint-disable-next-line no-console */
           console.error("Failed to upload PDF:", error);
@@ -386,6 +387,7 @@ const ViewModulePage = () => {
       if (updatedModule) {
         setModule(updatedModule);
       }
+      setCurrentPage(selectedPageIndexForActivity + 1);
     } catch (error) {
       /* eslint-disable-next-line no-console */
       console.error("Failed to create activity:", error);
@@ -878,10 +880,10 @@ const ViewModulePage = () => {
                       border: `1px solid ${theme.palette.Learner.Dark.Default}`,
                       background: isActivityCompleted(module.id, page.id)
                         ? theme.palette.Success.Light.Default
-                        : theme.palette.Learner.Light.Default,
+                        : theme.palette[role].Light.Default,
                       color: isActivityCompleted(module.id, page.id)
                         ? theme.palette.Success.Dark.Default
-                        : theme.palette.Learner.Dark.Default,
+                        : theme.palette[role].Dark.Default,
                     }}
                   >
                     {isActivityCompleted(module.id, page.id) && (
@@ -1379,6 +1381,9 @@ const ViewModulePage = () => {
                       borderRadius: "4px",
                       backgroundColor: theme.palette[role].Dark.Default,
                       color: "white",
+                      "&:hover": {
+                        backgroundColor: theme.palette[role].Dark.Hover,
+                      },
                     }}
                     onClick={() => setIsPreviewModalOpen(true)}
                   >
@@ -1397,6 +1402,9 @@ const ViewModulePage = () => {
                       borderRadius: "4px",
                       backgroundColor: theme.palette.Error.Light.Default,
                       color: theme.palette.Error.Dark.Default,
+                      "&:hover": {
+                        backgroundColor: theme.palette.Error.Light.Hover,
+                      },
                     }}
                     onClick={() => setIsDeleteModalOpen(true)}
                     disabled={isDeleteLoading}
@@ -1411,6 +1419,30 @@ const ViewModulePage = () => {
             </Box>
 
             <Box display="flex" gap="16px">
+              {role === "Administrator" && (
+                <Button
+                  sx={{
+                    height: "48px",
+                    paddingLeft: "16px",
+                    paddingRight: "24px",
+                    paddingY: "10px",
+                    gap: "8px",
+                    border: "1px solid",
+                    borderColor: theme.palette.Administrator.Light.Default,
+                    borderRadius: "4px",
+                    backgroundColor: theme.palette.Administrator.Dark.Default,
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: theme.palette.Administrator.Dark.Hover,
+                    },
+                  }}
+                  onClick={(ev) => handleContextMenu(ev, currentPage, true)}
+                  disabled={isDeleteLoading}
+                >
+                  <Add />
+                  <Typography variant="labelLarge">Add Next Slide</Typography>
+                </Button>
+              )}
               <IconButton
                 disabled={currentPage <= 0}
                 onClick={() => setCurrentPage(currentPage - 1)}
@@ -1459,13 +1491,13 @@ const ViewModulePage = () => {
             </Box>
           </Box>
         </Box>
-        {currentPageObject && canEdit && (
+        {activity && canEdit && (
           <>
             <Divider orientation="vertical" flexItem />
-            {(isMultipleChoiceActivity(currentPageObject) ||
-              isMultiSelectActivity(currentPageObject)) && (
+            {(isMultipleChoiceActivity(activity) ||
+              isMultiSelectActivity(activity)) && (
               <MultipleChoiceEditorSidebar
-                key={currentPageObject.id}
+                key={activity.id}
                 hasImage={hasImage}
                 setHasImage={(newHasImage) => {
                   setHasImage(newHasImage);
@@ -1494,18 +1526,18 @@ const ViewModulePage = () => {
                       },
                   )
                 }
-                hint={currentPageObject.hint || ""}
+                hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
                 }}
-                isMultiSelect={isMultiSelectActivity(currentPageObject)}
-                isAddOptionDisabled={currentPageObject.options.length >= 4}
+                isMultiSelect={isMultiSelectActivity(activity)}
+                isAddOptionDisabled={activity.options.length >= 4}
               />
             )}
-            {isTableActivity(currentPageObject) && (
+            {isTableActivity(activity) && (
               <TableSidebar
-                key={currentPageObject.id}
-                numColumns={currentPageObject.columnLabels.length}
+                key={activity.id}
+                numColumns={activity.columnLabels.length}
                 setNumColumns={setNumColumns}
                 onAddRow={() =>
                   setActivity((prev) => {
@@ -1516,12 +1548,12 @@ const ViewModulePage = () => {
                     };
                   })
                 }
-                isAddRowDisabled={currentPageObject.rowLabels.length >= 6}
-                hint={currentPageObject.hint || ""}
+                isAddRowDisabled={activity.rowLabels.length >= 6}
+                hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
                 }}
-                headerColumnIncludes={currentPageObject.headerColumnIncludes}
+                headerColumnIncludes={activity.headerColumnIncludes}
                 setHeaderColumnIncludes={setHeaderColumnIncludes}
               />
             )}
@@ -1571,7 +1603,7 @@ const ViewModulePage = () => {
                     };
                   })
                 }
-                isAddRowDisabled={false}
+                isAddRowDisabled={activity.rows >= 6}
                 hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
@@ -1713,7 +1745,10 @@ const ViewModulePage = () => {
           disabled={isUploadingPdf || isDeletingFromContext}
         >
           <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
-            <ArrowCircleDown /> Insert pages below
+            <ArrowCircleDown />{" "}
+            {contextMenu?.addToEnd
+              ? "Insert next page(s)"
+              : "Insert pages below"}
           </Stack>
         </MenuItem>
         <MenuItem
