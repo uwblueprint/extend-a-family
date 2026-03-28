@@ -268,6 +268,12 @@ const ModuleCardAdmin = ({
       sx={{
         opacity: isDragging ? 0.5 : 1,
         cursor: "move",
+        "&:hover": {
+          borderRadius: "8px",
+          border: "1px solid #000",
+          bgcolor: theme.palette.Neutral[200],
+          boxShadow: "-2px 2px 12px 1px rgba(0, 0, 0, 0.18)",
+        },
       }}
     >
       <CardMedia

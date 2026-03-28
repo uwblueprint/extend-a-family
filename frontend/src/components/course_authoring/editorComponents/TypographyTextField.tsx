@@ -108,21 +108,15 @@ export const BodyMediumTextField = ({
 };
 
 export const HeaderLargeTextField = ({
-  defaultValue,
+  value,
   onChange,
   placeholder,
-  minRows,
-  maxRows,
-  rows,
   color,
   onBlur,
 }: {
-  defaultValue: string;
+  value: string;
   onChange: (newValue: string) => void;
   placeholder?: string;
-  minRows?: number;
-  maxRows?: number;
-  rows?: number;
   color?: string;
   onBlur?: () => void;
 }) => {
@@ -130,14 +124,15 @@ export const HeaderLargeTextField = ({
     <TextField
       variant="outlined"
       fullWidth
-      multiline
-      minRows={minRows}
-      maxRows={maxRows}
-      rows={rows}
       placeholder={placeholder}
-      defaultValue={defaultValue}
+      value={value}
       onChange={(e) => onChange(e.target.value)}
       onBlur={onBlur}
+      slotProps={{
+        htmlInput: {
+          maxLength: 70,
+        },
+      }}
       sx={{
         "& .MuiInputBase-input": {
           fontSize: "28px",

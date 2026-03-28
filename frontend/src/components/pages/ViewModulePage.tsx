@@ -98,6 +98,8 @@ import NeedHelpModal from "../help/NeedHelpModal";
 import DeletePageModal from "./DeletePageModal";
 import ModuleLockedModal from "./ModuleLockedModal";
 import "./ViewModulePage.css";
+import { HeaderLargeTextField } from "../course_authoring/editorComponents/TypographyTextField";
+import useCourseModules from "../../hooks/useCourseModules";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -435,6 +437,8 @@ const ViewModulePage = () => {
   };
 
   const currentPageId = module?.pages[currentPage]?.id;
+
+  const { invalidateCache } = useCourseModules(unit?.id || "");
 
   useEffect(() => {
     if (currentPageId) {
@@ -1121,7 +1125,12 @@ const ViewModulePage = () => {
               alignItems="center"
               width="100%"
             >
-              <Box display="inline-flex" alignItems="center" gap="8px">
+              <Box
+                display="inline-flex"
+                flexGrow={1}
+                alignItems="center"
+                gap="8px"
+              >
                 <Link
                   to={`${COURSE_PAGE}${unit ? `?selectedUnit=${unit.id}` : ""}`}
                 >
@@ -1129,7 +1138,31 @@ const ViewModulePage = () => {
                     <ArrowBack sx={{ fontSize: "24px" }} />
                   </IconButton>
                 </Link>
-                <Typography variant="headlineLarge">{module?.title}</Typography>
+                <HeaderLargeTextField
+                  value={module?.title || ""}
+                  onBlur={() => {
+                    if (unit && module) {
+                      CourseAPIClient.editModule(
+                        unit.id,
+                        module.id,
+                        module.title,
+                      )
+                        .then(() => {
+                          invalidateCache();
+                        })
+                        .catch((error) => {
+                          /* eslint-disable-next-line no-console */
+                          console.error(
+                            "Failed to update module title:",
+                            error,
+                          );
+                        });
+                    }
+                  }}
+                  onChange={(newTitle) => {
+                    setModule((prev) => prev && { ...prev, title: newTitle });
+                  }}
+                />
               </Box>
               {role === "Learner" && (
                 <Box display="inline-flex" alignItems="center" gap="20px">
@@ -1548,7 +1581,7 @@ const ViewModulePage = () => {
                     };
                   })
                 }
-                isAddRowDisabled={activity.rowLabels.length >= 6}
+                isAddRowDisabled={activity.rowLabels.length >= 5}
                 hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
