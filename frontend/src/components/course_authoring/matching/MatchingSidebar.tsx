@@ -234,6 +234,10 @@ export default function MatchingSidebar({
 
                         borderRadius: "4px",
                         border: `1px solid ${theme.palette.Neutral[500]}`,
+
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: theme.palette.Administrator.Dark.Default,
+                        },
                       }}
                       renderValue={(selected: string) => (
                         <Typography variant="labelMedium">
@@ -313,7 +317,14 @@ export default function MatchingSidebar({
               rows={5}
               defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
-              sx={{ width: "100%" }}
+              sx={{
+                width: "100%",
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
+                },
+              }}
             />
           </Box>
         </Box>

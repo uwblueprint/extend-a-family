@@ -136,15 +136,13 @@ const UploadProfilePictureModal = ({
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        <IconButton>
-          <FileUploadOutlinedIcon
-            sx={{
-              width: "48px",
-              height: "48px",
-              color: "black",
-            }}
-          />
-        </IconButton>
+        <FileUploadOutlinedIcon
+          sx={{
+            width: "48px",
+            height: "48px",
+            color: "black",
+          }}
+        />
         <Typography color="black">
           Drag and drop your profile picture.
         </Typography>

@@ -167,6 +167,9 @@ export default function TextInputEditorSidebar({
                 color: theme.palette.Administrator.Dark.Default,
                 borderRadius: "4px",
                 border: `1px solid ${theme.palette.Neutral[500]}`,
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: theme.palette.Administrator.Dark.Default,
+                },
               }}
             >
               <MenuItem value="short_answer">
@@ -258,7 +261,14 @@ export default function TextInputEditorSidebar({
                 placeholder="Unit - ex. dollars, coins, etc."
                 defaultValue={units}
                 onChange={(e) => setUnits(e.target.value)}
-                sx={{ width: "100%" }}
+                sx={{
+                  width: "100%",
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: theme.palette.Administrator.Dark.Default,
+                    },
+                  },
+                }}
               />
             )}
           </Box>
@@ -305,7 +315,15 @@ export default function TextInputEditorSidebar({
                       placeholder="Enter an answer..."
                       value={currentAnswer}
                       onChange={(e) => setCurrentAnswer(e.target.value)}
-                      sx={{ width: "100%" }}
+                      sx={{
+                        width: "100%",
+                        "& .MuiOutlinedInput-root": {
+                          "&.Mui-focused fieldset": {
+                            borderColor:
+                              theme.palette.Administrator.Dark.Default,
+                          },
+                        },
+                      }}
                     />
                     <Button
                       type="submit"
@@ -361,7 +379,14 @@ export default function TextInputEditorSidebar({
                     type="number"
                     label="Min"
                     defaultValue={activity.validation.min}
-                    sx={{ width: "100%" }}
+                    sx={{
+                      width: "100%",
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: theme.palette.Administrator.Dark.Default,
+                        },
+                      },
+                    }}
                     onChange={(ev) =>
                       setActivity((prev) => {
                         if (!prev || !isTextInputActivity(prev)) return prev;
@@ -379,7 +404,14 @@ export default function TextInputEditorSidebar({
                     type="number"
                     label="Max"
                     defaultValue={activity.validation.max}
-                    sx={{ width: "100%" }}
+                    sx={{
+                      width: "100%",
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: theme.palette.Administrator.Dark.Default,
+                        },
+                      },
+                    }}
                     onChange={(ev) =>
                       setActivity((prev) => {
                         if (!prev || !isTextInputActivity(prev)) return prev;
@@ -434,7 +466,14 @@ export default function TextInputEditorSidebar({
               rows={5}
               defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
-              sx={{ width: "100%" }}
+              sx={{
+                width: "100%",
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
+                },
+              }}
             />
           </Box>
         </Box>

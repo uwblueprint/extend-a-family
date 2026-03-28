@@ -254,7 +254,14 @@ export default function MultipleChoiceEditorSidebar({
               rows={5}
               defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
-              sx={{ width: "100%" }}
+              sx={{
+                width: "100%",
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
+                },
+              }}
             />
           </Box>
         </Box>

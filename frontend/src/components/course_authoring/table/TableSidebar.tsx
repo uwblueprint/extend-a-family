@@ -144,6 +144,10 @@ export default function TableSidebar({
 
                   borderRadius: "4px",
                   border: `1px solid ${theme.palette.Neutral[500]}`,
+
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
                 }}
               >
                 {[2, 3, 4, 5].map((numCols) => (
@@ -180,6 +184,10 @@ export default function TableSidebar({
 
                   borderRadius: "4px",
                   border: `1px solid ${theme.palette.Neutral[500]}`,
+
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
                 }}
               >
                 {Object.values(HeaderColumnIncludesTypes).map(
@@ -298,7 +306,14 @@ export default function TableSidebar({
               rows={5}
               defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
-              sx={{ width: "100%" }}
+              sx={{
+                width: "100%",
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
+                },
+              }}
             />
           </Box>
         </Box>
