@@ -193,7 +193,7 @@ const TextInputMainEditor = ({
               </Typography>
 
               <BodySmallTextField
-                defaultValue={activity.additionalContext || ""}
+                value={activity.additionalContext || ""}
                 onChange={(newValue) => {
                   setActivity(
                     (prev) =>

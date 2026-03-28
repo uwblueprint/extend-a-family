@@ -126,7 +126,7 @@ const TableActivityRow = ({
         >
           <Typography variant="bodySmall">
             <BodySmallTextField
-              defaultValue={rowLabel}
+              value={rowLabel}
               placeholder="[Row Name]"
               onChange={(newValue) =>
                 setActivity((prev) => {

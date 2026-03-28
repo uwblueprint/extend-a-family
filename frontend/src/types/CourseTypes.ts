@@ -150,9 +150,9 @@ export function isTableActivity(
 }
 
 export function isTextInputActivity(
-  activity: CoursePage,
+  activity?: CoursePage,
 ): activity is TextInputActivity {
-  return activity.type === QuestionType.TextInput;
+  return !!(activity && activity.type === QuestionType.TextInput);
 }
 
 export enum ModuleStatus {

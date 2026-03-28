@@ -1,14 +1,14 @@
 import { TextField } from "@mui/material";
 
 export const BodySmallTextField = ({
-  defaultValue,
+  value,
   onChange,
   placeholder,
   minRows,
   maxRows,
   rows,
 }: {
-  defaultValue: string;
+  value: string;
   onChange: (newValue: string) => void;
   placeholder?: string;
   minRows?: number;
@@ -24,7 +24,7 @@ export const BodySmallTextField = ({
       maxRows={maxRows}
       rows={rows}
       placeholder={placeholder}
-      defaultValue={defaultValue}
+      value={value}
       onChange={(e) => onChange(e.target.value)}
       sx={{
         "& .MuiInputBase-input": {

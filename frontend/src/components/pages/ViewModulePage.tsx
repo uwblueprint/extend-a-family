@@ -109,6 +109,8 @@ const options = {
   standardFontDataUrl: "/standard_fonts/",
 };
 
+const activityDataCache: Record<string, Activity> = {};
+
 const ViewModulePage = () => {
   const { queryParams } = useQueryParams();
   const requestedModuleId = queryParams.get("moduleId") || "";
@@ -183,7 +185,9 @@ const ViewModulePage = () => {
   );
   const [hasAdditionalContext, setHasAdditionalContext] = useState(false);
 
-  const { activity, setActivity } = useActivity<Activity>(undefined);
+  const { activity, setActivity } = useActivity<Activity>(
+    isActivityPage(currentPageObject) ? currentPageObject : undefined,
+  );
 
   const activityViewerRef = useRef<ActivityViewerHandle>(null);
 
@@ -246,7 +250,12 @@ const ViewModulePage = () => {
     setIsRetryButtonDisplayed(false);
     setIsPreviewModalOpen(false);
     if (currentPageObject && isActivityPage(currentPageObject)) {
-      setActivity(currentPageObject);
+      const cached = activityDataCache[currentPageObject.id];
+      if (cached) {
+        setActivity(cached);
+      } else {
+        setActivity(currentPageObject);
+      }
       if (currentPageObject.imageUrl) {
         setHasImage(true);
       }
@@ -257,16 +266,9 @@ const ViewModulePage = () => {
   }, [currentPageObject, setActivity]);
 
   useEffect(() => {
-    setModule((prevModule) => {
-      if (!prevModule) return prevModule;
-      const updatedPages = prevModule.pages.map((page) => {
-        if (isActivityPage(page) && activity && page.id === activity.id) {
-          return activity;
-        }
-        return page;
-      });
-      return { ...prevModule, pages: updatedPages };
-    });
+    if (activity) {
+      activityDataCache[activity.id] = activity;
+    }
   }, [activity]);
 
   const handleContextMenu = useCallback(
@@ -859,11 +861,7 @@ const ViewModulePage = () => {
                       <Typography variant="bodyMedium">Loading...</Typography>
                     }
                   >
-                    <Thumbnail
-                      pageNumber={page.pageIndex}
-                      height={130}
-                      scale={1.66}
-                    />
+                    <Thumbnail pageNumber={page.pageIndex} width={224} />
                   </Document>
                 )}
                 {isActivityPage(page) && (
@@ -1527,12 +1525,12 @@ const ViewModulePage = () => {
                 setHeaderColumnIncludes={setHeaderColumnIncludes}
               />
             )}
-            {isMatchingActivity(currentPageObject) && (
+            {isMatchingActivity(activity) && (
               <MatchingSidebar
-                key={currentPageObject.id}
-                activity={currentPageObject}
+                key={activity.id}
+                activity={activity}
                 setActivity={setActivity}
-                numColumns={Object.keys(currentPageObject.media).length}
+                numColumns={Object.keys(activity.media).length}
                 setNumColumns={(newNumColumns: number) => {
                   setActivity((prev) => {
                     if (!prev || !isMatchingActivity(prev)) return prev;
@@ -1574,18 +1572,18 @@ const ViewModulePage = () => {
                   })
                 }
                 isAddRowDisabled={false}
-                hint={currentPageObject.hint || ""}
+                hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
                 }}
               />
             )}
-            {isTextInputActivity(currentPageObject) && (
+            {isTextInputActivity(activity) && (
               <TextInputEditorSidebar
-                key={currentPageObject.id}
-                activity={currentPageObject}
+                key={activity.id}
+                activity={activity}
                 setActivity={setActivity}
-                mode={currentPageObject.validation.mode}
+                mode={activity.validation.mode}
                 setMode={(newMode: "short_answer" | "numeric_range") =>
                   setActivity((prev) => {
                     if (!prev || !isTextInputActivity(prev)) return prev;
@@ -1611,8 +1609,8 @@ const ViewModulePage = () => {
                   })
                 }
                 correctAnswers={
-                  currentPageObject.validation.mode === "short_answer"
-                    ? currentPageObject.validation.answers
+                  activity.validation.mode === "short_answer"
+                    ? activity.validation.answers
                     : []
                 }
                 setCorrectAnswers={(newCorrectAnswers) =>
@@ -1632,7 +1630,7 @@ const ViewModulePage = () => {
                     };
                   })
                 }
-                hint={currentPageObject.hint || ""}
+                hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
                 }}
@@ -1652,7 +1650,7 @@ const ViewModulePage = () => {
                     );
                   }
                 }}
-                units={currentPageObject.units}
+                units={activity.units}
                 setUnits={(newUnits) =>
                   setActivity((prev) => prev && { ...prev, units: newUnits })
                 }
@@ -1665,12 +1663,12 @@ const ViewModulePage = () => {
         open={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
         module={module}
-        currentPage={currentPageObject || null}
+        currentPage={activity || null}
       />
       <WrongAnswerModal
-        open={isWrongAnswerModalOpen && !isMatchingActivity(currentPageObject)}
+        open={isWrongAnswerModalOpen && !isMatchingActivity(activity)}
         onClose={() => setIsWrongAnswerModalOpen(false)}
-        hint={isActivityPage(currentPageObject) ? currentPageObject.hint : ""}
+        hint={isActivityPage(activity) ? activity.hint : ""}
       />
       <DeletePageModal
         open={isDeleteModalOpen}
@@ -1678,9 +1676,9 @@ const ViewModulePage = () => {
         onConfirm={handleDeletePage}
         isLoading={isDeleteLoading}
       />
-      {isActivityPage(currentPageObject) && (
+      {isActivityPage(activity) && (
         <PreviewLearnerModal
-          activity={currentPageObject}
+          activity={activity}
           open={isPreviewModalOpen}
           handleClose={() => setIsPreviewModalOpen(false)}
         />
