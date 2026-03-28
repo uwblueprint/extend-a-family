@@ -170,15 +170,13 @@ const CreateModuleModal = ({
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          <IconButton>
-            <FileUploadOutlinedIcon
-              sx={{
-                width: "48px",
-                height: "48px",
-                color: "black",
-              }}
-            />
-          </IconButton>
+          <FileUploadOutlinedIcon
+            sx={{
+              width: "48px",
+              height: "48px",
+              color: "black",
+            }}
+          />
           <Box
             style={{
               display: "flex",
@@ -239,10 +237,15 @@ const CreateModuleModal = ({
       <TextField
         label="Module Title"
         variant="outlined"
-        style={{
+        sx={{
           display: "flex",
           padding: "4px 0",
           flex: "1 0 0",
+          "& .MuiOutlinedInput-root": {
+            "&.Mui-focused fieldset": {
+              borderColor: theme.palette.Administrator.Dark.Default,
+            },
+          },
         }}
         onChange={(e) => setModuleTitle(e.target.value)}
         InputProps={{

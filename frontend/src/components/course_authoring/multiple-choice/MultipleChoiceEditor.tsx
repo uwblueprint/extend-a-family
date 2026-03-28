@@ -230,7 +230,7 @@ const MultipleChoiceMainEditor = ({
               </Typography>
 
               <BodySmallTextField
-                defaultValue={activity.additionalContext || ""}
+                value={activity.additionalContext || ""}
                 onChange={(newValue) => {
                   setActivity(
                     (prev) =>
@@ -287,7 +287,7 @@ const MultipleChoiceMainEditor = ({
                   }
                   let newCorrectAnswer = prev.correctAnswer;
                   if (index === prev.correctAnswer) {
-                    newCorrectAnswer = -1; // No correct answer
+                    newCorrectAnswer = Math.max(0, prev.correctAnswer - 1);
                   } else if (index < prev.correctAnswer) {
                     newCorrectAnswer = prev.correctAnswer - 1;
                   }

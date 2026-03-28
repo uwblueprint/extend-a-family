@@ -98,6 +98,8 @@ import NeedHelpModal from "../help/NeedHelpModal";
 import DeletePageModal from "./DeletePageModal";
 import ModuleLockedModal from "./ModuleLockedModal";
 import "./ViewModulePage.css";
+import { HeaderLargeTextField } from "../course_authoring/editorComponents/TypographyTextField";
+import useCourseModules from "../../hooks/useCourseModules";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -108,6 +110,8 @@ const options = {
   cMapUrl: "/cmaps/",
   standardFontDataUrl: "/standard_fonts/",
 };
+
+const activityDataCache: Record<string, Activity> = {};
 
 const ViewModulePage = () => {
   const { queryParams } = useQueryParams();
@@ -183,7 +187,9 @@ const ViewModulePage = () => {
   );
   const [hasAdditionalContext, setHasAdditionalContext] = useState(false);
 
-  const { activity, setActivity } = useActivity<Activity>(undefined);
+  const { activity, setActivity } = useActivity<Activity>(
+    isActivityPage(currentPageObject) ? currentPageObject : undefined,
+  );
 
   const activityViewerRef = useRef<ActivityViewerHandle>(null);
 
@@ -246,7 +252,12 @@ const ViewModulePage = () => {
     setIsRetryButtonDisplayed(false);
     setIsPreviewModalOpen(false);
     if (currentPageObject && isActivityPage(currentPageObject)) {
-      setActivity(currentPageObject);
+      const cached = activityDataCache[currentPageObject.id];
+      if (cached) {
+        setActivity(cached);
+      } else {
+        setActivity(currentPageObject);
+      }
       if (currentPageObject.imageUrl) {
         setHasImage(true);
       }
@@ -257,16 +268,9 @@ const ViewModulePage = () => {
   }, [currentPageObject, setActivity]);
 
   useEffect(() => {
-    setModule((prevModule) => {
-      if (!prevModule) return prevModule;
-      const updatedPages = prevModule.pages.map((page) => {
-        if (isActivityPage(page) && activity && page.id === activity.id) {
-          return activity;
-        }
-        return page;
-      });
-      return { ...prevModule, pages: updatedPages };
-    });
+    if (activity) {
+      activityDataCache[activity.id] = activity;
+    }
   }, [activity]);
 
   const handleContextMenu = useCallback(
@@ -354,6 +358,7 @@ const ViewModulePage = () => {
           setUploadSnackbarMessage(
             `${pagesAdded} page${pagesAdded !== 1 ? "s" : ""} uploaded`,
           );
+          setCurrentPage(contextMenu.pageIndex + 1);
         } catch (error) {
           /* eslint-disable-next-line no-console */
           console.error("Failed to upload PDF:", error);
@@ -384,6 +389,7 @@ const ViewModulePage = () => {
       if (updatedModule) {
         setModule(updatedModule);
       }
+      setCurrentPage(selectedPageIndexForActivity + 1);
     } catch (error) {
       /* eslint-disable-next-line no-console */
       console.error("Failed to create activity:", error);
@@ -431,6 +437,8 @@ const ViewModulePage = () => {
   };
 
   const currentPageId = module?.pages[currentPage]?.id;
+
+  const { invalidateCache } = useCourseModules(unit?.id || "");
 
   useEffect(() => {
     if (currentPageId) {
@@ -859,11 +867,7 @@ const ViewModulePage = () => {
                       <Typography variant="bodyMedium">Loading...</Typography>
                     }
                   >
-                    <Thumbnail
-                      pageNumber={page.pageIndex}
-                      height={130}
-                      scale={1.66}
-                    />
+                    <Thumbnail pageNumber={page.pageIndex} width={224} />
                   </Document>
                 )}
                 {isActivityPage(page) && (
@@ -880,10 +884,10 @@ const ViewModulePage = () => {
                       border: `1px solid ${theme.palette.Learner.Dark.Default}`,
                       background: isActivityCompleted(module.id, page.id)
                         ? theme.palette.Success.Light.Default
-                        : theme.palette.Learner.Light.Default,
+                        : theme.palette[role].Light.Default,
                       color: isActivityCompleted(module.id, page.id)
                         ? theme.palette.Success.Dark.Default
-                        : theme.palette.Learner.Dark.Default,
+                        : theme.palette[role].Dark.Default,
                     }}
                   >
                     {isActivityCompleted(module.id, page.id) && (
@@ -1121,7 +1125,12 @@ const ViewModulePage = () => {
               alignItems="center"
               width="100%"
             >
-              <Box display="inline-flex" alignItems="center" gap="8px">
+              <Box
+                display="inline-flex"
+                flexGrow={1}
+                alignItems="center"
+                gap="8px"
+              >
                 <Link
                   to={`${COURSE_PAGE}${unit ? `?selectedUnit=${unit.id}` : ""}`}
                 >
@@ -1129,7 +1138,31 @@ const ViewModulePage = () => {
                     <ArrowBack sx={{ fontSize: "24px" }} />
                   </IconButton>
                 </Link>
-                <Typography variant="headlineLarge">{module?.title}</Typography>
+                <HeaderLargeTextField
+                  value={module?.title || ""}
+                  onBlur={() => {
+                    if (unit && module) {
+                      CourseAPIClient.editModule(
+                        unit.id,
+                        module.id,
+                        module.title,
+                      )
+                        .then(() => {
+                          invalidateCache();
+                        })
+                        .catch((error) => {
+                          /* eslint-disable-next-line no-console */
+                          console.error(
+                            "Failed to update module title:",
+                            error,
+                          );
+                        });
+                    }
+                  }}
+                  onChange={(newTitle) => {
+                    setModule((prev) => prev && { ...prev, title: newTitle });
+                  }}
+                />
               </Box>
               {role === "Learner" && (
                 <Box display="inline-flex" alignItems="center" gap="20px">
@@ -1381,6 +1414,9 @@ const ViewModulePage = () => {
                       borderRadius: "4px",
                       backgroundColor: theme.palette[role].Dark.Default,
                       color: "white",
+                      "&:hover": {
+                        backgroundColor: theme.palette[role].Dark.Hover,
+                      },
                     }}
                     onClick={() => setIsPreviewModalOpen(true)}
                   >
@@ -1399,6 +1435,9 @@ const ViewModulePage = () => {
                       borderRadius: "4px",
                       backgroundColor: theme.palette.Error.Light.Default,
                       color: theme.palette.Error.Dark.Default,
+                      "&:hover": {
+                        backgroundColor: theme.palette.Error.Light.Hover,
+                      },
                     }}
                     onClick={() => setIsDeleteModalOpen(true)}
                     disabled={isDeleteLoading}
@@ -1413,6 +1452,30 @@ const ViewModulePage = () => {
             </Box>
 
             <Box display="flex" gap="16px">
+              {role === "Administrator" && (
+                <Button
+                  sx={{
+                    height: "48px",
+                    paddingLeft: "16px",
+                    paddingRight: "24px",
+                    paddingY: "10px",
+                    gap: "8px",
+                    border: "1px solid",
+                    borderColor: theme.palette.Administrator.Light.Default,
+                    borderRadius: "4px",
+                    backgroundColor: theme.palette.Administrator.Dark.Default,
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: theme.palette.Administrator.Dark.Hover,
+                    },
+                  }}
+                  onClick={(ev) => handleContextMenu(ev, currentPage, true)}
+                  disabled={isDeleteLoading}
+                >
+                  <Add />
+                  <Typography variant="labelLarge">Add Next Slide</Typography>
+                </Button>
+              )}
               <IconButton
                 disabled={currentPage <= 0}
                 onClick={() => setCurrentPage(currentPage - 1)}
@@ -1461,13 +1524,13 @@ const ViewModulePage = () => {
             </Box>
           </Box>
         </Box>
-        {currentPageObject && canEdit && (
+        {activity && canEdit && (
           <>
             <Divider orientation="vertical" flexItem />
-            {(isMultipleChoiceActivity(currentPageObject) ||
-              isMultiSelectActivity(currentPageObject)) && (
+            {(isMultipleChoiceActivity(activity) ||
+              isMultiSelectActivity(activity)) && (
               <MultipleChoiceEditorSidebar
-                key={currentPageObject.id}
+                key={activity.id}
                 hasImage={hasImage}
                 setHasImage={(newHasImage) => {
                   setHasImage(newHasImage);
@@ -1496,18 +1559,18 @@ const ViewModulePage = () => {
                       },
                   )
                 }
-                hint={currentPageObject.hint || ""}
+                hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
                 }}
-                isMultiSelect={isMultiSelectActivity(currentPageObject)}
-                isAddOptionDisabled={currentPageObject.options.length >= 4}
+                isMultiSelect={isMultiSelectActivity(activity)}
+                isAddOptionDisabled={activity.options.length >= 4}
               />
             )}
-            {isTableActivity(currentPageObject) && (
+            {isTableActivity(activity) && (
               <TableSidebar
-                key={currentPageObject.id}
-                numColumns={currentPageObject.columnLabels.length}
+                key={activity.id}
+                numColumns={activity.columnLabels.length}
                 setNumColumns={setNumColumns}
                 onAddRow={() =>
                   setActivity((prev) => {
@@ -1518,21 +1581,21 @@ const ViewModulePage = () => {
                     };
                   })
                 }
-                isAddRowDisabled={currentPageObject.rowLabels.length >= 6}
-                hint={currentPageObject.hint || ""}
+                isAddRowDisabled={activity.rowLabels.length >= 5}
+                hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
                 }}
-                headerColumnIncludes={currentPageObject.headerColumnIncludes}
+                headerColumnIncludes={activity.headerColumnIncludes}
                 setHeaderColumnIncludes={setHeaderColumnIncludes}
               />
             )}
-            {isMatchingActivity(currentPageObject) && (
+            {isMatchingActivity(activity) && (
               <MatchingSidebar
-                key={currentPageObject.id}
-                activity={currentPageObject}
+                key={activity.id}
+                activity={activity}
                 setActivity={setActivity}
-                numColumns={Object.keys(currentPageObject.media).length}
+                numColumns={Object.keys(activity.media).length}
                 setNumColumns={(newNumColumns: number) => {
                   setActivity((prev) => {
                     if (!prev || !isMatchingActivity(prev)) return prev;
@@ -1573,19 +1636,19 @@ const ViewModulePage = () => {
                     };
                   })
                 }
-                isAddRowDisabled={false}
-                hint={currentPageObject.hint || ""}
+                isAddRowDisabled={activity.rows >= 6}
+                hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
                 }}
               />
             )}
-            {isTextInputActivity(currentPageObject) && (
+            {isTextInputActivity(activity) && (
               <TextInputEditorSidebar
-                key={currentPageObject.id}
-                activity={currentPageObject}
+                key={activity.id}
+                activity={activity}
                 setActivity={setActivity}
-                mode={currentPageObject.validation.mode}
+                mode={activity.validation.mode}
                 setMode={(newMode: "short_answer" | "numeric_range") =>
                   setActivity((prev) => {
                     if (!prev || !isTextInputActivity(prev)) return prev;
@@ -1611,8 +1674,8 @@ const ViewModulePage = () => {
                   })
                 }
                 correctAnswers={
-                  currentPageObject.validation.mode === "short_answer"
-                    ? currentPageObject.validation.answers
+                  activity.validation.mode === "short_answer"
+                    ? activity.validation.answers
                     : []
                 }
                 setCorrectAnswers={(newCorrectAnswers) =>
@@ -1632,7 +1695,7 @@ const ViewModulePage = () => {
                     };
                   })
                 }
-                hint={currentPageObject.hint || ""}
+                hint={activity.hint || ""}
                 setHint={(newHint: string) => {
                   setActivity((prev) => prev && { ...prev, hint: newHint });
                 }}
@@ -1652,7 +1715,7 @@ const ViewModulePage = () => {
                     );
                   }
                 }}
-                units={currentPageObject.units}
+                units={activity.units}
                 setUnits={(newUnits) =>
                   setActivity((prev) => prev && { ...prev, units: newUnits })
                 }
@@ -1665,12 +1728,12 @@ const ViewModulePage = () => {
         open={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
         module={module}
-        currentPage={currentPageObject || null}
+        currentPage={activity || null}
       />
       <WrongAnswerModal
-        open={isWrongAnswerModalOpen && !isMatchingActivity(currentPageObject)}
+        open={isWrongAnswerModalOpen && !isMatchingActivity(activity)}
         onClose={() => setIsWrongAnswerModalOpen(false)}
-        hint={isActivityPage(currentPageObject) ? currentPageObject.hint : ""}
+        hint={isActivityPage(activity) ? activity.hint : ""}
       />
       <DeletePageModal
         open={isDeleteModalOpen}
@@ -1678,9 +1741,9 @@ const ViewModulePage = () => {
         onConfirm={handleDeletePage}
         isLoading={isDeleteLoading}
       />
-      {isActivityPage(currentPageObject) && (
+      {isActivityPage(activity) && (
         <PreviewLearnerModal
-          activity={currentPageObject}
+          activity={activity}
           open={isPreviewModalOpen}
           handleClose={() => setIsPreviewModalOpen(false)}
         />
@@ -1715,7 +1778,10 @@ const ViewModulePage = () => {
           disabled={isUploadingPdf || isDeletingFromContext}
         >
           <Stack direction="row" alignItems="center" gap="12px" paddingY="8px">
-            <ArrowCircleDown /> Insert pages below
+            <ArrowCircleDown />{" "}
+            {contextMenu?.addToEnd
+              ? "Insert next page(s)"
+              : "Insert pages below"}
           </Stack>
         </MenuItem>
         <MenuItem

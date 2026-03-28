@@ -5,6 +5,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -143,6 +144,10 @@ export default function TableSidebar({
 
                   borderRadius: "4px",
                   border: `1px solid ${theme.palette.Neutral[500]}`,
+
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
                 }}
               >
                 {[2, 3, 4, 5].map((numCols) => (
@@ -179,6 +184,10 @@ export default function TableSidebar({
 
                   borderRadius: "4px",
                   border: `1px solid ${theme.palette.Neutral[500]}`,
+
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
                 }}
               >
                 {Object.values(HeaderColumnIncludesTypes).map(
@@ -218,31 +227,47 @@ export default function TableSidebar({
             >
               <Typography variant="bodyMedium">Table rows</Typography>
             </Box>
-            <Button
-              sx={{
-                display: "flex",
-                padding: "10px 24px 10px 16px",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "8px",
-                flex: "1 0 0",
-                alignSelf: "stretch",
-
-                borderRadius: "4px",
-                border: `1px solid ${theme.palette.Neutral[500]}`,
-              }}
-              onClick={onAddRow}
-              disabled={isAddRowDisabled}
+            <Tooltip
+              title={
+                isAddRowDisabled
+                  ? "Maximum number of rows (5) reached"
+                  : undefined
+              }
             >
-              <Typography
-                variant="labelLarge"
+              <Button
                 sx={{
-                  color: theme.palette.Administrator.Dark.Default,
+                  display: "flex",
+                  padding: "10px 24px 10px 16px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "8px",
+                  flex: "1 0 0",
+                  alignSelf: "stretch",
+
+                  borderRadius: "4px",
+                  border: `1px solid ${theme.palette.Neutral[500]}`,
+
+                  opacity: isAddRowDisabled ? 0.55 : undefined,
+
+                  "&:hover": {
+                    backgroundColor: isAddRowDisabled
+                      ? undefined
+                      : theme.palette.Administrator.Light.Hover,
+                  },
+                }}
+                onClick={() => {
+                  if (isAddRowDisabled) return;
+                  onAddRow();
                 }}
               >
-                + Add row
-              </Typography>
-            </Button>
+                <Typography
+                  variant="labelLarge"
+                  sx={{ color: theme.palette.Administrator.Dark.Default }}
+                >
+                  + Add row
+                </Typography>
+              </Button>
+            </Tooltip>
           </Box>
           <Divider
             sx={{
@@ -281,7 +306,14 @@ export default function TableSidebar({
               rows={5}
               defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
-              sx={{ width: "100%" }}
+              sx={{
+                width: "100%",
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
+                },
+              }}
             />
           </Box>
         </Box>

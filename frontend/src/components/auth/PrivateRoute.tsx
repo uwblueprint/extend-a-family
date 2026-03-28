@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import React, { useContext } from "react";
-import { Redirect, Route } from "react-router-dom";
+import { Redirect, Route, useLocation } from "react-router-dom";
 import {
   CREATE_PASSWORD_PAGE,
   NOT_AUTHORIZED_PAGE,
@@ -9,8 +9,8 @@ import {
 } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { Role } from "../../types/AuthTypes";
-import Navbar from "../common/navbar/Navbar";
 import { isFacilitator } from "../../types/UserTypes";
+import Navbar from "../common/navbar/Navbar";
 
 type PrivateRouteProps = {
   component: React.FC;
@@ -26,13 +26,20 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   allowedRoles,
 }: PrivateRouteProps) => {
   const { authenticatedUser } = useContext(AuthContext);
+  const location = useLocation();
+
+  const fullPath = location.pathname + location.search;
 
   if (authenticatedUser) {
     if (
       authenticatedUser.status === "Invited" &&
       path !== CREATE_PASSWORD_PAGE
     ) {
-      return <Redirect to={CREATE_PASSWORD_PAGE} />;
+      return (
+        <Redirect
+          to={`${CREATE_PASSWORD_PAGE}?next=${encodeURIComponent(fullPath)}`}
+        />
+      );
     }
 
     if (isFacilitator(authenticatedUser) && !authenticatedUser.approved) {
@@ -62,7 +69,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
       <Redirect to={NOT_AUTHORIZED_PAGE} />
     );
   }
-  return <Redirect to={WELCOME_PAGE} />;
+  return (
+    <Redirect to={`${WELCOME_PAGE}?next=${encodeURIComponent(fullPath)}`} />
+  );
 };
 
 export default PrivateRoute;

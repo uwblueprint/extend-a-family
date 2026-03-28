@@ -1,6 +1,6 @@
 import { Box, Container, Link, Typography, useTheme } from "@mui/material";
 import React, { useContext, useState } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, useLocation } from "react-router-dom";
 import { LANDING_PAGE } from "../../constants/Routes";
 import AuthContext from "../../contexts/AuthContext";
 import { Role } from "../../types/AuthTypes";
@@ -21,10 +21,17 @@ const Login: React.FC<LoginProps> = ({
 }: LoginProps): React.ReactElement => {
   const { authenticatedUser } = useContext(AuthContext);
   const [showDrawerLogin, setShowDrawerLogin] = useState<boolean>(true);
+  const { search } = useLocation();
 
   const theme = useTheme();
+  const nextPath = new URLSearchParams(search).get("next");
+  const redirectPath =
+    nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")
+      ? nextPath
+      : LANDING_PAGE;
+
   if (authenticatedUser) {
-    return <Redirect to={LANDING_PAGE} />;
+    return <Redirect to={redirectPath} />;
   }
 
   const redirectSignUpPath = (): boolean => {

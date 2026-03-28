@@ -71,6 +71,7 @@ const ModuleCardFacilitator = ({
         startIcon={<ModeCommentOutlined />}
         sx={{
           width: "100%",
+          marginTop: "auto",
           padding: "10px 24px 10px 16px",
           color: theme.palette.Facilitator.Dark.Default,
 

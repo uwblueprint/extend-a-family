@@ -70,7 +70,15 @@ const MediaDisplay = ({
   // mediaItem.mediaType === "text"
   return (
     <TextField
-      sx={{ width: "180px", maxHeight: "64px" }}
+      sx={{
+        width: "180px",
+        maxHeight: "64px",
+        "& .MuiOutlinedInput-root": {
+          "&.Mui-focused fieldset": {
+            borderColor: theme.palette.Administrator.Dark.Default,
+          },
+        },
+      }}
       placeholder="[Click here to edit]"
       defaultValue={mediaItem.context}
       onChange={(e) => onChange(e.target.value)}

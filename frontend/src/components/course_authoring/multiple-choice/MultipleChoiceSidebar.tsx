@@ -3,6 +3,7 @@ import {
   Button,
   Divider,
   TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -174,32 +175,47 @@ export default function MultipleChoiceEditorSidebar({
                 Add options associated to the question
               </Typography>
             </Box>
-            <Button
-              sx={{
-                display: "flex",
-                padding: "10px 24px 10px 16px",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "8px",
-                flex: "1 0 0",
-                alignSelf: "stretch",
-
-                borderRadius: "4px",
-                border: "1px solid #1D1B201F",
-              }}
-              onClick={onAddQuestionOption}
-              disabled={isAddOptionDisabled}
+            <Tooltip
+              title={
+                isAddOptionDisabled
+                  ? "Maximum number of options (4) reached"
+                  : undefined
+              }
             >
-              <Typography
-                variant="labelLarge"
+              <Button
                 sx={{
-                  color: "#171D1D",
-                  opacity: 0.38,
+                  display: "flex",
+                  padding: "10px 24px 10px 16px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "8px",
+                  flex: "1 0 0",
+                  alignSelf: "stretch",
+
+                  borderRadius: "4px",
+                  border: `1px solid ${theme.palette.Neutral[500]}`,
+
+                  opacity: isAddOptionDisabled ? 0.55 : undefined,
+
+                  "&:hover": {
+                    backgroundColor: isAddOptionDisabled
+                      ? undefined
+                      : theme.palette.Administrator.Light.Hover,
+                  },
+                }}
+                onClick={() => {
+                  if (isAddOptionDisabled) return;
+                  onAddQuestionOption();
                 }}
               >
-                + Add option
-              </Typography>
-            </Button>
+                <Typography
+                  variant="labelLarge"
+                  sx={{ color: theme.palette.Administrator.Dark.Default }}
+                >
+                  + Add option
+                </Typography>
+              </Button>
+            </Tooltip>
           </Box>
           <Divider
             sx={{
@@ -238,7 +254,14 @@ export default function MultipleChoiceEditorSidebar({
               rows={5}
               defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
-              sx={{ width: "100%" }}
+              sx={{
+                width: "100%",
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
+                },
+              }}
             />
           </Box>
         </Box>

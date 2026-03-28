@@ -3,6 +3,7 @@ import React from "react";
 
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import { padNumber } from "../../../utils/StringUtils";
+import { useUser } from "../../../hooks/useUser";
 
 const ModuleSidebarThumbnail = ({
   index,
@@ -71,6 +72,8 @@ const ModuleSidebarThumbnail = ({
     }
   };
 
+  const { role } = useUser();
+
   return (
     <Box
       key={`thumbnail_${index}`}
@@ -85,7 +88,7 @@ const ModuleSidebarThumbnail = ({
       onDrop={handleDrop}
       sx={{
         color:
-          index === currentPage ? theme.palette.Learner.Dark.Default : "black",
+          index === currentPage ? theme.palette[role].Dark.Default : "black",
         cursor: isDraggable ? "grab" : "pointer",
         marginBottom: "10px",
         borderRadius: "5px",
@@ -107,7 +110,7 @@ const ModuleSidebarThumbnail = ({
               left: 0,
               right: 0,
               height: "3px",
-              backgroundColor: theme.palette.Learner.Dark.Default,
+              backgroundColor: theme.palette[role].Dark.Default,
               borderRadius: "2px",
               zIndex: 10,
             }
@@ -119,9 +122,7 @@ const ModuleSidebarThumbnail = ({
       <Box
         sx={{
           color:
-            index === currentPage
-              ? theme.palette.Learner.Dark.Default
-              : "black",
+            index === currentPage ? theme.palette[role].Dark.Default : "black",
         }}
       >
         <Typography
@@ -140,7 +141,7 @@ const ModuleSidebarThumbnail = ({
           position: "relative",
           border:
             currentPage === index
-              ? `2px solid ${theme.palette.Learner.Dark.Default}`
+              ? `2px solid ${theme.palette[role].Dark.Default}`
               : "none",
           borderRadius: "4px",
           width: "fit-content",

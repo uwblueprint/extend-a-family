@@ -91,7 +91,7 @@ export default function MultipleChoiceOption({
           </Box>
         </Box>
         <BodySmallTextField
-          defaultValue={optionText}
+          value={optionText}
           onChange={onTextChange}
           placeholder="Edit option..."
         />
@@ -111,6 +111,11 @@ export default function MultipleChoiceOption({
           backgroundColor: isCorrectAnswer
             ? theme.palette.Success.Dark.Default
             : "transparent",
+          "&:hover": {
+            backgroundColor: isCorrectAnswer
+              ? theme.palette.Success.Dark.Default
+              : theme.palette.Success.Light.Hover,
+          },
         }}
         onClick={onSetCorrectAnswer}
       >

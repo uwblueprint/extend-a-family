@@ -13,8 +13,8 @@ export default function useActivity<ActivityType extends Activity>(
   );
   const { role } = useUser();
 
-  const activityRef = useRef<ActivityType | undefined>(initialActivity);
-  const lastSentActivityRef = useRef<ActivityType | undefined>(initialActivity);
+  const activityRef = useRef<ActivityType | undefined>(activity);
+  const lastSentActivityRef = useRef<ActivityType | undefined>(activity);
   const hasUnsavedChanges = useRef(false);
 
   useEffect(() => {

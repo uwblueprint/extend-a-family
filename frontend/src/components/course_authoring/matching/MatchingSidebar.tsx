@@ -10,6 +10,7 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -120,31 +121,47 @@ export default function MatchingSidebar({
             >
               <Typography variant="titleSmall">Add row</Typography>
             </Box>
-            <Button
-              sx={{
-                display: "flex",
-                padding: "10px 24px 10px 16px",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "8px",
-                flex: "1 0 0",
-                alignSelf: "stretch",
-
-                borderRadius: "4px",
-                border: `1px solid ${theme.palette.Neutral[500]}`,
-              }}
-              onClick={onAddRow}
-              disabled={isAddRowDisabled}
+            <Tooltip
+              title={
+                isAddRowDisabled
+                  ? `Maximum number of rows (${activity.rows}) reached`
+                  : undefined
+              }
             >
-              <Typography
-                variant="labelLarge"
+              <Button
                 sx={{
-                  color: theme.palette.Administrator.Dark.Default,
+                  display: "flex",
+                  padding: "10px 24px 10px 16px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "8px",
+                  flex: "1 0 0",
+                  alignSelf: "stretch",
+
+                  borderRadius: "4px",
+                  border: `1px solid ${theme.palette.Neutral[500]}`,
+
+                  opacity: isAddRowDisabled ? 0.55 : undefined,
+
+                  "&:hover": {
+                    backgroundColor: isAddRowDisabled
+                      ? undefined
+                      : theme.palette.Administrator.Light.Hover,
+                  },
+                }}
+                onClick={() => {
+                  if (isAddRowDisabled) return;
+                  onAddRow();
                 }}
               >
-                + Add row
-              </Typography>
-            </Button>
+                <Typography
+                  variant="labelLarge"
+                  sx={{ color: theme.palette.Administrator.Dark.Default }}
+                >
+                  + Add row
+                </Typography>
+              </Button>
+            </Tooltip>
           </Box>
           <Divider
             sx={{
@@ -217,6 +234,10 @@ export default function MatchingSidebar({
 
                         borderRadius: "4px",
                         border: `1px solid ${theme.palette.Neutral[500]}`,
+
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: theme.palette.Administrator.Dark.Default,
+                        },
                       }}
                       renderValue={(selected: string) => (
                         <Typography variant="labelMedium">
@@ -296,7 +317,14 @@ export default function MatchingSidebar({
               rows={5}
               defaultValue={hint}
               onChange={(e) => setHint(e.target.value)}
-              sx={{ width: "100%" }}
+              sx={{
+                width: "100%",
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: theme.palette.Administrator.Dark.Default,
+                  },
+                },
+              }}
             />
           </Box>
         </Box>

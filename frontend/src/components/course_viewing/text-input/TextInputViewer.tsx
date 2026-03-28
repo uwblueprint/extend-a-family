@@ -187,10 +187,15 @@ const TextInputViewer = React.forwardRef<
             fullWidth
             value={isCompleted ? sampleCorrectAnswer() : userAnswer}
             disabled={isCompleted}
-            style={{
+            sx={{
               backgroundColor: isCompleted
                 ? theme.palette.Success.Light.Default
                 : undefined,
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: theme.palette.Administrator.Dark.Default,
+                },
+              },
             }}
             onChange={(e) => setUserAnswer(e.target.value)}
           />
