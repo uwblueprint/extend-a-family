@@ -1,11 +1,9 @@
 import React from "react";
+import { Redirect } from "react-router-dom";
+import { LANDING_PAGE } from "../../constants/Routes";
 
 const NotAuthorized = (): React.ReactElement => {
-  return (
-    <div style={{ textAlign: "center" }}>
-      <h1>Can&apos;t view this page since you don&apos;t have permission 🙁</h1>
-    </div>
-  );
+  return <Redirect to={LANDING_PAGE} />;
 };
 
 export default NotAuthorized;

@@ -8,15 +8,15 @@ import BlankImg from "../../assets/blankSlide.png";
 
 const ModuleCardFacilitator = ({
   module,
-  index,
+  unitId,
 }: {
   module: CourseModule;
-  index: number;
+  unitId: string;
 }) => {
   const theme = useTheme();
   const history = useHistory();
 
-  const viewFeedbackUrl = `${Routes.FEEDBACK_PAGE}?moduleId=${module.id}`;
+  const viewFeedbackUrl = `${Routes.FEEDBACK_PAGE}?unitId=${unitId}&moduleId=${module.id}`;
   const handleFeedbackClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -64,7 +64,9 @@ const ModuleCardFacilitator = ({
         gap="8px"
         alignSelf="stretch"
       >
-        <Typography variant="labelLarge">Module {index + 1}</Typography>
+        <Typography variant="labelLarge">
+          Module {module.displayIndex}
+        </Typography>
         <Typography variant="bodyLarge">{module.title}</Typography>
       </Stack>
       <Button
@@ -77,6 +79,10 @@ const ModuleCardFacilitator = ({
 
           borderRadius: "4px",
           border: `1px solid ${theme.palette.Neutral[500]}`,
+
+          "&:hover": {
+            backgroundColor: theme.palette.Facilitator.Light.Hover,
+          },
         }}
         onClick={handleFeedbackClick}
         href={viewFeedbackUrl}

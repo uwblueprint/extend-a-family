@@ -1,11 +1,10 @@
 import { useSortable } from "@dnd-kit/sortable";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import {
-  ListItem,
-  ListItemButton,
   ListItemText,
   useTheme,
   IconButton,
+  ListItemButton,
 } from "@mui/material";
 import { MoreHoriz } from "@mui/icons-material";
 import { CourseUnit } from "../../../types/CourseTypes";
@@ -22,6 +21,8 @@ interface UnitProps {
   userRole: Role;
   rearrangeUnitsMode: boolean;
   isAdmin: boolean;
+  activeDragUnitId: string | number | null;
+  overDragUnitId: string | number | null;
 }
 
 export default function Unit({
@@ -33,18 +34,42 @@ export default function Unit({
   rearrangeUnitsMode,
   handleContextMenuOpen,
   isAdmin,
+  activeDragUnitId,
+  overDragUnitId,
 }: UnitProps) {
+  const theme = useTheme();
   const { id } = unit;
-  const { attributes, listeners, setNodeRef, transition } = useSortable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transition,
+    transform,
+    isDragging,
+  } = useSortable({ id });
+
+  const isDropTarget =
+    rearrangeUnitsMode && overDragUnitId === id && activeDragUnitId !== id;
+  const isActiveDragItem = rearrangeUnitsMode && activeDragUnitId === id;
+  let backgroundColor = "transparent";
+  if (isActiveDragItem) {
+    backgroundColor = theme.palette[userRole].Light.Hover;
+  } else if (selectedIndex === index && !rearrangeUnitsMode) {
+    backgroundColor = theme.palette[userRole].Light.Selected;
+  }
 
   const style = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0) scaleX(${
+          transform.scaleX ?? 1
+        }) scaleY(${transform.scaleY ?? 1})`
+      : undefined,
     transition,
+    zIndex: isDragging ? 2 : "auto",
   };
 
-  const theme = useTheme();
-
   return (
-    <ListItem
+    <ListItemButton
       key={unit.id}
       ref={setNodeRef}
       style={style}
@@ -53,10 +78,10 @@ export default function Unit({
       sx={{
         borderBottom: 1,
         borderColor: theme.palette.Neutral[300],
-        backgroundColor:
-          selectedIndex === index && !rearrangeUnitsMode
-            ? theme.palette[userRole].Light.Selected
-            : "transparent",
+        backgroundColor,
+        opacity: isDragging ? 0.7 : 1,
+        boxShadow: isDragging ? "0 6px 18px rgba(0, 0, 0, 0.18)" : "none",
+        outlineOffset: isDropTarget ? "-2px" : 0,
         "&:hover": {
           backgroundColor: theme.palette[userRole].Light.Hover,
         },
@@ -68,6 +93,7 @@ export default function Unit({
         alignItems: "center",
         gap: "8px",
         alignSelf: "stretch",
+        transition: "background-color 120ms ease, outline-color 120ms ease",
       }}
       onClick={
         !rearrangeUnitsMode
@@ -75,7 +101,7 @@ export default function Unit({
           : undefined
       }
     >
-      <ListItemButton
+      {/* <ListItemButton
         key={unit.id}
         sx={{
           "&:hover": {
@@ -83,44 +109,44 @@ export default function Unit({
           },
           padding: "0",
         }}
-      >
-        {isAdmin && rearrangeUnitsMode && (
-          <IconButton
-            edge="start"
-            /* eslint-disable react/jsx-props-no-spreading */
-            {...listeners}
-          >
-            <DragIndicatorIcon />
-          </IconButton>
-        )}
-        <ListItemText
-          disableTypography
-          primary={
-            <span style={{ display: "flex", gap: "16px" }}>
-              <span>{index + 1}.</span>
-              <span>{unit.title}</span>
-            </span>
-          }
-          sx={{
-            ...(selectedIndex === index && !rearrangeUnitsMode
-              ? theme.typography.titleSmall
-              : theme.typography.bodyMedium),
-            color: theme.palette.Neutral[700],
+      > */}
+      {isAdmin && rearrangeUnitsMode && (
+        <IconButton
+          edge="start"
+          /* eslint-disable react/jsx-props-no-spreading */
+          {...listeners}
+        >
+          <DragIndicatorIcon />
+        </IconButton>
+      )}
+      <ListItemText
+        disableTypography
+        primary={
+          <span style={{ display: "flex", gap: "16px" }}>
+            <span>{index + 1}.</span>
+            <span>{unit.title}</span>
+          </span>
+        }
+        sx={{
+          ...(selectedIndex === index && !rearrangeUnitsMode
+            ? theme.typography.titleSmall
+            : theme.typography.bodyMedium),
+          color: theme.palette.Neutral[700],
+        }}
+      />
+      {isAdmin && !rearrangeUnitsMode && selectedIndex === index && (
+        <IconButton
+          edge="start"
+          onClick={(event) => {
+            event.stopPropagation(); // Prevent triggering the list item click
+            handleContextMenuOpen(event, unit); // Custom function to handle button click
           }}
-        />
-        {isAdmin && !rearrangeUnitsMode && selectedIndex === index && (
-          <IconButton
-            edge="start"
-            onClick={(event) => {
-              event.stopPropagation(); // Prevent triggering the list item click
-              handleContextMenuOpen(event, unit); // Custom function to handle button click
-            }}
-            sx={{ marginLeft: "16px" }}
-          >
-            <MoreHoriz />
-          </IconButton>
-        )}
-      </ListItemButton>
-    </ListItem>
+          sx={{ marginLeft: "16px" }}
+        >
+          <MoreHoriz />
+        </IconButton>
+      )}
+      {/* </ListItemButton> */}
+    </ListItemButton>
   );
 }

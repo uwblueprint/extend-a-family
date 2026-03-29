@@ -407,7 +407,9 @@ const ModuleCardAdmin = ({
         gap="8px"
         alignSelf="stretch"
       >
-        <Typography variant="labelLarge">Module {index + 1}</Typography>
+        <Typography variant="labelLarge">
+          Module {module.displayIndex}
+        </Typography>
         <Typography variant="bodyLarge">{module.title}</Typography>
       </Stack>
       <Button
@@ -420,6 +422,10 @@ const ModuleCardAdmin = ({
 
           borderRadius: "4px",
           border: `1px solid ${theme.palette.Neutral[500]}`,
+
+          "&:hover": {
+            backgroundColor: theme.palette.Administrator.Light.Hover,
+          },
         }}
         onClick={() => {
           if (module.status !== ModuleStatus.published) {

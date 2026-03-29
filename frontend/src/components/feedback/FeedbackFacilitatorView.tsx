@@ -6,7 +6,8 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { useFeedbacks } from "../../contexts/FeedbacksContext";
 import { isCaseInsensitiveSubstring } from "../../utils/StringUtils";
@@ -17,12 +18,37 @@ import LearnerFeedbackBlock from "./LearnerFeedbackBlock";
 const FeedbackFacilitatorView = (): React.ReactElement => {
   const theme = useTheme();
   const { role } = useUser();
+  const location = useLocation();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { feedbacks } = useFeedbacks();
   const { courseUnits } = useCourseUnits();
   const [selectedUnit, setSelectedUnit] = useState<string>("");
   const [selectedModule, setSelectedModule] = useState<string>("");
+
+  // Initialize from URL query parameters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const unitId = params.get("unitId");
+    const moduleId = params.get("moduleId");
+
+    // Only set unit if it exists in courseUnits
+    if (unitId && courseUnits.some((unit) => unit.id === unitId)) {
+      setSelectedUnit(unitId);
+    }
+
+    // Only set module if unit is set and module exists in that unit
+    if (
+      moduleId &&
+      unitId &&
+      courseUnits.some(
+        (unit) =>
+          unit.id === unitId && unit.modules.some((m) => m.id === moduleId),
+      )
+    ) {
+      setSelectedModule(moduleId);
+    }
+  }, [location.search, courseUnits]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -184,6 +210,11 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
               feedbacks={learnerFeedbacks}
             />
           ),
+        )}
+        {Object.keys(groupedByLearner).length === 0 && (
+          <Typography variant="bodyLarge" color={theme.palette.Neutral[600]}>
+            No feedback entries found for the given search criteria.
+          </Typography>
         )}
       </Stack>
     </Stack>

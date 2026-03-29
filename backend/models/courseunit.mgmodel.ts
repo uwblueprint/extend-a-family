@@ -36,15 +36,13 @@ CourseUnitSchema.set("toObject", {
 });
 
 // eslint-disable-next-line func-names
-CourseUnitSchema.pre("save", function (next) {
-  (this as unknown as CourseUnit).modules.forEach((moduleId, index) => {
+CourseUnitSchema.post("findOneAndUpdate", function (doc: CourseUnit) {
+  doc.modules.forEach((moduleId, index) => {
     mongoose
       .model("CourseModule")
       .findByIdAndUpdate(moduleId, { displayIndex: index + 1 }, { new: true })
       .exec();
-    (this as unknown as CourseUnit).modules[index] = moduleId;
   });
-  next();
 });
 
 export default mongoose.model<CourseUnit>("CourseUnit", CourseUnitSchema);

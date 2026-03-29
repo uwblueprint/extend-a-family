@@ -6,7 +6,13 @@ import {
   verticalListSortingStrategy,
   SortableContext,
 } from "@dnd-kit/sortable";
-import { DndContext, closestCorners } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCorners,
+  DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+} from "@dnd-kit/core";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 import { useUser } from "../../../hooks/useUser";
@@ -41,6 +47,12 @@ export default function UnitSidebar({
   const [openEditUnitModal, setOpenEditUnitModal] = useState(false);
   const [openDeleteUnitModal, setOpenDeleteUnitModal] = useState(false);
   const [rearrangeUnitsMode, setRearrangeUnitsMode] = useState(false);
+  const [activeDragUnitId, setActiveDragUnitId] = useState<
+    string | number | null
+  >(null);
+  const [overDragUnitId, setOverDragUnitId] = useState<string | number | null>(
+    null,
+  );
   // const [selectedIndex, setSelectedIndex] = useState(0)
 
   const {
@@ -60,18 +72,20 @@ export default function UnitSidebar({
     const selectedUnitParam = queryParams.get("selectedUnit");
 
     if (selectedUnitParam) {
-      const unitFromParams = courseUnits.find(
+      const unitIndex = courseUnits.findIndex(
         (unit) => unit.id === selectedUnitParam,
       );
-      if (unitFromParams) {
-        setSelectedUnit(unitFromParams);
+      if (unitIndex !== -1) {
+        setSelectedUnit(courseUnits[unitIndex]);
+        changeSelectedIndex(unitIndex);
         return;
       }
     }
 
     // Default to first unit if no valid query parameter
     setSelectedUnit(courseUnits[0]);
-  }, [courseUnits, setSelectedUnit]);
+    changeSelectedIndex(0);
+  }, [courseUnits, setSelectedUnit, changeSelectedIndex]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleContextMenuOpen = (event: any, unit: CourseUnit) => {
@@ -170,6 +184,25 @@ export default function UnitSidebar({
     changeSelectedIndex(index);
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragUnitId(event.active.id);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    setOverDragUnitId(event.over?.id ?? null);
+  };
+
+  const handleDragEndWithIndicator = (event: DragEndEvent) => {
+    handleDrag(event);
+    setActiveDragUnitId(null);
+    setOverDragUnitId(null);
+  };
+
+  const handleDragCancel = () => {
+    setActiveDragUnitId(null);
+    setOverDragUnitId(null);
+  };
+
   return (
     <Drawer
       sx={{
@@ -264,7 +297,10 @@ export default function UnitSidebar({
               <List sx={{ width: "100%" }}>
                 <DndContext
                   collisionDetection={closestCorners}
-                  onDragEnd={handleDrag}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDragEnd={handleDragEndWithIndicator}
+                  onDragCancel={handleDragCancel}
                 >
                   <SortableContext
                     items={courseUnits.map((u) => u.id)}
@@ -273,7 +309,7 @@ export default function UnitSidebar({
                     {courseUnits.map((unit, index) => {
                       return (
                         <Unit
-                          key={index}
+                          key={unit.id}
                           index={index}
                           unit={unit}
                           courseLength={courseUnits.length}
@@ -283,6 +319,8 @@ export default function UnitSidebar({
                           rearrangeUnitsMode={rearrangeUnitsMode}
                           isAdmin={isAdministrator(user)}
                           handleContextMenuOpen={handleContextMenuOpen}
+                          activeDragUnitId={activeDragUnitId}
+                          overDragUnitId={overDragUnitId}
                         />
                       );
                     })}

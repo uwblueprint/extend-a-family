@@ -16,11 +16,10 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({
 }) => {
   return (
     <Grid container spacing={3}>
-      {modules.map((module, index) => (
+      {modules.map((module) => (
         <ModuleCardLearner
           key={module.id}
           module={module}
-          index={index}
           unitId={unitId}
           isSidebarOpen={false}
           completionDate={

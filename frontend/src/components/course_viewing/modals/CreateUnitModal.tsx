@@ -131,6 +131,7 @@ export default function CreateUnitModal({
               "&:hover": {
                 bgcolor: theme.palette[user.role].Light.Hover,
               },
+              borderColor: theme.palette[user.role].Light.Default,
             }}
             onClick={handleCloseCreateUnitModal}
           >

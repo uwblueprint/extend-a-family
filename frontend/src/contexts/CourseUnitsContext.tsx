@@ -13,7 +13,7 @@ import ProgressAPIClient, {
   ModuleCompletion,
 } from "../APIClients/ProgressAPIClient";
 import { CourseUnit } from "../types/CourseTypes";
-import AuthContext from "./AuthContext";
+// import { useUser } from "../hooks/useUser";
 
 interface CourseUnitsContextType {
   courseUnits: CourseUnit[];
@@ -65,8 +65,10 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     useState<LearnerProgress | null>(null);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  // const authenticatedUser = useUser();
 
-  const refetchCourseProgress = async () => {
+  const refetchCourseProgress = useCallback(async () => {
+    // if (authenticatedUser.role !== "Learner") return;
     try {
       const [progress, fullProgress] = await Promise.all([
         ProgressAPIClient.getCourseProgress(),
@@ -78,7 +80,7 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
       // eslint-disable-next-line no-console
       console.error("Failed to fetch course progress:", err);
     }
-  };
+  }, []);
 
   const isModuleCompleted = useCallback(
     (moduleId: string): boolean => {
@@ -213,12 +215,10 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     }
   };
 
-  const { authenticatedUser } = useContext(AuthContext);
-
   useEffect(() => {
     refetchCourseUnits();
     refetchCourseProgress();
-  }, [authenticatedUser]);
+  }, [refetchCourseProgress]);
 
   const value: CourseUnitsContextType = {
     courseUnits,

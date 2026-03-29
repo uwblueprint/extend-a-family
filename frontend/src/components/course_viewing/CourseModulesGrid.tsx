@@ -137,7 +137,7 @@ export default function CourseModulesGrid({
                   <ModuleCardFacilitator
                     key={module.id}
                     module={module}
-                    index={index}
+                    unitId={unitId}
                   />
                 );
               case "Learner":
@@ -147,7 +147,6 @@ export default function CourseModulesGrid({
                     <ModuleCardLearner
                       key={module.id}
                       module={module}
-                      index={index}
                       unitId={unitId}
                       isSidebarOpen={isSidebarOpen}
                     />
