@@ -149,7 +149,15 @@ const TableActivityRow = ({
           <TableCell
             align="center"
             key={colIndex}
-            sx={{ backgroundColor: isCorrect ? "#F5FFDF" : "transparent" }}
+            sx={{
+              backgroundColor: isCorrect ? "#F5FFDF" : "transparent",
+              "&:hover": {
+                backgroundColor: theme.palette.Success.Light.Pressed,
+              },
+              "&:active": {
+                backgroundColor: "#9EC444",
+              },
+            }}
             onClick={() => toggleCorrectAnswer(colIndex)}
           >
             {isCorrect ? (

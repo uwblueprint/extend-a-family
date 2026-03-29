@@ -102,7 +102,15 @@ const TableActivityRow = ({
           <TableCell
             align="center"
             key={colIndex}
-            sx={{ backgroundColor: displayCorrect ? "#F5FFDF" : "transparent" }}
+            sx={{
+              backgroundColor: displayCorrect ? "#F5FFDF" : "transparent",
+              "&:hover": {
+                backgroundColor: theme.palette.Learner.Light.Hover,
+              },
+              "&:active": {
+                backgroundColor: theme.palette.Learner.Light.Pressed,
+              },
+            }}
             onClick={() => toggleSelected(colIndex)}
           >
             {isSelected || displayCorrect ? (

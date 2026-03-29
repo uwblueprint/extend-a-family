@@ -193,7 +193,7 @@ const TextInputViewer = React.forwardRef<
                 : undefined,
               "& .MuiOutlinedInput-root": {
                 "&.Mui-focused fieldset": {
-                  borderColor: theme.palette.Administrator.Dark.Default,
+                  borderColor: theme.palette.Learner.Dark.Default,
                 },
               },
             }}

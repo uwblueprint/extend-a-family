@@ -101,15 +101,6 @@ export default function Unit({
           : undefined
       }
     >
-      {/* <ListItemButton
-        key={unit.id}
-        sx={{
-          "&:hover": {
-            backgroundColor: "transparent",
-          },
-          padding: "0",
-        }}
-      > */}
       {isAdmin && rearrangeUnitsMode && (
         <IconButton
           edge="start"
@@ -146,7 +137,6 @@ export default function Unit({
           <MoreHoriz />
         </IconButton>
       )}
-      {/* </ListItemButton> */}
     </ListItemButton>
   );
 }

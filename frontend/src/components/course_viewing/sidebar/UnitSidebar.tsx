@@ -85,7 +85,8 @@ export default function UnitSidebar({
     // Default to first unit if no valid query parameter
     setSelectedUnit(courseUnits[0]);
     changeSelectedIndex(0);
-  }, [courseUnits, setSelectedUnit, changeSelectedIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseUnits]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleContextMenuOpen = (event: any, unit: CourseUnit) => {

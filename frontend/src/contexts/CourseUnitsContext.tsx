@@ -13,7 +13,7 @@ import ProgressAPIClient, {
   ModuleCompletion,
 } from "../APIClients/ProgressAPIClient";
 import { CourseUnit } from "../types/CourseTypes";
-// import { useUser } from "../hooks/useUser";
+import AuthContext from "./AuthContext";
 
 interface CourseUnitsContextType {
   courseUnits: CourseUnit[];
@@ -65,10 +65,8 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     useState<LearnerProgress | null>(null);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  // const authenticatedUser = useUser();
 
   const refetchCourseProgress = useCallback(async () => {
-    // if (authenticatedUser.role !== "Learner") return;
     try {
       const [progress, fullProgress] = await Promise.all([
         ProgressAPIClient.getCourseProgress(),
@@ -215,10 +213,12 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
     }
   };
 
+  const authenticatedUser = useContext(AuthContext);
+
   useEffect(() => {
     refetchCourseUnits();
     refetchCourseProgress();
-  }, [refetchCourseProgress]);
+  }, [authenticatedUser, refetchCourseProgress]);
 
   const value: CourseUnitsContextType = {
     courseUnits,

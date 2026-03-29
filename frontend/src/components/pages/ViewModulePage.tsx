@@ -881,7 +881,7 @@ const ViewModulePage = () => {
                       alignItems: "center",
                       backgroundColor: "white",
                       borderRadius: "4px",
-                      border: `1px solid ${theme.palette.Learner.Dark.Default}`,
+                      border: `1px solid ${theme.palette[role].Dark.Default}`,
                       background: isActivityCompleted(module.id, page.id)
                         ? theme.palette.Success.Light.Default
                         : theme.palette[role].Light.Default,
@@ -1113,7 +1113,7 @@ const ViewModulePage = () => {
         <Box
           alignItems="center"
           justifyContent="center"
-          padding={isFullScreen ? "0px" : "40px"}
+          padding={isFullScreen ? "0px" : "10px 40px 40px 40px"}
           display="flex"
           flexDirection="column"
           height={boxHeight}
@@ -1336,6 +1336,7 @@ const ViewModulePage = () => {
             height={isFullScreen ? "80px" : "48px"}
             paddingY={isFullScreen ? "16px" : "0px"}
             paddingX={isFullScreen ? "32px" : "0px"}
+            marginTop={isFullScreen ? undefined : "16px"}
             sx={{
               display: "flex",
               flexDirection: "row",

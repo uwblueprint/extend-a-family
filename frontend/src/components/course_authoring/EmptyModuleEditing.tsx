@@ -125,8 +125,6 @@ export const AddYourFirstPageSlide = ({
         borderRadius: 8,
         border: `1px dashed ${theme.palette.Administrator.Dark.Default}`,
         background: theme.palette.Administrator.Light.Default,
-
-        marginY: "15px",
       }}
     >
       <Stack
