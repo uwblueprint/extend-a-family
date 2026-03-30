@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { getApiValidationError, validatePrimitive } from "./util";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
@@ -81,6 +81,21 @@ export const updateTemporaryPasswordRequestValidator = async (
 ) => {
   if (!validatePrimitive(req.body.newPassword, "string")) {
     return res.status(400).send(getApiValidationError("newPassword", "string"));
+  }
+
+  return next();
+};
+
+export const changePasswordRequestValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!validatePrimitive(req.body.newPassword, "string")) {
+    return res.status(400).send(getApiValidationError("newPassword", "string"));
+  }
+  if (!validatePrimitive(req.body.authId, "string")) {
+    return res.status(400).send(getApiValidationError("authId", "string"));
   }
 
   return next();

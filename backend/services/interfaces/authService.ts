@@ -36,7 +36,13 @@ interface IAuthService {
    * @param email email of user requesting password reset
    * @throws Error if unable to generate link or send email
    */
-  resetPassword(name: string, role: Role, email: string): Promise<void>;
+  resetPassword(
+    name: string,
+    role: Role,
+    email: string,
+    authId: string,
+    requestedTime: string,
+  ): Promise<void>;
 
   /**
    * Generate an email verification link for the user with the given email and send
@@ -74,6 +80,18 @@ interface IAuthService {
    * @param newPassword new password chosen to replace the user's old password
    */
   changeUserPassword(accessToken: string, newPassword: string): Promise<string>;
+
+  /**
+   * Changes a user's password using their authId
+   * @param authId the user's firebase auth id
+   * @param newPassword new password chosen to replace the user's old password
+   * @param requestedTime the time when the password reset was requested
+   */
+  changeUserPasswordFromId(
+    authId: string,
+    newPassword: string,
+    requestedTime: string,
+  ): Promise<void>;
 
   /**
    * Determine if the provided access token is valid and authorized for at least

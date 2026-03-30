@@ -49,6 +49,7 @@ import { COURSE_PAGE } from "../../constants/Routes";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 import { useSocket } from "../../contexts/SocketContext";
 import useActivity from "../../hooks/useActivity";
+import useCourseModules from "../../hooks/useCourseModules";
 import useQueryParams from "../../hooks/useQueryParams";
 import { useUser } from "../../hooks/useUser";
 import {
@@ -70,6 +71,7 @@ import {
 import { Bookmark } from "../../types/UserTypes";
 import { padNumber } from "../../utils/StringUtils";
 import PreviewLearnerModal from "../course_authoring/editorComponents/PreviewLearnerModal";
+import { HeaderLargeTextField } from "../course_authoring/editorComponents/TypographyTextField";
 import {
   AddYourFirstPageSlide,
   EmptyModuleLeftSidebar,
@@ -98,8 +100,6 @@ import NeedHelpModal from "../help/NeedHelpModal";
 import DeletePageModal from "./DeletePageModal";
 import ModuleLockedModal from "./ModuleLockedModal";
 import "./ViewModulePage.css";
-import { HeaderLargeTextField } from "../course_authoring/editorComponents/TypographyTextField";
-import useCourseModules from "../../hooks/useCourseModules";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -252,18 +252,11 @@ const ViewModulePage = () => {
     setIsRetryButtonDisplayed(false);
     setIsPreviewModalOpen(false);
     if (currentPageObject && isActivityPage(currentPageObject)) {
-      const cached = activityDataCache[currentPageObject.id];
-      if (cached) {
-        setActivity(cached);
-      } else {
-        setActivity(currentPageObject);
-      }
-      if (currentPageObject.imageUrl) {
-        setHasImage(true);
-      }
-      if (currentPageObject.additionalContext) {
-        setHasAdditionalContext(true);
-      }
+      const updateTo =
+        activityDataCache[currentPageObject.id] || currentPageObject;
+      setActivity(updateTo);
+      setHasImage(!!updateTo.imageUrl);
+      setHasAdditionalContext(!!updateTo.additionalContext);
     }
   }, [currentPageObject, setActivity]);
 

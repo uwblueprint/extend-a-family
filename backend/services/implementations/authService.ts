@@ -1,19 +1,20 @@
 import * as firebaseAdmin from "firebase-admin";
 import { ObjectId } from "mongoose";
 
-import IAuthService from "../interfaces/authService";
-import IEmailService from "../interfaces/emailService";
-import IUserService from "../interfaces/userService";
+import adminInviteEmail from "../../emails/adminInvite";
+import { defaultFrontendUrl, ROLE_COLORS } from "../../emails/constants";
+import facilitatorVerificationEmail from "../../emails/facilitatorVerification";
+import forgotPasswordEmail from "../../emails/forgotPassword";
+import learnerInviteEmail from "../../emails/learnerInvite";
+import UserModel from "../../models/user.mgmodel";
 import { AuthDTO, Token } from "../../types/authTypes";
 import { Role } from "../../types/userTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import FirebaseRestClient from "../../utilities/firebaseRestClient";
 import logger from "../../utilities/logger";
-import learnerInviteEmail from "../../emails/learnerInvite";
-import adminInviteEmail from "../../emails/adminInvite";
-import facilitatorVerificationEmail from "../../emails/facilitatorVerification";
-import forgotPasswordEmail from "../../emails/forgotPassword";
-import { ROLE_COLORS } from "../../emails/constants";
+import IAuthService from "../interfaces/authService";
+import IEmailService from "../interfaces/emailService";
+import IUserService from "../interfaces/userService";
 
 const Logger = logger(__filename);
 
@@ -72,7 +73,13 @@ class AuthService implements IAuthService {
     }
   }
 
-  async resetPassword(name: string, role: Role, email: string): Promise<void> {
+  async resetPassword(
+    name: string,
+    role: Role,
+    email: string,
+    authId: string,
+    requestedTime: string,
+  ): Promise<void> {
     if (!this.emailService) {
       const errorMessage =
         "Attempted to call resetPassword but this instance of AuthService does not have an EmailService instance";
@@ -81,9 +88,13 @@ class AuthService implements IAuthService {
     }
 
     try {
-      const resetLink = await firebaseAdmin
-        .auth()
-        .generatePasswordResetLink(email);
+      const resetLink = `${defaultFrontendUrl}/change-password?authId=${authId}&requestedTime=${requestedTime}`;
+
+      const userId = await this.userService.getUserIdByAuthId(authId);
+      await this.userService.updateUserById(userId, {
+        role,
+        passwordResetRequestedAt: requestedTime,
+      });
 
       this.emailService.sendEmail(
         email,
@@ -168,6 +179,47 @@ class AuthService implements IAuthService {
   ): Promise<string> {
     try {
       return await FirebaseRestClient.changePassword(accessToken, newPassword);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to change user's password. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async changeUserPasswordFromId(
+    authId: string,
+    newPassword: string,
+    requestedTime: string,
+  ): Promise<void> {
+    try {
+      const user = await UserModel.findOne({ authId });
+      if (!user) {
+        throw new Error(`No user found with authId ${authId}`);
+      }
+      const savedRequestedTime = user.passwordResetRequestedAt;
+      if (!savedRequestedTime || savedRequestedTime !== requestedTime) {
+        throw new Error(
+          "This password reset link has expired or does not exist. Please request a new password reset link.",
+        );
+      }
+      const requestedTimeDate = new Date(savedRequestedTime);
+      const currentTime = new Date();
+      const timeDifference =
+        (currentTime.getTime() - requestedTimeDate.getTime()) / (1000 * 60); // difference in minutes
+      if (timeDifference > 1440) {
+        throw new Error(
+          `Password reset request for user with authId ${authId} has expired`,
+        );
+      }
+      await firebaseAdmin.auth().updateUser(authId, {
+        password: newPassword,
+      });
+      // eslint-disable-next-line no-underscore-dangle
+      await this.userService.updateUserById(user._id as string, {
+        role: user.role,
+        passwordResetRequestedAt: "",
+      });
     } catch (error: unknown) {
       Logger.error(
         `Failed to change user's password. Reason = ${getErrorMessage(error)}`,

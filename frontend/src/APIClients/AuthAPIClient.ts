@@ -157,6 +157,28 @@ const changePassword = async (
   }
 };
 
+const changePasswordFromId = async (
+  authId: string,
+  newPassword: string,
+  requestedTime: string,
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const { data } = await baseAPIClient.put(`/auth/changePasswordFromId`, {
+      authId,
+      newPassword,
+      requestedTime,
+    });
+    return {
+      success: true,
+      message: data.message || "Password updated successfully!",
+    };
+  } catch (error) {
+    return error instanceof AxiosError
+      ? { success: false, message: error.response?.data.error }
+      : { success: false, message: "Failed to change password." };
+  }
+};
+
 const updateUserStatus = async (newStatus: Status): Promise<boolean> => {
   const bearerToken = `Bearer ${getLocalStorageObjProperty(
     AUTHENTICATED_USER_KEY,
@@ -275,6 +297,7 @@ export default {
   resetPassword,
   updateTemporaryPassword,
   changePassword,
+  changePasswordFromId,
   updateUserStatus,
   refresh,
   isUserVerified,

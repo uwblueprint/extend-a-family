@@ -24,6 +24,8 @@ export const HOOKS_PAGE = "/hooks";
 
 export const CREATE_PASSWORD_PAGE = "/create-password";
 
+export const CHANGE_PASSWORD_PAGE = "/change-password";
+
 export const NOT_AUTHORIZED_PAGE = "/not-authorized";
 
 export const MY_ACCOUNT_PAGE = "/account";

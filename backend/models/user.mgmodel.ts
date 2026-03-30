@@ -13,6 +13,7 @@ export interface User extends Document {
   email: string;
   profilePicture?: string;
   bookmarks: Bookmark[];
+  passwordResetRequestedAt?: string;
 }
 
 export interface Bookmark {
@@ -96,6 +97,9 @@ export const UserSchema: Schema = new Schema(
       type: [BookmarkSchema],
       default: [],
       required: true,
+    },
+    passwordResetRequestedAt: {
+      type: String,
     },
   },
   options,

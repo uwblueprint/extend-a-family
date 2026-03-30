@@ -52,7 +52,7 @@ const forgotPasswordEmail = (
         <p style="margin: 0 0 20px">Hi ${name},</p>
 
         <p style="margin: 0 0 20px">
-          We heard you forgot your password for the Extend-A-Family Waterloo Region Financial Literacy Tool. No worries! Here’s the link to create a new one.
+          We heard you forgot your password for the Extend-A-Family Waterloo Region Financial Literacy Tool. No worries! Here’s the link to create a new one (it will expire in 24 hours):
         </p>
 
         <!-- RESPOND BUTTON -->

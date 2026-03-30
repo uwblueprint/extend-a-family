@@ -1,55 +1,41 @@
 import { Box, Button, Container, Typography, useTheme } from "@mui/material";
-import React, { useContext, useState } from "react";
-import { Redirect } from "react-router-dom";
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import AuthAPIClient from "../../APIClients/AuthAPIClient";
-import { LANDING_PAGE } from "../../constants/Routes";
-import AuthContext from "../../contexts/AuthContext";
-import { useUser } from "../../hooks/useUser";
 import Logo from "../assets/logoColoured.png";
-import CreatePasswordHelpModal from "../help/CreatePasswordHelpModal";
 import CreatePasswordConfirmationPage from "./CreatePasswordConfirmationPage";
 import PasswordCheck from "./PasswordCheck";
 
-const CreatePasswordPage = (): React.ReactElement => {
-  const user = useUser();
-
-  const { authenticatedUser, setAuthenticatedUser } = useContext(AuthContext);
+const ChangePasswordPage = (): React.ReactElement => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
 
   const theme = useTheme();
 
+  const { search } = useLocation();
+  const authId = new URLSearchParams(search).get("authId");
+  const requestedTime = new URLSearchParams(search).get("requestedTime");
+
   const onSubmitNewPasswordClick = async () => {
-    if (!authenticatedUser) {
+    if (!authId || !requestedTime) {
       // eslint-disable-next-line no-alert
-      alert("User is not authenticated.");
+      alert("Invalid password reset link.");
       return;
     }
 
-    const changePasswordSuccess = await AuthAPIClient.updateTemporaryPassword(
-      authenticatedUser.email,
+    const changePasswordResult = await AuthAPIClient.changePasswordFromId(
+      authId,
       newPassword,
-      authenticatedUser.role,
+      requestedTime,
     );
 
-    if (!changePasswordSuccess) {
-      setAuthenticatedUser(null);
+    if (!changePasswordResult.success) {
       // eslint-disable-next-line no-alert
-      alert("Error occurred when changing your password. Please log in again.");
+      alert(changePasswordResult.message);
       return;
     }
-
-    const updateStatusSuccess = await AuthAPIClient.updateUserStatus("Active");
-    if (!updateStatusSuccess) {
-      // eslint-disable-next-line no-alert
-      alert('Failed to update user status to "Active"');
-      return;
-    }
-
-    await AuthAPIClient.logout(authenticatedUser.id);
 
     if (isFormValid) {
       setIsPasswordConfirmed(true);
@@ -58,13 +44,6 @@ const CreatePasswordPage = (): React.ReactElement => {
       alert("Passwords do not match or do not meet the criteria.");
     }
   };
-
-  // const handleOpenHelpModal = () => setIsHelpModalOpen(true);
-  const handleCloseHelpModal = () => setIsHelpModalOpen(false);
-
-  if (user.status !== "Invited") {
-    return <Redirect to={LANDING_PAGE} />;
-  }
 
   if (isPasswordConfirmed) {
     return <CreatePasswordConfirmationPage />;
@@ -113,7 +92,7 @@ const CreatePasswordPage = (): React.ReactElement => {
               textAlign: "center",
             }}
           >
-            Create Password
+            Change Password
           </Typography>
           <form>
             <PasswordCheck
@@ -133,9 +112,9 @@ const CreatePasswordPage = (): React.ReactElement => {
                 padding: "10px 24px",
                 width: "100%",
                 textTransform: "none",
-                backgroundColor: theme.palette[`${user.role}`].Dark.Default,
+                backgroundColor: theme.palette.Learner.Dark.Default,
                 "&:hover": {
-                  background: theme.palette[`${user.role}`].Dark.Pressed,
+                  background: theme.palette.Learner.Dark.Pressed,
                 },
                 "&.Mui-disabled": {
                   backgroundColor: "#ccc",
@@ -143,34 +122,13 @@ const CreatePasswordPage = (): React.ReactElement => {
                 },
               }}
             >
-              Create Password
+              Change Password
             </Button>
-            {/* {`${user.role}` !== "Administrator" && (
-              <Typography
-                sx={{
-                  textAlign: "right",
-                  marginTop: 2,
-                  marginRight: "12px",
-                  color: theme.palette.Learner.Dark.Default,
-                  cursor: "pointer",
-                  "&:hover": {
-                    textDecoration: "underline",
-                  },
-                }}
-                onClick={handleOpenHelpModal}
-              >
-                Help
-              </Typography>
-            )} */}
           </form>
         </Container>
       </Container>
-      <CreatePasswordHelpModal
-        open={isHelpModalOpen}
-        onClose={handleCloseHelpModal}
-      />
     </Container>
   );
 };
 
-export default CreatePasswordPage;
+export default ChangePasswordPage;

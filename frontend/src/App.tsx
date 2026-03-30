@@ -24,17 +24,18 @@ import MyAccount from "./components/profile/MyAccountPage";
 import AUTHENTICATED_USER_KEY from "./constants/AuthConstants";
 import * as Routes from "./constants/Routes";
 import AuthContext from "./contexts/AuthContext";
+import { FeedbacksProvider } from "./contexts/FeedbacksContext";
+import { NotificationsProvider } from "./contexts/NotificationsContext";
 import SampleContext, {
   DEFAULT_SAMPLE_CONTEXT,
 } from "./contexts/SampleContext";
 import SampleContextDispatcherContext from "./contexts/SampleContextDispatcherContext";
 import { SocketProvider } from "./contexts/SocketContext";
-import { NotificationsProvider } from "./contexts/NotificationsContext";
-import { FeedbacksProvider } from "./contexts/FeedbacksContext";
 import sampleContextReducer from "./reducers/SampleContextReducer";
 import { AuthenticatedUser } from "./types/AuthTypes";
 import { getLocalStorageObj } from "./utils/LocalStorageUtils";
 
+import ChangePasswordPage from "./components/auth/ChangePasswordPage";
 import CreatePasswordPage from "./components/auth/CreatePasswordPage";
 import ForgotPasswordPage from "./components/auth/forgot_password/ForgotPasswordPage";
 import CourseViewingPage from "./components/course_viewing/CourseViewingPage";
@@ -218,6 +219,11 @@ const App = (): React.ReactElement => {
                           "Facilitator",
                           "Learner",
                         ]}
+                      />
+                      <Route
+                        exact
+                        path={Routes.CHANGE_PASSWORD_PAGE}
+                        component={ChangePasswordPage}
                       />
                       <PrivateRoute
                         exact

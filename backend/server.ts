@@ -1,28 +1,28 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
 import RateLimit from "express-rate-limit";
 import * as firebaseAdmin from "firebase-admin";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 
 import { mongo } from "./models";
+import activityRouter from "./rest/activityRoutes";
 import authRouter from "./rest/authRoutes";
+import courseRouter from "./rest/courseRoutes";
 import entityRouter from "./rest/entityRoutes";
+import feedbackRouter from "./rest/feedbackRoutes";
+import helpRequestRouter from "./rest/helpRequestRoutes";
+import notificationRouter from "./rest/notificationRoutes";
+import progressRouter from "./rest/progressRoutes";
 import userRouter from "./rest/userRoutes";
+import { registerModuleEditingHandlers } from "./sockets/moduleEditing";
 import {
   registerNotificationHandlers,
   registerNotificationSchemaListener,
 } from "./sockets/notification";
-import { registerModuleEditingHandlers } from "./sockets/moduleEditing";
-import helpRequestRouter from "./rest/helpRequestRoutes";
-import notificationRouter from "./rest/notificationRoutes";
-import courseRouter from "./rest/courseRoutes";
-import feedbackRouter from "./rest/feedbackRoutes";
-import activityRouter from "./rest/activityRoutes";
-import progressRouter from "./rest/progressRoutes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",

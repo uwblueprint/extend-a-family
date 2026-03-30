@@ -28,17 +28,20 @@ export type UserDTO = {
   status: Status;
   profilePicture?: string;
   bookmarks: BookmarkDTO[];
+  authId?: string;
+  passwordResetRequestedAt?: string;
 };
 
 export type CreateUserDTO = Omit<UserDTO, "id" | "bookmarks"> & {
   password: string;
 };
 
-type UserOmmitedDTO = Omit<UserDTO, "id" | "email" | "bookmarks">;
+type UserOmmitedDTO = Omit<UserDTO, "id" | "email" | "bookmarks" | "role">;
 
-export type UpdateUserDTO = UserOmmitedDTO & {
+export type UpdateUserDTO = Partial<UserOmmitedDTO> & {
   bio?: string;
   emailPrefrence?: number;
+  role: Role;
 };
 
 export type SignupUserDTO = Omit<CreateUserDTO, "role">;

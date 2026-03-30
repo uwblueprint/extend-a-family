@@ -1,11 +1,11 @@
+import { arrayMove } from "@dnd-kit/sortable";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
-  useCallback,
   useState,
 } from "react";
-import { arrayMove } from "@dnd-kit/sortable";
 import CourseAPIClient from "../APIClients/CourseAPIClient";
 import ProgressAPIClient, {
   CourseProgress,
@@ -55,6 +55,7 @@ interface CourseUnitsProviderProps {
 export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
   children,
 }) => {
+  const authenticatedUser = useContext(AuthContext);
   const [courseUnits, setCourseUnits] = useState<CourseUnit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -67,6 +68,9 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const refetchCourseProgress = useCallback(async () => {
+    if (authenticatedUser?.authenticatedUser?.role !== "Learner") {
+      return;
+    }
     try {
       const [progress, fullProgress] = await Promise.all([
         ProgressAPIClient.getCourseProgress(),
@@ -78,7 +82,7 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
       // eslint-disable-next-line no-console
       console.error("Failed to fetch course progress:", err);
     }
-  }, []);
+  }, [authenticatedUser]);
 
   const isModuleCompleted = useCallback(
     (moduleId: string): boolean => {
@@ -212,8 +216,6 @@ export const CourseUnitsProvider: React.FC<CourseUnitsProviderProps> = ({
       });
     }
   };
-
-  const authenticatedUser = useContext(AuthContext);
 
   useEffect(() => {
     refetchCourseUnits();

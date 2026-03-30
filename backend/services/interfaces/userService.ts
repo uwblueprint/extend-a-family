@@ -82,7 +82,10 @@ interface IUserService {
    * @returns a UserDTO with the updated user's information
    * @throws Error if user update fails
    */
-  updateUserById(userId: string, user: UpdateUserDTO): Promise<UserDTO>;
+  updateUserById(
+    userId: string | ObjectId,
+    user: UpdateUserDTO,
+  ): Promise<UserDTO>;
 
   /**
    * Delete a user by id

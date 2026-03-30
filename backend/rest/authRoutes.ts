@@ -8,6 +8,7 @@ import {
   isFirstTimeInvitedUser,
 } from "../middlewares/auth";
 import {
+  changePasswordRequestValidator as changePasswordFromIdRequestValidator,
   forgotPasswordRequestValidator,
   inviteUserRequestValidator,
   loginRequestValidator,
@@ -143,10 +144,21 @@ authRouter.post(
 /* Emails a password reset link to the user with the specified email */
 authRouter.post("/resetPassword/:email", async (req, res) => {
   try {
-    const { firstName, role } = await userService.getUserByEmail(
+    const { firstName, role, authId } = await userService.getUserByEmail(
       req.params.email,
     );
-    await authService.resetPassword(firstName, role, req.params.email);
+    if (!authId) {
+      res.status(404).json({ error: "User authId not found" });
+      return;
+    }
+    const requestedTime = `${Date.now()}`;
+    await authService.resetPassword(
+      firstName,
+      role,
+      req.params.email,
+      authId,
+      requestedTime,
+    );
     res.status(204).send();
   } catch (error: unknown) {
     res.status(500).json({ error: getErrorMessage(error) });
@@ -247,10 +259,21 @@ authRouter.post(
   forgotPasswordRequestValidator,
   async (req, res) => {
     try {
-      const { firstName, role } = await userService.getUserByEmail(
+      const { firstName, role, authId } = await userService.getUserByEmail(
         req.body.email,
       );
-      await authService.resetPassword(firstName, role, req.body.email);
+      if (!authId) {
+        res.status(404).json({ error: "User authId not found" });
+        return;
+      }
+      const requestedTime = `${Date.now()}`;
+      await authService.resetPassword(
+        firstName,
+        role,
+        req.body.email,
+        authId,
+        requestedTime,
+      );
       res.status(204).send();
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
@@ -293,6 +316,23 @@ authRouter.put(
       });
     } catch (error: unknown) {
       res.status(500).json({ error: getErrorMessage(error) });
+    }
+  },
+);
+
+authRouter.put(
+  "/changePasswordFromId",
+  changePasswordFromIdRequestValidator,
+  async (req, res) => {
+    try {
+      await authService.changeUserPasswordFromId(
+        req.body.authId,
+        req.body.newPassword,
+        req.body.requestedTime,
+      );
+      res.status(200).json({ message: "Password updated successfully!" });
+    } catch (error: unknown) {
+      res.status(400).json({ error: getErrorMessage(error) });
     }
   },
 );

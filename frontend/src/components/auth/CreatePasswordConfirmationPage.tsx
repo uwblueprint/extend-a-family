@@ -3,17 +3,17 @@ import { Box, Button, Container, Typography, useTheme } from "@mui/material";
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { WELCOME_PAGE } from "../../constants/Routes";
-import { useUser } from "../../hooks/useUser";
-import Logo from "../assets/logoColoured.png";
 import AuthContext from "../../contexts/AuthContext";
+import Logo from "../assets/logoColoured.png";
 
 const CreatePasswordConfirmationPage = (): React.ReactElement => {
-  const user = useUser();
   const history = useHistory();
   const theme = useTheme();
-  const { setAuthenticatedUser } = React.useContext(AuthContext);
+  const authContext = React.useContext(AuthContext);
   const handleBackToHome = () => {
-    setAuthenticatedUser(null);
+    if (authContext) {
+      authContext.setAuthenticatedUser(null);
+    }
     history.push(WELCOME_PAGE);
   };
 
@@ -98,7 +98,9 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             alignItems: "center",
             gap: theme.spacing(1),
             borderRadius: "4px",
-            background: theme.palette[`${user.role}`].Dark.Default,
+            background:
+              theme.palette[authContext.authenticatedUser?.role || "Learner"]
+                .Dark.Default,
             color: theme.palette.Neutral[100],
             textAlign: "center",
             fontSize: theme.typography.labelLarge.fontSize,
@@ -108,7 +110,9 @@ const CreatePasswordConfirmationPage = (): React.ReactElement => {
             letterSpacing: theme.typography.labelLarge.letterSpacing,
             textTransform: theme.typography.labelLarge.textTransform,
             "&:hover": {
-              background: theme.palette[`${user.role}`].Dark.Pressed,
+              background:
+                theme.palette[authContext.authenticatedUser?.role || "Learner"]
+                  .Dark.Pressed,
             },
           }}
           onClick={handleBackToHome}
