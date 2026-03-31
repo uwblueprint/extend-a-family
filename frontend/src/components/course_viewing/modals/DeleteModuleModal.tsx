@@ -1,3 +1,4 @@
+import { FileDownload } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -10,9 +11,8 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { FileDownload } from "@mui/icons-material";
-import { useUser } from "../../../hooks/useUser";
 import { useFeedbacks } from "../../../contexts/FeedbacksContext";
+import { useUser } from "../../../hooks/useUser";
 
 interface DeleteModuleModalProps {
   openDeleteModuleModal: boolean;
@@ -27,7 +27,7 @@ export default function DeleteModuleModal(props: DeleteModuleModalProps) {
   const theme = useTheme();
   const user = useUser();
 
-  const { exportFeedbackToTSV } = useFeedbacks();
+  const { exportFeedbackToCSV } = useFeedbacks();
 
   return (
     <Box
@@ -125,7 +125,7 @@ export default function DeleteModuleModal(props: DeleteModuleModalProps) {
                   color: "white",
                 }}
                 disableElevation
-                onClick={exportFeedbackToTSV}
+                onClick={exportFeedbackToCSV}
               >
                 <Typography variant="labelLarge">
                   Download Feedback (TSV)

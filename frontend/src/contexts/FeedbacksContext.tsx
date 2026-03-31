@@ -8,7 +8,7 @@ interface FeedbacksContextType {
   isLoading: boolean;
   error: boolean;
   refetchFeedbacks: () => Promise<void>;
-  exportFeedbackToTSV: () => void;
+  exportFeedbackToCSV: () => void;
 }
 
 const FeedbacksContext = createContext<FeedbacksContextType | undefined>(
@@ -47,14 +47,14 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     }
   };
 
-  const exportFeedbackToTSV = () => {
+  const exportFeedbackToCSV = () => {
     if (feedbacks.length === 0) {
       // eslint-disable-next-line no-alert
       alert("No feedback data to export yet");
       return;
     }
 
-    // Define TSV headers
+    // Define CSV headers
     const headers = [
       "Learner First Name",
       "Learner Last Name",
@@ -68,14 +68,14 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
       "Module ID",
     ];
 
-    // Convert feedbacks to TSV rows
+    // Convert feedbacks to CSV rows
     const rows = feedbacks.map((feedback) => [
       feedback.learnerId.firstName,
       feedback.learnerId.lastName,
       feedback.moduleId.title,
       feedback.isLiked ? "Yes" : "No",
       feedback.difficulty.toString(),
-      feedback.message.replace(/\t/g, " ").replace(/\n/g, " "), // Replace tabs and newlines
+      `"${feedback.message.replace(/"/g, '""')}"`, // Quote message to handle commas and escape quotes
       feedback.createdAt,
       feedback.id,
       feedback.learnerId.id,
@@ -83,18 +83,18 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     ]);
 
     // Combine headers and rows
-    const tsvContent = [headers, ...rows]
-      .map((row) => row.join("\t"))
+    const csvContent = [headers, ...rows]
+      .map((row) => row.join(","))
       .join("\n");
 
     // Create blob and download
-    const blob = new Blob([tsvContent], { type: "text/tab-separated-values" });
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = `feedback_export_${
       new Date().toISOString().split("T")[0]
-    }.tsv`;
+    }.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -112,7 +112,7 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     isLoading,
     error,
     refetchFeedbacks,
-    exportFeedbackToTSV,
+    exportFeedbackToCSV,
   };
 
   return (

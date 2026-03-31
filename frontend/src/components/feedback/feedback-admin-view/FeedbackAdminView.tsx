@@ -46,7 +46,7 @@ const FeedbackAdminView = () => {
   const history = useHistory();
 
   const { courseUnits, moduleDisplayIndex } = useCourseUnits();
-  const { feedbacks: allFeedbacks, exportFeedbackToTSV } = useFeedbacks();
+  const { feedbacks: allFeedbacks, exportFeedbackToCSV } = useFeedbacks();
 
   // Initialize state from URL params only once
   const initialUnitIdRef = React.useRef<string | null>(null);
@@ -267,9 +267,9 @@ const FeedbackAdminView = () => {
                   backgroundColor: theme.palette.Administrator.Light.Hover,
                 },
               }}
-              onClick={exportFeedbackToTSV}
+              onClick={exportFeedbackToCSV}
             >
-              Export All Feedback TSV
+              Export All Feedback CSV
             </Button>
           </Stack>
           <Stack

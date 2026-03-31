@@ -1,4 +1,3 @@
-import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -15,10 +14,11 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useUser } from "../../../hooks/useUser";
+import { useState } from "react";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
-import { CourseModule } from "../../../types/CourseTypes";
 import { useFeedbacks } from "../../../contexts/FeedbacksContext";
+import { useUser } from "../../../hooks/useUser";
+import { CourseModule } from "../../../types/CourseTypes";
 
 interface PublishModuleModalProps {
   openPublishModuleModal: boolean;
@@ -41,7 +41,7 @@ export default function PublishModuleModal(props: PublishModuleModalProps) {
     moduleId,
     onUpdateModule,
   } = props;
-  const { exportFeedbackToTSV, refetchFeedbacks } = useFeedbacks();
+  const { exportFeedbackToCSV, refetchFeedbacks } = useFeedbacks();
 
   const [retainFeedback, setRetainFeedback] = useState<
     RetainFeedbackOption | undefined
@@ -212,7 +212,7 @@ export default function PublishModuleModal(props: PublishModuleModalProps) {
                         onClick={(ev) => {
                           ev.stopPropagation();
                           ev.preventDefault();
-                          exportFeedbackToTSV();
+                          exportFeedbackToCSV();
                         }}
                       >
                         Download old feedback (TSV)
