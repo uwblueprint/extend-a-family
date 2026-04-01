@@ -147,7 +147,12 @@ const UploadProfilePictureModal = ({
           Drag and drop your profile picture.
         </Typography>
         <VisuallyHidden>
-          <input type="file" onChange={(e) => handleFileUpload(e)} multiple />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleFileUpload(e)}
+            multiple
+          />
         </VisuallyHidden>
       </Box>
 
@@ -178,7 +183,12 @@ const UploadProfilePictureModal = ({
         >
           Choose File
           <VisuallyHidden>
-            <input type="file" onChange={(e) => handleFileUpload(e)} multiple />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFileUpload(e)}
+              multiple
+            />
           </VisuallyHidden>
         </Button>
       </Box>

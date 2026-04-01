@@ -209,7 +209,7 @@ const CreateModuleModal = ({
               <VisuallyHidden>
                 <input
                   id="clickHereInput"
-                  type="file"
+                  type="image/*"
                   onChange={(e) => handleFileUpload(e)}
                   multiple
                 />

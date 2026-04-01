@@ -206,6 +206,7 @@ const ChangeThumbnailModal = ({
                 <input
                   id="clickHereInput"
                   type="file"
+                  accept="image/*"
                   onChange={(e) => handleFileUpload(e)}
                   multiple
                 />
