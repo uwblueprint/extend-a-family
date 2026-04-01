@@ -1,5 +1,4 @@
 import AddIcon from "@mui/icons-material/Add";
-import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { Box, Button, Drawer, List, Typography, useTheme } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import {
@@ -25,14 +24,12 @@ import ContextMenu from "./ContextMenu";
 import Unit from "./Unit";
 
 interface UnitSideBarProps {
-  handleClose: () => void;
   open: boolean;
   setSelectedUnit: React.Dispatch<React.SetStateAction<CourseUnit | null>>;
   selectedUnit: CourseUnit | null;
 }
 
 export default function UnitSidebar({
-  handleClose,
   open,
   setSelectedUnit,
   selectedUnit,
@@ -238,19 +235,6 @@ export default function UnitSidebar({
           fontSize="16px"
         >
           Units
-          <Button
-            type="button"
-            sx={{
-              p: "8px",
-              fontSize: "12px",
-              color: theme.palette.Neutral[700],
-              lineHeight: "1.5",
-            }}
-            endIcon={<MenuOpenIcon />}
-            onClick={handleClose}
-          >
-            Close
-          </Button>
         </Box>
         <ContextMenu
           anchorEl={anchorEl}

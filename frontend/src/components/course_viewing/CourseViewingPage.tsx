@@ -23,10 +23,6 @@ export default function CourseUnitsPage() {
     setSidebarOpen(true);
   };
 
-  const handleDrawerClose = () => {
-    setSidebarOpen(false);
-  };
-
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
@@ -51,7 +47,6 @@ export default function CourseUnitsPage() {
     <Box display="flex" width="100%" height="100vh" overflow="hidden">
       <UnitSidebar
         setSelectedUnit={setSelectedUnit}
-        handleClose={handleDrawerClose}
         open={sidebarOpen}
         selectedUnit={selectedUnit}
       />
