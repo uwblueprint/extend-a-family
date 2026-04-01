@@ -146,6 +146,7 @@ const PreviewLearnerModal = ({
       <WrongAnswerModal
         open={showWrongAnswerModal}
         onClose={() => setShowWrongAnswerModal(false)}
+        hint={activity.hint}
       />
     </Dialog>
   );

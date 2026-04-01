@@ -198,7 +198,7 @@ const ViewModulePage = () => {
       requestedModuleId,
     );
     if (
-      fetchedModule?.status === ModuleStatus.unpublished &&
+      fetchedModule?.status !== ModuleStatus.published &&
       role === "Learner"
     ) {
       // eslint-disable-next-line no-alert

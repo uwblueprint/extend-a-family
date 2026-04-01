@@ -72,7 +72,7 @@ const TableActivityRow = ({
           align="center"
           sx={{
             backgroundImage: `url(${imageURL})`,
-            backgroundSize: "cover",
+            backgroundSize: "contain",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
           }}

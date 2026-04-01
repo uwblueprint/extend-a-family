@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useUser } from "../../hooks/useUser";
+import { useFacilitator } from "../../hooks/useUser";
 import { useFeedbacks } from "../../contexts/FeedbacksContext";
 import { isCaseInsensitiveSubstring } from "../../utils/StringUtils";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
@@ -17,7 +17,7 @@ import LearnerFeedbackBlock from "./LearnerFeedbackBlock";
 
 const FeedbackFacilitatorView = (): React.ReactElement => {
   const theme = useTheme();
-  const { role } = useUser();
+  const { role, learners } = useFacilitator();
   const location = useLocation();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,6 +55,10 @@ const FeedbackFacilitatorView = (): React.ReactElement => {
   };
 
   const filteredFeedbacks = feedbacks.filter((feedback) => {
+    if (!learners.some((learner) => learner === feedback.learnerId.id)) {
+      return false; // Exclude feedbacks from learners not in facilitator's list
+    }
+
     // name filter
     const fullName = `${feedback.learnerId.firstName} ${feedback.learnerId.lastName}`;
     const matchesSearch =

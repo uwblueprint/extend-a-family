@@ -24,14 +24,14 @@ const UserButton = () => {
   return (
     <>
       <IconButton
-        size="large"
+        size="small"
         edge="end"
         aria-label="account of current user"
         aria-haspopup="true"
         onClick={handleClick}
         sx={{ color: theme.palette.Neutral[400] }}
       >
-        <ProfilePicture size={24} sourceUrl={profilePicture} />
+        <ProfilePicture size={40} sourceUrl={profilePicture} />
       </IconButton>
       <Popover
         id={id}

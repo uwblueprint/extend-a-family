@@ -64,15 +64,16 @@ const TableActivityRow = ({
   };
 
   return (
-    <TableRow>
+    <TableRow sx={{ height: "78px" }}>
       {headerColumnIncludes !== HeaderColumnIncludesTypes.TEXT && (
         <TableCell
           align="center"
           sx={{
             backgroundImage: `url(${imageURL})`,
-            backgroundSize: "cover",
+            backgroundSize: "contain",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
+            width: "120px",
           }}
         />
       )}
