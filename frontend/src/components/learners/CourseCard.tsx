@@ -11,27 +11,18 @@ import {
 import { Link } from "react-router-dom";
 import BlankImg from "../assets/blankSlide.png";
 import * as Routes from "../../constants/Routes";
-import { CourseModule, ModuleStatus } from "../../types/CourseTypes";
+import { CourseModule } from "../../types/CourseTypes";
 
 interface CourseCardProps {
-  module?: CourseModule;
-  unitId?: string;
+  module: CourseModule;
+  unitDisplayIndex: number;
   size?: "small" | "large";
   progress?: number;
 }
 
-const defaultModule: CourseModule = {
-  id: "4823042394hfd0253",
-  title: "Sample Module Title",
-  displayIndex: 1,
-  imageURL: BlankImg,
-  pages: [],
-  status: ModuleStatus.published,
-};
-
 export default function CourseCard({
-  module = defaultModule,
-  unitId = "demo-unit",
+  module,
+  unitDisplayIndex,
   size = "small",
   progress = 0,
 }: CourseCardProps) {
@@ -52,7 +43,7 @@ export default function CourseCard({
       <CardActionArea
         disableRipple
         component={Link}
-        to={`${Routes.VIEW_PAGE}?unitId=${unitId}&moduleId=${module.id}`}
+        to={`${Routes.VIEW_PAGE}?moduleId=${module.id}`}
         sx={{
           borderRadius: isSmall ? "8px" : "16px",
           backgroundColor: "transparent",
@@ -172,7 +163,7 @@ export default function CourseCard({
                   color: theme.palette.Neutral[500],
                 }}
               >
-                Module {module.displayIndex}
+                Unit {unitDisplayIndex} Module {module.displayIndex}
               </Typography>
 
               <Typography
@@ -243,7 +234,7 @@ export default function CourseCard({
               paddingBottom: "8px",
             }}
           >
-            Module {module.displayIndex}
+            Unit {unitDisplayIndex} Module {module.displayIndex}
           </Typography>
 
           <Typography
