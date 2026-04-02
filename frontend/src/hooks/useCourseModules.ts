@@ -5,6 +5,10 @@ import { CourseModule } from "../types/CourseTypes";
 // Module-level cache so it persists across component remounts and unitId changes
 const moduleDataCache: Record<string, CourseModule[]> = {};
 
+export const invalidateModuleDataCache = (unitId: string) => {
+  delete moduleDataCache[unitId];
+};
+
 const useCourseModules = (unitId: string) => {
   const cached = moduleDataCache[unitId];
   const [courseModules, setCourseModules] = useState<CourseModule[]>(

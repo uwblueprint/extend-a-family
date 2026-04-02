@@ -1,12 +1,15 @@
 import * as firebaseAdmin from "firebase-admin";
 import mongoose, { Model, ObjectId } from "mongoose";
-import IUserService from "../interfaces/userService";
+import facilitatorApprovedEmail from "../../emails/facilitatorApproved";
+import facilitatorRejectedEmail from "../../emails/facilitatorRejected";
 import MgUser, {
-  Learner,
-  User,
-  LearnerModel,
   FacilitatorModel,
+  Learner,
+  LearnerModel,
+  User,
 } from "../../models/user.mgmodel";
+import nodemailerConfig from "../../nodemailer.config";
+import { AuthErrorCodes } from "../../types/authTypes";
 import {
   CreateUserDTO,
   LearnerDTO,
@@ -15,14 +18,11 @@ import {
   UpdateUserDTO,
   UserDTO,
 } from "../../types/userTypes";
-import { AuthErrorCodes } from "../../types/authTypes";
 import { getErrorCode, getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
-import EmailService from "./emailService";
 import IEmailService from "../interfaces/emailService";
-import nodemailerConfig from "../../nodemailer.config";
-import facilitatorRejectedEmail from "../../emails/facilitatorRejected";
-import facilitatorApprovedEmail from "../../emails/facilitatorApproved";
+import IUserService from "../interfaces/userService";
+import EmailService from "./emailService";
 
 const Logger = logger(__filename);
 const emailService: IEmailService = new EmailService(nodemailerConfig);

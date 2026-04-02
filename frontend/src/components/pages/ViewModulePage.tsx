@@ -49,7 +49,7 @@ import { COURSE_PAGE } from "../../constants/Routes";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
 import { useSocket } from "../../contexts/SocketContext";
 import useActivity from "../../hooks/useActivity";
-import useCourseModules from "../../hooks/useCourseModules";
+import { invalidateModuleDataCache } from "../../hooks/useCourseModules";
 import useQueryParams from "../../hooks/useQueryParams";
 import { useUser } from "../../hooks/useUser";
 import {
@@ -430,8 +430,6 @@ const ViewModulePage = () => {
   };
 
   const currentPageId = module?.pages[currentPage]?.id;
-
-  const { invalidateCache } = useCourseModules(unit?.id || "");
 
   useEffect(() => {
     if (currentPageId) {
@@ -1141,7 +1139,7 @@ const ViewModulePage = () => {
                         module.title,
                       )
                         .then(() => {
-                          invalidateCache();
+                          invalidateModuleDataCache(unit.id);
                         })
                         .catch((error) => {
                           /* eslint-disable-next-line no-console */

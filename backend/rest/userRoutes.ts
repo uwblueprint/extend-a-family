@@ -16,8 +16,8 @@ import AuthService from "../services/implementations/authService";
 import CoursePageService from "../services/implementations/coursePageService";
 import EmailService from "../services/implementations/emailService";
 import FileStorageService from "../services/implementations/fileStorageService";
-import UserService from "../services/implementations/userService";
 import LearnerProgressService from "../services/implementations/learnerProgressService";
+import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import ICoursePageService from "../services/interfaces/coursePageService";
 import IEmailService from "../services/interfaces/emailService";
@@ -92,11 +92,11 @@ userRouter.put(
       const updatedUser: UpdateUserDTO = await userService.updateUserById(
         userId.toString(),
         {
-          ...oldUser,
           firstName: req.body.firstName,
           lastName: req.body.lastName,
           bio: req.body.bio,
           emailPrefrence: req.body.emailPrefrence,
+          role: oldUser.role,
         },
       );
       res.status(200).json(updatedUser);
