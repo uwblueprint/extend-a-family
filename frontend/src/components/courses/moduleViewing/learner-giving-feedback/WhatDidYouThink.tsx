@@ -1,5 +1,4 @@
-import { Box, TextField, Typography, useTheme } from "@mui/material";
-import { Button } from "react-bootstrap";
+import { Box, Button, TextField, Typography, useTheme } from "@mui/material";
 
 const WhatDidYouThink = ({
   text,
@@ -73,11 +72,12 @@ const WhatDidYouThink = ({
                   "&.MuiOutlinedInput-notchedOutline": { fontSize: "14px" },
                 },
               },
+              htmlInput: {
+                maxLength: 500,
+              },
             }}
             value={text}
-            onChange={(e) =>
-              e.target.value.length <= 500 && onChange(e.target.value)
-            }
+            onChange={(e) => onChange(e.target.value)}
           />
           <Box
             sx={{
@@ -98,7 +98,7 @@ const WhatDidYouThink = ({
               {charactersLeft} characters left
             </Typography>
             <Button
-              variant="contained"
+              variant="outlined"
               color="primary"
               onClick={onSubmit}
               disabled={isSubmitting}

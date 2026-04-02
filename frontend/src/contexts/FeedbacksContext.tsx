@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import FeedbackAPIClient from "../APIClients/FeedbackAPIClient";
 import { CourseModule } from "../types/CourseTypes";
 import { FeedbackPopulated } from "../types/FeedbackTypes";
@@ -34,8 +40,15 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
   const [feedbacks, setFeedbacks] = useState<FeedbackPopulated[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
+  const { authenticatedUser } = useContext(AuthContext);
 
-  const refetchFeedbacks = async () => {
+  const refetchFeedbacks = useCallback(async () => {
+    if (
+      authenticatedUser?.role !== "Administrator" &&
+      authenticatedUser?.role !== "Facilitator"
+    ) {
+      return;
+    }
     setIsLoading(true);
     setError(false);
     try {
@@ -46,7 +59,7 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [authenticatedUser]);
 
   const exportFeedbackToCSV = (module?: CourseModule) => {
     let filteredFeedbacks = feedbacks;
@@ -115,11 +128,9 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  const { authenticatedUser } = useContext(AuthContext);
-
   useEffect(() => {
     refetchFeedbacks();
-  }, [authenticatedUser]);
+  }, [authenticatedUser, refetchFeedbacks]);
 
   const value = {
     feedbacks,
