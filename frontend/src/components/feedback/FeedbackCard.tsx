@@ -69,7 +69,7 @@ const FeedbackCard = ({
           margin: 0,
         }}
       />
-      <Stack direction="column" gap="12px">
+      <Stack direction="column" gap="12px" maxWidth="100%">
         <Stack direction="row" gap="24px" alignItems="center">
           <Stack direction="row" gap="12px" alignItems="center">
             <RatingOfFive rating={feedback.difficulty} starGap="4px" />
@@ -105,7 +105,15 @@ const FeedbackCard = ({
             </Typography>
           </Stack>
         </Stack>
-        <Typography variant="bodyMedium">{feedback.message}</Typography>
+        <Typography
+          variant="bodyMedium"
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {feedback.message}
+        </Typography>
       </Stack>
     </Stack>
   );

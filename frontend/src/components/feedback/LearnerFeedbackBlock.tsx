@@ -49,7 +49,12 @@ const LearnerFeedbackBlock: React.FC<LearnerFeedbackBlockProps> = ({
         width="100%"
         sx={{
           background: theme.palette.Facilitator.Light.Default,
+          "&:hover": {
+            cursor: "pointer",
+            background: theme.palette.Facilitator.Light.Hover,
+          },
         }}
+        onClick={() => setExpanded((prev) => !prev)}
       >
         <Typography variant="titleMedium" color={theme.palette.Neutral[700]}>
           {learnerName}
@@ -80,7 +85,6 @@ const LearnerFeedbackBlock: React.FC<LearnerFeedbackBlockProps> = ({
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              onClick={() => setExpanded(!expanded)}
             >
               <ExpandMore sx={{ fontSize: "32px" }} />
             </IconButton>
