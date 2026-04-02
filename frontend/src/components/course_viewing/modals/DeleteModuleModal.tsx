@@ -13,17 +13,21 @@ import {
 } from "@mui/material";
 import { useFeedbacks } from "../../../contexts/FeedbacksContext";
 import { useUser } from "../../../hooks/useUser";
+import { CourseModule } from "../../../types/CourseTypes";
 
 interface DeleteModuleModalProps {
+  module: CourseModule;
   openDeleteModuleModal: boolean;
   handleCloseDeleteModuleModal: () => void;
   deleteModule: () => Promise<void>;
 }
 
-export default function DeleteModuleModal(props: DeleteModuleModalProps) {
-  const { openDeleteModuleModal, handleCloseDeleteModuleModal, deleteModule } =
-    props;
-
+export default function DeleteModuleModal({
+  module,
+  openDeleteModuleModal,
+  handleCloseDeleteModuleModal,
+  deleteModule,
+}: DeleteModuleModalProps) {
   const theme = useTheme();
   const user = useUser();
 
@@ -125,10 +129,10 @@ export default function DeleteModuleModal(props: DeleteModuleModalProps) {
                   color: "white",
                 }}
                 disableElevation
-                onClick={exportFeedbackToCSV}
+                onClick={() => exportFeedbackToCSV(module)}
               >
                 <Typography variant="labelLarge">
-                  Download Feedback (TSV)
+                  Download Feedback (CSV)
                 </Typography>
               </Button>
             </Box>

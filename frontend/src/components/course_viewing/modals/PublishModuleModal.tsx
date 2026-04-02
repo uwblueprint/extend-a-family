@@ -23,7 +23,7 @@ import { CourseModule } from "../../../types/CourseTypes";
 interface PublishModuleModalProps {
   openPublishModuleModal: boolean;
   handleClosePublishModuleModal: () => void;
-  moduleId: string;
+  module: CourseModule;
   onUpdateModule: (updatedModule: CourseModule) => void;
 }
 
@@ -38,7 +38,7 @@ export default function PublishModuleModal(props: PublishModuleModalProps) {
   const {
     openPublishModuleModal,
     handleClosePublishModuleModal,
-    moduleId,
+    module,
     onUpdateModule,
   } = props;
   const { exportFeedbackToCSV, refetchFeedbacks } = useFeedbacks();
@@ -49,7 +49,7 @@ export default function PublishModuleModal(props: PublishModuleModalProps) {
 
   const handlePublish = async () => {
     const updatedModule = await CourseAPIClient.publishModule(
-      moduleId,
+      module.id,
       retainFeedback,
     );
     if (updatedModule) onUpdateModule(updatedModule);
@@ -212,10 +212,10 @@ export default function PublishModuleModal(props: PublishModuleModalProps) {
                         onClick={(ev) => {
                           ev.stopPropagation();
                           ev.preventDefault();
-                          exportFeedbackToCSV();
+                          exportFeedbackToCSV(module);
                         }}
                       >
-                        Download old feedback (TSV)
+                        Download old feedback (CSV)
                       </Typography>
                     </Stack>
                   }

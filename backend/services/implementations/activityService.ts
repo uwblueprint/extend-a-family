@@ -22,10 +22,8 @@ class ActivityService {
 
       const baseActivity = {
         questionType,
-        title: "New Activity",
-        activityNumber: "1",
-        questionText: "Enter your question here",
-        instruction: "Please select the correct answer",
+        title: "",
+        activityNumber: "",
       };
 
       let activityData;
@@ -33,26 +31,20 @@ class ActivityService {
         activityData = {
           ...baseActivity,
           correctAnswer: 0,
-          options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+          options: ["", "", "", ""],
         };
       } else if (questionType === QuestionType.MultiSelect) {
         activityData = {
           ...baseActivity,
           correctAnswers: [0],
-          options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+          options: ["", "", "", ""],
         };
       } else if (questionType === QuestionType.Table) {
         activityData = {
           ...baseActivity,
-          columnLabels: ["Header", "Header", "Header", "Header", "Header"],
-          rowLabels: [["Row 1"], ["Row 2"], ["Row 3"], ["Row 4"], ["Row 5"]],
-          correctAnswers: [
-            [0, 0],
-            [1, 0],
-            [2, 0],
-            [3, 0],
-            [4, 0],
-          ],
+          columnLabels: ["", "", "", "", ""],
+          rowLabels: [[""], [""], [""], [""], [""]],
+          correctAnswers: [],
         };
       } else if (questionType === QuestionType.Matching) {
         const media: Media[] = [

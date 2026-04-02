@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import FeedbackAPIClient from "../APIClients/FeedbackAPIClient";
+import { CourseModule } from "../types/CourseTypes";
 import { FeedbackPopulated } from "../types/FeedbackTypes";
 import AuthContext from "./AuthContext";
 
@@ -8,7 +9,7 @@ interface FeedbacksContextType {
   isLoading: boolean;
   error: boolean;
   refetchFeedbacks: () => Promise<void>;
-  exportFeedbackToCSV: () => void;
+  exportFeedbackToCSV: (module?: CourseModule) => void;
 }
 
 const FeedbacksContext = createContext<FeedbacksContextType | undefined>(
@@ -47,8 +48,16 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     }
   };
 
-  const exportFeedbackToCSV = () => {
-    if (feedbacks.length === 0) {
+  const exportFeedbackToCSV = (module?: CourseModule) => {
+    let filteredFeedbacks = feedbacks;
+
+    if (module) {
+      filteredFeedbacks = filteredFeedbacks.filter(
+        (feedback) => feedback.moduleId.id === module.id,
+      );
+    }
+
+    if (filteredFeedbacks.length === 0) {
       // eslint-disable-next-line no-alert
       alert("No feedback data to export yet");
       return;
@@ -69,7 +78,7 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     ];
 
     // Convert feedbacks to CSV rows
-    const rows = feedbacks.map((feedback) => [
+    const rows = filteredFeedbacks.map((feedback) => [
       feedback.learnerId.firstName,
       feedback.learnerId.lastName,
       feedback.moduleId.title,
@@ -92,9 +101,14 @@ export const FeedbacksProvider: React.FC<FeedbacksProviderProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `feedback_export_${
+
+    const moduleTitle = module
+      ? module.title.replace(/[^a-z0-9]/gi, "_")
+      : "all_modules";
+    link.download = `feedback_export_${moduleTitle}_${
       new Date().toISOString().split("T")[0]
     }.csv`;
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

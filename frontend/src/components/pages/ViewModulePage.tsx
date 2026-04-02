@@ -1129,31 +1129,37 @@ const ViewModulePage = () => {
                     <ArrowBack sx={{ fontSize: "24px" }} />
                   </IconButton>
                 </Link>
-                <HeaderLargeTextField
-                  value={module?.title || ""}
-                  onBlur={() => {
-                    if (unit && module) {
-                      CourseAPIClient.editModule(
-                        unit.id,
-                        module.id,
-                        module.title,
-                      )
-                        .then(() => {
-                          invalidateModuleDataCache(unit.id);
-                        })
-                        .catch((error) => {
-                          /* eslint-disable-next-line no-console */
-                          console.error(
-                            "Failed to update module title:",
-                            error,
-                          );
-                        });
-                    }
-                  }}
-                  onChange={(newTitle) => {
-                    setModule((prev) => prev && { ...prev, title: newTitle });
-                  }}
-                />
+                {role === "Administrator" ? (
+                  <HeaderLargeTextField
+                    value={module?.title || ""}
+                    onBlur={() => {
+                      if (unit && module) {
+                        CourseAPIClient.editModule(
+                          unit.id,
+                          module.id,
+                          module.title,
+                        )
+                          .then(() => {
+                            invalidateModuleDataCache(unit.id);
+                          })
+                          .catch((error) => {
+                            /* eslint-disable-next-line no-console */
+                            console.error(
+                              "Failed to update module title:",
+                              error,
+                            );
+                          });
+                      }
+                    }}
+                    onChange={(newTitle) => {
+                      setModule((prev) => prev && { ...prev, title: newTitle });
+                    }}
+                  />
+                ) : (
+                  <Typography variant="headlineLarge">
+                    {module?.title}
+                  </Typography>
+                )}
               </Box>
               {role === "Learner" && (
                 <Box display="inline-flex" alignItems="center" gap="20px">
@@ -1931,7 +1937,7 @@ const ViewModulePage = () => {
         <PublishModuleModal
           openPublishModuleModal={publishModuleModalOpen}
           handleClosePublishModuleModal={() => setPublishModuleModalOpen(false)}
-          moduleId={module.id}
+          module={module}
           onUpdateModule={() =>
             history.push(
               `${COURSE_PAGE}${unit ? `?selectedUnit=${unit?.id}` : ""}`,

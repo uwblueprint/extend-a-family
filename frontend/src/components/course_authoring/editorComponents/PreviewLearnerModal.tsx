@@ -37,8 +37,15 @@ const PreviewLearnerModal = ({
 }) => {
   const theme = useTheme();
   const activityPreviewRef = useRef<ActivityViewerHandle>(null);
+  const [canReset, setCanReset] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showWrongAnswerModal, setShowWrongAnswerModal] = useState(false);
+
+  const onCorrectAnswer = () => {
+    setIsCompleted(true);
+    setCanReset(true);
+  };
+
   return (
     <Dialog
       open={open}
@@ -70,8 +77,12 @@ const PreviewLearnerModal = ({
         <Stack direction="row" alignItems="center" gap="8px">
           <Button
             onClick={() => {
-              if (isCompleted) {
+              if (canReset) {
+                setCanReset(false);
                 setIsCompleted(false);
+                if (activityPreviewRef.current?.onRetry) {
+                  activityPreviewRef.current?.onRetry();
+                }
               } else {
                 activityPreviewRef.current?.checkAnswer();
               }
@@ -90,7 +101,7 @@ const PreviewLearnerModal = ({
             }}
           >
             <Typography variant="labelLarge">
-              {isCompleted ? (
+              {canReset ? (
                 <>
                   <Replay /> Reset
                 </>
@@ -110,7 +121,7 @@ const PreviewLearnerModal = ({
           <MultipleChoiceViewer
             activity={activity}
             onWrongAnswer={() => setShowWrongAnswerModal(true)}
-            onCorrectAnswer={() => setIsCompleted(true)}
+            onCorrectAnswer={onCorrectAnswer}
             isCompleted={isCompleted}
             ref={activityPreviewRef}
           />
@@ -119,7 +130,7 @@ const PreviewLearnerModal = ({
           <TableViewer
             activity={activity}
             onWrongAnswer={() => setShowWrongAnswerModal(true)}
-            onCorrectAnswer={() => setIsCompleted(true)}
+            onCorrectAnswer={onCorrectAnswer}
             isCompleted={isCompleted}
             ref={activityPreviewRef}
           />
@@ -127,8 +138,8 @@ const PreviewLearnerModal = ({
         {isMatchingActivity(activity) && (
           <MatchingViewer
             activity={activity}
-            onWrongAnswer={() => setShowWrongAnswerModal(true)}
-            onCorrectAnswer={() => setIsCompleted(true)}
+            onWrongAnswer={() => setCanReset(true)}
+            onCorrectAnswer={onCorrectAnswer}
             isCompleted={isCompleted}
             ref={activityPreviewRef}
           />
@@ -137,7 +148,7 @@ const PreviewLearnerModal = ({
           <TextInputViewer
             activity={activity}
             onWrongAnswer={() => setShowWrongAnswerModal(true)}
-            onCorrectAnswer={() => setIsCompleted(true)}
+            onCorrectAnswer={onCorrectAnswer}
             isCompleted={isCompleted}
             ref={activityPreviewRef}
           />

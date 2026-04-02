@@ -23,7 +23,7 @@ const TextInputViewer = React.forwardRef<
 
   const sampleCorrectAnswer = () => {
     if (activity.validation.mode === "short_answer") {
-      return activity.validation.answers[0];
+      return `Correct answers: ${activity.validation.answers.join(", ")}`;
     }
     if (activity.validation.mode === "numeric_range") {
       return (

@@ -33,6 +33,9 @@ const MainPageButton = (): React.ReactElement => {
           left: "12px",
           top: "80px",
           borderRadius: "4px",
+          "&:hover": {
+            backgroundColor: theme.palette[user.role].Light.Hover,
+          },
         }}
       >
         <Typography

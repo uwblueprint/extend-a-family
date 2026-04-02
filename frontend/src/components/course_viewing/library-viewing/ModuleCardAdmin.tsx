@@ -407,9 +407,7 @@ const ModuleCardAdmin = ({
         gap="8px"
         alignSelf="stretch"
       >
-        <Typography variant="labelLarge">
-          Module {module.displayIndex}
-        </Typography>
+        <Typography variant="labelLarge">Module {index + 1}</Typography>
         <Typography variant="bodyLarge">{module.title}</Typography>
       </Stack>
       <Button
@@ -450,6 +448,7 @@ const ModuleCardAdmin = ({
         onThumbnailUpdate={handleThumbnailUpdate}
       />
       <DeleteModuleModal
+        module={module}
         openDeleteModuleModal={openDeleteModuleModal}
         handleCloseDeleteModuleModal={handleCloseDeleteModuleModal}
         deleteModule={deleteModule}
@@ -457,7 +456,7 @@ const ModuleCardAdmin = ({
       <PublishModuleModal
         openPublishModuleModal={openPublishModuleModal}
         handleClosePublishModuleModal={() => setOpenPublishModuleModal(false)}
-        moduleId={module.id}
+        module={module}
         onUpdateModule={onModuleUpdate}
       />
       <UnpublishModuleModal

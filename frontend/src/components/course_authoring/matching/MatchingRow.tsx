@@ -35,6 +35,9 @@ const MediaDisplay = ({
           p: 0,
           border: `1px solid ${theme.palette.Neutral[400]}`,
           color: theme.palette.Neutral[800],
+          "&:hover": {
+            backgroundColor: theme.palette.Administrator.Light.Hover,
+          },
           ...(mediaItem.context
             ? {
                 backgroundImage: `url(${mediaItem.context})`,

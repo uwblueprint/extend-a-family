@@ -6,6 +6,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Dayjs } from "dayjs";
 
+import { ChevronLeft } from "@mui/icons-material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { useHistory, useLocation } from "react-router-dom";
 import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
@@ -232,6 +233,37 @@ const FeedbackAdminView = () => {
               justifyContent="center"
               gap="4px"
             >
+              {selectedUnitId && (
+                <Button
+                  variant="text"
+                  onClick={() => {
+                    setSelectedUnitId(null);
+                    setSelectedModuleId(null);
+                  }}
+                  startIcon={
+                    <ChevronLeft
+                      sx={{ color: theme.palette.Administrator.Dark.Default }}
+                    />
+                  }
+                  sx={{
+                    padding: "10px 16px 10px 12px",
+                    justifyContent: "center",
+                    borderRadius: "4px",
+                    "&:hover": {
+                      backgroundColor: theme.palette.Administrator.Light.Hover,
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="labelLarge"
+                    sx={{
+                      color: theme.palette.Administrator.Dark.Default,
+                    }}
+                  >
+                    Back to All Course Feedback
+                  </Typography>
+                </Button>
+              )}
               <Stack
                 direction="row"
                 alignItems="flex-start"
@@ -263,13 +295,16 @@ const FeedbackAdminView = () => {
               sx={{
                 color: theme.palette.Administrator.Dark.Default,
                 borderColor: theme.palette.Administrator.Dark.Default,
+                maxHeight: "60px",
                 "&:hover": {
                   backgroundColor: theme.palette.Administrator.Light.Hover,
                 },
               }}
-              onClick={exportFeedbackToCSV}
+              onClick={() => exportFeedbackToCSV(selectedModule)}
             >
-              Export All Feedback CSV
+              {selectedModule
+                ? `Export Feedback CSV for "${selectedModule.title}"`
+                : "Export All Feedback CSV"}
             </Button>
           </Stack>
           <Stack

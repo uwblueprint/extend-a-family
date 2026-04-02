@@ -5,9 +5,6 @@ import CoursePageModel, { CoursePageBase } from "./coursepage.mgmodel";
 // Base Activity Interface
 export interface Activity extends CoursePageBase {
   questionType: QuestionType;
-  activityNumber: string;
-  questionText: string;
-  instruction: string;
   imageUrl?: string;
   additionalContext?: string;
   userFeedback?: string;
@@ -93,20 +90,6 @@ export const ActivitySchema: Schema = new Schema(
       type: String,
       required: true,
       enum: Object.values(QuestionType),
-    },
-    activityNumber: {
-      type: String,
-      required: true,
-    },
-    questionText: {
-      type: String,
-      required: true,
-      maxlength: 1000,
-    },
-    instruction: {
-      type: String,
-      required: true,
-      maxlength: 200,
     },
     imageUrl: {
       type: String,

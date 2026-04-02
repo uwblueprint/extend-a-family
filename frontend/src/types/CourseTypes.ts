@@ -37,8 +37,6 @@ export interface Media {
 interface ActivityBase extends CoursePageBase {
   questionType: QuestionType;
   activityNumber: string;
-  questionText: string;
-  instruction: string;
   imageUrl?: string;
   additionalContext?: string;
   userFeedback?: string;

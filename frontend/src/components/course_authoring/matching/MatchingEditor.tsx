@@ -62,8 +62,9 @@ const MatchingEditor = ({
             variant="bodyMedium"
             sx={{ color: theme.palette.Neutral[500] }}
           >
-            Match each item on the left with the item that goes with it on the
-            right.
+            Match each option from left to right by first clicking on a left
+            option and then clicking on a right option. For three columns, match
+            from left to middle and then middle to right.
           </Typography>
         </Box>
         <Stack direction="column" gap="12px" sx={{ width: "100%" }}>

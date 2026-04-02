@@ -11,8 +11,6 @@ export enum QuestionType {
 export interface ActivityDTO extends CoursePageDTO {
   questionType: QuestionType;
   activityNumber: string;
-  questionText: string;
-  instruction: string;
   imageUrl?: string;
   additionalContext?: string;
   userFeedback?: string;
@@ -92,8 +90,6 @@ export type CreateActivityDTO =
       MultipleChoiceActivityDTO,
       | "questionType"
       | "activityNumber"
-      | "questionText"
-      | "instruction"
       | "options"
       | "correctAnswer"
       | "imageUrl"
@@ -104,8 +100,6 @@ export type CreateActivityDTO =
       MultiSelectActivityDTO,
       | "questionType"
       | "activityNumber"
-      | "questionText"
-      | "instruction"
       | "options"
       | "correctAnswers"
       | "imageUrl"
@@ -114,20 +108,12 @@ export type CreateActivityDTO =
     >
   | Pick<
       MatchingActivityDTO,
-      | "questionType"
-      | "activityNumber"
-      | "questionText"
-      | "instruction"
-      | "media"
-      | "correctAnswers"
-      | "rows"
+      "questionType" | "activityNumber" | "media" | "correctAnswers" | "rows"
     >
   | Pick<
       TableActivityDTO,
       | "questionType"
       | "activityNumber"
-      | "questionText"
-      | "instruction"
       | "columnLabels"
       | "rowLabels"
       | "correctAnswers"
@@ -136,8 +122,6 @@ export type CreateActivityDTO =
       TextInputActivityDTO,
       | "questionType"
       | "activityNumber"
-      | "questionText"
-      | "instruction"
       | "placeholder"
       | "maxLength"
       | "validation"
