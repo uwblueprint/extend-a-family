@@ -167,6 +167,7 @@ export type CourseModule = {
   pages: CoursePage[];
   unitId?: string;
   status: ModuleStatus;
+  unitDisplayIndex?: number;
 };
 
 export enum InteractiveElementType {

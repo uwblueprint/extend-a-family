@@ -920,7 +920,8 @@ const ViewModulePage = () => {
                         <Typography variant="bodyMedium">
                           Activity{" "}
                           {(() => {
-                            const unitNumber = unit?.displayIndex ?? 0;
+                            const unitNumber =
+                              unit?.displayIndex ?? module.unitDisplayIndex;
                             const moduleNumber = module.displayIndex;
                             const activityNumber =
                               module?.pages

@@ -16,11 +16,11 @@ import {
   ModuleStatus,
   UpdateCourseModuleDTO,
 } from "../../types/courseTypes";
+import { Role } from "../../types/userTypes";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ICourseModuleService from "../interfaces/courseModuleService";
 import FileStorageService from "./fileStorageService";
-import { Role } from "../../types/userTypes";
 
 const Logger = logger(__filename);
 
@@ -136,6 +136,8 @@ class CourseModuleService implements ICourseModuleService {
         // default status is draft; rely on schema default but keep explicit for clarity
         status: ModuleStatus.Draft,
         displayIndex: numCourseModules + 1,
+        unitDisplayIndex: courseUnit.displayIndex,
+        unitId: courseUnit.id,
         session,
       });
 

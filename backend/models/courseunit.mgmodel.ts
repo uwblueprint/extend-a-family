@@ -35,14 +35,25 @@ CourseUnitSchema.set("toObject", {
   },
 });
 
-// eslint-disable-next-line func-names
-CourseUnitSchema.post("findOneAndUpdate", function (doc: CourseUnit) {
-  doc.modules.forEach((moduleId, index) => {
-    mongoose
-      .model("CourseModule")
-      .findByIdAndUpdate(moduleId, { displayIndex: index + 1 }, { new: true })
-      .exec();
-  });
-});
+CourseUnitSchema.post(
+  /^(findOneAndUpdate|updateOne|updateMany|findByIdAndUpdate)$/,
+  // eslint-disable-next-line func-names
+  function (doc: CourseUnit) {
+    doc.modules.forEach((moduleId, index) => {
+      mongoose
+        .model("CourseModule")
+        .findByIdAndUpdate(
+          moduleId,
+          {
+            displayIndex: index + 1,
+            unitId: doc.id,
+            unitDisplayIndex: doc.displayIndex,
+          },
+          { new: true },
+        )
+        .exec();
+    });
+  },
+);
 
 export default mongoose.model<CourseUnit>("CourseUnit", CourseUnitSchema);

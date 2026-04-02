@@ -9,6 +9,8 @@ export interface CourseModule extends Document {
   imageURL: string;
   status: ModuleStatus;
   displayIndex: number;
+  unitId?: string;
+  unitDisplayIndex?: number;
 }
 
 export const CourseModuleSchema: Schema = new Schema({
@@ -34,6 +36,13 @@ export const CourseModuleSchema: Schema = new Schema({
   displayIndex: {
     type: Number,
     required: true,
+  },
+  unitId: {
+    type: Schema.Types.ObjectId,
+    ref: "CourseUnit",
+  },
+  unitDisplayIndex: {
+    type: Number,
   },
 });
 

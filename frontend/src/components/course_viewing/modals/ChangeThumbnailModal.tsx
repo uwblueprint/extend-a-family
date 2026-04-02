@@ -238,7 +238,19 @@ const ChangeThumbnailModal = ({
           gap: "12px",
         }}
       >
-        <Button variant="outlined" onClick={onClose} disabled={isUploading}>
+        <Button
+          variant="outlined"
+          onClick={onClose}
+          disabled={isUploading}
+          sx={{
+            color: theme.palette.Error.Dark.Default,
+            backgroundColor: "white",
+            borderColor: theme.palette.Error.Dark.Default,
+            "&:hover": {
+              backgroundColor: theme.palette.Error.Light.Hover,
+            },
+          }}
+        >
           Cancel
         </Button>
         <Button
@@ -246,6 +258,13 @@ const ChangeThumbnailModal = ({
           onClick={handleUpload}
           disabled={!image || isUploading}
           startIcon={isUploading ? <CircularProgress size={20} /> : undefined}
+          sx={{
+            color: "white",
+            backgroundColor: theme.palette.Administrator.Dark.Default,
+            "&:hover": {
+              backgroundColor: theme.palette.Administrator.Dark.Hover,
+            },
+          }}
         >
           {isUploading ? "Uploading..." : "Upload"}
         </Button>
