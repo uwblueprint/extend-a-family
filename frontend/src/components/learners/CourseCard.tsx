@@ -1,17 +1,17 @@
 import {
   Box,
   Card,
-  CardMedia,
-  CardContent,
-  Typography,
   CardActionArea,
+  CardContent,
+  CardMedia,
   LinearProgress,
+  Typography,
   useTheme,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import BlankImg from "../assets/blankSlide.png";
 import * as Routes from "../../constants/Routes";
 import { CourseModule } from "../../types/CourseTypes";
+import BlankImg from "../assets/blankSlide.png";
 
 interface CourseCardProps {
   module: CourseModule;
@@ -32,7 +32,8 @@ export default function CourseCard({
   return (
     <Card
       sx={{
-        maxWidth: isSmall ? 320 : 688,
+        maxWidth: isSmall ? 320 : undefined,
+        width: isSmall ? undefined : "100%",
         display: "flex",
         flexDirection: "column",
         border: "none",
