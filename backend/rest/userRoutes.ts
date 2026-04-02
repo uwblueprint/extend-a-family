@@ -65,7 +65,7 @@ userRouter.post(
       );
       const userDTO: UserDTO = await userService.getUserById(userId);
       const updatedUser = await userService.updateUserById(userId, {
-        ...userDTO,
+        role: userDTO.role,
         profilePicture: imageURL,
       });
       res.status(200).json(updatedUser);
