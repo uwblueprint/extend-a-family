@@ -148,7 +148,7 @@ const Home = (): React.ReactElement => {
               </Typography>
               <CourseCard
                 module={topModule.module}
-                unitId={topModule.unitId}
+                unitDisplayIndex={topModule.unitDisplayIndex}
                 size="large"
                 progress={topModule.progressPercentage}
               />
@@ -175,7 +175,7 @@ const Home = (): React.ReactElement => {
                   <CourseCard
                     key={ranked.module.id}
                     module={ranked.module}
-                    unitId={ranked.unitId}
+                    unitDisplayIndex={ranked.unitDisplayIndex}
                     progress={ranked.progressPercentage}
                   />
                 ))}

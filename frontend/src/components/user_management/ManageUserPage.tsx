@@ -23,6 +23,8 @@ import TopToolBar from "./TopToolBar";
 import UserTable from "./UserTable";
 
 const ManageUserPage = (): React.ReactElement => {
+  const { refreshUser } = useUser();
+
   // Main state
   const [users, setUsers] = useState<User[]>([]);
   const [userData, setUserData] = useState<User[]>([]);
@@ -186,6 +188,7 @@ const ManageUserPage = (): React.ReactElement => {
           );
           handleCloseAddLearnerModal();
           setOpenAddUserSnackbar(true);
+          refreshUser();
           await getUsers();
         }
       } finally {
