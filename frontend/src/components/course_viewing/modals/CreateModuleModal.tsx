@@ -18,6 +18,7 @@ import React, {
   SetStateAction,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
@@ -42,6 +43,7 @@ const CreateModuleModal = ({
   const [image, setImage] = useState<FormData | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [moduleTitle, setModuleTitle] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   let role: "Learner" | "Facilitator" | "Administrator";
   if (authenticatedUser?.role === "Learner") {
@@ -200,17 +202,17 @@ const CreateModuleModal = ({
                 color={theme.palette.Administrator.Dark.Default}
                 style={{ cursor: "pointer", textDecoration: "underline" }}
                 onClick={() => {
-                  const inputElem = document.getElementById("clickHereInput");
-                  inputElem?.click();
+                  fileInputRef.current?.click();
                 }}
               >
                 click here
               </Typography>
               <VisuallyHidden>
                 <input
-                  id="clickHereInput"
-                  type="image/*"
-                  onChange={(e) => handleFileUpload(e)}
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
                   multiple
                 />
               </VisuallyHidden>

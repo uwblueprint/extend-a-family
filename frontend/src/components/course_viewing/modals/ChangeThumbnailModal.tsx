@@ -10,7 +10,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { VisuallyHidden } from "@reach/visually-hidden";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 
 interface ChangeThumbnailModalProps {
@@ -30,6 +30,7 @@ const ChangeThumbnailModal = ({
   const [image, setImage] = useState<FormData | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -196,15 +197,14 @@ const ChangeThumbnailModal = ({
                 color={theme.palette.Administrator.Dark.Default}
                 style={{ cursor: "pointer", textDecoration: "underline" }}
                 onClick={() => {
-                  const inputElem = document.getElementById("clickHereInput");
-                  inputElem?.click();
+                  fileInputRef.current?.click();
                 }}
               >
                 click here
               </Typography>
               <VisuallyHidden>
                 <input
-                  id="clickHereInput"
+                  ref={fileInputRef}
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleFileUpload(e)}
