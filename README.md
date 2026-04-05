@@ -5,15 +5,8 @@
 **Backend Language:** Node (Express)<br>
 **Backend API:** REST<br>
 **Database:** MongoDB<br>
-**User Auth:** Opt-in<br>
-**File Storage:** Opt-in<br>
-
-## The Team
-### S24
-**Project Lead:** Carolyn Zhang<br>
-**Product Managers:** Olivia Chan, Aatman Shah<br>
-**Designers:** Gaurav Shah, Abeer Das<br>
-**Developers:** Aathithan Chandrabalan, Jeffery Hu, Shannon Cui, Jason D'Souza, Jimmy Liu, Cherry Yang, Maggie Chen, Harishan Ravindranathan, Jeffrey Zhao<br>
+**User Auth:** Firebase Auth<br>
+**File Storage:** Firebase Cloud Storage<br>
 
 ## Table of Contents
 * ⚙️ [Setup](#setup)
@@ -30,7 +23,6 @@
 
 ## Setup
 Follow the steps here: [Setup Instructions](https://www.notion.so/uwblueprintexecs/Setup-Instructions-d6e0cdeb69cf4bbf93a33c7302370550)!
-
 
 ## Useful Commands
 
