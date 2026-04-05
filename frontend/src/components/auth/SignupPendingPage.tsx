@@ -83,7 +83,7 @@ const SignupPending = (): React.ReactElement => {
               history.push(WELCOME_PAGE);
             }}
           >
-            <Typography variant="labelLarge">Retry</Typography>
+            <Typography variant="labelLarge">Back to Login</Typography>
           </Button>
         </Box>
       </Box>
