@@ -44,7 +44,7 @@ const defaultMinuteRateLimit = parseInt(
   10,
 );
 const limiter = RateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
+  windowMs: 0.25 * 60 * 1000, // 15 seconds
   max: defaultMinuteRateLimit,
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers

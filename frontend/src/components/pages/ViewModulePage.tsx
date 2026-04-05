@@ -593,6 +593,13 @@ const ViewModulePage = () => {
     fetchLearnerProgress();
   }, [role]);
 
+  // Track hasEditingLock in a ref so the cleanup function always has the latest value
+  // without needing it in the dependency array (which would cause re-runs and lock release/re-acquire cycles)
+  const hasEditingLockRef = useRef(hasEditingLock);
+  useEffect(() => {
+    hasEditingLockRef.current = hasEditingLock;
+  }, [hasEditingLock]);
+
   // Module editing lock management (Administrators only)
   useEffect(() => {
     if (role !== "Administrator" || !socket || !requestedModuleId) {
@@ -601,12 +608,20 @@ const ViewModulePage = () => {
 
     const userName = `${firstName} ${lastName}`;
 
-    // Request lock when component mounts
-    socket.emit("moduleEditing:acquireLock", {
-      moduleId: requestedModuleId,
-      userId,
-      userName,
-    });
+    const acquireLock = () => {
+      socket.emit("moduleEditing:acquireLock", {
+        moduleId: requestedModuleId,
+        userId,
+        userName,
+      });
+    };
+
+    // If the socket is already connected, acquire immediately.
+    // Otherwise, wait for the (re)connect event so we don't emit on a stale session.
+    if (socket.connected) {
+      acquireLock();
+    }
+    socket.on("connect", acquireLock);
 
     // Listen for lock acquisition success
     const handleLockAcquired = (data: { moduleId: string }) => {
@@ -642,25 +657,19 @@ const ViewModulePage = () => {
     // Release lock when component unmounts or module changes
     // eslint-disable-next-line consistent-return
     return () => {
-      if (hasEditingLock) {
+      if (hasEditingLockRef.current) {
         socket.emit("moduleEditing:releaseLock", {
           moduleId: requestedModuleId,
           userId,
         });
+        setHasEditingLock(false);
       }
+      socket.off("connect", acquireLock);
       socket.off("moduleEditing:lockAcquired", handleLockAcquired);
       socket.off("moduleEditing:lockDenied", handleLockDenied);
       socket.off("moduleEditing:error", handleLockError);
     };
-  }, [
-    role,
-    socket,
-    requestedModuleId,
-    userId,
-    firstName,
-    lastName,
-    hasEditingLock,
-  ]);
+  }, [role, socket, requestedModuleId, userId, firstName, lastName]);
 
   const handleDeletePage = async () => {
     if (!module || !currentPageObject) return;
