@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import NotificationAPIClient from "../APIClients/NotificationAPIClient";
 import { useSocket } from "./SocketContext";
 import { Notification } from "../types/NotificationTypes";
+import AuthContext from "./AuthContext";
 
 interface NotificationsContextType {
   notifications: Notification[];
@@ -36,6 +37,7 @@ export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({
   const [numUnseenNotifications, setNumUnseenNotification] = useState(0);
   const [errorFetchNotifs, setErrorFetchNotifs] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { authenticatedUser } = useContext(AuthContext);
   const NUMBER_OF_NOTIFICATIONS_TO_LOAD = 10;
 
   const socket = useSocket();
@@ -58,7 +60,7 @@ export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
+  }, [authenticatedUser]);
 
   useEffect(() => {
     if (!socket) return;

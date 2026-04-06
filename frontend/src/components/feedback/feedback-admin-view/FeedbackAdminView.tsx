@@ -8,7 +8,7 @@ import { Dayjs } from "dayjs";
 
 import { ChevronLeft } from "@mui/icons-material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 import { useFeedbacks } from "../../../contexts/FeedbacksContext";
 import { FeedbackPopulated } from "../../../types/FeedbackTypes";
@@ -270,18 +270,44 @@ const FeedbackAdminView = () => {
                 gap="4px"
                 color={theme.palette.Neutral[500]}
               >
-                <Typography variant="bodyMedium">Course Feedback</Typography>
+                <Typography
+                  variant="bodyMedium"
+                  onClick={() => {
+                    setSelectedUnitId(null);
+                    setSelectedModuleId(null);
+                  }}
+                >
+                  <Link
+                    to="/feedback"
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    Course Feedback
+                  </Link>
+                </Typography>
                 {selectedUnit && (
                   <>
                     <Typography variant="bodyMedium">/</Typography>
-                    <Typography variant="bodyMedium">
-                      {selectedUnit.title}
+                    <Typography
+                      variant="bodyMedium"
+                      onClick={() => setSelectedModuleId(null)}
+                    >
+                      <Link
+                        to={`/feedback?unitId=${selectedUnit.id}`}
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        {selectedUnit.title}
+                      </Link>
                     </Typography>
                     {selectedModule && (
                       <>
                         <Typography variant="bodyMedium">/</Typography>
                         <Typography variant="bodyMedium">
-                          {selectedModule.title}
+                          <Link
+                            to={`/feedback?unitId=${selectedUnit.id}&moduleId=${selectedModule.id}`}
+                            style={{ textDecoration: "none", color: "inherit" }}
+                          >
+                            {selectedModule.title}
+                          </Link>
                         </Typography>
                       </>
                     )}

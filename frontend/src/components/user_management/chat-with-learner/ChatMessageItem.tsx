@@ -7,7 +7,6 @@ import { formatTimeElasped } from "../../../utils/DateUtils";
 import { isActivityPage, isLessonPage } from "../../../types/CourseTypes";
 import * as Routes from "../../../constants/Routes";
 import NotificationAPIClient from "../../../APIClients/NotificationAPIClient";
-import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 import { questionTypeIcons } from "../../../constants/ActivityLabels";
 
 export default function ChatMessageItem({
@@ -18,7 +17,6 @@ export default function ChatMessageItem({
   refreshNotifs: () => void;
 }) {
   const theme = useTheme();
-  const { courseUnits } = useCourseUnits();
 
   const handleMarkAsRead = async (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -29,14 +27,7 @@ export default function ChatMessageItem({
     refreshNotifs();
   };
 
-  // @ts-expect-error populate gives _id instead of id
-  // eslint-disable-next-line no-underscore-dangle
-  const unit = courseUnits.find((u) => u.id === message.helpRequest.unit._id);
-  const moduleIndex =
-    // @ts-expect-error populate gives _id instead of id
-    // eslint-disable-next-line no-underscore-dangle
-    (unit?.modules.findIndex((m) => m.id === message.helpRequest.module._id) ??
-      -1) + 1;
+  const moduleIndex = message.helpRequest.module.displayIndex;
   const pageIndex =
     (message.helpRequest.module.pages.findIndex(
       // @ts-expect-error populate gives _id instead of id

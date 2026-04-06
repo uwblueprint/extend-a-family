@@ -1171,7 +1171,7 @@ const ViewModulePage = () => {
                   </Typography>
                 )}
               </Box>
-              {role === "Learner" && (
+              {role === "Learner" && !isFeedbackSurveyPage && (
                 <Box display="inline-flex" alignItems="center" gap="20px">
                   <Button
                     sx={{
@@ -1187,35 +1187,33 @@ const ViewModulePage = () => {
                       Need Help?
                     </Typography>
                   </Button>
-                  {!isFeedbackSurveyPage && (
-                    <IconButton
-                      sx={{
-                        border: "1px solid",
-                        borderColor: theme.palette.Neutral[500],
-                        height: "48px",
-                        width: "48px",
-                        padding: "8px",
-                      }}
-                      onClick={() => toggleBookmark(currentPage)}
-                      disabled={isBookmarkLoading}
-                    >
-                      {isCurrentPageBookmarked ? (
-                        <BookmarkIcon
-                          sx={{
-                            fontSize: "24px",
-                            color: theme.palette.Learner.Dark.Default,
-                          }}
-                        />
-                      ) : (
-                        <BookmarkBorderIcon
-                          sx={{
-                            fontSize: "24px",
-                            color: theme.palette.Learner.Dark.Default,
-                          }}
-                        />
-                      )}
-                    </IconButton>
-                  )}
+                  <IconButton
+                    sx={{
+                      border: "1px solid",
+                      borderColor: theme.palette.Neutral[500],
+                      height: "48px",
+                      width: "48px",
+                      padding: "8px",
+                    }}
+                    onClick={() => toggleBookmark(currentPage)}
+                    disabled={isBookmarkLoading}
+                  >
+                    {isCurrentPageBookmarked ? (
+                      <BookmarkIcon
+                        sx={{
+                          fontSize: "24px",
+                          color: theme.palette.Learner.Dark.Default,
+                        }}
+                      />
+                    ) : (
+                      <BookmarkBorderIcon
+                        sx={{
+                          fontSize: "24px",
+                          color: theme.palette.Learner.Dark.Default,
+                        }}
+                      />
+                    )}
+                  </IconButton>
                 </Box>
               )}
             </Box>

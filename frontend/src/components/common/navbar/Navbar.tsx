@@ -34,6 +34,9 @@ export default function Navbar() {
   );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (errorFetchNotifs) {
+      fetchNotifications();
+    }
     setAnchorEl(event.currentTarget);
   };
 
