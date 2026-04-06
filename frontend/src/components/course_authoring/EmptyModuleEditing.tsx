@@ -132,7 +132,7 @@ export const AddYourFirstPageSlide = ({
         width="220px"
         alignItems="center"
         gap="32px"
-        alignSelf="stretch"
+        alignSelf="center"
       >
         <Stack
           direction="column"
