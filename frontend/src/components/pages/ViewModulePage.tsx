@@ -567,8 +567,8 @@ const ViewModulePage = () => {
         updatedBookmarks = await UserAPIClient.deleteBookmark(pageId);
       } else {
         updatedBookmarks = await UserAPIClient.addBookmark(
-          requestedUnitId,
-          requestedModuleId,
+          unit?.id || module.unitId || requestedUnitId,
+          module.id,
           pageId,
         );
       }
