@@ -14,6 +14,7 @@ const Logout = (): React.ReactElement => {
     if (success) {
       setAuthenticatedUser(null);
     }
+    window.history.pushState({}, "", "/");
   };
 
   return (

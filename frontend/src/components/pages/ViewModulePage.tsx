@@ -1,5 +1,12 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   Add,
@@ -31,6 +38,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Document, Page, pdfjs, Thumbnail } from "react-pdf";
+import { PageCallback } from "react-pdf/dist/cjs/shared/types";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { Link, useHistory } from "react-router-dom";
@@ -484,38 +492,38 @@ const ViewModulePage = () => {
     return Math.min(scaleToHeight, scaleToWidth);
   };
 
-  const handleResize = useCallback(() => {
-    if (lessonPageHeight === 0) {
-      setLessonPageHeight(lessonPageRef.current?.clientHeight || 0);
-    }
-    if (lessonPageWidth === 0) {
-      setLessonPageWidth(lessonPageRef.current?.clientWidth || 0);
-    }
-    if (activityPageHeight === 0) {
-      setActivityPageHeight(activityPageRef.current?.clientHeight || 0);
-    }
-    if (activityPageWidth === 0) {
-      setActivityPageWidth(activityPageRef.current?.clientWidth || 0);
-    }
-    setContainerHeight(lessonPageContainerRef.current?.clientHeight || 0);
-    setContainerWidth(
-      Math.min(
-        window.innerWidth,
-        lessonPageContainerRef.current?.clientWidth || 0,
-      ),
-    );
-  }, [
-    activityPageHeight,
-    activityPageWidth,
-    lessonPageHeight,
-    lessonPageWidth,
-  ]);
+  const handleResize = useCallback(
+    (page?: PageCallback) => {
+      if (page) {
+        setLessonPageHeight(page.originalHeight);
+        setLessonPageWidth(page.originalWidth);
+      }
+      if (activityPageHeight === 0) {
+        setActivityPageHeight(activityPageRef.current?.clientHeight || 0);
+      }
+      if (activityPageWidth === 0) {
+        setActivityPageWidth(activityPageRef.current?.clientWidth || 0);
+      }
+      setContainerHeight(lessonPageContainerRef.current?.clientHeight || 0);
+      setContainerWidth(
+        Math.min(
+          window.innerWidth,
+          lessonPageContainerRef.current?.clientWidth || 0,
+        ),
+      );
+    },
+    [activityPageHeight, activityPageWidth],
+  );
 
-  useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
-  }, [handleResize, isFullScreen, lessonPageHeight]);
+  useLayoutEffect(() => {
+    const resizeObserver = new ResizeObserver(() => handleResize());
+    if (lessonPageContainerRef.current) {
+      resizeObserver.observe(lessonPageContainerRef.current);
+    }
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [handleResize, isFullScreen]);
 
   const activityPageScale = isFullScreen
     ? getPageScale(activityPageHeight, activityPageWidth)
@@ -1227,6 +1235,7 @@ const ViewModulePage = () => {
             sx={{ overflow: "hidden", position: "relative" }}
             bgcolor={isFullScreen ? "black" : "white"}
             ref={lessonPageContainerRef}
+            id="lesson-page-container"
           >
             {isEmptyModuleEditing && module && (
               <AddYourFirstPageSlide
