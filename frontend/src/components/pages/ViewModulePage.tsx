@@ -471,6 +471,7 @@ const ViewModulePage = () => {
   }, [currentPage]);
 
   const getPageScale = (pageHeight: number, pageWidth: number) => {
+    console.log({ pageHeight, pageWidth, containerHeight, containerWidth });
     if (
       pageHeight === 0 ||
       containerHeight === 0 ||
@@ -481,6 +482,7 @@ const ViewModulePage = () => {
     }
     const scaleToHeight = containerHeight / pageHeight;
     const scaleToWidth = containerWidth / pageWidth;
+    console.log(Math.min(scaleToHeight, scaleToWidth));
     return Math.min(scaleToHeight, scaleToWidth);
   };
 
@@ -515,7 +517,7 @@ const ViewModulePage = () => {
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, [handleResize, isFullScreen, lessonPageHeight]);
+  }, [handleResize, isFullScreen, currentPageId]);
 
   const activityPageScale = isFullScreen
     ? getPageScale(activityPageHeight, activityPageWidth)
@@ -1227,6 +1229,7 @@ const ViewModulePage = () => {
             sx={{ overflow: "hidden", position: "relative" }}
             bgcolor={isFullScreen ? "black" : "white"}
             ref={lessonPageContainerRef}
+            id="lesson-page-container"
           >
             {isEmptyModuleEditing && module && (
               <AddYourFirstPageSlide
