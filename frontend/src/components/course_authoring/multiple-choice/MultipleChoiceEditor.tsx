@@ -161,7 +161,7 @@ const MultipleChoiceMainEditor = ({
                   minWidth: "auto",
                   width: "auto",
                   "&:hover": {
-                    backgroundColor: "rgba(0, 0, 0, 0.04)",
+                    backgroundColor: theme.palette.Administrator.Light.Hover,
                   },
                 }}
               >
