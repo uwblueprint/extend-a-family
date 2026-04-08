@@ -141,7 +141,9 @@ const MultipleChoiceMainEditor = ({
                 ...(activity.imageUrl
                   ? {
                       backgroundImage: `url(${activity.imageUrl})`,
-                      backgroundSize: "cover",
+                      backgroundSize: "contain",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
                     }
                   : {}),
               }}

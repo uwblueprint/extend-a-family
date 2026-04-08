@@ -41,7 +41,7 @@ export const validateArray = (value: any, type: Type): boolean => {
 };
 
 export const validateFileType = (mimetype: string): boolean => {
-  return allowableContentTypes.has(mimetype);
+  return allowableContentTypes.has(mimetype) || /^image\/.*/.test(mimetype);
 };
 
 export const getApiValidationError = (
