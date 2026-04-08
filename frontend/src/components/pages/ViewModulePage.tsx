@@ -145,8 +145,8 @@ const ViewModulePage = () => {
   const lessonPageContainerRef = useRef<HTMLDivElement>(null);
   const [lessonPageWidth, setLessonPageWidth] = useState<number>(0);
   const [lessonPageHeight, setLessonPageHeight] = useState<number>(0);
-  const [activityPageWidth, setActivityPageWidth] = useState<number>(0);
-  const [activityPageHeight, setActivityPageHeight] = useState<number>(0);
+  const [activityPageWidth, setActivityPageWidth] = useState<number>(778);
+  const [activityPageHeight, setActivityPageHeight] = useState<number>(582);
   const [containerHeight, setContainerHeight] = useState<number>(0);
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const theme = useTheme();
