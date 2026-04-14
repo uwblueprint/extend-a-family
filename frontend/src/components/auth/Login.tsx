@@ -112,6 +112,8 @@ const Login: React.FC<LoginProps> = ({
               {!redirectSignUpPath() && (
                 <Box sx={{ textAlign: "center" }}>
                   <Typography
+                    role="button"
+                    tabIndex={0}
                     variant="labelSmall"
                     style={{
                       color: theme.palette[userRole].Dark.Default,

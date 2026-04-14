@@ -1,6 +1,6 @@
-import React from "react";
-import { Box } from "@mui/material";
 import BookmarkRemoveOutlinedIcon from "@mui/icons-material/BookmarkRemoveOutlined";
+import { Box } from "@mui/material";
+import React from "react";
 
 interface DeleteBookmarkButtonProps {
   onClick?: (e: React.MouseEvent) => void;
@@ -18,6 +18,7 @@ const DeleteBookmarkButton: React.FC<DeleteBookmarkButtonProps> = ({
         top: "10px",
         right: "10px",
         zIndex: 2,
+        tabIndex: 0,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",

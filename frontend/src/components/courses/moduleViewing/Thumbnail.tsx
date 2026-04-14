@@ -2,8 +2,8 @@ import { Box, Typography, useTheme } from "@mui/material";
 import React from "react";
 
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import { padNumber } from "../../../utils/StringUtils";
 import { useUser } from "../../../hooks/useUser";
+import { padNumber } from "../../../utils/StringUtils";
 
 const ModuleSidebarThumbnail = ({
   index,

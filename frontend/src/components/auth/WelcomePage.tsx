@@ -77,7 +77,6 @@ const Welcome = (): React.ReactElement => {
         }}
       >
         <Button
-          disableRipple
           sx={{
             width: "100%",
             height: "100%",

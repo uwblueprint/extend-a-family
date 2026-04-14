@@ -1,17 +1,17 @@
-import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, Drawer, List, Typography, useTheme } from "@mui/material";
-import React, { useEffect, useState } from "react";
 import {
-  verticalListSortingStrategy,
-  SortableContext,
-} from "@dnd-kit/sortable";
-import {
-  DndContext,
   closestCorners,
+  DndContext,
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
 } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import AddIcon from "@mui/icons-material/Add";
+import { Box, Button, Drawer, List, Typography, useTheme } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import CourseAPIClient from "../../../APIClients/CourseAPIClient";
 import { useCourseUnits } from "../../../contexts/CourseUnitsContext";
 import { useUser } from "../../../hooks/useUser";
@@ -201,6 +201,25 @@ export default function UnitSidebar({
     setOverDragUnitId(null);
   };
 
+  const courseUnitElements = courseUnits.map((unit, index) => {
+    return (
+      <Unit
+        key={unit.id}
+        index={index}
+        unit={unit}
+        courseLength={courseUnits.length}
+        handleListItemClick={handleListItemClick}
+        selectedIndex={selectedIndex}
+        userRole={user.role}
+        rearrangeUnitsMode={rearrangeUnitsMode}
+        isAdmin={isAdministrator(user)}
+        handleContextMenuOpen={handleContextMenuOpen}
+        activeDragUnitId={activeDragUnitId}
+        overDragUnitId={overDragUnitId}
+      />
+    );
+  });
+
   return (
     <Drawer
       sx={{
@@ -280,37 +299,24 @@ export default function UnitSidebar({
           <List sx={{ width: "100%" }}>
             <Box sx={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
               <List sx={{ width: "100%" }}>
-                <DndContext
-                  collisionDetection={closestCorners}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDragEnd={handleDragEndWithIndicator}
-                  onDragCancel={handleDragCancel}
-                >
-                  <SortableContext
-                    items={courseUnits.map((u) => u.id)}
-                    strategy={verticalListSortingStrategy}
+                {isAdministrator(user) ? (
+                  <DndContext
+                    collisionDetection={closestCorners}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDragEnd={handleDragEndWithIndicator}
+                    onDragCancel={handleDragCancel}
                   >
-                    {courseUnits.map((unit, index) => {
-                      return (
-                        <Unit
-                          key={unit.id}
-                          index={index}
-                          unit={unit}
-                          courseLength={courseUnits.length}
-                          handleListItemClick={handleListItemClick}
-                          selectedIndex={selectedIndex}
-                          userRole={user.role}
-                          rearrangeUnitsMode={rearrangeUnitsMode}
-                          isAdmin={isAdministrator(user)}
-                          handleContextMenuOpen={handleContextMenuOpen}
-                          activeDragUnitId={activeDragUnitId}
-                          overDragUnitId={overDragUnitId}
-                        />
-                      );
-                    })}
-                  </SortableContext>
-                </DndContext>
+                    <SortableContext
+                      items={courseUnits.map((u) => u.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {courseUnitElements}
+                    </SortableContext>
+                  </DndContext>
+                ) : (
+                  courseUnitElements
+                )}
               </List>
             </Box>
           </List>

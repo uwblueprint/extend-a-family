@@ -1,14 +1,14 @@
 import { useSortable } from "@dnd-kit/sortable";
+import { MoreHoriz } from "@mui/icons-material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import {
-  ListItemText,
-  useTheme,
   IconButton,
   ListItemButton,
+  ListItemText,
+  useTheme,
 } from "@mui/material";
-import { MoreHoriz } from "@mui/icons-material";
-import { CourseUnit } from "../../../types/CourseTypes";
 import { Role } from "../../../types/AuthTypes";
+import { CourseUnit } from "../../../types/CourseTypes";
 
 interface UnitProps {
   index: number;
@@ -39,14 +39,15 @@ export default function Unit({
 }: UnitProps) {
   const theme = useTheme();
   const { id } = unit;
+  const sortable = useSortable({ id });
   const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transition,
-    transform,
-    isDragging,
-  } = useSortable({ id });
+    attributes = {},
+    listeners = {},
+    setNodeRef = undefined,
+    transition = undefined,
+    transform = null,
+    isDragging = false,
+  } = isAdmin ? sortable : {};
 
   const isDropTarget =
     rearrangeUnitsMode && overDragUnitId === id && activeDragUnitId !== id;
@@ -75,6 +76,7 @@ export default function Unit({
       style={style}
       /* eslint-disable react/jsx-props-no-spreading */
       {...attributes}
+      // {...(isAdmin ? attributes : {})}
       sx={{
         borderBottom: 1,
         borderColor: theme.palette.Neutral[300],

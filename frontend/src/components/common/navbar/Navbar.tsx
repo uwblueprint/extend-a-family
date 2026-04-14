@@ -9,8 +9,8 @@ import Toolbar from "@mui/material/Toolbar";
 import React from "react";
 import { Link } from "react-router-dom";
 import { LANDING_PAGE } from "../../../constants/Routes";
-import { useSocket } from "../../../contexts/SocketContext";
 import { useNotifications } from "../../../contexts/NotificationsContext";
+import { useSocket } from "../../../contexts/SocketContext";
 import { useUser } from "../../../hooks/useUser";
 import eafLogo from "../../assets/logoColoured.png";
 import NotificationList from "../../notification/NotificationsList";
@@ -21,6 +21,30 @@ export default function Navbar() {
   const user = useUser();
   const theme = useTheme();
   const socket = useSocket();
+
+  // const handleSkipToMainContent = (
+  //   event: React.MouseEvent<HTMLAnchorElement>,
+  // ) => {
+  //   event.preventDefault();
+  //   const mainContent = document.querySelector<HTMLElement>(
+  //     "#main-content, main, [role='main']",
+  //   );
+
+  //   if (!mainContent) {
+  //     return;
+  //   }
+
+  //   if (!mainContent.hasAttribute("tabindex")) {
+  //     mainContent.setAttribute("tabindex", "-1");
+  //   }
+
+  //   if (!mainContent.id) {
+  //     mainContent.id = "main-content";
+  //   }
+
+  //   mainContent.focus();
+  //   mainContent.scrollIntoView({ block: "start" });
+  // };
 
   const {
     notifications,
@@ -55,6 +79,31 @@ export default function Navbar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
+      {/* <Box
+        component="a"
+        href="#main-content"
+        onClick={handleSkipToMainContent}
+        sx={{
+          position: "absolute",
+          top: "-100px",
+          left: 0,
+          zIndex: theme.zIndex.tooltip,
+          px: 2,
+          py: 1,
+          borderRadius: "0 0 8px 0",
+          bgcolor: theme.palette.Neutral[100],
+          color: theme.palette.Facilitator.Dark.Default,
+          border: `2px solid ${theme.palette.Facilitator.Dark.Default}`,
+          textDecoration: "none",
+          fontWeight: 700,
+          transition: "top 0.2s ease",
+          "&:focus": {
+            top: 0,
+          },
+        }}
+      >
+        Skip to main content
+      </Box> */}
       <AppBar
         position="sticky"
         sx={{

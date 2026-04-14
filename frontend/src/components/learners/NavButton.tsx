@@ -11,7 +11,7 @@ interface NavButtonProps {
 export default function NavButton({ label, icon, href }: NavButtonProps) {
   const theme = useTheme();
   return (
-    <Link to={href || "#"} style={{ textDecoration: "none" }}>
+    <Link to={href || "#"} style={{ textDecoration: "none" }} tabIndex={-1}>
       <Button
         variant="outlined"
         startIcon={icon}

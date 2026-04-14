@@ -827,6 +827,7 @@ const ViewModulePage = () => {
   const SideBar = useMemo(
     () => (
       <Stack
+        aria-label="Module pages sidebar"
         direction="column"
         width="auto"
         minWidth="fit-content"
@@ -883,6 +884,7 @@ const ViewModulePage = () => {
                     height={168}
                     width={224}
                     flexShrink={0}
+                    tabIndex={0}
                     sx={{
                       display: "inline-flex",
                       justifyContent: "center",
@@ -1142,8 +1144,10 @@ const ViewModulePage = () => {
               >
                 <Link
                   to={`${COURSE_PAGE}${unit ? `?selectedUnit=${unit.id}` : ""}`}
+                  role="button"
+                  aria-label="back to library"
                 >
-                  <IconButton>
+                  <IconButton tabIndex={-1}>
                     <ArrowBack sx={{ fontSize: "24px" }} />
                   </IconButton>
                 </Link>
@@ -1492,6 +1496,7 @@ const ViewModulePage = () => {
                 </Button>
               )}
               <IconButton
+                aria-label="Previous page"
                 disabled={currentPage <= 0}
                 onClick={() => setCurrentPage(currentPage - 1)}
                 sx={{
@@ -1514,6 +1519,7 @@ const ViewModulePage = () => {
                 {padNumber(currentPage + 1)}
               </Typography>
               <IconButton
+                aria-label="Next page"
                 disabled={
                   role !== "Administrator" &&
                   (role === "Learner" && module && isModuleCompleted(module.id)

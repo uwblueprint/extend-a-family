@@ -8,8 +8,8 @@ import {
   useTheme,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import CircularProgressWithLabel from "./CircularProgressBar";
 import { useCourseUnits } from "../../contexts/CourseUnitsContext";
+import CircularProgressWithLabel from "./CircularProgressBar";
 
 export default function LearnerUnitSidebar() {
   const theme = useTheme();
@@ -58,8 +58,6 @@ export default function LearnerUnitSidebar() {
           {courseUnits.map((unit, index) => {
             return (
               <ListItem
-                component={Link}
-                to={`/course?selectedUnit=${unit.id}`}
                 key={unit.id}
                 disablePadding
                 sx={{
@@ -73,7 +71,8 @@ export default function LearnerUnitSidebar() {
                 }}
               >
                 <ListItemButton
-                  disableRipple
+                  component={Link}
+                  to={`/course?selectedUnit=${unit.id}`}
                   key={unit.id}
                   sx={{
                     py: "15px",
